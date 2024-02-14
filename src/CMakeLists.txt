@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.27)
-project(OChat)
+project(SynergySpot)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_AUTOMOC ON)
@@ -14,7 +14,7 @@ find_package(Qt6 COMPONENTS
         Widgets
         REQUIRED)
 
-add_executable(OChat main.cpp
+add_executable(SynergySpot main.cpp
         page/base-arch/arch-page/ArchPage.cpp
         page/base-arch/arch-page/ArchPage.h
         page/base-arch/arch-page/ArchPage.ui
@@ -41,7 +41,7 @@ add_executable(OChat main.cpp
         page/land-page/LandPage.h
         page/land-page/LandPage.ui
 )
-target_link_libraries(OChat
+target_link_libraries(SynergySpot
         Qt::Core
         Qt::Gui
         Qt::Widgets
