@@ -17,21 +17,21 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QPushButton" name="name_2">
+      <widget class="QPushButton" name="name">
        <property name="text">
         <string>名称</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="statusOrNum_2">
+      <widget class="QPushButton" name="statusOrNum">
        <property name="text">
         <string>状态/人数</string>
        </property>
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer_3">
+      <spacer name="horizontalSpacer_2">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -44,28 +44,28 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="call_2">
+      <widget class="QPushButton" name="call">
        <property name="text">
         <string>语音通话</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="video_2">
+      <widget class="QPushButton" name="video">
        <property name="text">
         <string>视频通话</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="inviteGroup_2">
+      <widget class="QPushButton" name="inviteGroup">
        <property name="text">
         <string>邀请加群</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="more_2">
+      <widget class="QPushButton" name="more">
        <property name="text">
         <string>更多</string>
        </property>
@@ -74,33 +74,33 @@
     </layout>
    </item>
    <item>
-    <widget class="QListWidget" name="listWidget"/>
+    <widget class="QListView" name="msgList"/>
    </item>
    <item>
-    <layout class="QGridLayout" name="gridLayout_2">
+    <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="1">
-      <widget class="QPushButton" name="screenShot_2">
+      <widget class="QPushButton" name="screenShot">
        <property name="text">
         <string>截图</string>
        </property>
       </widget>
      </item>
      <item row="0" column="3">
-      <widget class="QPushButton" name="pic_2">
+      <widget class="QPushButton" name="pic">
        <property name="text">
         <string>图片</string>
        </property>
       </widget>
      </item>
      <item row="0" column="2">
-      <widget class="QPushButton" name="file_2">
+      <widget class="QPushButton" name="file">
        <property name="text">
         <string>文件</string>
        </property>
       </widget>
      </item>
      <item row="0" column="5">
-      <spacer name="horizontalSpacer_4">
+      <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -113,42 +113,42 @@
       </spacer>
      </item>
      <item row="0" column="0">
-      <widget class="QPushButton" name="emoji_2">
+      <widget class="QPushButton" name="emoji">
        <property name="text">
         <string>表情</string>
        </property>
       </widget>
      </item>
      <item row="0" column="4">
-      <widget class="QPushButton" name="voice_2">
+      <widget class="QPushButton" name="voice">
        <property name="text">
         <string>语音</string>
        </property>
       </widget>
      </item>
      <item row="2" column="7">
-      <widget class="QPushButton" name="pushButton_15">
+      <widget class="QPushButton" name="close">
        <property name="text">
         <string>关闭</string>
        </property>
       </widget>
      </item>
      <item row="0" column="7">
-      <widget class="QPushButton" name="historyMsg_2">
+      <widget class="QPushButton" name="historyMsg">
        <property name="text">
         <string>消息记录</string>
        </property>
       </widget>
      </item>
      <item row="2" column="6">
-      <widget class="QPushButton" name="send_2">
+      <widget class="QPushButton" name="send">
        <property name="text">
         <string>发送</string>
        </property>
       </widget>
      </item>
      <item row="1" column="0" colspan="8">
-      <widget class="QTextEdit" name="textEdit_2">
+      <widget class="QTextEdit" name="textEdit">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>

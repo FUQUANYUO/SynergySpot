@@ -25,8 +25,8 @@ ArchPage::ArchPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::ArchPage) 
 #endif
 
 #ifdef SHOW_MSG_PAGE
-    QListWidget * qwlist = new QListWidget(this);
-    ui->Vlayout->addWidget(qwlist);
+    //QListView * msgView = new QListView(this);
+    //msgView-
 
     //外部独立消息窗口（两种方式不能共存）
     MsgPage * msp = new MsgPage();

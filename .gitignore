@@ -1,4 +1,4 @@
 #clion generate some file or dir
-/src/cmake-build-debug-visual-studio-qt
+/src/cmake-build-debug
 /src/.idea
 /src/.clang-format

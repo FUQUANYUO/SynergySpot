@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>352</width>
+    <width>354</width>
     <height>468</height>
    </rect>
   </property>
@@ -16,24 +16,24 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="6" column="1" colspan="2">
-     <widget class="QPushButton" name="pushButton_3">
+     <widget class="QPushButton" name="recvPasswordBtn">
       <property name="text">
        <string>忘记密码</string>
       </property>
      </widget>
     </item>
     <item row="2" column="0" colspan="3">
-     <widget class="QLineEdit" name="lineEdit_2"/>
+     <widget class="QLineEdit" name="passwordInput"/>
     </item>
     <item row="6" column="0">
-     <widget class="QPushButton" name="pushButton_2">
+     <widget class="QPushButton" name="registerBtn">
       <property name="text">
        <string>注册账号</string>
       </property>
      </widget>
     </item>
     <item row="1" column="2">
-     <widget class="QComboBox" name="comboBox">
+     <widget class="QComboBox" name="selectHisSsid">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
         <horstretch>0</horstretch>
@@ -60,14 +60,14 @@
      </widget>
     </item>
     <item row="3" column="0" colspan="2">
-     <widget class="QRadioButton" name="radioButton">
+     <widget class="QRadioButton" name="checkBox">
       <property name="text">
        <string>已阅读并同意服务协议和隐私保护指引</string>
       </property>
      </widget>
     </item>
     <item row="1" column="0" colspan="2">
-     <widget class="QLineEdit" name="lineEdit">
+     <widget class="QLineEdit" name="ssidInput">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
         <horstretch>0</horstretch>
@@ -83,7 +83,7 @@
      </widget>
     </item>
     <item row="4" column="0" colspan="3">
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="loginBtn">
       <property name="text">
        <string>登录</string>
       </property>

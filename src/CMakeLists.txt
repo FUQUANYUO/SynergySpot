@@ -8,6 +8,28 @@ set(CMAKE_AUTOUIC ON)
 
 set(CMAKE_PREFIX_PATH "D:/QT/6.4.3/msvc2019_64")
 
+# Vcpkg Protobuf
+find_package(protobuf CONFIG REQUIRED)
+
+file(GLOB_RECURSE CoreCpp ${CMAKE_SOURCE_DIR}/core/*.cpp)
+file(GLOB_RECURSE PageCpp ${CMAKE_SOURCE_DIR}/page/*.cpp)
+file(GLOB_RECURSE ProtoCC ${CMAKE_SOURCE_DIR}/protofile/*.cc)
+file(GLOB_RECURSE UtilsCpp ${CMAKE_SOURCE_DIR}/utils/*.cpp)
+file(GLOB_RECURSE PageUi ${CMAKE_SOURCE_DIR}/page/*.ui)
+
+# core
+include_directories(core)
+# lib-common
+include_directories(lib-common/include)
+# page
+include_directories(page)
+# protofile
+include_directories(protofile)
+# utils
+include_directories(utils)
+# protobuf
+include_directories(${Protobuf_INCLUDE_DIRS})
+
 find_package(Qt6 COMPONENTS
         Core
         Gui
@@ -15,33 +37,18 @@ find_package(Qt6 COMPONENTS
         REQUIRED)
 
 add_executable(SynergySpot main.cpp
-        page/base-arch/arch-page/ArchPage.cpp
-        page/base-arch/arch-page/ArchPage.h
-        page/base-arch/arch-page/ArchPage.ui
-        page/base-arch/contact-page/ContactPage.cpp
-        page/base-arch/contact-page/ContactPage.h
-        page/base-arch/contact-page/ContactPage.ui
-        page/base-arch/file-page/FilePage.cpp
-        page/base-arch/file-page/FilePage.h
-        page/base-arch/file-page/FilePage.ui
-        page/base-arch/more-option-page/MoreOptionPage.cpp
-        page/base-arch/more-option-page/MoreOptionPage.h
-        page/base-arch/more-option-page/MoreOptionPage.ui
-        page/base-arch/msg-page/MsgPage.cpp
-        page/base-arch/msg-page/MsgPage.h
-        page/base-arch/msg-page/MsgPage.ui
-        page/base-arch/msg-page/MsgPage.cpp
-        page/base-arch/msg-page/MsgPage.h
-        page/base-arch/msg-page/MsgPage.ui
-        page/base-arch/avatar-page/AvatarPage.cpp
-        page/base-arch/avatar-page/AvatarPage.h
-        page/base-arch/avatar-page/AvatarPage.ui
-        page/base-arch/avatar-page/AvatarPage.h
-        page/land-page/LandPage.cpp
-        page/land-page/LandPage.h
-        page/land-page/LandPage.ui
+        ${CoreCpp}
+        ${PageCpp}
+        ${ProtoCC}
+        ${UtilsCpp}
+        ${PageUi}
 )
-target_link_libraries(SynergySpot
+
+link_libraries(lib-common/lib/yaml-cppd.lib)
+
+target_link_libraries(SynergySpot PRIVATE
+        protobuf::libprotobuf
+        protobuf::libprotobuf-lite
         Qt::Core
         Qt::Gui
         Qt::Widgets
