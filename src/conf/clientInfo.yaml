@@ -1,0 +1,10 @@
+mysql-info:
+ ip: 127.0.0.1
+ port: 3306
+ userName: root
+ password: Fu159753
+ dbName: synergy_spot
+ minSize: 100
+ maxSize: 1024
+ maxIdleTime: 5000
+ timeout: 1000

@@ -8,8 +8,16 @@ set(CMAKE_AUTOUIC ON)
 
 set(CMAKE_PREFIX_PATH "D:/QT/6.4.3/msvc2019_64")
 
+
+# Qt module
+find_package(Qt6 6.4.3 EXACT COMPONENTS
+        Core
+        Gui
+        Widgets
+        REQUIRED)
 # Vcpkg Protobuf
 find_package(protobuf CONFIG REQUIRED)
+
 
 file(GLOB_RECURSE CoreCpp ${CMAKE_SOURCE_DIR}/core/*.cpp)
 file(GLOB_RECURSE PageCpp ${CMAKE_SOURCE_DIR}/page/*.cpp)
@@ -30,11 +38,7 @@ include_directories(utils)
 # protobuf
 include_directories(${Protobuf_INCLUDE_DIRS})
 
-find_package(Qt6 COMPONENTS
-        Core
-        Gui
-        Widgets
-        REQUIRED)
+
 
 add_executable(SynergySpot main.cpp
         ${CoreCpp}
@@ -44,15 +48,27 @@ add_executable(SynergySpot main.cpp
         ${PageUi}
 )
 
-link_libraries(lib-common/lib/yaml-cppd.lib)
+# 使用 yaml 静态库
+target_compile_definitions(SynergySpot PUBLIC
+        YAML_CPP_STATIC_DEFINE
+)
+
+target_link_directories(SynergySpot PRIVATE
+        lib-common/lib
+)
 
 target_link_libraries(SynergySpot PRIVATE
-        protobuf::libprotobuf
-        protobuf::libprotobuf-lite
         Qt::Core
         Qt::Gui
         Qt::Widgets
+        protobuf::libprotobuf
+        protobuf::libprotobuf-lite
+        libmysql
+        yaml-cppd
 )
+
+
+
 
 if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(DEBUG_SUFFIX)
