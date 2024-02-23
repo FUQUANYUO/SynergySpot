@@ -25,6 +25,7 @@ DROP TABLE IF EXISTS `user_private_info`;
 CREATE TABLE `user_private_info`(
     `ssid` VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'ss号',
     `status` VARCHAR(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '在线状态（off 离线，on 在线）',
+    `email` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '验证邮箱',
     `password` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '用户密码',
     PRIMARY KEY (`ssid`) USING BTREE
 )ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '用户私有信息' ROW_FORMAT = DYNAMIC;

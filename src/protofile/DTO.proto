@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package SSDTO;
+
+enum Business_Type{
+    LOGIN = 0;
+    ENROLL = 1;
+    FOWARD_MSG = 2;
+}

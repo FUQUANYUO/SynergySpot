@@ -18,7 +18,6 @@ find_package(Qt6 6.4.3 EXACT COMPONENTS
 # Vcpkg Protobuf
 find_package(protobuf CONFIG REQUIRED)
 
-
 file(GLOB_RECURSE CoreCpp ${CMAKE_SOURCE_DIR}/core/*.cpp)
 file(GLOB_RECURSE PageCpp ${CMAKE_SOURCE_DIR}/page/*.cpp)
 file(GLOB_RECURSE ProtoCC ${CMAKE_SOURCE_DIR}/protofile/*.cc)
@@ -38,7 +37,8 @@ include_directories(utils)
 # protobuf
 include_directories(${Protobuf_INCLUDE_DIRS})
 
-
+# sqlite3 源文件
+add_library(sqlite3 OBJECT lib-common/include/SQLite/sqlite3.c)
 
 add_executable(SynergySpot main.cpp
         ${CoreCpp}
@@ -63,11 +63,10 @@ target_link_libraries(SynergySpot PRIVATE
         Qt::Widgets
         protobuf::libprotobuf
         protobuf::libprotobuf-lite
+        sqlite3
         libmysql
         yaml-cppd
 )
-
-
 
 
 if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)

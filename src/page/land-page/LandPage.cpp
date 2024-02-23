@@ -7,9 +7,19 @@
 #include "LandPage.h"
 #include "ui_LandPage.h"
 
+// enroll_type protobuf
+#include "enroll/EnrollDTO.pb.h"
 
 LandPage::LandPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::LandPage) {
     ui->setupUi(this);
+
+    // 注册账号
+    connect(ui->registerBtn,&QPushButton::clicked,this,[&](){
+
+
+    });
+
+
 }
 
 LandPage::~LandPage() {

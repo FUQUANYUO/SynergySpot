@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+import "DTO.proto";
+
+package SSDTO;
+
+message ForwardMsg_DTO{
+    bytes date_time = 1;
+    bytes recv_ssid = 2;
+    bytes send_ssid = 3;
+    bytes content = 4;
+    bytes ip_sender = 5;
+    SSDTO.Business_Type type = 6;
+}

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>354</width>
-    <height>468</height>
+    <width>360</width>
+    <height>484</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,7 +23,17 @@
      </widget>
     </item>
     <item row="2" column="0" colspan="3">
-     <widget class="QLineEdit" name="passwordInput"/>
+     <widget class="QLineEdit" name="passwordInput">
+      <property name="echoMode">
+       <enum>QLineEdit::Password</enum>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="placeholderText">
+       <string>输入SS号密码</string>
+      </property>
+     </widget>
     </item>
     <item row="6" column="0">
      <widget class="QPushButton" name="registerBtn">
@@ -79,6 +89,12 @@
         <width>310</width>
         <height>0</height>
        </size>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="placeholderText">
+       <string>       输入SS账号</string>
       </property>
      </widget>
     </item>
