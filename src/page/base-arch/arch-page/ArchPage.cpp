@@ -25,9 +25,6 @@ ArchPage::ArchPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::ArchPage) 
 #endif
 
 #ifdef SHOW_MSG_PAGE
-    //QListView * msgView = new QListView(this);
-    //msgView-
-
     //外部独立消息窗口（两种方式不能共存）
     MsgPage * msp = new MsgPage();
     delVec.push_back(msp);
@@ -58,6 +55,10 @@ ArchPage::ArchPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::ArchPage) 
        ap->show();
     });
 #endif
+    // 关闭信号重载
+    connect(this,&ArchPage::over,this,[&](){
+        this->deleteLater();
+    });
 }
 
 ArchPage::~ArchPage() {

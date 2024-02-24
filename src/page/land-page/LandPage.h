@@ -15,11 +15,12 @@ QT_END_NAMESPACE
 
 class LandPage : public QMainWindow {
     Q_OBJECT
-
 public:
     explicit LandPage(QWidget *parent = nullptr);
     ~LandPage() override;
-
+signals:
+    void LAND_SUCCESS();
+    void LAND_FAIL();
 private:
     Ui::LandPage *ui;
 };

@@ -2,7 +2,7 @@
 #include <QDebug>
 #include <iostream>
 
-#include "page/base-arch/arch-page/ArchPage.h"
+#include "page/land-page/LandPage.h"
 #include "db-pool/ConnectionPool.h"
 
 #include "SQLite/sqlite3.h"
@@ -21,10 +21,10 @@ void GetQueryRes(MYSQL_RES * res,const vector<int> &index){
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
-    ArchPage ap;
-    ap.show();
+    LandPage lp;
+    lp.show();
 // 数据库测试
-    ConnectionPool::getConnectPool()->getConnection()->update("insert into user_private_info(`ssid`,`status`,`password`) values('10000001',0,'Fu159753')");
-    GetQueryRes(ConnectionPool::getConnectPool()->getConnection()->query("SELECT `ssid`,`status`,`password` FROM user_private_info"),{0,1,2});
+//    ConnectionPool::getConnectPool()->getConnection()->update("insert into user_private_info(`ssid`,`status`,`password`) values('10000001',0,'Fu159753')");
+//    GetQueryRes(ConnectionPool::getConnectPool()->getConnection()->query("SELECT `ssid`,`status`,`password` FROM user_private_info"),{0,1,2});
     return QApplication::exec();
 }

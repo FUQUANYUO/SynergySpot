@@ -7,7 +7,6 @@
 
 #include <QMainWindow>
 
-
 QT_BEGIN_NAMESPACE
 namespace Ui {
     class RegisterPage;
@@ -16,7 +15,6 @@ QT_END_NAMESPACE
 
 class RegisterPage : public QMainWindow {
     Q_OBJECT
-
 public:
     explicit RegisterPage(QWidget *parent = nullptr);
     ~RegisterPage() override;

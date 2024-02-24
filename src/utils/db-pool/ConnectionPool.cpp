@@ -2,6 +2,9 @@
 #include "yaml-cpp/yaml.h"
 
 #include <thread>
+#include <utility>
+
+extern string yamlPath;
 
 ConnectionPool* ConnectionPool::getConnectPool()
 {
@@ -11,7 +14,7 @@ ConnectionPool* ConnectionPool::getConnectPool()
 
 bool ConnectionPool::parseYamlFile()
 {
-    YAML::Node conf = YAML::LoadFile("../../conf/clientInfo.yaml");
+    YAML::Node conf = YAML::LoadFile(yamlPath);
     if (!conf.IsNull())
     {
         m_ip = conf["mysql-info"]["ip"].as<std::string>();

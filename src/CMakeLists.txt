@@ -51,6 +51,7 @@ add_executable(SynergySpot main.cpp
 # 使用 yaml 静态库
 target_compile_definitions(SynergySpot PUBLIC
         YAML_CPP_STATIC_DEFINE
+        LOC_TEST
 )
 
 target_link_directories(SynergySpot PRIVATE
