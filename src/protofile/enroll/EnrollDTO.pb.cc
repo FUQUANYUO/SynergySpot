@@ -28,6 +28,7 @@ PROTOBUF_CONSTEXPR Enroll_DTO::Enroll_DTO(
   , /*decltype(_impl_.password_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.email_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.ip_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.is_pass_)*/false
   , /*decltype(_impl_.type_)*/0
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct Enroll_DTODefaultTypeInternal {
@@ -55,6 +56,7 @@ const uint32_t TableStruct_EnrollDTO_2eproto::offsets[] PROTOBUF_SECTION_VARIABL
   PROTOBUF_FIELD_OFFSET(::SSDTO::Enroll_DTO, _impl_.user_name_),
   PROTOBUF_FIELD_OFFSET(::SSDTO::Enroll_DTO, _impl_.password_),
   PROTOBUF_FIELD_OFFSET(::SSDTO::Enroll_DTO, _impl_.email_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::Enroll_DTO, _impl_.is_pass_),
   PROTOBUF_FIELD_OFFSET(::SSDTO::Enroll_DTO, _impl_.ip_),
   PROTOBUF_FIELD_OFFSET(::SSDTO::Enroll_DTO, _impl_.type_),
 };
@@ -67,18 +69,18 @@ static const ::_pb::Message* const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_EnrollDTO_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\017EnrollDTO.proto\022\005SSDTO\032\tDTO.proto\"~\n\nE"
-  "nroll_DTO\022\014\n\004SSID\030\001 \001(\014\022\021\n\tuser_name\030\002 \001"
-  "(\014\022\020\n\010password\030\003 \001(\014\022\r\n\005email\030\004 \001(\014\022\n\n\002i"
-  "p\030\005 \001(\014\022\"\n\004type\030\006 \001(\0162\024.SSDTO.Business_T"
-  "ypeb\006proto3"
+  "\n\017EnrollDTO.proto\022\005SSDTO\032\tDTO.proto\"\217\001\n\n"
+  "Enroll_DTO\022\014\n\004ssid\030\001 \001(\014\022\021\n\tuser_name\030\002 "
+  "\001(\014\022\020\n\010password\030\003 \001(\014\022\r\n\005email\030\004 \001(\014\022\017\n\007"
+  "is_pass\030\005 \001(\010\022\n\n\002ip\030\006 \001(\014\022\"\n\004type\030\007 \001(\0162"
+  "\024.SSDTO.Business_Typeb\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_EnrollDTO_2eproto_deps[1] = {
   &::descriptor_table_DTO_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_EnrollDTO_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_EnrollDTO_2eproto = {
-    false, false, 171, descriptor_table_protodef_EnrollDTO_2eproto,
+    false, false, 189, descriptor_table_protodef_EnrollDTO_2eproto,
     "EnrollDTO.proto",
     &descriptor_table_EnrollDTO_2eproto_once, descriptor_table_EnrollDTO_2eproto_deps, 1, 1,
     schemas, file_default_instances, TableStruct_EnrollDTO_2eproto::offsets,
@@ -114,6 +116,7 @@ Enroll_DTO::Enroll_DTO(const Enroll_DTO& from)
     , decltype(_impl_.password_){}
     , decltype(_impl_.email_){}
     , decltype(_impl_.ip_){}
+    , decltype(_impl_.is_pass_){}
     , decltype(_impl_.type_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
@@ -158,7 +161,9 @@ Enroll_DTO::Enroll_DTO(const Enroll_DTO& from)
     _this->_impl_.ip_.Set(from._internal_ip(), 
       _this->GetArenaForAllocation());
   }
-  _this->_impl_.type_ = from._impl_.type_;
+  ::memcpy(&_impl_.is_pass_, &from._impl_.is_pass_,
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.type_) -
+    reinterpret_cast<char*>(&_impl_.is_pass_)) + sizeof(_impl_.type_));
   // @@protoc_insertion_point(copy_constructor:SSDTO.Enroll_DTO)
 }
 
@@ -172,6 +177,7 @@ inline void Enroll_DTO::SharedCtor(
     , decltype(_impl_.password_){}
     , decltype(_impl_.email_){}
     , decltype(_impl_.ip_){}
+    , decltype(_impl_.is_pass_){false}
     , decltype(_impl_.type_){0}
     , /*decltype(_impl_._cached_size_)*/{}
   };
@@ -230,7 +236,9 @@ void Enroll_DTO::Clear() {
   _impl_.password_.ClearToEmpty();
   _impl_.email_.ClearToEmpty();
   _impl_.ip_.ClearToEmpty();
-  _impl_.type_ = 0;
+  ::memset(&_impl_.is_pass_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&_impl_.type_) -
+      reinterpret_cast<char*>(&_impl_.is_pass_)) + sizeof(_impl_.type_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -240,7 +248,7 @@ const char* Enroll_DTO::_InternalParse(const char* ptr, ::_pbi::ParseContext* ct
     uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
-      // bytes SSID = 1;
+      // bytes ssid = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           auto str = _internal_mutable_ssid();
@@ -276,18 +284,26 @@ const char* Enroll_DTO::_InternalParse(const char* ptr, ::_pbi::ParseContext* ct
         } else
           goto handle_unusual;
         continue;
-      // bytes ip = 5;
+      // bool is_pass = 5;
       case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 42)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
+          _impl_.is_pass_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // bytes ip = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 50)) {
           auto str = _internal_mutable_ip();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
-      // .SSDTO.Business_Type type = 6;
-      case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 48)) {
+      // .SSDTO.Business_Type type = 7;
+      case 7:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 56)) {
           uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
           _internal_set_type(static_cast<::SSDTO::Business_Type>(val));
@@ -323,7 +339,7 @@ uint8_t* Enroll_DTO::_InternalSerialize(
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // bytes SSID = 1;
+  // bytes ssid = 1;
   if (!this->_internal_ssid().empty()) {
     target = stream->WriteBytesMaybeAliased(
         1, this->_internal_ssid(), target);
@@ -347,17 +363,23 @@ uint8_t* Enroll_DTO::_InternalSerialize(
         4, this->_internal_email(), target);
   }
 
-  // bytes ip = 5;
-  if (!this->_internal_ip().empty()) {
-    target = stream->WriteBytesMaybeAliased(
-        5, this->_internal_ip(), target);
+  // bool is_pass = 5;
+  if (this->_internal_is_pass() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(5, this->_internal_is_pass(), target);
   }
 
-  // .SSDTO.Business_Type type = 6;
+  // bytes ip = 6;
+  if (!this->_internal_ip().empty()) {
+    target = stream->WriteBytesMaybeAliased(
+        6, this->_internal_ip(), target);
+  }
+
+  // .SSDTO.Business_Type type = 7;
   if (this->_internal_type() != 0) {
     target = stream->EnsureSpace(target);
     target = ::_pbi::WireFormatLite::WriteEnumToArray(
-      6, this->_internal_type(), target);
+      7, this->_internal_type(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -376,7 +398,7 @@ size_t Enroll_DTO::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // bytes SSID = 1;
+  // bytes ssid = 1;
   if (!this->_internal_ssid().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
@@ -404,14 +426,19 @@ size_t Enroll_DTO::ByteSizeLong() const {
         this->_internal_email());
   }
 
-  // bytes ip = 5;
+  // bytes ip = 6;
   if (!this->_internal_ip().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
         this->_internal_ip());
   }
 
-  // .SSDTO.Business_Type type = 6;
+  // bool is_pass = 5;
+  if (this->_internal_is_pass() != 0) {
+    total_size += 1 + 1;
+  }
+
+  // .SSDTO.Business_Type type = 7;
   if (this->_internal_type() != 0) {
     total_size += 1 +
       ::_pbi::WireFormatLite::EnumSize(this->_internal_type());
@@ -449,6 +476,9 @@ void Enroll_DTO::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PRO
   }
   if (!from._internal_ip().empty()) {
     _this->_internal_set_ip(from._internal_ip());
+  }
+  if (from._internal_is_pass() != 0) {
+    _this->_internal_set_is_pass(from._internal_is_pass());
   }
   if (from._internal_type() != 0) {
     _this->_internal_set_type(from._internal_type());
@@ -492,7 +522,12 @@ void Enroll_DTO::InternalSwap(Enroll_DTO* other) {
       &_impl_.ip_, lhs_arena,
       &other->_impl_.ip_, rhs_arena
   );
-  swap(_impl_.type_, other->_impl_.type_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(Enroll_DTO, _impl_.type_)
+      + sizeof(Enroll_DTO::_impl_.type_)
+      - PROTOBUF_FIELD_OFFSET(Enroll_DTO, _impl_.is_pass_)>(
+          reinterpret_cast<char*>(&_impl_.is_pass_),
+          reinterpret_cast<char*>(&other->_impl_.is_pass_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata Enroll_DTO::GetMetadata() const {

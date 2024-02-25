@@ -9,6 +9,7 @@
 #include "register-page/RegisterPage.h"
 #include "base-arch/arch-page/ArchPage.h"
 
+//----------- middle software -----------//
 // enroll_type protobuf
 #include "enroll/EnrollDTO.pb.h"
 // mysql connection pool
@@ -16,6 +17,10 @@
 // parse yaml file
 #include "yaml-cpp/yaml.h"
 
+//-----------      core      -----------//
+
+
+// client info yaml file path
 string yamlPath = "../../conf/clientInfo.yaml";
 
 LandPage::LandPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::LandPage) {
@@ -39,28 +44,29 @@ LandPage::LandPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::LandPage) 
         MYSQL_RES * mRes = ConnectionPool::getConnectPool()->getConnection()->query(sqlStr);
         if(mRes == nullptr) {
             cout <<  __FILE__ << " | " << __LINE__ << " | " << __TIME__ << " | " << "verify error" << endl;
-            emit LAND_FAIL();
+            emit lver.LAND_FAIL();
         }else{
             MYSQL_ROW row;
             while((row = mysql_fetch_row(mRes))){
                 string comS(row[0]);
                 if(comS == inputPassword.toStdString()){
                     cout << "verify success" << endl;
-                    emit LAND_SUCCESS();
+                    emit lver.LAND_SUCCESS();
                 }else{
                     cout <<  __FILE__ << " | " << __LINE__ << " | " << __TIME__ << " | " << "verify error" << endl;
-                    emit LAND_FAIL();
+                    emit lver.LAND_FAIL();
                 }
             }
             mysql_free_result(mRes);
         }
 #else
         // 云端检验
+        lver.verifyInServer(inputSSID.toStdString(),inputPassword.toStdString());
 #endif
     });
 
     // 数据库检验通过
-    connect(this,&LandPage::LAND_SUCCESS,this,[&](){
+    connect(&lver,&LoginVerify::LAND_SUCCESS,this,[&](){
         // 生成框架界面
         auto * ap = new ArchPage();
         ap->show();

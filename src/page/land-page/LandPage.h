@@ -7,6 +7,10 @@
 
 #include <QMainWindow>
 
+//-----------      core      -----------//
+// land-check
+#include "land/land-check/LoginVerify.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
     class LandPage;
@@ -18,11 +22,9 @@ class LandPage : public QMainWindow {
 public:
     explicit LandPage(QWidget *parent = nullptr);
     ~LandPage() override;
-signals:
-    void LAND_SUCCESS();
-    void LAND_FAIL();
 private:
     Ui::LandPage *ui;
+    LoginVerify lver;
 };
 
 

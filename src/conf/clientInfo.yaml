@@ -8,3 +8,6 @@ mysql-info:
  maxSize: 1024
  maxIdleTime: 5000
  timeout: 1000
+server_host_info:
+ ip: 127.0.0.1
+ port: 12992

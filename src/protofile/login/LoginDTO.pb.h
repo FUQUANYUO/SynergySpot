@@ -178,13 +178,14 @@ class Login_DTO final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kSSIDFieldNumber = 1,
+    kSsidFieldNumber = 1,
     kPasswordFieldNumber = 2,
-    kEmailFieldNumber = 3,
-    kIpFieldNumber = 4,
-    kTypeFieldNumber = 5,
+    kEmailFieldNumber = 4,
+    kIpFieldNumber = 5,
+    kIsPassFieldNumber = 3,
+    kTypeFieldNumber = 6,
   };
-  // bytes SSID = 1;
+  // bytes ssid = 1;
   void clear_ssid();
   const std::string& ssid() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -212,7 +213,7 @@ class Login_DTO final :
   std::string* _internal_mutable_password();
   public:
 
-  // bytes email = 3;
+  // bytes email = 4;
   void clear_email();
   const std::string& email() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -226,7 +227,7 @@ class Login_DTO final :
   std::string* _internal_mutable_email();
   public:
 
-  // bytes ip = 4;
+  // bytes ip = 5;
   void clear_ip();
   const std::string& ip() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -240,7 +241,16 @@ class Login_DTO final :
   std::string* _internal_mutable_ip();
   public:
 
-  // .SSDTO.Business_Type type = 5;
+  // bool is_pass = 3;
+  void clear_is_pass();
+  bool is_pass() const;
+  void set_is_pass(bool value);
+  private:
+  bool _internal_is_pass() const;
+  void _internal_set_is_pass(bool value);
+  public:
+
+  // .SSDTO.Business_Type type = 6;
   void clear_type();
   ::SSDTO::Business_Type type() const;
   void set_type(::SSDTO::Business_Type value);
@@ -261,6 +271,7 @@ class Login_DTO final :
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr password_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr email_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr ip_;
+    bool is_pass_;
     int type_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
@@ -278,12 +289,12 @@ class Login_DTO final :
 #endif  // __GNUC__
 // Login_DTO
 
-// bytes SSID = 1;
+// bytes ssid = 1;
 inline void Login_DTO::clear_ssid() {
   _impl_.ssid_.ClearToEmpty();
 }
 inline const std::string& Login_DTO::ssid() const {
-  // @@protoc_insertion_point(field_get:SSDTO.Login_DTO.SSID)
+  // @@protoc_insertion_point(field_get:SSDTO.Login_DTO.ssid)
   return _internal_ssid();
 }
 template <typename ArgT0, typename... ArgT>
@@ -291,11 +302,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void Login_DTO::set_ssid(ArgT0&& arg0, ArgT... args) {
  
  _impl_.ssid_.SetBytes(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:SSDTO.Login_DTO.SSID)
+  // @@protoc_insertion_point(field_set:SSDTO.Login_DTO.ssid)
 }
 inline std::string* Login_DTO::mutable_ssid() {
   std::string* _s = _internal_mutable_ssid();
-  // @@protoc_insertion_point(field_mutable:SSDTO.Login_DTO.SSID)
+  // @@protoc_insertion_point(field_mutable:SSDTO.Login_DTO.ssid)
   return _s;
 }
 inline const std::string& Login_DTO::_internal_ssid() const {
@@ -310,7 +321,7 @@ inline std::string* Login_DTO::_internal_mutable_ssid() {
   return _impl_.ssid_.Mutable(GetArenaForAllocation());
 }
 inline std::string* Login_DTO::release_ssid() {
-  // @@protoc_insertion_point(field_release:SSDTO.Login_DTO.SSID)
+  // @@protoc_insertion_point(field_release:SSDTO.Login_DTO.ssid)
   return _impl_.ssid_.Release();
 }
 inline void Login_DTO::set_allocated_ssid(std::string* ssid) {
@@ -325,7 +336,7 @@ inline void Login_DTO::set_allocated_ssid(std::string* ssid) {
     _impl_.ssid_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:SSDTO.Login_DTO.SSID)
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.Login_DTO.ssid)
 }
 
 // bytes password = 2;
@@ -378,7 +389,27 @@ inline void Login_DTO::set_allocated_password(std::string* password) {
   // @@protoc_insertion_point(field_set_allocated:SSDTO.Login_DTO.password)
 }
 
-// bytes email = 3;
+// bool is_pass = 3;
+inline void Login_DTO::clear_is_pass() {
+  _impl_.is_pass_ = false;
+}
+inline bool Login_DTO::_internal_is_pass() const {
+  return _impl_.is_pass_;
+}
+inline bool Login_DTO::is_pass() const {
+  // @@protoc_insertion_point(field_get:SSDTO.Login_DTO.is_pass)
+  return _internal_is_pass();
+}
+inline void Login_DTO::_internal_set_is_pass(bool value) {
+  
+  _impl_.is_pass_ = value;
+}
+inline void Login_DTO::set_is_pass(bool value) {
+  _internal_set_is_pass(value);
+  // @@protoc_insertion_point(field_set:SSDTO.Login_DTO.is_pass)
+}
+
+// bytes email = 4;
 inline void Login_DTO::clear_email() {
   _impl_.email_.ClearToEmpty();
 }
@@ -428,7 +459,7 @@ inline void Login_DTO::set_allocated_email(std::string* email) {
   // @@protoc_insertion_point(field_set_allocated:SSDTO.Login_DTO.email)
 }
 
-// bytes ip = 4;
+// bytes ip = 5;
 inline void Login_DTO::clear_ip() {
   _impl_.ip_.ClearToEmpty();
 }
@@ -478,7 +509,7 @@ inline void Login_DTO::set_allocated_ip(std::string* ip) {
   // @@protoc_insertion_point(field_set_allocated:SSDTO.Login_DTO.ip)
 }
 
-// .SSDTO.Business_Type type = 5;
+// .SSDTO.Business_Type type = 6;
 inline void Login_DTO::clear_type() {
   _impl_.type_ = 0;
 }

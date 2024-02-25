@@ -8,12 +8,21 @@ set(CMAKE_AUTOUIC ON)
 
 set(CMAKE_PREFIX_PATH "D:/QT/6.4.3/msvc2019_64")
 
+# 设置输出路径
+if(CMAKE_BUILD_TYPE AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
+    set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/out/Debug)
+elseif(CMAKE_BUILD_TYPE AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
+    set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/out/Release)
+endif()
+
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/${CMAKE_}/out)
 
 # Qt module
 find_package(Qt6 6.4.3 EXACT COMPONENTS
         Core
         Gui
         Widgets
+        Network
         REQUIRED)
 # Vcpkg Protobuf
 find_package(protobuf CONFIG REQUIRED)
@@ -51,7 +60,7 @@ add_executable(SynergySpot main.cpp
 # 使用 yaml 静态库
 target_compile_definitions(SynergySpot PUBLIC
         YAML_CPP_STATIC_DEFINE
-        LOC_TEST
+        #LOC_TEST
 )
 
 target_link_directories(SynergySpot PRIVATE
@@ -62,6 +71,7 @@ target_link_libraries(SynergySpot PRIVATE
         Qt::Core
         Qt::Gui
         Qt::Widgets
+        Qt::Network
         protobuf::libprotobuf
         protobuf::libprotobuf-lite
         sqlite3

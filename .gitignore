@@ -2,3 +2,10 @@
 /src/cmake-build-debug
 /src/.idea
 /src/.clang-format
+/server/.idea
+/server/cmake-build-debug-wsl-ubuntu
+/server/.clang-format
+
+# out-put dir
+/server/out
+/src/out

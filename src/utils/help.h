@@ -1,0 +1,13 @@
+//
+// Created by FU-QAQ on 2024/2/25.
+//
+
+#ifndef SYNERGYSPOT_HELP_H
+#define SYNERGYSPOT_HELP_H
+
+#include <iostream>
+
+#define LOG(__STR__) \
+    std::cout << "[" << __FILE__ << "] | in " << __LINE__ << " | at " << __TIME__ << " ] : " << __STR__ << std::endl;
+
+#endif//SYNERGYSPOT_HELP_H

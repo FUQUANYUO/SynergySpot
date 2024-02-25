@@ -5,10 +5,11 @@ import "DTO.proto";
 package SSDTO;
 
 message Enroll_DTO{
-    bytes SSID = 1;
+    bytes ssid = 1;
     bytes user_name = 2;
     bytes password = 3;
     bytes email = 4;
-    bytes ip = 5;
-    SSDTO.Business_Type type = 6;
+    bool is_pass = 5;
+    bytes ip = 6;
+    SSDTO.Business_Type type = 7;
 }
