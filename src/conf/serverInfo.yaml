@@ -1,5 +1,5 @@
 mysql-info:
- ip: 127.0.0.1
+ ip: 172.29.240.1
  port: 3306
  userName: root
  password: Fu159753

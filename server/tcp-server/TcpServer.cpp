@@ -16,6 +16,12 @@ int TcpServer::setListen(unsigned short port) {
     saddr.sin_family = AF_INET;
     saddr.sin_port = htons(port);
     saddr.sin_addr.s_addr = INADDR_ANY;// 0 = 0.0.0.0
+
+    // 端口复用
+    int opt = 1;
+    setsockopt( m_fd, SOL_SOCKET,SO_REUSEADDR,
+               (const void *)&opt, sizeof(opt) );
+
     int ret = bind(m_fd, (struct sockaddr *) &saddr, sizeof(saddr));
     if (ret == -1) {
         perror("bind");

@@ -1,12 +1,15 @@
 #include "Server.h"
 #include "ThreadPool.h"
 #include "yaml-cpp/yaml.h"
-#include <iostream>
 
 #include "../src/protofile/DTO.pb.h"
-#include "../src/protofile/login/LoginDTO.pb.h"
+#include "../src/utils/help.h"
+
+#include "do-business/DoLogin.h"
 
 using namespace std;
+
+std::string yamlPath = "../../src/conf/serverInfo.yaml";
 
 void *working(void *arg) {
     struct SockInfo *pinfo = static_cast<struct SockInfo *>(arg);
@@ -18,22 +21,19 @@ void *working(void *arg) {
 
     // 5. 通信
     while (1) {
-        printf("接收数据: .....\n");
         string dto;
         char business_type;
         pinfo->tcp->recvMsg(dto, business_type);
         if (!dto.empty()) {
-            cout << dto << endl
-                 << endl
-                 << endl;
             //后续用epoll处理接收和发送
             //如果非空，获取数据，判断业务类型，之后调用对应的业务函数,服务器存储qq和对应的tcp
             if (business_type == SSDTO::Business_Type::LOGIN) {
-                SSDTO::Login_DTO ldto;
-                ldto.ParseFromString(dto);
-                cout << ldto.ssid() << "," << ldto.password() << endl;
+                DoLogin dl;
+                string resDto = dl.sendVerifyRes(dl.execVerifyLogin(dto));
+                LOG(resDto)
+                pinfo->tcp->sendMsg(resDto);
             } else {
-                cout << "some error occur!" << endl;
+                LOG("some error occur in parse business!")
             }
         } else {
             break;
@@ -45,7 +45,7 @@ void *working(void *arg) {
 }
 
 int main() {
-    YAML::Node node = YAML::LoadFile("../../src/conf/serverInfo.yaml");
+    YAML::Node node = YAML::LoadFile(yamlPath);
     if (node.IsNull()) return -1;
     int listen_port = node["host-info"]["listen-port"].as<int>();
     // 1. 创建监听的套接字

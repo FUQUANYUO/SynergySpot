@@ -2,6 +2,7 @@
 #include <queue>
 #include <mutex>
 #include <condition_variable>
+#include <atomic>
 #include "MysqlConn.h"
 using namespace std;
 class ConnectionPool

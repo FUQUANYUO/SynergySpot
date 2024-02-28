@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../TcpSocket/TcpSocket.h"
+#include "../tcp-socket/TcpSocket.h"
 
 class TcpServer {
 public:
