@@ -10,15 +10,9 @@
 class LoginVerify : public QObject{
     Q_OBJECT
 public:
-    explicit LoginVerify() = default;
+    explicit LoginVerify(QObject * parent = nullptr);
     ~LoginVerify() = default;
     void verifyInServer(std::string ssid,std::string password);
-signals:
-    void LAND_SUCCESS();
-    void LAND_FAIL();
-private:
-    ClientConServer _ccons;
 };
-
 
 #endif//SYNERGYSPOT_LOGINVERIFY_H

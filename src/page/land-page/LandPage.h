@@ -8,8 +8,9 @@
 #include <QMainWindow>
 
 //-----------      core      -----------//
-// land-check
-#include "land/land-check/LoginVerify.h"
+// business-listen
+#include "base/business-listen/BusinessListen.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -22,9 +23,13 @@ class LandPage : public QMainWindow {
 public:
     explicit LandPage(QWidget *parent = nullptr);
     ~LandPage() override;
+signals:
 private:
     Ui::LandPage *ui;
-    LoginVerify lver;
+    // 向服务端提交验证信息
+    LoginVerify *lver;
+    // 监听服务端返回的信息
+    BusinessListen *bl;
 };
 
 

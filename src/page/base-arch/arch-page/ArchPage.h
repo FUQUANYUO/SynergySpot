@@ -8,6 +8,7 @@
 #include <QMainWindow>
 #include <QtWidgets>
 
+#include "base/business-listen/BusinessListen.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -24,13 +25,17 @@ protected:
         emit over();
     }
 public:
-    explicit ArchPage(QWidget *parent = nullptr);
+    explicit ArchPage(QObject * obj = nullptr,QWidget *parent = nullptr);
+    BusinessListen * getBusinessObj();
     ~ArchPage() override;
 signals:
     void over();    // 关闭释放资源信号
 private:
-    std::vector<QWidget*> delVec;
+    std::vector<QObject*> delVec;
     Ui::ArchPage *ui;
+
+    // 监听服务端事务
+    BusinessListen * bl;
 };
 
 

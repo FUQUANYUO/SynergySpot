@@ -23,3 +23,6 @@ QTcpSocket *ClientConServer::getQSocket() {
 void ClientConServer::ConnToSer() {
     _qSocket.connectToHost(_host_ip,_port);
 }
+ClientConServer::~ClientConServer() {
+    _qSocket.deleteLater();
+}

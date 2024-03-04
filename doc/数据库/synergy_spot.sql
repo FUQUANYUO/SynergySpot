@@ -100,6 +100,7 @@ CREATE TABLE `user_message` (
     `friendship_id` VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT '好友关系表外键',
     `group_member_id` VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT '群成员关系表外键',
     `content` VARCHAR(9000) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '消息内容',
+    `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `friendship_id_index`(`friendship_id` ASC) USING BTREE,
     INDEX `group_member_id_index`(`group_member_id` ASC) USING BTREE

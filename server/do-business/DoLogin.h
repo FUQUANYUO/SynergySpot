@@ -13,7 +13,7 @@ public:
     ~DoLogin() = default;
 
     // 执行SQL
-    bool execVerifyLogin(const std::string& dto);
+    bool execVerifyLogin(const std::string &dto,std::string &ssid);
 
     // 查询结果包装为dto 返回值为protobuf序列化值
     std::string sendVerifyRes(bool isPass);

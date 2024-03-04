@@ -4,9 +4,9 @@ mysql-info:
  userName: root
  password: Fu159753
  dbName: synergy_spot
- minSize: 100
+ minSize: 10
  maxSize: 1024
- maxIdleTime: 5000
- timeout: 1000
+ maxIdleTime: 60 # 最大空闲事件（单位秒）
+ timeout: 100    # 连接超时时间（单位毫秒）
 host-info:
  listen-port: 12992

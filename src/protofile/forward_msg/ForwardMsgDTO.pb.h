@@ -183,7 +183,8 @@ class ForwardMsg_DTO final :
     kSendSsidFieldNumber = 3,
     kContentFieldNumber = 4,
     kIpSenderFieldNumber = 5,
-    kTypeFieldNumber = 6,
+    kIsForwardSuccessFieldNumber = 6,
+    kTypeFieldNumber = 7,
   };
   // bytes date_time = 1;
   void clear_date_time();
@@ -255,7 +256,16 @@ class ForwardMsg_DTO final :
   std::string* _internal_mutable_ip_sender();
   public:
 
-  // .SSDTO.Business_Type type = 6;
+  // bool is_forward_success = 6;
+  void clear_is_forward_success();
+  bool is_forward_success() const;
+  void set_is_forward_success(bool value);
+  private:
+  bool _internal_is_forward_success() const;
+  void _internal_set_is_forward_success(bool value);
+  public:
+
+  // .SSDTO.Business_Type type = 7;
   void clear_type();
   ::SSDTO::Business_Type type() const;
   void set_type(::SSDTO::Business_Type value);
@@ -277,6 +287,7 @@ class ForwardMsg_DTO final :
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr send_ssid_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr content_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr ip_sender_;
+    bool is_forward_success_;
     int type_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
@@ -544,7 +555,27 @@ inline void ForwardMsg_DTO::set_allocated_ip_sender(std::string* ip_sender) {
   // @@protoc_insertion_point(field_set_allocated:SSDTO.ForwardMsg_DTO.ip_sender)
 }
 
-// .SSDTO.Business_Type type = 6;
+// bool is_forward_success = 6;
+inline void ForwardMsg_DTO::clear_is_forward_success() {
+  _impl_.is_forward_success_ = false;
+}
+inline bool ForwardMsg_DTO::_internal_is_forward_success() const {
+  return _impl_.is_forward_success_;
+}
+inline bool ForwardMsg_DTO::is_forward_success() const {
+  // @@protoc_insertion_point(field_get:SSDTO.ForwardMsg_DTO.is_forward_success)
+  return _internal_is_forward_success();
+}
+inline void ForwardMsg_DTO::_internal_set_is_forward_success(bool value) {
+  
+  _impl_.is_forward_success_ = value;
+}
+inline void ForwardMsg_DTO::set_is_forward_success(bool value) {
+  _internal_set_is_forward_success(value);
+  // @@protoc_insertion_point(field_set:SSDTO.ForwardMsg_DTO.is_forward_success)
+}
+
+// .SSDTO.Business_Type type = 7;
 inline void ForwardMsg_DTO::clear_type() {
   _impl_.type_ = 0;
 }

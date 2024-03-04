@@ -8,6 +8,6 @@
 #include <iostream>
 
 #define LOG(__STR__) \
-    std::cout << "[" << __FILE__ << "] | in " << __LINE__ << " | at " << __TIME__ << " ] : " << __STR__ << std::endl;
+    std::cout << "[" << __FILE__ << "] |in " << __LINE__ << " line |at " << __TIME__ << "] : " << __STR__ << std::endl;
 
 #endif//SYNERGYSPOT_HELP_H

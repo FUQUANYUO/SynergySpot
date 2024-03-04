@@ -7,8 +7,8 @@ public:
     TcpSocket(int socket);
     ~TcpSocket();
     int connectToHost(std::string ip, unsigned short port);
-    int sendMsg(std::string msg);
-    void recvMsg(std::string &msg, char &business_type);
+    int sendMsg(std::string msg,char business_type);
+    int recvMsg(std::string &msg, char &business_type);
 
 private:
     int readn(char *buf, int size);

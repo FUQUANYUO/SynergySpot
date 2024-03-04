@@ -40,9 +40,9 @@ void ConnectionPool::produceConnection()
         {
             m_cond.wait(locker);
         }
-        if(m_connection_cnt >= m_maxSize)
-            continue;
-        addConnection();
+        if(m_connection_cnt < m_maxSize){
+            addConnection();
+        }
         m_cond.notify_all();
     }
 }
@@ -52,15 +52,15 @@ void ConnectionPool::recycleConnection()
     while (true)
     {
         this_thread::sleep_for(chrono::milliseconds(m_maxIdleTime));
-        lock_guard<mutex> locker(m_mutexQ);
-        while (m_connection_cnt)
+        unique_lock<mutex> locker(m_mutexQ);
+        while (m_connection_cnt > m_minSize)
         {
             MysqlConn* conn = m_connectionQ.front();
-            if (conn->getAliveTime() >= m_maxIdleTime)
+            if (conn->getAliveTime() >= (m_maxIdleTime * 1000))
             {
                 m_connectionQ.pop();
-                delete conn;
                 --m_connection_cnt;
+                delete conn;
             }
             else
             {
@@ -88,28 +88,19 @@ shared_ptr<MysqlConn> ConnectionPool::getConnection()
         {
             if (m_connectionQ.empty())
             {
-                continue;
+                LOG("get available connection time out...")
+                return nullptr;
             }
         }
     }
     shared_ptr<MysqlConn> connptr(m_connectionQ.front(), [this](MysqlConn* conn) {
-        lock_guard<mutex> locker(m_mutexQ);
+        unique_lock<mutex> locker(m_mutexQ);
         conn->refreshAliveTime();
         m_connectionQ.push(conn);
         });
     m_connectionQ.pop();
     m_cond.notify_all();
     return connptr;
-}
-
-ConnectionPool::~ConnectionPool()
-{
-    while (!m_connectionQ.empty())
-    {
-        MysqlConn* conn = m_connectionQ.front();
-        m_connectionQ.pop();
-        delete conn;
-    }
 }
 
 ConnectionPool::ConnectionPool()

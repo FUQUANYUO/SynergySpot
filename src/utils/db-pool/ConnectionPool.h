@@ -12,7 +12,6 @@ public:
     ConnectionPool(const ConnectionPool& obj) = delete;
     ConnectionPool& operator=(const ConnectionPool& obj) = delete;
     shared_ptr<MysqlConn> getConnection();
-    ~ConnectionPool();
 private:
     ConnectionPool();
     bool parseYamlFile();
@@ -30,7 +29,7 @@ private:
     int m_maxIdleTime;       // 连接池中连接的最大空闲时长
     int m_timeout;           // 连接池获取连接的超时时长
 
-    atomic<int> m_connection_cnt;   // 现在拥有的连接数
+    atomic_int m_connection_cnt;   // 现在拥有的连接数
 
     queue<MysqlConn*> m_connectionQ;
     mutex m_mutexQ;

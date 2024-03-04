@@ -6,7 +6,9 @@
 #define OCHAT_MSGPAGE_H
 
 #include <QWidget>
+#include <QThread>
 
+#include "base/message-list/MessageList.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -16,13 +18,12 @@ QT_END_NAMESPACE
 
 class MsgPage : public QWidget {
     Q_OBJECT
-
 public:
-    explicit MsgPage(QWidget *parent = nullptr);
+    explicit MsgPage(MessageList * ml,QWidget *parent = nullptr);
     ~MsgPage() override;
-
 private:
     Ui::MsgPage *ui;
+    std::string _sendTo = "";
 };
 
 

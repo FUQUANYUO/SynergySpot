@@ -8,9 +8,10 @@
 #include "../../src/protofile/login/LoginDTO.pb.h"
 
 
-bool DoLogin::execVerifyLogin(const std::string& dto) {
+bool DoLogin::execVerifyLogin(const std::string& dto,std::string &ssid) {
     SSDTO::Login_DTO ldto;
     ldto.ParseFromString(dto);
+    ssid = ldto.ssid();
     char sqlStr[100];
     sprintf(sqlStr,"SELECT `password` from user_private_info WHERE `ssid`='%s'",
             ldto.ssid().c_str());

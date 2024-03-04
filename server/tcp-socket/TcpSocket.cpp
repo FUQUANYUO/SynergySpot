@@ -33,19 +33,21 @@ int TcpSocket::connectToHost(string ip, unsigned short port) {
     return ret;
 }
 
-int TcpSocket::sendMsg(string msg) {
+int TcpSocket::sendMsg(std::string msg,char business_type) {
     // 申请内存空间: 数据长度 + 包头4字节(存储数据长度)
-    char *data = new char[msg.size() + 4];
+    char *data = new char[msg.size() + 8];
     int bigLen = htonl(msg.size());
+    int bigType = htonl(business_type);
     memcpy(data, &bigLen, 4);
-    memcpy(data + 4, msg.data(), msg.size());
+    memcpy(data + 4,&bigType,4);
+    memcpy(data + 8, msg.data(), msg.size());
     // 发送数据
-    int ret = writen(data, msg.size() + 4);
+    int ret = writen(data, msg.size() + 8);
     delete[] data;
     return ret;
 }
 
-void TcpSocket::recvMsg(string &msg, char &business_type) {
+int TcpSocket::recvMsg(string &msg, char &business_type) {
     // 接收数据
     // 1. 读数据头
     int len = 0;
@@ -61,11 +63,12 @@ void TcpSocket::recvMsg(string &msg, char &business_type) {
     if (ret != len) {
         msg = "";
         business_type = -1;
-        return;
+        return 0;
     }
     buf[len] = '\0';
     msg = buf;
     delete[] buf;
+    return 1;
 }
 
 int TcpSocket::readn(char *buf, int size) {

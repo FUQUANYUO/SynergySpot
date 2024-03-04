@@ -13,7 +13,7 @@ public:
     explicit ClientConServer();
     QTcpSocket *getQSocket();
     void ConnToSer();
-    ~ClientConServer() = default;
+    ~ClientConServer();
 private:
     QString _host_ip;
     qintptr _port;

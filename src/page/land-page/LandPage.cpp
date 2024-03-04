@@ -23,8 +23,12 @@
 // client info yaml file path
 string yamlPath = "../../conf/clientInfo.yaml";
 
+std::string CurSSID;
+
 LandPage::LandPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::LandPage) {
     ui->setupUi(this);
+    bl = new BusinessListen();
+    lver = new LoginVerify(bl);
 
     // 注册账号
     connect(ui->registerBtn,&QPushButton::clicked,this,[&](){
@@ -35,6 +39,9 @@ LandPage::LandPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::LandPage) 
     connect(ui->loginBtn,&QPushButton::clicked,this,[&](){
         QString inputSSID = ui->ssidInput->text();
         QString inputPassword = ui->passwordInput->text();
+
+        // 连接服务端
+        emit bl->CONTOSER();
 
 #ifdef LOC_TEST
         // 本地检验
@@ -61,14 +68,15 @@ LandPage::LandPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::LandPage) 
         }
 #else
         // 云端检验
-        lver.verifyInServer(inputSSID.toStdString(),inputPassword.toStdString());
+        CurSSID = ui->ssidInput->text().toStdString();
+        lver->verifyInServer(inputSSID.toStdString(),inputPassword.toStdString());
 #endif
     });
 
     // 数据库检验通过
-    connect(&lver,&LoginVerify::LAND_SUCCESS,this,[&](){
+    connect(bl,&BusinessListen::LAND_SUCCESS,this,[=](){
         // 生成框架界面
-        auto * ap = new ArchPage();
+        auto * ap = new ArchPage(bl);
         ap->show();
         // 关闭登录页面
         this->close();
@@ -76,5 +84,6 @@ LandPage::LandPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::LandPage) 
 }
 
 LandPage::~LandPage() {
+    delete lver;
     delete ui;
 }

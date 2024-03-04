@@ -4,31 +4,16 @@
 
 #ifndef SYNERGYSPOT_MESSAGELIST_H
 #define SYNERGYSPOT_MESSAGELIST_H
+#include <QListView>
 
-#include <QStyledItemDelegate>
-#include <QStandardItemModel>
-
-// Listview Model
-class MessageListModel : QStandardItemModel
-{
+class MessageList : public QObject{
+    Q_OBJECT
 public:
-    MessageListModel(QObject *parent = nullptr);
-};
-
-// delegate
-class MessageListDelegate : public QStyledItemDelegate
-{
-public:
-    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-
-    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-};
-
-
-class MessageList {
-public:
-    MessageList();
+    MessageList() = default;
+    MessageList(QListView &lv);
     ~MessageList() = default;
+signals:
+    void SelectedMsgItem(std::string ssid);
 };
 
 
