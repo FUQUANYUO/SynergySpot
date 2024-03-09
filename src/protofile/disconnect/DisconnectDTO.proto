@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+import "DTO.proto";
+
+package SSDTO;
+
+message Disconnect_DTO{
+    bytes ssid = 1;
+    bytes ip = 2;
+    SSDTO.Business_Type type = 3;
+};

@@ -27,3 +27,6 @@ void LoginVerify::verifyInServer(std::string ssid, std::string password) {
 
 LoginVerify::LoginVerify(QObject * parent) : QObject(parent){
 }
+
+LoginVerify::~LoginVerify() {
+}

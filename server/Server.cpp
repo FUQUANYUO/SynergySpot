@@ -35,6 +35,8 @@ void *working(void *arg) {
         if (!dto.empty() && res != 0) {
             //后续用epoll处理接收和发送
             //如果非空，获取数据，判断业务类型，之后调用对应的业务函数,服务器存储qq和对应的tcp
+
+            // 登录
             if (business_type == SSDTO::Business_Type::LOGIN) {
                 DoLogin dl;
                 bool isPass = dl.execVerifyLogin(dto,ssid);
@@ -49,9 +51,14 @@ void *working(void *arg) {
                     break;
                 }
             }
+            // 消息转发
             else if(business_type == SSDTO::Business_Type::FOWARD_MSG){
                 DoForwardMsg dfmsg;
                 dfmsg.execForward(dto);
+            }
+            // 连接断开
+            else if(business_type == SSDTO::Business_Type::DISCONNECT){
+                break;
             }
             else {
                 LOG("some error occur in parse business!")

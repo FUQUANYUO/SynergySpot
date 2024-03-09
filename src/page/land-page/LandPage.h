@@ -27,7 +27,7 @@ signals:
 private:
     Ui::LandPage *ui;
     // 向服务端提交验证信息
-    LoginVerify *lver;
+    LoginVerify* lver;
     // 监听服务端返回的信息
     BusinessListen *bl;
 };

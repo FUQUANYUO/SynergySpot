@@ -10,12 +10,17 @@
 
 #include "land/land-check/LoginVerify.h"
 
+
 extern std::string CurSSID;
 
 BusinessListen::BusinessListen() {
     _t = new QThread;
     allocBusiness = new DoBusiness::AllocBusiness();
     allocBusiness->moveToThread(_t);
+
+    /*
+     *  需要操作子线程的socket需要通过信号与槽机制，最好是在ConToSer这个槽函数中注册这些事件
+     * */
 
     // 建立连接
     connect(this,&BusinessListen::CONTOSER,allocBusiness,&DoBusiness::AllocBusiness::ConToSer);
@@ -28,10 +33,10 @@ BusinessListen::BusinessListen() {
     connect(this,&BusinessListen::FORWARD_MSG,allocBusiness,&DoBusiness::AllocBusiness::ForwardBySer);
 
     // 转发子线程的信号
-    connect(allocBusiness,&DoBusiness::AllocBusiness::LAND_SUCCESS,this,[&](){
+    connect(allocBusiness,&DoBusiness::AllocBusiness::LAND_SUCCESS,this,[=](){
         emit LAND_SUCCESS();
     });
-    connect(allocBusiness,&DoBusiness::AllocBusiness::LAND_FAIL,this,[&](){
+    connect(allocBusiness,&DoBusiness::AllocBusiness::LAND_FAIL,this,[=](){
         emit LAND_FAIL();
     });
     connect(allocBusiness,&DoBusiness::AllocBusiness::RECV_MSG,this,[=](std::string rawFmdto){
@@ -44,10 +49,11 @@ BusinessListen::BusinessListen() {
 
 
 BusinessListen::~BusinessListen() {
+    emit allocBusiness->DISCONNECTFROMSER();
+    _t->wait(100);
     _t->requestInterruption();
     _t->quit();
-    _t->wait();
-    delete _t;
+    _t->deleteLater();
 }
 
 DoBusiness::RecvMsgTask::RecvMsgTask(QObject * parent,std::string dto) : QObject(parent), dto(std::move(dto)){
@@ -142,4 +148,27 @@ void DoBusiness::AllocBusiness::ConToSer() {
     connect(_ccon->getQSocket(),&QTcpSocket::readyRead,this,[&](){
         emit BUSINESSTODO();
     });
+
+    // 断开信号
+    connect(this,&AllocBusiness::DISCONNECTFROMSER,this,&AllocBusiness::DisConnFromSer);
+}
+
+void DoBusiness::AllocBusiness::DisConnFromSer() {
+    // 发送离线通知
+    std::string outDisdto;
+    SSDTO::Disconnect_DTO ddto;
+    ddto.set_ssid(CurSSID);
+    ddto.set_ip("");
+    ddto.set_type(SSDTO::Business_Type::DISCONNECT);
+    ddto.SerializeToString(&outDisdto);
+
+    QByteArray packet;
+    QDataStream stream(&packet,QIODevice::WriteOnly);
+    stream << static_cast<quint32>(outDisdto.size());
+    stream << static_cast<quint8>(SSDTO::Business_Type::DISCONNECT);
+    packet.append(outDisdto.c_str(),outDisdto.size());
+    _ccon->getQSocket()->write(packet);
+    _ccon->getQSocket()->waitForBytesWritten();
+    LOG("disconnect notice has been send to server...")
+    this->~AllocBusiness();
 }

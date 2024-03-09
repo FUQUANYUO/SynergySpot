@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+import "DTO.proto";
+
+package SSDTO;
+
+message FriendInfo{
+    bytes ssid = 1;
+    bytes nickname = 2;
+}
+
+message GetFriendList_DTO{
+    bytes request_ssid = 1;
+    repeated FriendInfo friend_infos = 2;
+    bytes ip = 3;
+    SSDTO.Business_Type type = 4;
+}
+
+message AddFriend_DTO{
+    bytes add_ssid = 1;
+    bytes ip = 2;
+    SSDTO.Business_Type type = 3;
+}

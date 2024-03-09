@@ -6,4 +6,5 @@ enum Business_Type{
     LOGIN = 0;
     ENROLL = 1;
     FOWARD_MSG = 2;
+    DISCONNECT = 3;
 }

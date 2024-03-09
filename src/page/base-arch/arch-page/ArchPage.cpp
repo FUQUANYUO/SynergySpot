@@ -68,6 +68,7 @@ ArchPage::ArchPage(QObject * obj,QWidget *parent) : QMainWindow(parent), ui(new 
 #endif
     // 关闭信号重载
     connect(this,&ArchPage::over,this,[&](){
+        bl->~BusinessListen();
         this->deleteLater();
     });
 }
@@ -77,7 +78,6 @@ ArchPage::~ArchPage() {
         it->deleteLater();
     }
     delete ui;
-    bl->~BusinessListen();
 }
 
 BusinessListen* ArchPage::getBusinessObj() {

@@ -11,7 +11,7 @@ class LoginVerify : public QObject{
     Q_OBJECT
 public:
     explicit LoginVerify(QObject * parent = nullptr);
-    ~LoginVerify() = default;
+    ~LoginVerify();
     void verifyInServer(std::string ssid,std::string password);
 };
 

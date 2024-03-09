@@ -29,7 +29,6 @@ LandPage::LandPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::LandPage) 
     ui->setupUi(this);
     bl = new BusinessListen();
     lver = new LoginVerify(bl);
-
     // 注册账号
     connect(ui->registerBtn,&QPushButton::clicked,this,[&](){
         auto * rgPage = new RegisterPage(this);
@@ -40,37 +39,38 @@ LandPage::LandPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::LandPage) 
         QString inputSSID = ui->ssidInput->text();
         QString inputPassword = ui->passwordInput->text();
 
-        // 连接服务端
-        emit bl->CONTOSER();
-
+        if(!inputSSID.isEmpty() && !inputPassword.isEmpty()){
+            // 连接服务端
+            emit bl->CONTOSER();
 #ifdef LOC_TEST
-        // 本地检验
-        char sqlStr[100];
-        sprintf(sqlStr,"SELECT `password` from user_private_info WHERE `ssid`='%s'",
-                inputSSID.toStdString().c_str());
-        MYSQL_RES * mRes = ConnectionPool::getConnectPool()->getConnection()->query(sqlStr);
-        if(mRes == nullptr) {
-            cout <<  __FILE__ << " | " << __LINE__ << " | " << __TIME__ << " | " << "verify error" << endl;
-            emit lver.LAND_FAIL();
-        }else{
-            MYSQL_ROW row;
-            while((row = mysql_fetch_row(mRes))){
-                string comS(row[0]);
-                if(comS == inputPassword.toStdString()){
-                    cout << "verify success" << endl;
-                    emit lver.LAND_SUCCESS();
-                }else{
-                    cout <<  __FILE__ << " | " << __LINE__ << " | " << __TIME__ << " | " << "verify error" << endl;
-                    emit lver.LAND_FAIL();
+            // 本地检验
+            char sqlStr[100];
+            sprintf(sqlStr,"SELECT `password` from user_private_info WHERE `ssid`='%s'",
+                    inputSSID.toStdString().c_str());
+            MYSQL_RES * mRes = ConnectionPool::getConnectPool()->getConnection()->query(sqlStr);
+            if(mRes == nullptr) {
+                cout <<  __FILE__ << " | " << __LINE__ << " | " << __TIME__ << " | " << "verify error" << endl;
+                emit lver.LAND_FAIL();
+            }else{
+                MYSQL_ROW row;
+                while((row = mysql_fetch_row(mRes))){
+                    string comS(row[0]);
+                    if(comS == inputPassword.toStdString()){
+                        cout << "verify success" << endl;
+                        emit lver.LAND_SUCCESS();
+                    }else{
+                        cout <<  __FILE__ << " | " << __LINE__ << " | " << __TIME__ << " | " << "verify error" << endl;
+                        emit lver.LAND_FAIL();
+                    }
                 }
+                mysql_free_result(mRes);
             }
-            mysql_free_result(mRes);
-        }
 #else
-        // 云端检验
-        CurSSID = ui->ssidInput->text().toStdString();
-        lver->verifyInServer(inputSSID.toStdString(),inputPassword.toStdString());
+            // 云端检验
+            CurSSID = ui->ssidInput->text().toStdString();
+            lver->verifyInServer(inputSSID.toStdString(),inputPassword.toStdString());
 #endif
+        }
     });
 
     // 数据库检验通过
@@ -84,6 +84,5 @@ LandPage::LandPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::LandPage) 
 }
 
 LandPage::~LandPage() {
-    delete lver;
     delete ui;
 }

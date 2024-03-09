@@ -11,6 +11,7 @@
 
 //-----------      proto-file -----------//
 #include "forward_msg/ForwardMsgDTO.pb.h"
+#include "disconnect/DisconnectDTO.pb.h"
 #include "login/LoginDTO.pb.h"
 
 //-----------      core      -----------//
@@ -26,6 +27,9 @@ namespace DoBusiness{
         ~AllocBusiness();
         void run();
     public slots:
+        // 断开连接
+        void DisConnFromSer();
+
         // 连接服务端
         void ConToSer();
 
@@ -35,6 +39,9 @@ namespace DoBusiness{
         // 转发信息
         void ForwardBySer(const std::string& outFmdto);
     signals:
+        // 断开连接
+        void DISCONNECTFROMSER();
+
         // 未读业务
         void BUSINESSTODO();
 
