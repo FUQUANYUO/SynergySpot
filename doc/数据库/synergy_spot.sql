@@ -79,9 +79,9 @@ DROP TABLE IF EXISTS `user_contact_info`;
 CREATE TABLE `user_contact_info` (
     `id` INT AUTO_INCREMENT,
     `ssid` VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'ss号',
-    `friendship_id` INT NOT NULL UNIQUE COMMENT '好友关系表外键',
+    `friendship_id` INT COMMENT '好友关系表外键',
     `friendship_remark` VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT '关系备注',
-    `group_id` INT NOT NULL UNIQUE COMMENT '群组关系表外键',
+    `group_id` INT COMMENT '群组关系表外键',
     `group_remark` VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT '群组备注',
     `user_name_in_group` VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT '群昵称',
     `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',

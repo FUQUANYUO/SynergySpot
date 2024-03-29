@@ -187,7 +187,9 @@ class FriendInfo final :
 
   enum : int {
     kSsidFieldNumber = 1,
-    kNicknameFieldNumber = 2,
+    kNicknameFieldNumber = 3,
+    kRemarkFieldNumber = 4,
+    kIsGroupFieldNumber = 2,
   };
   // bytes ssid = 1;
   void clear_ssid();
@@ -203,7 +205,7 @@ class FriendInfo final :
   std::string* _internal_mutable_ssid();
   public:
 
-  // bytes nickname = 2;
+  // bytes nickname = 3;
   void clear_nickname();
   const std::string& nickname() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -217,6 +219,29 @@ class FriendInfo final :
   std::string* _internal_mutable_nickname();
   public:
 
+  // bytes remark = 4;
+  void clear_remark();
+  const std::string& remark() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_remark(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_remark();
+  PROTOBUF_NODISCARD std::string* release_remark();
+  void set_allocated_remark(std::string* remark);
+  private:
+  const std::string& _internal_remark() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_remark(const std::string& value);
+  std::string* _internal_mutable_remark();
+  public:
+
+  // bool is_group = 2;
+  void clear_is_group();
+  bool is_group() const;
+  void set_is_group(bool value);
+  private:
+  bool _internal_is_group() const;
+  void _internal_set_is_group(bool value);
+  public:
+
   // @@protoc_insertion_point(class_scope:SSDTO.FriendInfo)
  private:
   class _Internal;
@@ -227,6 +252,8 @@ class FriendInfo final :
   struct Impl_ {
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr ssid_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr nickname_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr remark_;
+    bool is_group_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -673,7 +700,27 @@ inline void FriendInfo::set_allocated_ssid(std::string* ssid) {
   // @@protoc_insertion_point(field_set_allocated:SSDTO.FriendInfo.ssid)
 }
 
-// bytes nickname = 2;
+// bool is_group = 2;
+inline void FriendInfo::clear_is_group() {
+  _impl_.is_group_ = false;
+}
+inline bool FriendInfo::_internal_is_group() const {
+  return _impl_.is_group_;
+}
+inline bool FriendInfo::is_group() const {
+  // @@protoc_insertion_point(field_get:SSDTO.FriendInfo.is_group)
+  return _internal_is_group();
+}
+inline void FriendInfo::_internal_set_is_group(bool value) {
+  
+  _impl_.is_group_ = value;
+}
+inline void FriendInfo::set_is_group(bool value) {
+  _internal_set_is_group(value);
+  // @@protoc_insertion_point(field_set:SSDTO.FriendInfo.is_group)
+}
+
+// bytes nickname = 3;
 inline void FriendInfo::clear_nickname() {
   _impl_.nickname_.ClearToEmpty();
 }
@@ -721,6 +768,56 @@ inline void FriendInfo::set_allocated_nickname(std::string* nickname) {
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:SSDTO.FriendInfo.nickname)
+}
+
+// bytes remark = 4;
+inline void FriendInfo::clear_remark() {
+  _impl_.remark_.ClearToEmpty();
+}
+inline const std::string& FriendInfo::remark() const {
+  // @@protoc_insertion_point(field_get:SSDTO.FriendInfo.remark)
+  return _internal_remark();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void FriendInfo::set_remark(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.remark_.SetBytes(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:SSDTO.FriendInfo.remark)
+}
+inline std::string* FriendInfo::mutable_remark() {
+  std::string* _s = _internal_mutable_remark();
+  // @@protoc_insertion_point(field_mutable:SSDTO.FriendInfo.remark)
+  return _s;
+}
+inline const std::string& FriendInfo::_internal_remark() const {
+  return _impl_.remark_.Get();
+}
+inline void FriendInfo::_internal_set_remark(const std::string& value) {
+  
+  _impl_.remark_.Set(value, GetArenaForAllocation());
+}
+inline std::string* FriendInfo::_internal_mutable_remark() {
+  
+  return _impl_.remark_.Mutable(GetArenaForAllocation());
+}
+inline std::string* FriendInfo::release_remark() {
+  // @@protoc_insertion_point(field_release:SSDTO.FriendInfo.remark)
+  return _impl_.remark_.Release();
+}
+inline void FriendInfo::set_allocated_remark(std::string* remark) {
+  if (remark != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.remark_.SetAllocated(remark, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.remark_.IsDefault()) {
+    _impl_.remark_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.FriendInfo.remark)
 }
 
 // -------------------------------------------------------------------

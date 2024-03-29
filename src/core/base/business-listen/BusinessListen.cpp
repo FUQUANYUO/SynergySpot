@@ -14,13 +14,10 @@
 extern std::string CurSSID;
 
 BusinessListen::BusinessListen() {
-    _t = new QThread;
     allocBusiness = new DoBusiness::AllocBusiness();
-    allocBusiness->moveToThread(_t);
+    _t = new QThread(allocBusiness);
 
-    /*
-     *  需要操作子线程的socket需要通过信号与槽机制，最好是在ConToSer这个槽函数中注册这些事件
-     * */
+    /* 需要操作子线程的socket需要通过信号与槽机制，最好是在ConToSer这个槽函数中注册这些事件 */
 
     // 建立连接
     connect(this,&BusinessListen::CONTOSER,allocBusiness,&DoBusiness::AllocBusiness::ConToSer);
@@ -31,6 +28,7 @@ BusinessListen::BusinessListen() {
     // 业务通过子线程发送给服务端
     connect(this,&BusinessListen::VERIFY_ACCOUNT,allocBusiness,&DoBusiness::AllocBusiness::VerifyAcc);
     connect(this,&BusinessListen::FORWARD_MSG,allocBusiness,&DoBusiness::AllocBusiness::ForwardBySer);
+    connect(this,&BusinessListen::REQUEST_CONTACTLIST,allocBusiness,&DoBusiness::AllocBusiness::QueryContactList);
 
     // 转发子线程的信号
     connect(allocBusiness,&DoBusiness::AllocBusiness::LAND_SUCCESS,this,[=](){
@@ -42,16 +40,17 @@ BusinessListen::BusinessListen() {
     connect(allocBusiness,&DoBusiness::AllocBusiness::RECV_MSG,this,[=](std::string rawFmdto){
         emit RECV_MSG(std::move(rawFmdto));
     });
+    connect(allocBusiness,&DoBusiness::AllocBusiness::GET_CONTACTLIST,this,[=](std::string rawGfdto){
+        emit GET_CONTACTLIST(std::move(rawGfdto));
+    });
 
     // 开启事务监听
     _t->start();
 }
-
-
 BusinessListen::~BusinessListen() {
     emit allocBusiness->DISCONNECTFROMSER();
-    _t->wait(100);
     _t->requestInterruption();
+    _t->wait(100);
     _t->quit();
     _t->deleteLater();
 }
@@ -101,6 +100,9 @@ void DoBusiness::AllocBusiness::run() {
     }else if(type == SSDTO::FOWARD_MSG){
         DoBusiness::RecvMsgTask mtask(this,dto.toStdString());
         mtask.forwardMsg();
+    }else if(type == SSDTO::GET_CONTACTLIST){
+        DoBusiness::GetContactList gcl(this,dto.toStdString());
+        gcl.getContactList();
     }
     LOG("recv some business to do from server")
 }
@@ -109,7 +111,7 @@ void DoBusiness::AllocBusiness::VerifyAcc(const std::string& outLdto) {
     QByteArray packet;
     QDataStream stream(&packet,QIODevice::WriteOnly);
     stream << static_cast<quint32>(outLdto.size());
-    stream << static_cast<quint8>(SSDTO::Business_Type::LOGIN);
+    stream << static_cast<quint8>(SSDTO::LOGIN);
     packet.append(outLdto.c_str(),outLdto.size());
 
     _ccon->getQSocket()->write(packet);
@@ -122,7 +124,7 @@ void DoBusiness::AllocBusiness::ForwardBySer(const std::string& outFmdto) {
     QByteArray packet;
     QDataStream stream(&packet,QIODevice::WriteOnly);
     stream << static_cast<quint32>(outFmdto.size());
-    stream << static_cast<quint8>(SSDTO::Business_Type::FOWARD_MSG);
+    stream << static_cast<quint8>(SSDTO::FOWARD_MSG);
     packet.append(outFmdto.c_str(),outFmdto.size());
     _ccon->getQSocket()->write(packet);
     _ccon->getQSocket()->waitForBytesWritten();
@@ -159,16 +161,34 @@ void DoBusiness::AllocBusiness::DisConnFromSer() {
     SSDTO::Disconnect_DTO ddto;
     ddto.set_ssid(CurSSID);
     ddto.set_ip("");
-    ddto.set_type(SSDTO::Business_Type::DISCONNECT);
+    ddto.set_type(SSDTO::DISCONNECT);
     ddto.SerializeToString(&outDisdto);
 
     QByteArray packet;
     QDataStream stream(&packet,QIODevice::WriteOnly);
     stream << static_cast<quint32>(outDisdto.size());
-    stream << static_cast<quint8>(SSDTO::Business_Type::DISCONNECT);
+    stream << static_cast<quint8>(SSDTO::DISCONNECT);
     packet.append(outDisdto.c_str(),outDisdto.size());
     _ccon->getQSocket()->write(packet);
     _ccon->getQSocket()->waitForBytesWritten();
     LOG("disconnect notice has been send to server...")
-    this->~AllocBusiness();
+}
+void DoBusiness::AllocBusiness::QueryContactList(const std::string &outGfdto) {
+    // 发送检验包
+    QByteArray packet;
+    QDataStream stream(&packet,QIODevice::WriteOnly);
+    stream << static_cast<quint32>(outGfdto.size());
+    stream << static_cast<quint8>(SSDTO::GET_CONTACTLIST);
+    packet.append(outGfdto.c_str(),outGfdto.size());
+
+    _ccon->getQSocket()->write(packet);
+    _ccon->getQSocket()->waitForBytesWritten();
+    LOG("query contact list dto has been send to server...")
+}
+
+DoBusiness::GetContactList::GetContactList(QObject * parent,std::string dto) : QObject(parent), dto(std::move(dto)) {
+}
+
+void DoBusiness::GetContactList::getContactList() {
+    emit dynamic_cast<AllocBusiness*>(parent())->GET_CONTACTLIST(dto);
 }

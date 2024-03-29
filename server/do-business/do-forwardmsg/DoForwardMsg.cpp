@@ -1,10 +1,10 @@
 //
 // Created by FU-QAQ on 2024/3/1.
 //
-#include "../Server.h"
 #include "DoForwardMsg.h"
+#include "../../Server.h"
 
-#include "../../src/protofile/forward_msg/ForwardMsgDTO.pb.h"
+#include "forward_msg/ForwardMsgDTO.pb.h"
 
 
 //未发送的聊天记录表  key:接收消息的账号  v:接收的消息

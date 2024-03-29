@@ -7,4 +7,6 @@ enum Business_Type{
     ENROLL = 1;
     FOWARD_MSG = 2;
     DISCONNECT = 3;
+    GET_CONTACTLIST = 4;
+    ADD_FRIEND = 5;
 }

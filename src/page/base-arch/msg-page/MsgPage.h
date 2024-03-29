@@ -9,6 +9,7 @@
 #include <QThread>
 
 #include "base/message-list/MessageList.h"
+#include "base/msgcontent-show/MsgContentShow.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -19,10 +20,12 @@ QT_END_NAMESPACE
 class MsgPage : public QWidget {
     Q_OBJECT
 public:
-    explicit MsgPage(MessageList * ml,QWidget *parent = nullptr);
+    explicit MsgPage(QWidget *parent = nullptr);
+    void setSendTo(std::string sendTo);
     ~MsgPage() override;
 private:
     Ui::MsgPage *ui;
+    MsgContentShow * mcs;
     std::string _sendTo = "";
 };
 

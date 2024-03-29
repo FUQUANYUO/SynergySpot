@@ -6,7 +6,9 @@ package SSDTO;
 
 message FriendInfo{
     bytes ssid = 1;
-    bytes nickname = 2;
+    bool is_group = 2;
+    bytes nickname = 3;
+    bytes remark = 4;
 }
 
 message GetFriendList_DTO{

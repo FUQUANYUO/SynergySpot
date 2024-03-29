@@ -4,8 +4,8 @@
 
 #include "DoLogin.h"
 
-#include "../../src/utils/db-pool/ConnectionPool.h"
-#include "../../src/protofile/login/LoginDTO.pb.h"
+#include "../../../src/utils/db-pool/ConnectionPool.h"
+#include "login/LoginDTO.pb.h"
 
 
 bool DoLogin::execVerifyLogin(const std::string& dto,std::string &ssid) {

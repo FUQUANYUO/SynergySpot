@@ -25,6 +25,8 @@ PROTOBUF_CONSTEXPR FriendInfo::FriendInfo(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.ssid_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.nickname_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.remark_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.is_group_)*/false
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct FriendInfoDefaultTypeInternal {
   PROTOBUF_CONSTEXPR FriendInfoDefaultTypeInternal()
@@ -79,7 +81,9 @@ const uint32_t TableStruct_FriendDTO_2eproto::offsets[] PROTOBUF_SECTION_VARIABL
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::SSDTO::FriendInfo, _impl_.ssid_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::FriendInfo, _impl_.is_group_),
   PROTOBUF_FIELD_OFFSET(::SSDTO::FriendInfo, _impl_.nickname_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::FriendInfo, _impl_.remark_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::SSDTO::GetFriendList_DTO, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -102,8 +106,8 @@ const uint32_t TableStruct_FriendDTO_2eproto::offsets[] PROTOBUF_SECTION_VARIABL
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::SSDTO::FriendInfo)},
-  { 8, -1, -1, sizeof(::SSDTO::GetFriendList_DTO)},
-  { 18, -1, -1, sizeof(::SSDTO::AddFriend_DTO)},
+  { 10, -1, -1, sizeof(::SSDTO::GetFriendList_DTO)},
+  { 20, -1, -1, sizeof(::SSDTO::AddFriend_DTO)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -113,21 +117,22 @@ static const ::_pb::Message* const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_FriendDTO_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\017FriendDTO.proto\022\005SSDTO\032\tDTO.proto\",\n\nF"
-  "riendInfo\022\014\n\004ssid\030\001 \001(\014\022\020\n\010nickname\030\002 \001("
-  "\014\"\202\001\n\021GetFriendList_DTO\022\024\n\014request_ssid\030"
-  "\001 \001(\014\022\'\n\014friend_infos\030\002 \003(\0132\021.SSDTO.Frie"
-  "ndInfo\022\n\n\002ip\030\003 \001(\014\022\"\n\004type\030\004 \001(\0162\024.SSDTO"
-  ".Business_Type\"Q\n\rAddFriend_DTO\022\020\n\010add_s"
-  "sid\030\001 \001(\014\022\n\n\002ip\030\002 \001(\014\022\"\n\004type\030\003 \001(\0162\024.SS"
-  "DTO.Business_Typeb\006proto3"
+  "\n\017FriendDTO.proto\022\005SSDTO\032\tDTO.proto\"N\n\nF"
+  "riendInfo\022\014\n\004ssid\030\001 \001(\014\022\020\n\010is_group\030\002 \001("
+  "\010\022\020\n\010nickname\030\003 \001(\014\022\016\n\006remark\030\004 \001(\014\"\202\001\n\021"
+  "GetFriendList_DTO\022\024\n\014request_ssid\030\001 \001(\014\022"
+  "\'\n\014friend_infos\030\002 \003(\0132\021.SSDTO.FriendInfo"
+  "\022\n\n\002ip\030\003 \001(\014\022\"\n\004type\030\004 \001(\0162\024.SSDTO.Busin"
+  "ess_Type\"Q\n\rAddFriend_DTO\022\020\n\010add_ssid\030\001 "
+  "\001(\014\022\n\n\002ip\030\002 \001(\014\022\"\n\004type\030\003 \001(\0162\024.SSDTO.Bu"
+  "siness_Typeb\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_FriendDTO_2eproto_deps[1] = {
   &::descriptor_table_DTO_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_FriendDTO_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_FriendDTO_2eproto = {
-    false, false, 305, descriptor_table_protodef_FriendDTO_2eproto,
+    false, false, 339, descriptor_table_protodef_FriendDTO_2eproto,
     "FriendDTO.proto",
     &descriptor_table_FriendDTO_2eproto_once, descriptor_table_FriendDTO_2eproto_deps, 1, 3,
     schemas, file_default_instances, TableStruct_FriendDTO_2eproto::offsets,
@@ -160,6 +165,8 @@ FriendInfo::FriendInfo(const FriendInfo& from)
   new (&_impl_) Impl_{
       decltype(_impl_.ssid_){}
     , decltype(_impl_.nickname_){}
+    , decltype(_impl_.remark_){}
+    , decltype(_impl_.is_group_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
@@ -179,6 +186,15 @@ FriendInfo::FriendInfo(const FriendInfo& from)
     _this->_impl_.nickname_.Set(from._internal_nickname(), 
       _this->GetArenaForAllocation());
   }
+  _impl_.remark_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.remark_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_remark().empty()) {
+    _this->_impl_.remark_.Set(from._internal_remark(), 
+      _this->GetArenaForAllocation());
+  }
+  _this->_impl_.is_group_ = from._impl_.is_group_;
   // @@protoc_insertion_point(copy_constructor:SSDTO.FriendInfo)
 }
 
@@ -189,6 +205,8 @@ inline void FriendInfo::SharedCtor(
   new (&_impl_) Impl_{
       decltype(_impl_.ssid_){}
     , decltype(_impl_.nickname_){}
+    , decltype(_impl_.remark_){}
+    , decltype(_impl_.is_group_){false}
     , /*decltype(_impl_._cached_size_)*/{}
   };
   _impl_.ssid_.InitDefault();
@@ -198,6 +216,10 @@ inline void FriendInfo::SharedCtor(
   _impl_.nickname_.InitDefault();
   #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
     _impl_.nickname_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.remark_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.remark_.Set("", GetArenaForAllocation());
   #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 }
 
@@ -214,6 +236,7 @@ inline void FriendInfo::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
   _impl_.ssid_.Destroy();
   _impl_.nickname_.Destroy();
+  _impl_.remark_.Destroy();
 }
 
 void FriendInfo::SetCachedSize(int size) const {
@@ -228,6 +251,8 @@ void FriendInfo::Clear() {
 
   _impl_.ssid_.ClearToEmpty();
   _impl_.nickname_.ClearToEmpty();
+  _impl_.remark_.ClearToEmpty();
+  _impl_.is_group_ = false;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -246,10 +271,27 @@ const char* FriendInfo::_InternalParse(const char* ptr, ::_pbi::ParseContext* ct
         } else
           goto handle_unusual;
         continue;
-      // bytes nickname = 2;
+      // bool is_group = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
+          _impl_.is_group_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // bytes nickname = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
           auto str = _internal_mutable_nickname();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // bytes remark = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
+          auto str = _internal_mutable_remark();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
         } else
@@ -290,10 +332,22 @@ uint8_t* FriendInfo::_InternalSerialize(
         1, this->_internal_ssid(), target);
   }
 
-  // bytes nickname = 2;
+  // bool is_group = 2;
+  if (this->_internal_is_group() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(2, this->_internal_is_group(), target);
+  }
+
+  // bytes nickname = 3;
   if (!this->_internal_nickname().empty()) {
     target = stream->WriteBytesMaybeAliased(
-        2, this->_internal_nickname(), target);
+        3, this->_internal_nickname(), target);
+  }
+
+  // bytes remark = 4;
+  if (!this->_internal_remark().empty()) {
+    target = stream->WriteBytesMaybeAliased(
+        4, this->_internal_remark(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -319,11 +373,23 @@ size_t FriendInfo::ByteSizeLong() const {
         this->_internal_ssid());
   }
 
-  // bytes nickname = 2;
+  // bytes nickname = 3;
   if (!this->_internal_nickname().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
         this->_internal_nickname());
+  }
+
+  // bytes remark = 4;
+  if (!this->_internal_remark().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+        this->_internal_remark());
+  }
+
+  // bool is_group = 2;
+  if (this->_internal_is_group() != 0) {
+    total_size += 1 + 1;
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
@@ -349,6 +415,12 @@ void FriendInfo::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PRO
   }
   if (!from._internal_nickname().empty()) {
     _this->_internal_set_nickname(from._internal_nickname());
+  }
+  if (!from._internal_remark().empty()) {
+    _this->_internal_set_remark(from._internal_remark());
+  }
+  if (from._internal_is_group() != 0) {
+    _this->_internal_set_is_group(from._internal_is_group());
   }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
@@ -377,6 +449,11 @@ void FriendInfo::InternalSwap(FriendInfo* other) {
       &_impl_.nickname_, lhs_arena,
       &other->_impl_.nickname_, rhs_arena
   );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.remark_, lhs_arena,
+      &other->_impl_.remark_, rhs_arena
+  );
+  swap(_impl_.is_group_, other->_impl_.is_group_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata FriendInfo::GetMetadata() const {

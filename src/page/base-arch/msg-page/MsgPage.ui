@@ -60,7 +60,7 @@
      <item>
       <widget class="QPushButton" name="inviteGroup">
        <property name="text">
-        <string>邀请加群</string>
+        <string>邀请加群/发起群聊</string>
        </property>
       </widget>
      </item>

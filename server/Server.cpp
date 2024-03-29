@@ -5,8 +5,9 @@
 #include "../src/protofile/DTO.pb.h"
 #include "../src/utils/help.h"
 
-#include "do-business/DoLogin.h"
-#include "do-business/DoForwardMsg.h"
+#include "do-forwardmsg/DoForwardMsg.h"
+#include "do-login/DoLogin.h"
+#include "do-get-friendlist/DoGetFriendList.h"
 
 using namespace std;
 
@@ -44,6 +45,13 @@ void *working(void *arg) {
                 pinfo->tcp->sendMsg(resDto,SSDTO::Business_Type::LOGIN);
 
                 if(isPass){
+                    // 如果在线则顶掉
+                    auto isOnline = onlineList.find(ssid);
+                    if(isOnline != onlineList.end()){
+                        onlineList.erase(ssid);
+                        LOG("account[" << ssid << "] is take over in another IP");
+                    }
+
                     // 加入在线列表
                     onlineList[ssid] = pinfo->tcp;
                     DoForwardMsg::execForwardByMap(ssid);
@@ -55,6 +63,11 @@ void *working(void *arg) {
             else if(business_type == SSDTO::Business_Type::FOWARD_MSG){
                 DoForwardMsg dfmsg;
                 dfmsg.execForward(dto);
+            }
+            // 获取好友列表
+            else if(business_type == SSDTO::Business_Type::GET_CONTACTLIST){
+                DoGetFriendList dgflist;
+                pinfo->tcp->sendMsg(dgflist.execQueryFriendList(dto),SSDTO::Business_Type::GET_CONTACTLIST);
             }
             // 连接断开
             else if(business_type == SSDTO::Business_Type::DISCONNECT){

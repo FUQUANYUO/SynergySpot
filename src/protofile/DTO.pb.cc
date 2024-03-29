@@ -29,13 +29,14 @@ static constexpr ::_pbi::MigrationSchema* schemas = nullptr;
 static constexpr ::_pb::Message* const* file_default_instances = nullptr;
 
 const char descriptor_table_protodef_DTO_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\tDTO.proto\022\005SSDTO*F\n\rBusiness_Type\022\t\n\005L"
+  "\n\tDTO.proto\022\005SSDTO*k\n\rBusiness_Type\022\t\n\005L"
   "OGIN\020\000\022\n\n\006ENROLL\020\001\022\016\n\nFOWARD_MSG\020\002\022\016\n\nDI"
-  "SCONNECT\020\003b\006proto3"
+  "SCONNECT\020\003\022\023\n\017GET_CONTACTLIST\020\004\022\016\n\nADD_F"
+  "RIEND\020\005b\006proto3"
   ;
 static ::_pbi::once_flag descriptor_table_DTO_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_DTO_2eproto = {
-    false, false, 98, descriptor_table_protodef_DTO_2eproto,
+    false, false, 135, descriptor_table_protodef_DTO_2eproto,
     "DTO.proto",
     &descriptor_table_DTO_2eproto_once, nullptr, 0, 0,
     schemas, file_default_instances, TableStruct_DTO_2eproto::offsets,
@@ -59,6 +60,8 @@ bool Business_Type_IsValid(int value) {
     case 1:
     case 2:
     case 3:
+    case 4:
+    case 5:
       return true;
     default:
       return false;

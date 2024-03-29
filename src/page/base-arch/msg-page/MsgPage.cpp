@@ -6,24 +6,30 @@
 #include "MsgPage.h"
 #include "ui_MsgPage.h"
 
+
 #include "base-arch/arch-page/ArchPage.h"
 #include "forward_msg/ForwardMsgDTO.pb.h"
 #include "help.h"
 
 extern std::string CurSSID;
 
-MsgPage::MsgPage(MessageList * ml,QWidget *parent) : ui(new Ui::MsgPage) {
+
+// 每一个用户（好友/群）拥有一个MsgPage
+MsgPage::MsgPage(QWidget *parent) : ui(new Ui::MsgPage) {
     ui->setupUi(this);
     BusinessListen * bl = dynamic_cast<ArchPage*>(parent)->getBusinessObj();
+    mcs = new MsgContentShow(ui->msgList,bl);
 
-    // 当点击后获取待发送的消息对象
-    connect(ml,&MessageList::SelectedMsgItem,this,[=](const std::string &ssid){
-        _sendTo = ssid;
-    });
     // 发送信息
     connect(ui->send,&QPushButton::clicked,this,[=](){
         QString inputTxt = ui->text->toPlainText();
         if(!inputTxt.isEmpty()){
+            // 清空信息
+            ui->text->clear();
+
+            // 在 ui listview 中显示
+            emit mcs->PRESENT_SENDCOTENT(inputTxt);
+
             // 获取当前时间
             std::time_t now = std::time(nullptr);
             char timebuf[20];
@@ -47,15 +53,11 @@ MsgPage::MsgPage(MessageList * ml,QWidget *parent) : ui(new Ui::MsgPage) {
             emit bl->FORWARD_MSG(out);
         }
     });
-
-    // 接收转发信息
-    connect(bl,&BusinessListen::RECV_MSG,[=](const std::string rawFmdto){
-        SSDTO::ForwardMsg_DTO fmdto;
-        fmdto.ParseFromString(rawFmdto);
-        LOG(fmdto.content());
-    });
 }
 
 MsgPage::~MsgPage() {
     delete ui;
+}
+void MsgPage::setSendTo(std::string sendTo) {
+    _sendTo = std::move(sendTo);
 }

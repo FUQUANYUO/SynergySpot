@@ -7,6 +7,7 @@
 
 #include <QThread>
 #include <QEventLoop>
+#include <memory>
 #include "net-work/ClientConServer.h"
 
 //-----------      proto-file -----------//
@@ -38,6 +39,9 @@ namespace DoBusiness{
 
         // 转发信息
         void ForwardBySer(const std::string& outFmdto);
+
+        // 查询联系人
+        void QueryContactList(const std::string& outGfdto);
     signals:
         // 断开连接
         void DISCONNECTFROMSER();
@@ -51,6 +55,9 @@ namespace DoBusiness{
 
         // 接收消息
         void RECV_MSG(const std::string rawFmdto);
+
+        // 收到联系人信息
+        void GET_CONTACTLIST(const std::string rawGfdto);
     private:
         ClientConServer * _ccon;
     };
@@ -85,6 +92,19 @@ namespace DoBusiness{
     private:
         std::string dto;
     };
+
+    // 获取联系人列表
+    class GetContactList : public QObject{
+    public:
+        GetContactList(QObject * parent,std::string dto = nullptr);
+
+        // 解析联系人列表
+        void getContactList();
+
+        ~GetContactList() = default;
+    private:
+        std::string dto;
+    };
 }
 
 class BusinessListen : public QObject{
@@ -92,7 +112,6 @@ class BusinessListen : public QObject{
 public:
     BusinessListen();
     ~BusinessListen();
-
 signals:
     // 建立与服务器的连接
     void CONTOSER();
@@ -105,6 +124,10 @@ signals:
     // 接收消息
     void FORWARD_MSG(const std::string outFmdto);
     void RECV_MSG(const std::string rawFmdto);
+
+    // 获取联系人列表
+    void REQUEST_CONTACTLIST(const std::string outGfdto);
+    void GET_CONTACTLIST(const std::string rawGfdto);
 private:
     DoBusiness::AllocBusiness * allocBusiness;
     QThread * _t;

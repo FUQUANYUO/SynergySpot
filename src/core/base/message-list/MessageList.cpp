@@ -4,18 +4,29 @@
 #include <QStyledItemDelegate>
 #include <QStandardItemModel>
 #include <QPainter>
+#include <QMouseEvent>
 
 #include "MessageList.h"
+#include "base-arch/arch-page/ArchPage.h"
 
 #include "db-lite/LiteConn.h"
 
+//-----------    protobuf    -----------//
+#include "friend/FriendDTO.pb.h"
+
 extern std::string CurSSID;
+
+// ssid(user) : {nickname,remark}
+std::map<std::string,std::pair<std::string,std::string>> sWithInfo;
+// ssid(group) : {nickname,remark}
+std::map<std::string,std::pair<std::string,std::string>> gsWithInfo;
 
 // Listview Model
 class MessageListModel : public QStandardItemModel
 {
 public:
     explicit MessageListModel(QObject *parent = nullptr);
+    void addItem(const std::string &ssid);
 };
 
 // delegate
@@ -23,8 +34,9 @@ class MessageListDelegate : public QStyledItemDelegate
 {
 public:
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    // 鼠标事件重载
+    bool editorEvent(QEvent *event, QAbstractItemModel *model,const QStyleOptionViewItem &option,const QModelIndex &index);
 };
 
 MessageList::MessageList(QListView &lv) {
@@ -33,25 +45,63 @@ MessageList::MessageList(QListView &lv) {
     lv.setItemDelegate(mDelegate);
     lv.setModel(mModel);
 
+    // 鼠标信息追踪
+    lv.setMouseTracking(true);
+    lv.viewport()->setMouseTracking(true);
+
     // 选中后发送选中的消息对象的 ssid/group_ssid
     connect(&lv,&QListView::clicked,this,[=](const QModelIndex &index){
        QString selectMsgItem = mModel->data(index,Qt::DisplayRole).toString();
        LOG(selectMsgItem.toStdString())
        emit MessageList::SelectedMsgItem(selectMsgItem.toStdString());
     });
+
+    // 在联系人界面点击后添加消息显示
+    //connect();
+
+    // 在接收到信息后添加消息显示
 }
 
 QSize MessageListDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const {
     return {200, 60}; // 设置每个项的大小
 }
 
+// 重绘 listview value项
 void MessageListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
     QStyledItemDelegate::paint(painter, option, index);
 
-    painter->setBrush(Qt::blue);
+    // 选中变色
+    QColor color(255,255,255);
+    if(option.state & QStyle::State_Selected){
+        color.setRgb(0,153,255);
+    }else if(option.state & QStyle::State_MouseOver){
+        color.setRgb(240,240,240);
+    }
+    painter->setBrush(color);
     painter->drawRect(option.rect);
 
-    QString msgName = index.data(Qt::DisplayRole).toString();
+    QString _ssid = index.data(Qt::DisplayRole).toString();
+    QString msgName = "";
+    auto findName = sWithInfo.find(_ssid.toStdString());
+    if(findName == sWithInfo.end()){// 群信息
+        std::string _remark = gsWithInfo[_ssid.toStdString()].second;
+        std::string _nickname = gsWithInfo[_ssid.toStdString()].first;
+        if(_remark.empty()){
+            msgName = QString::fromStdString(_nickname);
+        }else{
+            msgName = QString::fromStdString(_remark);
+        }
+    }// 好友信息
+    else{
+        std::string _remark = sWithInfo[_ssid.toStdString()].second;
+        std::string _nickname = sWithInfo[_ssid.toStdString()].first;
+        if(_remark.empty()){
+            msgName = QString::fromStdString(_nickname);
+        }else{
+            msgName = QString::fromStdString(_remark);
+        }
+    }
+
     QString timeInfo = "10:00";
     QString chatContent = "小明：Hello, how are you?";
 
@@ -61,14 +111,78 @@ void MessageListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
     painter->drawText(firstLineRect, Qt::AlignLeft | Qt::AlignTop, msgName);
     painter->drawText(firstLineRect, Qt::AlignRight | Qt::AlignTop, timeInfo);
     painter->drawText(secondLineRect, Qt::AlignLeft | Qt::AlignTop, chatContent);
-
 }
-MessageListModel::MessageListModel(QObject *parent) : QStandardItemModel(parent) {
-    QList<QString> msgList = {"10000001","好友1","群组2"}; // 测试
-    for (const QString &_msg : msgList) {
-        QStandardItem *item = new QStandardItem(_msg);
-        appendRow(item);
+
+// 忽略鼠标除左键外的点击事件
+bool MessageListDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) {
+    if(event->type() == QEvent::MouseButtonPress)
+    {
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+        if(mouseEvent->button() == Qt::LeftButton)
+        {
+            return QStyledItemDelegate::editorEvent(event, model, option, index);
+        }
+        else
+        {
+            return true; // 忽略非左键的鼠标点击事件
+        }
     }
+    else
+    {
+        return QStyledItemDelegate::editorEvent(event, model, option, index);
+    }
+}
+
+// 获取好友列表信息
+MessageListModel::MessageListModel(QObject *parent) : QStandardItemModel(parent) {
+//    // 发送好友信息请求DTO
+//    SSDTO::GetFriendList_DTO dto;
+//    dto.set_type(SSDTO::Business_Type::GET_CONTACTLIST);
+//    dto.set_request_ssid(CurSSID);
+//    dto.set_ip("");
+//    std::string outGfdto;
+//    dto.SerializeToString(&outGfdto);
+//
+//    // 通过 lv 的父亲去做动态转化
+//    BusinessListen * bl = dynamic_cast<ArchPage*>(dynamic_cast<QListView*>(parent)->parent())->getBusinessObj();
+//
+//    emit bl->REQUEST_CONTACTLIST(outGfdto);
+//
+//    connect(bl,&BusinessListen::GET_CONTACTLIST,this,[&](const std::string& rawGfdto){
+//        SSDTO::GetFriendList_DTO gfdto;
+//        gfdto.ParseFromString(rawGfdto);
+//        if(CurSSID == gfdto.request_ssid()){
+//            for(int i = 0;i < gfdto.friend_infos_size();i++){
+//                // 提取 FriendInfo
+//                std::string fssid = gfdto.friend_infos(i).ssid();
+//                std::string fnickname = gfdto.friend_infos(i).nickname();
+//                std::string fremark = gfdto.friend_infos(i).remark();
+//                // 群
+//                if(gfdto.friend_infos(i).is_group()){
+//                    sWithInfo.insert({fssid,{fnickname,fremark}});
+//                }// 好友
+//                else{
+//                    gsWithInfo.insert({fssid,{fnickname,fremark}});
+//                }
+//            }
+//            for(auto & it : sWithInfo){
+//                auto *item = new QStandardItem(QString::fromStdString(it.first));
+//                appendRow(item);
+//            }
+//            for(auto & it : gsWithInfo){
+//                auto *item = new QStandardItem(QString::fromStdString(it.first));
+//                appendRow(item);
+//            }
+//        }
+//    });
+}
+void MessageListModel::addItem(const std::string &ssid) {
+    auto *item = new QStandardItem(QString::fromStdString(ssid));
+    appendRow(item);
+    dynamic_cast<QListView*>(parent())->update();
+}
+
+//------------------ 本地消息测试 ----------------------//
 //    const std::string& folderName = ssid;
 //    // 创建用户文件夹
 //    std::string createFolder = "if not exist " + folderName + " mkdir " + folderName;
@@ -153,4 +267,3 @@ MessageListModel::MessageListModel(QObject *parent) : QStandardItemModel(parent)
 //
 //        }
 //    }
-}
