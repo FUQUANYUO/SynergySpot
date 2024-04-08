@@ -14,7 +14,7 @@ public:
     MsgContentShow() = default;
     MsgContentShow(QListView *lv,QObject *obl = nullptr);
 
-    ~MsgContentShow() = default;
+    ~MsgContentShow();
 signals:
     void PRESENT_SENDCOTENT(QString sendStr);
 private:

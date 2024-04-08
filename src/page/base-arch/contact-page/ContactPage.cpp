@@ -7,11 +7,20 @@
 #include "ContactPage.h"
 #include "ui_ContactPage.h"
 
+#include "base/contact-list/ContactList.h"          // 联系人列表
 
 ContactPage::ContactPage(QWidget *parent) : QWidget(parent), ui(new Ui::ContactPage) {
     ui->setupUi(this);
+    cl = new ContactList({{"好友",ui->ftv},
+                              {"群组",ui->gtv}},
+                          parent);
 }
 
 ContactPage::~ContactPage() {
+    cl->deleteLater();
     delete ui;
+}
+
+ContactList *ContactPage::getContactList() {
+    return cl;
 }

@@ -14,7 +14,6 @@
 
 #include "base/message-list/MessageList.h"          // 消息列表
 
-
 #define SHOW_CONTACT_PAGE                           // 测试联系人模块
 #define SHOW_MSG_PAGE                               // 测试消息模块
 #define SHOW_MORE_OPTION_PAGE                       // 测试更多设置模块
@@ -25,6 +24,7 @@ std::unordered_map<std::string,MsgPage*> lmp;       // 维护全部的好友聊�
 ArchPage::ArchPage(QObject * obj,QWidget *parent) : QMainWindow(parent), ui(new Ui::ArchPage) {
     ui->setupUi(this);
     bl = dynamic_cast<BusinessListen*>(obj);
+
 #ifdef SHOW_MSG_PAGE
     // 消息列表
     QListView * lv = new QListView(this);
@@ -34,7 +34,7 @@ ArchPage::ArchPage(QObject * obj,QWidget *parent) : QMainWindow(parent), ui(new 
     ui->Vlayout->addWidget(lv);
 
     // 当点击后获取待发送的消息对象
-    connect(ml,&MessageList::SelectedMsgItem,this,[=](const std::string &ssid){
+    connect(ml,&MessageList::SELECTED_MSGITEM,this,[=](const std::string &ssid){
         // 外部独立消息窗口（两种方式不能共存）
         QLayoutItem * qit = ui->Hlayout->itemAt(2);
         QWidget * lastP = nullptr;
@@ -74,12 +74,6 @@ ArchPage::ArchPage(QObject * obj,QWidget *parent) : QMainWindow(parent), ui(new 
     });
 #endif
 
-#ifdef SHOW_CONTACT_PAGE
-    ContactPage * cp = new ContactPage(this);
-    ui->Vlayout->addWidget(cp);
-#endif
-
-
 #ifdef SHOW_MORE_OPTION_PAGE
     MoreOptionPage * mop = new MoreOptionPage(this);
     // 隐藏
@@ -92,6 +86,15 @@ ArchPage::ArchPage(QObject * obj,QWidget *parent) : QMainWindow(parent), ui(new 
     });
 #endif
 
+#ifdef SHOW_CONTACT_PAGE
+    ContactPage * cp = new ContactPage(this);
+    ui->Vlayout->addWidget(cp);
+    cp->hide();
+
+    // 联系人激活
+    connect(cp->getContactList(),&ContactList::SELECTED_CONTACTITEM,ml,&MessageList::Add_ContactItem);
+#endif
+
 #ifdef SHOW_AVATAR_PAGE
     AvatarPage * ap = new AvatarPage(this);
     ap->hide();
@@ -101,11 +104,6 @@ ArchPage::ArchPage(QObject * obj,QWidget *parent) : QMainWindow(parent), ui(new 
        ap->show();
     });
 #endif
-    // 关闭信号重载
-    connect(this,&ArchPage::over,this,[&](){
-        delVec.push_back(bl);
-        this->deleteLater();
-    });
 
     // 左侧 消息区域/联系人区域 切换
     connect(ui->contact,&QPushButton::clicked,this,[=](){
@@ -123,7 +121,12 @@ ArchPage::ArchPage(QObject * obj,QWidget *parent) : QMainWindow(parent), ui(new 
         cp->hide();
 #endif
     });
-    cp->hide();
+
+    // 关闭信号重载
+    connect(this,&ArchPage::over,this,[&](){
+        delVec.push_back(bl);
+        this->deleteLater();
+    });
 }
 
 ArchPage::~ArchPage() {

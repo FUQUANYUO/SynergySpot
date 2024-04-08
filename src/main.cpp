@@ -27,6 +27,20 @@ extern std::string CurSSID;
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
+    a.setStyleSheet(R"(
+        QMainWindow,QWidget {
+            background-color: white; /* 设置背景为白色 */
+            color: black; /* 设置文本颜色为黑色 */
+        }
+        QPushButton {
+            background-color: #e0e0e0; /* 设置按钮背景为浅灰色 */
+        }
+        QLineEdit, QTextEdit, QPlainTextEdit, QListView, QTreeView, QTableView {
+            background-color: white; /* 设置输入控件和视图背景为白色 */
+            color: black; /* 设置输入控件和视图文本为黑色 */
+            selection-background-color: #bbdefb; /* 设置选中项的背景颜色 */
+        }
+    )");
     LandPage lp;
     lp.show();
 

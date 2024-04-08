@@ -80,7 +80,7 @@ void MsgContentShowDelegate::paint(QPainter *painter, const QStyleOptionViewItem
     QString messageText = index.data(Qt::DisplayRole).toString();
 
     // 覆盖掉原项数据
-    painter->setBrush(QColor(255,255,255));
+    painter->setBrush(QColor(245,245,245));
     painter->setPen(Qt::NoPen);
     painter->drawRect(option.rect);
 
@@ -97,7 +97,7 @@ void MsgContentShowDelegate::paint(QPainter *painter, const QStyleOptionViewItem
     QRect bubbleRect = {};
     if(index.data(Qt::UserRole).toString() == "User"){
         // 右侧头像框
-        painter->setBrush(QColor(242,242,242));
+        painter->setBrush(QColor(255,255,255));
         painter->drawEllipse(option.rect.right() - 40, option.rect.top(), 40, 40);
 
         // 为消息气泡设置一个QRect，宽度根据messageText的像素长度动态调整
@@ -108,9 +108,12 @@ void MsgContentShowDelegate::paint(QPainter *painter, const QStyleOptionViewItem
         QPainterPath path;
         path.addRoundedRect(bubbleRect, 8, 8);
         painter->fillPath(path, QColor(0,153,255));
+
+        // 在气泡内部绘制文本
+        painter->setPen(Qt::white);
     }else if(index.data(Qt::UserRole).toString() == "Server"){
         // 左侧头像框
-        painter->setBrush(QColor(242,242,242));
+        painter->setBrush(QColor(255,255,255));
         painter->drawEllipse(option.rect.left(),option.rect.top(),40,40);
 
         // 为消息气泡设置一个QRect，宽度根据messageText的像素长度动态调整
@@ -121,20 +124,20 @@ void MsgContentShowDelegate::paint(QPainter *painter, const QStyleOptionViewItem
         QPainterPath path;
         path.addRoundedRect(bubbleRect, 8, 8);
         painter->fillPath(path, QColor(255,255,255));
+
+        // 在气泡内部绘制文本
+        painter->setPen(Qt::black);
     }
-
-    // 在气泡内部绘制文本
-    painter->setPen(Qt::white);
-
     QRect textRect = bubbleRect.adjusted(10, 10,-10,-10);
     painter->drawText(textRect,messageText);
 }
 
 
-
+MsgContentShowModel *mModel = nullptr;
+MsgContentShowDelegate *mDelegate = nullptr;
 MsgContentShow::MsgContentShow(QListView *lv,QObject *obl) : _lv(lv){
-    MsgContentShowModel *mModel = new MsgContentShowModel(_lv);
-    MsgContentShowDelegate * mDelegate = new MsgContentShowDelegate();
+    mModel = new MsgContentShowModel(_lv);
+    mDelegate = new MsgContentShowDelegate();
     _lv->setItemDelegate(mDelegate);
     _lv->setModel(mModel);
 
@@ -148,7 +151,7 @@ MsgContentShow::MsgContentShow(QListView *lv,QObject *obl) : _lv(lv){
     _lv->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     // 通过 lv 的父亲去做动态转化
-    BusinessListen * bl = dynamic_cast<BusinessListen*>(obl);
+    auto bl = dynamic_cast<BusinessListen*>(obl);
 
     // 接收转发信息
     connect(bl,&BusinessListen::RECV_MSG,[=](const std::string& rawFmdto){
@@ -165,4 +168,7 @@ MsgContentShow::MsgContentShow(QListView *lv,QObject *obl) : _lv(lv){
         // 设置用户发送的消息为 User
         mModel->addItem(sendStr,"User");
     });
+}
+MsgContentShow::~MsgContentShow() {
+    mDelegate->deleteLater();
 }

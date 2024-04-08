@@ -17,9 +17,12 @@
 extern std::string CurSSID;
 
 // ssid(user) : {nickname,remark}
-std::map<std::string,std::pair<std::string,std::string>> sWithInfo;
+extern std::map<std::string,std::pair<std::string,std::string>> sWithInfo;
 // ssid(group) : {nickname,remark}
-std::map<std::string,std::pair<std::string,std::string>> gsWithInfo;
+extern std::map<std::string,std::pair<std::string,std::string>> gsWithInfo;
+
+// 维护当前消息列表已经添加的联系人
+std::vector<std::string> addContactVec;
 
 // Listview Model
 class MessageListModel : public QStandardItemModel
@@ -36,31 +39,8 @@ public:
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     // 鼠标事件重载
-    bool editorEvent(QEvent *event, QAbstractItemModel *model,const QStyleOptionViewItem &option,const QModelIndex &index);
+    bool editorEvent(QEvent *event, QAbstractItemModel *model,const QStyleOptionViewItem &option,const QModelIndex &index) override;
 };
-
-MessageList::MessageList(QListView &lv) {
-    MessageListModel *mModel = new MessageListModel(&lv);
-    MessageListDelegate * mDelegate = new MessageListDelegate;
-    lv.setItemDelegate(mDelegate);
-    lv.setModel(mModel);
-
-    // 鼠标信息追踪
-    lv.setMouseTracking(true);
-    lv.viewport()->setMouseTracking(true);
-
-    // 选中后发送选中的消息对象的 ssid/group_ssid
-    connect(&lv,&QListView::clicked,this,[=](const QModelIndex &index){
-       QString selectMsgItem = mModel->data(index,Qt::DisplayRole).toString();
-       LOG(selectMsgItem.toStdString())
-       emit MessageList::SelectedMsgItem(selectMsgItem.toStdString());
-    });
-
-    // 在联系人界面点击后添加消息显示
-    //connect();
-
-    // 在接收到信息后添加消息显示
-}
 
 QSize MessageListDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const {
     return {200, 60}; // 设置每个项的大小
@@ -108,6 +88,7 @@ void MessageListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &o
     QRect firstLineRect = option.rect.adjusted(60, 5, -5, -30);
     QRect secondLineRect = option.rect.adjusted(60, 25, -5, -5);
 
+    painter->setPen(Qt::black);
     painter->drawText(firstLineRect, Qt::AlignLeft | Qt::AlignTop, msgName);
     painter->drawText(firstLineRect, Qt::AlignRight | Qt::AlignTop, timeInfo);
     painter->drawText(secondLineRect, Qt::AlignLeft | Qt::AlignTop, chatContent);
@@ -135,49 +116,11 @@ bool MessageListDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, 
 
 // 获取好友列表信息
 MessageListModel::MessageListModel(QObject *parent) : QStandardItemModel(parent) {
-//    // 发送好友信息请求DTO
-//    SSDTO::GetFriendList_DTO dto;
-//    dto.set_type(SSDTO::Business_Type::GET_CONTACTLIST);
-//    dto.set_request_ssid(CurSSID);
-//    dto.set_ip("");
-//    std::string outGfdto;
-//    dto.SerializeToString(&outGfdto);
-//
-//    // 通过 lv 的父亲去做动态转化
-//    BusinessListen * bl = dynamic_cast<ArchPage*>(dynamic_cast<QListView*>(parent)->parent())->getBusinessObj();
-//
-//    emit bl->REQUEST_CONTACTLIST(outGfdto);
-//
-//    connect(bl,&BusinessListen::GET_CONTACTLIST,this,[&](const std::string& rawGfdto){
-//        SSDTO::GetFriendList_DTO gfdto;
-//        gfdto.ParseFromString(rawGfdto);
-//        if(CurSSID == gfdto.request_ssid()){
-//            for(int i = 0;i < gfdto.friend_infos_size();i++){
-//                // 提取 FriendInfo
-//                std::string fssid = gfdto.friend_infos(i).ssid();
-//                std::string fnickname = gfdto.friend_infos(i).nickname();
-//                std::string fremark = gfdto.friend_infos(i).remark();
-//                // 群
-//                if(gfdto.friend_infos(i).is_group()){
-//                    sWithInfo.insert({fssid,{fnickname,fremark}});
-//                }// 好友
-//                else{
-//                    gsWithInfo.insert({fssid,{fnickname,fremark}});
-//                }
-//            }
-//            for(auto & it : sWithInfo){
-//                auto *item = new QStandardItem(QString::fromStdString(it.first));
-//                appendRow(item);
-//            }
-//            for(auto & it : gsWithInfo){
-//                auto *item = new QStandardItem(QString::fromStdString(it.first));
-//                appendRow(item);
-//            }
-//        }
-//    });
 }
+
 void MessageListModel::addItem(const std::string &ssid) {
     auto *item = new QStandardItem(QString::fromStdString(ssid));
+    item->setEditable(false);
     appendRow(item);
     dynamic_cast<QListView*>(parent())->update();
 }
@@ -267,3 +210,37 @@ void MessageListModel::addItem(const std::string &ssid) {
 //
 //        }
 //    }
+
+MessageListModel *mModel = nullptr;
+MessageListDelegate *mDelegate = nullptr;
+
+MessageList::MessageList(QListView &lv) {
+    mModel = new MessageListModel(&lv);
+    mDelegate = new MessageListDelegate();
+    lv.setItemDelegate(mDelegate);
+    lv.setModel(mModel);
+
+    // 鼠标信息追踪
+    lv.setMouseTracking(true);
+    lv.viewport()->setMouseTracking(true);
+
+    // 选中后发送选中的消息对象的 ssid/group_ssid
+    connect(&lv,&QListView::clicked,this,[=](const QModelIndex &index){
+        QString selectMsgItem = mModel->data(index,Qt::DisplayRole).toString();
+        LOG(selectMsgItem.toStdString())
+        emit MessageList::SELECTED_MSGITEM(selectMsgItem.toStdString());
+    });
+
+    // 在接收到信息后添加消息显示
+}
+
+MessageList::~MessageList() {
+    mDelegate->deleteLater();
+}
+
+void MessageList::Add_ContactItem(std::string ssid){
+    auto res = find(addContactVec.begin(),addContactVec.begin(),ssid);
+    if(res == addContactVec.end())
+        mModel->addItem(ssid);
+}
+

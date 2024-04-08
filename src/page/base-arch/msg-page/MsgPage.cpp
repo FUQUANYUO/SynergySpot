@@ -20,6 +20,12 @@ MsgPage::MsgPage(QWidget *parent) : ui(new Ui::MsgPage) {
     BusinessListen * bl = dynamic_cast<ArchPage*>(parent)->getBusinessObj();
     mcs = new MsgContentShow(ui->msgList,bl);
 
+    ui->msgList->setStyleSheet(
+        "QListView {"
+        "background-color: #f5f5f5;"
+        "}"
+    );
+
     // 发送信息
     connect(ui->send,&QPushButton::clicked,this,[=](){
         QString inputTxt = ui->text->toPlainText();

@@ -10,11 +10,12 @@ class MessageList : public QObject{
     Q_OBJECT
 public:
     MessageList() = default;
-    MessageList(QListView &lv);
-    ~MessageList() = default;
+    explicit MessageList(QListView &lv);
+    ~MessageList();
 signals:
-    void SelectedMsgItem(std::string ssid);
+    void SELECTED_MSGITEM(std::string ssid);
+public slots:
+    void Add_ContactItem(std::string ssid);
 };
-
 
 #endif//SYNERGYSPOT_MESSAGELIST_H

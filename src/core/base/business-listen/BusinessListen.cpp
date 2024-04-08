@@ -104,7 +104,7 @@ void DoBusiness::AllocBusiness::run() {
         DoBusiness::GetContactList gcl(this,dto.toStdString());
         gcl.getContactList();
     }
-    LOG("recv some business to do from server")
+    LOG("recv some business to do from server : " + std::to_string(type))
 }
 void DoBusiness::AllocBusiness::VerifyAcc(const std::string& outLdto) {
     // 发送检验包

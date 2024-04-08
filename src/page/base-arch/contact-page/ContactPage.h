@@ -7,6 +7,8 @@
 
 #include <QWidget>
 
+#include "base/contact-list/ContactList.h"          // 联系人列表
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -19,10 +21,15 @@ class ContactPage : public QWidget {
 
 public:
     explicit ContactPage(QWidget *parent = nullptr);
-    ~ContactPage() override;
 
+    ContactList * getContactList();
+
+    ~ContactPage() override;
 private:
     Ui::ContactPage *ui;
+
+    // ContactList delegate obj
+    ContactList *cl;
 };
 
 
