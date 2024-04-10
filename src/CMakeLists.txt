@@ -18,8 +18,6 @@ find_package(Qt6 6.5.3 EXACT COMPONENTS
         Widgets
         Network
         REQUIRED)
-# Vcpkg Protobuf
-find_package(protobuf CONFIG REQUIRED)
 
 file(GLOB_RECURSE CoreCpp ${CMAKE_SOURCE_DIR}/core/*.cpp)
 file(GLOB_RECURSE PageCpp ${CMAKE_SOURCE_DIR}/page/*.cpp)
@@ -37,8 +35,6 @@ include_directories(page)
 include_directories(protofile)
 # utils
 include_directories(utils)
-# protobuf
-include_directories(${Protobuf_INCLUDE_DIRS})
 
 # sqlite3 源文件
 add_library(sqlite3 OBJECT lib-common/include/SQLite/sqlite3.c)
@@ -54,6 +50,7 @@ add_executable(SynergySpot main.cpp
 # 使用 yaml 静态库
 target_compile_definitions(SynergySpot PUBLIC
         YAML_CPP_STATIC_DEFINE
+        PROTOBUF_USE_DLLS
         #LOC_TEST
 )
 
@@ -66,13 +63,25 @@ target_link_libraries(SynergySpot PRIVATE
         Qt::Gui
         Qt::Widgets
         Qt::Network
-        protobuf::libprotobuf
-        protobuf::libprotobuf-lite
+        libprotobuf
+        libprotobuf-lite
         sqlite3
         libmysql
         yaml-cppd
 )
 
+# 移动 protobuf.dll 到 out 文件夹
+file(GLOB PROTOBUF_DLLS "${CMAKE_CURRENT_SOURCE_DIR}/lib-common/lib/libprotobuf*.dll")
+set(DLL_DESTINATION_DIR "${CMAKE_CURRENT_SOURCE_DIR}/out/Debug")
+foreach(DLL_FILE ${PROTOBUF_DLLS})
+    get_filename_component(DLL_NAME "${DLL_FILE}" NAME)
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            "${DLL_FILE}"
+            "${DLL_DESTINATION_DIR}/${DLL_NAME}"
+            COMMENT "Copying ${DLL_NAME} to ${DLL_DESTINATION_DIR}"
+    )
+endforeach()
 
 if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(DEBUG_SUFFIX)
