@@ -63,15 +63,16 @@ target_link_libraries(SynergySpot PRIVATE
         Qt::Gui
         Qt::Widgets
         Qt::Network
-        libprotobuf
-        libprotobuf-lite
+        libprotobufd
+        libprotobuf-lited
+        libprotocd
         sqlite3
         libmysql
         yaml-cppd
 )
 
 # 移动 protobuf.dll 到 out 文件夹
-file(GLOB PROTOBUF_DLLS "${CMAKE_CURRENT_SOURCE_DIR}/lib-common/lib/libprotobuf*.dll")
+file(GLOB PROTOBUF_DLLS "${CMAKE_CURRENT_SOURCE_DIR}/lib-common/lib/libproto*.dll")
 set(DLL_DESTINATION_DIR "${CMAKE_CURRENT_SOURCE_DIR}/out/Debug")
 foreach(DLL_FILE ${PROTOBUF_DLLS})
     get_filename_component(DLL_NAME "${DLL_FILE}" NAME)

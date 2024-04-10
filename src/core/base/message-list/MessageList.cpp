@@ -123,6 +123,8 @@ void MessageListModel::addItem(const std::string &ssid) {
     item->setEditable(false);
     appendRow(item);
     dynamic_cast<QListView*>(parent())->update();
+
+    addContactVec.push_back(ssid);
 }
 
 //------------------ 本地消息测试 ----------------------//
