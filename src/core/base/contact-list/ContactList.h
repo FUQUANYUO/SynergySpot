@@ -24,5 +24,4 @@ private:
     std::vector<QObject*> delVec;
 };
 
-
 #endif//SYNERGYSPOT_CONTACTLIST_H

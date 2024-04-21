@@ -19,6 +19,18 @@
 // verify account
 #include "land/land-check/LoginVerify.h"
 
+// 回调函数宏
+#define DO_CALLBACK_CLASS(__CLASS_NAME__,__FUNC_NAME__,__FUNC_RETURN_TYPE__)    \
+class __CLASS_NAME__ : public QObject{                                          \
+public:                                                                         \
+    explicit __CLASS_NAME__(QObject * parent,std::string dto = "");             \
+    void __FUNC_NAME__();                                                       \
+    ~__CLASS_NAME__() = default;                                                \
+private:                                                                        \
+    std::string dto;                                                            \
+};
+
+
 namespace DoBusiness{
     // 分配业务
     class AllocBusiness : public QObject{
@@ -33,6 +45,9 @@ namespace DoBusiness{
 
         // 连接服务端
         void ConToSer();
+
+        // 邮箱验证
+        void QueryEmailVerifyCode(const std::string& outEdto);
 
         // 账号验证
         void VerifyAcc(const std::string& outLdto);
@@ -49,6 +64,9 @@ namespace DoBusiness{
         // 未读业务
         void BUSINESSTODO();
 
+        // 收到邮箱验证信息
+        void GET_EMAILCODE(const std::string rawEdto);
+
         // 登录验证信号
         void LAND_SUCCESS();
         void LAND_FAIL();
@@ -61,50 +79,16 @@ namespace DoBusiness{
     private:
         ClientConServer * _ccon;
     };
-
     // 获取登录验证结果
-    class RecvVerifyRes : public QObject{
-    public:
-        explicit RecvVerifyRes(QObject * parent,std::string dto = nullptr);
-
-        // 解析发送验证结果
-        void parseVerifyRes();
-
-        ~RecvVerifyRes() = default;
-    private:
-        std::string dto;
-    };
-
+    DO_CALLBACK_CLASS(RecvVerifyRes,parseVerifyRes,void)
     // 获取注册结果
-    class RecvEnrollRes : public QObject{
-    public:
-    };
 
     // 接收消息任务
-    class RecvMsgTask :  public QObject{
-    public:
-        RecvMsgTask(QObject * parent,std::string dto = nullptr);
-
-        // 转发信息
-        void forwardMsg();
-
-        ~RecvMsgTask() = default;
-    private:
-        std::string dto;
-    };
-
+    DO_CALLBACK_CLASS(RecvMsgTask,forwardMsg,void)
     // 获取联系人列表
-    class GetContactList : public QObject{
-    public:
-        GetContactList(QObject * parent,std::string dto = nullptr);
-
-        // 解析联系人列表
-        void getContactList();
-
-        ~GetContactList() = default;
-    private:
-        std::string dto;
-    };
+    DO_CALLBACK_CLASS(GetContactList,getContactList,void)
+    // 获取邮箱验证码
+    DO_CALLBACK_CLASS(GetEmailCode,getEmailCode,void)
 }
 
 class BusinessListen : public QObject{
@@ -115,6 +99,10 @@ public:
 signals:
     // 建立与服务器的连接
     void CONTOSER();
+
+    // 邮箱验证
+    void REQUEST_EMAILCODE(const std::string outEdto);
+    void GET_EMAILCODE(const std::string rawEdto);
 
     // 登录验证信号
     void VERIFY_ACCOUNT(const std::string outLdto);

@@ -23,7 +23,7 @@ class LandPage : public QMainWindow {
 public:
     explicit LandPage(QWidget *parent = nullptr);
     ~LandPage() override;
-signals:
+    BusinessListen * getBusinessObj();
 private:
     Ui::LandPage *ui;
     // 向服务端提交验证信息

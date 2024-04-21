@@ -18,7 +18,9 @@ class RegisterPage : public QMainWindow {
 public:
     explicit RegisterPage(QWidget *parent = nullptr);
     ~RegisterPage() override;
-
+signals:
+    // 传递验证请求时刻、有效时间、验证码
+    void TRANSVERIFYDATA(std::array<std::string,3> data);
 private:
     Ui::RegisterPage *ui;
 };

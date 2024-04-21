@@ -36,9 +36,6 @@ include_directories(protofile)
 # utils
 include_directories(utils)
 
-# sqlite3 源文件
-add_library(sqlite3 OBJECT lib-common/include/SQLite/sqlite3.c)
-
 add_executable(SynergySpot main.cpp
         ${CoreCpp}
         ${PageCpp}

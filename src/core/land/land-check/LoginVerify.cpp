@@ -9,8 +9,6 @@
 
 #include "base/business-listen/BusinessListen.h"
 
-// TODO email verify and get ip verify
-
 void LoginVerify::verifyInServer(std::string ssid, std::string password) {
     // 验证 ssid 对应的 password
     SSDTO::Login_DTO ldto;
@@ -26,7 +24,4 @@ void LoginVerify::verifyInServer(std::string ssid, std::string password) {
 }
 
 LoginVerify::LoginVerify(QObject * parent) : QObject(parent){
-}
-
-LoginVerify::~LoginVerify() {
 }

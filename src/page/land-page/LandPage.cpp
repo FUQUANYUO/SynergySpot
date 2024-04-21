@@ -17,9 +17,6 @@
 // parse yaml file
 #include "yaml-cpp/yaml.h"
 
-//-----------      core      -----------//
-
-
 // client info yaml file path
 string yamlPath = "../../conf/clientInfo.yaml";
 
@@ -31,6 +28,7 @@ LandPage::LandPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::LandPage) 
     lver = new LoginVerify(bl);
     // 注册账号
     connect(ui->registerBtn,&QPushButton::clicked,this,[&](){
+        emit bl->CONTOSER();
         auto * rgPage = new RegisterPage(this);
         rgPage->show();
     });
@@ -85,4 +83,7 @@ LandPage::LandPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::LandPage) 
 
 LandPage::~LandPage() {
     delete ui;
+}
+BusinessListen *LandPage::getBusinessObj() {
+    return bl;
 }

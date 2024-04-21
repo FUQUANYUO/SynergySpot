@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+import "DTO.proto";
+
+package SSDTO;
+
+message EmailVerifyCode_DTO{
+    bool is_request = 1;
+    string email_address = 2;
+    string verify_code = 3;
+    string start_time = 4;
+    string valid_time = 5;
+    SSDTO.Business_Type type = 6;
+}

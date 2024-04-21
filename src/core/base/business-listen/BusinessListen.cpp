@@ -10,6 +10,16 @@
 
 #include "land/land-check/LoginVerify.h"
 
+// 发送包装宏
+#define SEND_PACKAGE(__DTO_OBJ__,__DTO_TYPE__,__LOG__)      \
+    QByteArray packet;                                      \
+    QDataStream stream(&packet,QIODevice::WriteOnly);       \
+    stream << static_cast<quint32>(__DTO_OBJ__.size());     \
+    stream << static_cast<quint8>(__DTO_TYPE__);            \
+    packet.append(__DTO_OBJ__.c_str(),__DTO_OBJ__.size());  \
+    _ccon->getQSocket()->write(packet);                     \
+    _ccon->getQSocket()->waitForBytesWritten();             \
+    LOG(__LOG__)                                            \
 
 extern std::string CurSSID;
 
@@ -29,6 +39,7 @@ BusinessListen::BusinessListen() {
     connect(this,&BusinessListen::VERIFY_ACCOUNT,allocBusiness,&DoBusiness::AllocBusiness::VerifyAcc);
     connect(this,&BusinessListen::FORWARD_MSG,allocBusiness,&DoBusiness::AllocBusiness::ForwardBySer);
     connect(this,&BusinessListen::REQUEST_CONTACTLIST,allocBusiness,&DoBusiness::AllocBusiness::QueryContactList);
+    connect(this,&BusinessListen::REQUEST_EMAILCODE,allocBusiness,&DoBusiness::AllocBusiness::QueryEmailVerifyCode);
 
     // 转发子线程的信号
     connect(allocBusiness,&DoBusiness::AllocBusiness::LAND_SUCCESS,this,[=](){
@@ -42,6 +53,9 @@ BusinessListen::BusinessListen() {
     });
     connect(allocBusiness,&DoBusiness::AllocBusiness::GET_CONTACTLIST,this,[=](std::string rawGfdto){
         emit GET_CONTACTLIST(std::move(rawGfdto));
+    });
+    connect(allocBusiness,&DoBusiness::AllocBusiness::GET_EMAILCODE,this,[=](std::string rawEdto){
+        emit GET_EMAILCODE(std::move(rawEdto));
     });
 
     // 开启事务监听
@@ -75,60 +89,22 @@ void DoBusiness::RecvVerifyRes::parseVerifyRes() {
         emit dynamic_cast<AllocBusiness*>(parent())->LAND_FAIL();
 }
 
+DoBusiness::GetContactList::GetContactList(QObject * parent,std::string dto) : QObject(parent), dto(std::move(dto)) {
+}
+
+void DoBusiness::GetContactList::getContactList() {
+    emit dynamic_cast<AllocBusiness*>(parent())->GET_CONTACTLIST(dto);
+}
+
+DoBusiness::GetEmailCode::GetEmailCode(QObject *parent, std::string dto) : QObject(parent), dto(std::move(dto)){
+}
+
+void DoBusiness::GetEmailCode::getEmailCode() {
+    emit dynamic_cast<AllocBusiness*>(parent())->GET_EMAILCODE(dto);
+}
 
 DoBusiness::AllocBusiness::AllocBusiness() {
     _ccon = new ClientConServer();
-}
-
-void DoBusiness::AllocBusiness::run() {
-    QByteArray array = _ccon->getQSocket()->read(4);
-    int msgSize = 0;
-    QDataStream sizeStream(&array,QIODevice::ReadOnly);
-    sizeStream >> msgSize;
-
-    array = _ccon->getQSocket()->read(4);
-    QDataStream typeStream(&array,QIODevice::ReadOnly);
-    SSDTO::Business_Type type;
-    typeStream >> type;
-
-    QString dto = _ccon->getQSocket()->read(msgSize);
-    if(type == SSDTO::LOGIN){
-        DoBusiness::RecvVerifyRes vres(this,dto.toStdString());
-        vres.parseVerifyRes();
-    }else if(type == SSDTO::ENROLL){
-        DoBusiness::RecvEnrollRes eres();
-    }else if(type == SSDTO::FOWARD_MSG){
-        DoBusiness::RecvMsgTask mtask(this,dto.toStdString());
-        mtask.forwardMsg();
-    }else if(type == SSDTO::GET_CONTACTLIST){
-        DoBusiness::GetContactList gcl(this,dto.toStdString());
-        gcl.getContactList();
-    }
-    LOG("recv some business to do from server : " + std::to_string(type))
-}
-void DoBusiness::AllocBusiness::VerifyAcc(const std::string& outLdto) {
-    // 发送检验包
-    QByteArray packet;
-    QDataStream stream(&packet,QIODevice::WriteOnly);
-    stream << static_cast<quint32>(outLdto.size());
-    stream << static_cast<quint8>(SSDTO::LOGIN);
-    packet.append(outLdto.c_str(),outLdto.size());
-
-    _ccon->getQSocket()->write(packet);
-    _ccon->getQSocket()->waitForBytesWritten();
-    LOG("dto has been send to server...")
-}
-
-void DoBusiness::AllocBusiness::ForwardBySer(const std::string& outFmdto) {
-    // 发送转发包
-    QByteArray packet;
-    QDataStream stream(&packet,QIODevice::WriteOnly);
-    stream << static_cast<quint32>(outFmdto.size());
-    stream << static_cast<quint8>(SSDTO::FOWARD_MSG);
-    packet.append(outFmdto.c_str(),outFmdto.size());
-    _ccon->getQSocket()->write(packet);
-    _ccon->getQSocket()->waitForBytesWritten();
-    LOG("msg_forward dto has been send to server...")
 }
 
 DoBusiness::AllocBusiness::~AllocBusiness() {
@@ -155,6 +131,46 @@ void DoBusiness::AllocBusiness::ConToSer() {
     connect(this,&AllocBusiness::DISCONNECTFROMSER,this,&AllocBusiness::DisConnFromSer);
 }
 
+void DoBusiness::AllocBusiness::run() {
+    QByteArray array = _ccon->getQSocket()->read(4);
+    int msgSize = 0;
+    QDataStream sizeStream(&array, QIODevice::ReadOnly);
+    sizeStream >> msgSize;
+
+    array = _ccon->getQSocket()->read(4);
+    QDataStream typeStream(&array, QIODevice::ReadOnly);
+    SSDTO::Business_Type type;
+    typeStream >> type;
+
+    QString dto = _ccon->getQSocket()->read(msgSize);
+    if (type == SSDTO::LOGIN) {
+        DoBusiness::RecvVerifyRes vres(this, dto.toStdString());
+        vres.parseVerifyRes();
+    } else if (type == SSDTO::ENROLL) {
+        // DoBusiness::RecvEnrollRes eres();
+    } else if(type == SSDTO::GET_EMAILCODE){
+        DoBusiness::GetEmailCode gec(this,dto.toStdString());
+        gec.getEmailCode();
+    } else if(type == SSDTO::FOWARD_MSG){
+        DoBusiness::RecvMsgTask mtask(this,dto.toStdString());
+        mtask.forwardMsg();
+    } else if(type == SSDTO::GET_CONTACTLIST){
+        DoBusiness::GetContactList gcl(this,dto.toStdString());
+        gcl.getContactList();
+    }
+    LOG("recv some business to do from server : " + std::to_string(type))
+}
+
+void DoBusiness::AllocBusiness::VerifyAcc(const std::string& outLdto) {
+    // 发送检验包
+    SEND_PACKAGE(outLdto,SSDTO::LOGIN,"dto has been send to server...")
+}
+
+void DoBusiness::AllocBusiness::ForwardBySer(const std::string& outFmdto) {
+    // 发送转发包
+    SEND_PACKAGE(outFmdto,SSDTO::FOWARD_MSG,"msg_forward dto has been send to server...")
+}
+
 void DoBusiness::AllocBusiness::DisConnFromSer() {
     // 发送离线通知
     std::string outDisdto;
@@ -164,31 +180,15 @@ void DoBusiness::AllocBusiness::DisConnFromSer() {
     ddto.set_type(SSDTO::DISCONNECT);
     ddto.SerializeToString(&outDisdto);
 
-    QByteArray packet;
-    QDataStream stream(&packet,QIODevice::WriteOnly);
-    stream << static_cast<quint32>(outDisdto.size());
-    stream << static_cast<quint8>(SSDTO::DISCONNECT);
-    packet.append(outDisdto.c_str(),outDisdto.size());
-    _ccon->getQSocket()->write(packet);
-    _ccon->getQSocket()->waitForBytesWritten();
-    LOG("disconnect notice has been send to server...")
+    SEND_PACKAGE(outDisdto,SSDTO::DISCONNECT,"disconnect notice has been send to server...")
 }
+
 void DoBusiness::AllocBusiness::QueryContactList(const std::string &outGfdto) {
-    // 发送检验包
-    QByteArray packet;
-    QDataStream stream(&packet,QIODevice::WriteOnly);
-    stream << static_cast<quint32>(outGfdto.size());
-    stream << static_cast<quint8>(SSDTO::GET_CONTACTLIST);
-    packet.append(outGfdto.c_str(),outGfdto.size());
-
-    _ccon->getQSocket()->write(packet);
-    _ccon->getQSocket()->waitForBytesWritten();
-    LOG("query contact list dto has been send to server...")
+    // 发送查询联系人列表请求
+    SEND_PACKAGE(outGfdto,SSDTO::GET_CONTACTLIST,"query contact list dto has been send to server...")
 }
 
-DoBusiness::GetContactList::GetContactList(QObject * parent,std::string dto) : QObject(parent), dto(std::move(dto)) {
-}
-
-void DoBusiness::GetContactList::getContactList() {
-    emit dynamic_cast<AllocBusiness*>(parent())->GET_CONTACTLIST(dto);
+void DoBusiness::AllocBusiness::QueryEmailVerifyCode(const std::string &outEdto) {
+    // 发送请求邮箱验证码
+    SEND_PACKAGE(outEdto,SSDTO::GET_EMAILCODE,"query email code dto has been send to server...")
 }

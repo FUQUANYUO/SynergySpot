@@ -9,4 +9,5 @@ enum Business_Type{
     DISCONNECT = 3;
     GET_CONTACTLIST = 4;
     ADD_FRIEND = 5;
+    GET_EMAILCODE = 6;
 }
