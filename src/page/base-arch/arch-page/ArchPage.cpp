@@ -33,6 +33,15 @@ ArchPage::ArchPage(QObject * obj,QWidget *parent) : QMainWindow(parent), ui(new 
     delVec.push_back(reinterpret_cast<QObject*>(ml));
     ui->Vlayout->addWidget(lv);
 
+#ifdef SHOW_CONTACT_PAGE
+    ContactPage * cp = new ContactPage(this);
+    ui->Vlayout->addWidget(cp);
+    cp->hide();
+
+    // 联系人激活
+    connect(cp->getContactList(),&ContactList::SELECTED_CONTACTITEM,ml,&MessageList::Add_ContactItem);
+#endif
+
     // 当点击后获取待发送的消息对象
     connect(ml,&MessageList::SELECTED_MSGITEM,this,[=](const std::string &ssid){
         // 外部独立消息窗口（两种方式不能共存）
@@ -72,6 +81,31 @@ ArchPage::ArchPage(QObject * obj,QWidget *parent) : QMainWindow(parent), ui(new 
             }
         }
     });
+
+    // 接收到服务端转发消息
+    connect(bl,&BusinessListen::RECV_MSG,this,[=](const std::string& rawFmdto){
+        SSDTO::ForwardMsg_DTO fdto;
+        fdto.ParseFromString(rawFmdto);
+        // 检查有没有创建MsgPage
+        std::string ssid = fdto.send_ssid();
+
+        emit cp->getContactList()->SELECTED_CONTACTITEM(ssid);
+
+        auto res = lmp.find(ssid);
+        if(res == lmp.end()){// 不存在这个好友的聊天页面
+            auto * p = new MsgPage(this);
+            p->hide();
+            delVec.push_back(p);
+            p->setSendTo(ssid);// 消息包中需要sendToSSID
+
+            lmp.insert({ssid,p});
+        }
+        // 收到的信息可能是 群/用户
+        // TODO 群
+
+        // 用户
+        lmp[ssid]->addNewInfo({ssid,fdto.content()});
+    });
 #endif
 
 #ifdef SHOW_MORE_OPTION_PAGE
@@ -84,15 +118,6 @@ ArchPage::ArchPage(QObject * obj,QWidget *parent) : QMainWindow(parent), ui(new 
         mop->move(95,(ui->option->y())-(mop->height())+30);
         mop->show();
     });
-#endif
-
-#ifdef SHOW_CONTACT_PAGE
-    ContactPage * cp = new ContactPage(this);
-    ui->Vlayout->addWidget(cp);
-    cp->hide();
-
-    // 联系人激活
-    connect(cp->getContactList(),&ContactList::SELECTED_CONTACTITEM,ml,&MessageList::Add_ContactItem);
 #endif
 
 #ifdef SHOW_AVATAR_PAGE

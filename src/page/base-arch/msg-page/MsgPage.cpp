@@ -34,7 +34,7 @@ MsgPage::MsgPage(QWidget *parent) : ui(new Ui::MsgPage) {
             ui->text->clear();
 
             // 在 ui listview 中显示
-            emit mcs->PRESENT_SENDCOTENT(inputTxt);
+            emit mcs->PRESENT_SENDCONTENT(inputTxt);
 
             // 获取当前时间
             std::time_t now = std::time(nullptr);
@@ -64,6 +64,11 @@ MsgPage::MsgPage(QWidget *parent) : ui(new Ui::MsgPage) {
 MsgPage::~MsgPage() {
     delete ui;
 }
+
 void MsgPage::setSendTo(std::string sendTo) {
     _sendTo = std::move(sendTo);
+}
+
+void MsgPage::addNewInfo(std::vector<std::string> args) {
+    mcs->addNewItem(args[0],args[1]);
 }

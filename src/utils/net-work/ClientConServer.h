@@ -12,7 +12,7 @@ class ClientConServer {
 public:
     explicit ClientConServer();
     QTcpSocket *getQSocket();
-    void ConnToSer();
+    void connToSer();
     ~ClientConServer();
 private:
     QString _host_ip;

@@ -13,10 +13,10 @@
 AccountRegister::AccountRegister(const std::string& emailAddress,QObject *parent) : QObject(parent) {
     BusinessListen * bl = dynamic_cast<LandPage*>(this->parent()->parent())->getBusinessObj();
 
-    // 当前时间点 记录格式 xxxx-xx-xx xx-xx
+    // 当前时间点 记录格式 xxxx-xx-xx xx:xx:xx
     ev = new EmailVerify(bl,GetCurTime::getTimeObj()->getCurTime());
 
-    // 发送验证码请求
+    // 接收验证码请求
     connect(bl,&BusinessListen::GET_EMAILCODE,this,[=](const std::string & rawEdto){
         ev->parseEmailVerifyCode(rawEdto);
         emit dynamic_cast<RegisterPage*>(this->parent())->TRANSVERIFYDATA(

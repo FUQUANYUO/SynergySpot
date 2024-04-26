@@ -6,12 +6,6 @@
 
 #include "forward_msg/ForwardMsgDTO.pb.h"
 
-
-//未发送的聊天记录表  key:接收消息的账号  v:接收的消息
-extern std::unordered_map<std::string, chatLog> sentLog;
-//在线人员表  key:账号  v:与这个账号通信的Socket指针
-extern std::unordered_map<std::string, TcpSocket *> onlineList;
-
 bool execStoreMsg();
 
 void DoForwardMsg::execForward(const std::string &dto) {
@@ -28,7 +22,7 @@ void DoForwardMsg::execForward(const std::string &dto) {
     std::cout << fmdto.content() << std::endl;
     auto res = onlineList.find(recv_ssid);
     if(res != onlineList.end()){// 在线
-        res->second->sendMsg(outForward,SSDTO::Business_Type::FOWARD_MSG);
+        res->second->tcp->sendMsg(outForward,SSDTO::Business_Type::FOWARD_MSG);
     }else{// 不在线
         auto findRecver = sentLog.find(recv_ssid);
         if(findRecver != sentLog.end()){// 存在消息未发
@@ -54,7 +48,7 @@ void DoForwardMsg::execForwardByMap(std::string curSSID) {
     if(res != sentLog.end()){ // 存在未发送的消息
         for(auto it : res->second){
             for(auto msg : it.second){
-                onlineList[curSSID]->sendMsg(msg,SSDTO::Business_Type::FOWARD_MSG);
+                onlineList[curSSID]->tcp->sendMsg(msg,SSDTO::Business_Type::FOWARD_MSG);
             }
             onlineList.erase(it.first);
         }

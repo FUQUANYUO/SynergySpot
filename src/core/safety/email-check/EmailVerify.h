@@ -6,12 +6,13 @@
 #define SYNERGYSPOT_EMAILVERIFY_H
 
 #include <QObject>
+#include "help.h"
 
 class EmailVerify : public QObject{
     Q_OBJECT
 public:
     EmailVerify() = default;
-    EmailVerify(QObject * bobj,std::string queryTime);
+    EmailVerify(QObject * bobj,const std::string& queryTime);
     ~EmailVerify() = default;
     // 发送邮箱验证码
     void sendEmailVerifyCode(const std::string& emailAddress);

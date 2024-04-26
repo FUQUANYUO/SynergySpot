@@ -22,6 +22,11 @@ class MsgPage : public QWidget {
 public:
     explicit MsgPage(QWidget *parent = nullptr);
     void setSendTo(std::string sendTo);
+
+    // 添加新的信息
+    // args[0] ssid, args[1] content
+    void addNewInfo(std::vector<std::string> args);
+
     ~MsgPage() override;
 private:
     Ui::MsgPage *ui;

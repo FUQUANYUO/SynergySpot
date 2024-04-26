@@ -20,7 +20,7 @@ ClientConServer::ClientConServer() {
 QTcpSocket *ClientConServer::getQSocket() {
     return &_qSocket;
 }
-void ClientConServer::ConnToSer() {
+void ClientConServer::connToSer() {
     _qSocket.connectToHost(_host_ip,_port);
 }
 ClientConServer::~ClientConServer() {

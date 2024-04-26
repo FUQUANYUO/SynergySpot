@@ -1,6 +1,6 @@
 #include "TcpSocket.h"
 #include <iostream>
-#include <string.h>
+#include <cstring>
 #include <unistd.h>
 
 using namespace std;
@@ -49,7 +49,6 @@ int TcpSocket::sendMsg(std::string msg,char business_type) {
 
 int TcpSocket::recvMsg(string &msg, char &business_type) {
     // 接收数据
-    // 1. 读数据头
     int len = 0;
     business_type = -1;
     readn((char *) &len, 4);
@@ -60,6 +59,10 @@ int TcpSocket::recvMsg(string &msg, char &business_type) {
     // 根据读出的长度分配内存
     char *buf = new char[len + 1];
     int ret = readn(buf, len);
+    if (ret == -1)
+    {
+        return -1;
+    }
     if (ret != len) {
         msg = "";
         business_type = -1;
@@ -90,15 +93,19 @@ int TcpSocket::readn(char *buf, int size) {
 int TcpSocket::writen(const char *msg, int size) {
     int left = size;
     int nwrite = 0;
-    const char *p = msg;
+    const char* p = msg;
 
-    while (left > 0) {
-        if ((nwrite = write(m_fd, p, left)) > 0) {
+    while (left > 0)
+    {
+        if ((nwrite = write(m_fd, p, left)) > 0)
+        {
             p += nwrite;
             left -= nwrite;
-        } else if (nwrite == -1) {
+        }
+        else if (nwrite == -1)
+        {
             return -1;
         }
     }
-    return size;
+    return size - left;
 }

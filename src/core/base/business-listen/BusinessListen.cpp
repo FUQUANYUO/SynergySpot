@@ -116,7 +116,7 @@ void DoBusiness::AllocBusiness::ConToSer() {
     // 连接服务器
     if(_ccon->getQSocket()->state() != QAbstractSocket::ConnectedState){
         // 建立连接
-        _ccon->ConnToSer();
+        _ccon->connToSer();
     }
     connect(_ccon->getQSocket(),&QTcpSocket::connected,[=](){
         LOG("connect success")

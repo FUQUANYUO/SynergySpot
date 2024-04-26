@@ -2,7 +2,7 @@ mysql-info:
  ip: 127.0.0.1
  port: 3306
  userName: root
- password: Fu159753
+ password: xxx
  dbName: synergy_spot
  minSize: 10
  maxSize: 1024

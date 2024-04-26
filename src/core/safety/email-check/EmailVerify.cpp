@@ -3,6 +3,8 @@
 //
 
 #include "EmailVerify.h"
+
+#include <utility>
 #include "help.h"
 
 // protobuf 登录业务
@@ -12,11 +14,11 @@
 
 BusinessListen *bl = nullptr;
 
-EmailVerify::EmailVerify(QObject * bobj,std::string queryTime) {
+EmailVerify::EmailVerify(QObject * bobj,const std::string& queryTime) {
     bl = dynamic_cast<BusinessListen*>(bobj);
     this->validTime = "10";
     this->verifyCode = "-1";
-    this->startTime = std::move(queryTime);
+    this->startTime = queryTime;
 }
 
 void EmailVerify::sendEmailVerifyCode(const std::string& emailAddress) {
@@ -25,7 +27,7 @@ void EmailVerify::sendEmailVerifyCode(const std::string& emailAddress) {
     evdto.set_type(SSDTO::Business_Type::GET_EMAILCODE);
     evdto.set_is_request(true);
     evdto.set_email_address(emailAddress);
-    evdto.set_start_time("");
+    evdto.set_start_time(startTime);
     evdto.set_valid_time("");
     evdto.set_verify_code("");
     evdto.SerializeToString(&outEdto);

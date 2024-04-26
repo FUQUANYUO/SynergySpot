@@ -23,6 +23,7 @@ signals:
     void TRANSVERIFYDATA(std::array<std::string,3> data);
 private:
     Ui::RegisterPage *ui;
+    std::array<std::string,3> _data;
 };
 
 

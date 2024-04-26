@@ -11,6 +11,9 @@
 #include "ContactList.h"
 #include "base-arch/arch-page/ArchPage.h"
 
+//-----------    protobuf    -----------//
+#include "friend/FriendDTO.pb.h"
+
 extern std::string CurSSID;
 
 // ssid(user) : {nickname,remark}

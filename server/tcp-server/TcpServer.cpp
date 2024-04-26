@@ -41,7 +41,8 @@ int TcpServer::setListen(unsigned short port) {
     return ret;
 }
 
-TcpSocket *TcpServer::acceptConn(sockaddr_in *addr) {
+TcpSocket *TcpServer::acceptConn() {
+    sockaddr_in *addr = new sockaddr_in;
     if (addr == NULL) {
         return nullptr;
     }
@@ -54,4 +55,7 @@ TcpSocket *TcpServer::acceptConn(sockaddr_in *addr) {
     }
     printf("成功和客户端建立连接...\n");
     return new TcpSocket(cfd);
+}
+int TcpServer::getLisentFD() {
+    return m_fd;
 }

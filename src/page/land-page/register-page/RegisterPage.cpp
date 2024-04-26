@@ -20,6 +20,11 @@
 RegisterPage::RegisterPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::RegisterPage) {
     ui->setupUi(this);
     ui->statusBar->setSizeGripEnabled(false);
+    ui->statusBar->setStyleSheet("QStatusBar { font-size: 18pt; font-weight: bold; color: red; }");
+
+    _data = {"","",""};
+
+    auto * timer = new QTimer(this);
     // 发送获取验证码请求
     connect(ui->sendVerifyEmailCode,&QPushButton::clicked,this,[=](){
         // 验证邮箱格式
@@ -27,63 +32,49 @@ RegisterPage::RegisterPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::Re
         if(emailAddress.contains("@") && emailAddress.count("@") == 1){
             // 一分钟禁用发送按钮
             ui->sendVerifyEmailCode->setDisabled(true);
-
-            QTimer timer;
-            connect(&timer,&QTimer::timeout,this,[=](){
+            connect(timer,&QTimer::timeout,this,[=](){
                 ui->sendVerifyEmailCode->setDisabled(false);
             });
-            timer.start(60 * 1000);
-
-            AccountRegister ar(emailAddress.toStdString(),this);
+            timer->start(60 * 1000);
+            auto *ar = new AccountRegister(emailAddress.toStdString(),this);
         }
     });
 
     // 收到验证信息
     connect(this,&RegisterPage::TRANSVERIFYDATA,this,[=](const std::array<std::string,3>& data){
-        // 用户注册并验证验证码
-        connect(ui->registerBtn,&QPushButton::clicked,this,[=](){
-            std::string inputEmailCode = ui->emailCode->text().toStdString();
-            if(!inputEmailCode.empty() && inputEmailCode.size() == 6){
-                // 验证验证码是否在有效期
-                LOG("[email code] : request time " + data[0]);
-                LOG("[email code] : cur time " + GetCurTime::getTimeObj()->getCurTime())
-                std::time_t requestTimeStamp = GetCurTime::getTimeObj()->transformStrToTimeStamp(data[0]);
-                std::time_t curTimeStamp = GetCurTime::getTimeObj()->getCurTimeStamp();
-                if(requestTimeStamp + atoi(data[1].c_str()) * 60 > curTimeStamp){
-                    // 比对输入与服务端生成是否一致
-                    if(inputEmailCode == data[2]){
-                        LOG("[email code] : verify success!")
-                    }else{
-                        LOG("[email code] : input code doesn't equal server generate code!!!")
-                    }
-                }else{
-                    ui->statusBar->showMessage("<font color='red' size=4><b>" + tr("邮箱验证码超过时效期！") + "</b></font>",5000);
-                }
-            }else{
-                ui->statusBar->showMessage("<font color='red' size=4><b>" + tr("输入的验证码不符合格式要求！") + "</b></font>",5000);
-            }
-        });
+        _data = data;
     });
 
-    // 注册
+    // 用户注册并验证验证码
     connect(ui->registerBtn,&QPushButton::clicked,this,[=](){
-        QString inputPassword = ui->password->text();
-        QString inputEmail = ui->email->text();
-
-#ifdef LOC_TEST
-        // 本地注册
-        char sqlStr[1024];
-        std::string ssid = std::to_string(10000000 + time(nullptr) % 10000000);
-        sprintf(sqlStr,"INSERT INTO user_private_info(`ssid`,`status`,`password`,`email`) VALUES('%s',0,'%s','%s')",
-                ssid.c_str(),inputPassword.toStdString().c_str(),inputEmail.toStdString().c_str());
-        bool res = ConnectionPool::getConnectPool()->getConnection()->update(sqlStr);
-        if(res)
-            cout << "register success" << endl;
-        else
-            cout <<  __FILE__ << " | " << __LINE__ << " | " << __TIME__ << " | " << "register error" << endl;
-#else
-        // 云端注册
-#endif
+        if(_data[0].empty() && _data[1].empty() && _data[2].empty()){
+            ui->statusBar->showMessage(tr("客户端出现错误！") , 5000);
+        }else{
+            std::string inputEmailCode = ui->emailCode->text().toStdString();
+            if(!inputEmailCode.empty() && inputEmailCode.size() == 6){
+                std::time_t requestTimeStamp = GetCurTime::getTimeObj()->transformStrToTimeStamp(_data[0]);
+                std::time_t curTimeStamp = GetCurTime::getTimeObj()->getCurTimeStamp();
+                // 验证验证码是否在有效期
+                LOG("[email code] : request time " << _data[0] << " " << requestTimeStamp)
+                LOG("[email code] : cur time " << GetCurTime::getTimeObj()->getCurTime() << " " << curTimeStamp)
+                if(requestTimeStamp + std::stoi(_data[1]) * 60 > curTimeStamp){
+                    // 比对输入与服务端生成是否一致
+                    if(inputEmailCode == _data[2]){
+                        LOG("[email code] : verify success!")
+                        ui->statusBar->setStyleSheet("QStatusBar { font-size: 20pt; font-weight: bold; color: green; }");
+                        ui->statusBar->showMessage(tr("验证通过，注册成功！请返回登录！"), -1);
+                        ui->registerBtn->setDisabled(true);
+                    }else{
+                        LOG("[email code] : input code doesn't equal server generate code!!!")
+                        ui->statusBar->showMessage(tr("验证码不正确，请检查邮件验证码！！！") , 5000);
+                    }
+                }else{
+                    ui->statusBar->showMessage(tr("验证码已过期，请再次获取验证码！！！"), 5000);
+                }
+            }else{
+                ui->statusBar->showMessage(tr("验证码格式不正确，请再次检查！！！"), 5000);
+            }
+        }
     });
 }
 

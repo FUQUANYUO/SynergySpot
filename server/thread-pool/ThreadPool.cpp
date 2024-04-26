@@ -92,7 +92,9 @@ void *ThreadPool::worker(void *arg) {
         pthread_mutex_lock(&pool->m_lock);
         // 判断任务队列是否为空, 如果为空工作线程阻塞
         while (pool->m_taskQ->taskNumber() == 0 && !pool->m_shutdown) {
+#ifdef DEBUG_THREAD
             cout << "thread " << to_string(pthread_self()) << " waiting..." << endl;
+#endif
             // 阻塞线程
             pthread_cond_wait(&pool->m_notEmpty, &pool->m_lock);
 
@@ -119,13 +121,17 @@ void *ThreadPool::worker(void *arg) {
         // 线程池解锁
         pthread_mutex_unlock(&pool->m_lock);
         // 执行任务
+#ifdef DEBUG_THREAD
         cout << "thread " << to_string(pthread_self()) << " start working..." << endl;
+#endif
         task.function(task.arg);
         free(task.arg);
         task.arg = nullptr;
 
         // 任务处理结束
+#ifdef DEBUG_THREAD
         cout << "thread " << to_string(pthread_self()) << " end working...";
+#endif
         pthread_mutex_lock(&pool->m_lock);
         pool->m_busyNum--;
         pthread_mutex_unlock(&pool->m_lock);

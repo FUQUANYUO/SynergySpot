@@ -11,9 +11,6 @@
 
 #include "db-lite/LiteConn.h"
 
-//-----------    protobuf    -----------//
-#include "friend/FriendDTO.pb.h"
-
 extern std::string CurSSID;
 
 // ssid(user) : {nickname,remark}
@@ -241,7 +238,7 @@ MessageList::~MessageList() {
 }
 
 void MessageList::Add_ContactItem(std::string ssid){
-    auto res = find(addContactVec.begin(),addContactVec.begin(),ssid);
+    auto res = find(addContactVec.begin(),addContactVec.end(),ssid);
     if(res == addContactVec.end())
         mModel->addItem(ssid);
 }

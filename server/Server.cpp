@@ -3,11 +3,11 @@
 #include "yaml-cpp/yaml.h"
 
 #include "../src/protofile/DTO.pb.h"
-#include "../src/utils/help.h"
 
 #include "do-forwardmsg/DoForwardMsg.h"
 #include "do-login/DoLogin.h"
 #include "do-get-friendlist/DoGetFriendList.h"
+#include "do-email-code/DoEmailCode.h"
 
 using namespace std;
 
@@ -16,114 +16,119 @@ std::string yamlPath = "../../src/conf/serverInfo.yaml";
 //待发送的消息表      key: 发送人账号    v:发送的聊天记录
 std::unordered_map<std::string, chatLog> sentLog;
 //在线人员表  key:账号  v:与这个账号通信的Socket指针
-std::unordered_map<std::string, TcpSocket *> onlineList;
+std::unordered_map<std::string, SockInfo *> onlineList;
+// 文件描述符 : TcpSocket
+std::unordered_map<int,SockInfo*> fd_sockets;
 
+void working(void *arg){
+    string ssid;
+    auto readArgs = reinterpret_cast<ReadArgs*>(arg);
+    int &fd = readArgs->fd;
+    EpollEngine &en = *readArgs->en;
 
-void *working(void *arg) {
-    struct SockInfo *pinfo = static_cast<struct SockInfo *>(arg);
-    // 连接建立成功, 打印客户端的IP和端口信息
-    char ip[32];
-    printf("客户端的IP: %s, 端口: %d\n",
-           inet_ntop(AF_INET, &pinfo->addr.sin_addr.s_addr, ip, sizeof(ip)),
-           ntohs(pinfo->addr.sin_port));
+    // 读取数据
+    char business_type;
+    string dto;
+    SockInfo *info = fd_sockets[fd];
+    int res = (info->tcp->recvMsg(dto,business_type));
+    if(dto.empty()){
+        LOG("dto is empty! occur error please check program！")
+        return ;
+    }
+    // 断开连接
+    if(res == -1){
+        LOG("client( " << fd << " , " << fd_sockets[fd]->ssid << " ) disconnected.")
+        // 从在线列表移除
+        if(!info->ssid.empty())
+            onlineList.erase(info->ssid);
+        // 去掉账户关联文件描述符
+        fd_sockets.erase(fd);
+        delete info->tcp;
+        delete info;
+        en.deleteEvent(fd);
+        LOG("user go offline")
+        return ;
+    }
 
-    string ssid = "";
-    // 5. 通信
-    while (1) {
-        string dto = "";
-        char business_type;
-        int res = pinfo->tcp->recvMsg(dto, business_type);
-        if (!dto.empty() && res != 0) {
-            //后续用epoll处理接收和发送
-            //如果非空，获取数据，判断业务类型，之后调用对应的业务函数,服务器存储qq和对应的tcp
+    // 登录
+    if (business_type == SSDTO::Business_Type::LOGIN) {
+        DoLogin dl;
+        bool isPass = dl.execVerifyLogin(dto, ssid);
+        string resDto = dl.sendVerifyRes(isPass);
+        info->tcp->sendMsg(resDto, SSDTO::Business_Type::LOGIN);
 
-            // 登录
-            if (business_type == SSDTO::Business_Type::LOGIN) {
-                DoLogin dl;
-                bool isPass = dl.execVerifyLogin(dto,ssid);
-                string resDto = dl.sendVerifyRes(isPass);
-                pinfo->tcp->sendMsg(resDto,SSDTO::Business_Type::LOGIN);
-
-                if(isPass){
-                    // 如果在线则顶掉
-                    auto isOnline = onlineList.find(ssid);
-                    if(isOnline != onlineList.end()){
-                        onlineList.erase(ssid);
-                        LOG("account[" << ssid << "] is take over in another IP");
-                    }
-
-                    // 加入在线列表
-                    onlineList[ssid] = pinfo->tcp;
-                    DoForwardMsg::execForwardByMap(ssid);
-                }else{
-                    break;
-                }
+        if(isPass){
+            // 如果在线则顶掉
+            auto isOnline = onlineList.find(ssid);
+            if (isOnline != onlineList.end()) {
+                onlineList.erase(ssid);
+                LOG("account[" << ssid << "] is take over in another IP");
             }
-            // 消息转发
-            else if(business_type == SSDTO::Business_Type::FOWARD_MSG){
-                DoForwardMsg dfmsg;
-                dfmsg.execForward(dto);
-            }
-            // 获取好友列表
-            else if(business_type == SSDTO::Business_Type::GET_CONTACTLIST){
-                DoGetFriendList dgflist;
-                pinfo->tcp->sendMsg(dgflist.execQueryFriendList(dto),SSDTO::Business_Type::GET_CONTACTLIST);
-            }
-            // 连接断开
-            else if(business_type == SSDTO::Business_Type::DISCONNECT){
-                break;
-            }
-            else {
-                LOG("some error occur in parse business!")
-            }
-        }
-        else {
-            break;
+            // 加入在线列表
+            onlineList[ssid] = info;
+            // 维护SocketInfo
+            fd_sockets[fd]->ssid = ssid;
+
+            DoForwardMsg::execForwardByMap(ssid);
         }
     }
-    LOG("user go offline")
-    onlineList.erase(ssid);
+    // 消息转发
+    else if (business_type == SSDTO::Business_Type::FOWARD_MSG) {
+        DoForwardMsg dfmsg;
+        dfmsg.execForward(dto);
+    }
+    // 获取好友列表
+    else if (business_type == SSDTO::Business_Type::GET_CONTACTLIST) {
+        DoGetFriendList dgflist;
+        info->tcp->sendMsg(dgflist.execQueryFriendList(dto), SSDTO::Business_Type::GET_CONTACTLIST);
 
-    delete pinfo->tcp;
-    delete pinfo;
-    return nullptr;
+        DoForwardMsg::execForwardByMap(ssid);
+    }
+    // 连接断开
+    else if (business_type == SSDTO::Business_Type::DISCONNECT) {
+        onlineList.erase(info->ssid);
+        LOG("user go offline")
+    }
+    // 获取邮件验证码
+    else if(business_type == SSDTO::Business_Type::GET_EMAILCODE){
+        DoEmailCode doEmailCode;
+        info->tcp->sendMsg(doEmailCode.sendEmailCode(dto),SSDTO::Business_Type::GET_EMAILCODE);
+    }
+    else {
+        LOG("some error occur in parse business!");
+    }
 }
+
+// 创建监听的套接字
+TcpServer s;
+ThreadPool * pool = nullptr;
 
 int main() {
     YAML::Node node = YAML::LoadFile(yamlPath);
     if (node.IsNull()) return -1;
-    int listen_port = node["host-info"]["listen-port"].as<int>();
-    // 1. 创建监听的套接字
-    TcpServer s;
-    // 2. 绑定本地的IP port并设置监听
-    s.setListen(listen_port);
-    // 3. 阻塞并等待客户端的连接
+    int listenPort = node["host-info"]["listenPort"].as<int>();
+    int poolMin = node["thread-pool"]["minSize"].as<int>();
+    int poolMax = node["thread-pool"]["maxSize"].as<int>();
 
-    chatLog r;
-    string f = "123";
-    list<string> list;
-    list.push_back(f);
-    r[f] = list;
-    if (r.find(f) != r.end()) {
-        std::cout << "Element inserted successfully." << std::endl;
-    } else {
-        std::cout << "Element insertion failed." << std::endl;
-    }
+    // 创建线程池
+    ThreadPool Pool(poolMin, poolMax);
+    pool = &Pool;
+    // 绑定本地的IP port并设置监听
+    s.setListen(listenPort);
+    EpollEngine en;
+    // 添加服务端监听事件
+    en.addEvent(s.getLisentFD(),EPOLLIN);
 
     while (1) {
-        SockInfo *info = new SockInfo;
-        TcpSocket *tcp = s.acceptConn(&info->addr);
-        if (tcp == nullptr) {
-            cout << "重试...." << endl;
-            continue;
+        // 等待服务端监听响应
+        int numsOfReady = en.waitForEvents();
+        if (numsOfReady == -1) {
+            LOG("errno value: " << errno)
+            // 处理错误情况，可能需要退出循环或重启epoll
         }
-        // 创建子线程
-        pthread_t tid;
-        info->s = &s;
-        info->tcp = tcp;
-
-        pthread_create(&tid, NULL, working, info);
-        pthread_detach(tid);
+        else {
+            en.handleEvents(numsOfReady);
+        }
     }
     return 0;
 }

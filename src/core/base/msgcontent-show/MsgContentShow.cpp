@@ -150,25 +150,16 @@ MsgContentShow::MsgContentShow(QListView *lv,QObject *obl) : _lv(lv){
     // lv 触发不可编辑
     _lv->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    // 通过 lv 的父亲去做动态转化
-    auto bl = dynamic_cast<BusinessListen*>(obl);
-
-    // 接收转发信息
-    connect(bl,&BusinessListen::RECV_MSG,[=](const std::string& rawFmdto){
-        SSDTO::ForwardMsg_DTO fdto;
-        fdto.ParseFromString(rawFmdto);
-        // 收到的信息可能是 群/用户
-
-        // [测试] 用户的信息
-        mModel->addItem(QString::fromStdString(fdto.send_ssid()),QString::fromStdString(fdto.content()),"Server");
-    });
-
     // 用户发送消息的渲染
-    connect(this,&MsgContentShow::PRESENT_SENDCOTENT,this,[=](const QString& sendStr){
+    connect(this,&MsgContentShow::PRESENT_SENDCONTENT,this,[=](const QString& sendStr){
         // 设置用户发送的消息为 User
         mModel->addItem(sendStr,"User");
     });
 }
 MsgContentShow::~MsgContentShow() {
     mDelegate->deleteLater();
+}
+
+void MsgContentShow::addNewItem(const std::string &ssid, const std::string &content) {
+    mModel->addItem(QString::fromStdString(ssid),QString::fromStdString(content),"Server");
 }

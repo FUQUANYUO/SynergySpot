@@ -7,8 +7,8 @@ public:
     TcpServer();
     ~TcpServer();
     int setListen(unsigned short port);
-    TcpSocket *acceptConn(struct sockaddr_in *addr = nullptr);
-
+    TcpSocket *acceptConn();
+    int getLisentFD();
 private:
     int m_fd;// 监听的套接字
 };

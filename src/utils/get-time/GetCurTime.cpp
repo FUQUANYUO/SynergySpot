@@ -3,7 +3,7 @@
 //
 #include "GetCurTime.h"
 #include <array>
-#include <iomanip>
+#include <chrono>
 #include <sstream>
 
 GetCurTime * instance = nullptr;
@@ -29,8 +29,8 @@ std::string GetCurTime::getCurTime() {
 
     // 使用sprintf来格式化时间
     // %Y 表示四位数的年份，%m 表示月份，%d 表示日，%H 表示小时（24小时制），%M 表示分钟
-    std::strftime(buffer.data(), buffer.size(), "%Y-%m-%d %H-%M",&local_time);
-    return {buffer.data()};
+    std::strftime(buffer.data(), buffer.size(), "%Y-%m-%d %H:%M:%S",&local_time);
+    return buffer.data();
 }
 
 void GetCurTime::destroyTimeObj() {
@@ -51,24 +51,37 @@ std::string GetCurTime::transformTimeStampToStr(std::time_t timestamp) {
 
     // 使用sprintf来格式化时间
     // %Y 表示四位数的年份，%m 表示月份，%d 表示日，%H 表示小时（24小时制），%M 表示分钟
-    std::strftime(buffer.data(), buffer.size(), "%Y-%m-%d %H-%M",&local_time);
-    return {buffer.data()};
+    std::strftime(buffer.data(), buffer.size(), "%Y-%m-%d %H:%M:%S",&local_time);
+    return buffer.data();
 }
 
 std::time_t GetCurTime::transformStrToTimeStamp(const std::string& time) {
-    std::tm timeStruct = {};
-    // 使用std::istringstream来解析日期时间字符串
-    std::istringstream stream(time);
-    stream >> std::setw(4) >> timeStruct.tm_year // 4位数的年份
-            >> std::setw(2) >> timeStruct.tm_mon   // 月份，从1开始计数
-            >> std::setw(2) >> timeStruct.tm_mday  // 日期
-            >> std::setw(2) >> timeStruct.tm_hour  // 小时
-            >> std::setw(2) >> timeStruct.tm_min;  // 分钟
-    timeStruct.tm_year -= 1900;
-    timeStruct.tm_mon -= 1;
+    // 解析年月日
+    int year = std::stoi(time.substr(0, 4));
+    int month = std::stoi(time.substr(5, 2));
+    int day = std::stoi(time.substr(8, 2));
 
-    // 使用mktime将tm结构体转换为时间戳
-    std::time_t timestamp = std::mktime(&timeStruct);
+    // 解析时分秒
+    int hour = std::stoi(time.substr(11, 2));
+    int minute = std::stoi(time.substr(14, 2));
+    int second = std::stoi(time.substr(17, 2));
+
+    // 构造tm结构体
+    std::tm tmStruct{};
+    tmStruct.tm_year = year - 1900; // tm_year是从1900年开始的
+    tmStruct.tm_mon = month - 1;     // tm_mon是从0（一月）开始的
+    tmStruct.tm_mday = day;
+    tmStruct.tm_hour = hour;
+    tmStruct.tm_min = minute;
+    tmStruct.tm_sec = second;
+
+    // 使用mktime将tm结构体转换为time_t
+    std::time_t time_tStruct = std::mktime(&tmStruct);
+
+    // 使用chrono库将time_t转换为时间戳
+    auto duration = std::chrono::seconds(time_tStruct);
+    auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+
     return timestamp;
 }
 
