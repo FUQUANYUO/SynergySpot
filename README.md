@@ -23,6 +23,32 @@ find_package(CURL REQUIRED)
 ```CMakeLists
 set(CMAKE_PREFIX_PATH "D:/QT/6.5.3/msvc2019_64")
 ```
+## 配置文件
+**上述的依赖解决后，更改src/conf/clientInfo-example.yaml以及src/conf/serverInfo-example.yaml中的内容并更改文件名为clientInfo.yaml和serverInfo.yaml**
+需要更改的内容：
+```yaml
+# clientInfo.yaml
+server-host-info:
+ ip: [服务端部署地址]
+ port: [服务端端口]
+
+# serverInfo.yaml
+mysql-info:
+ ip: [服务端MySQL服务IP]
+ port: [服务端MySQL端口]
+ userName: [MySQL用户名]
+ password: [MySQL用户密码]
+
+host-info:
+ listenPort: [服务端监听端口]
+email-info:
+ sendAccount: [发送邮件邮箱]
+ emailServer: smtp://smtp.qq.com:587
+ accessToken: [邮箱授权码]
+```
+
+**执行SQL脚本**
+在MySQL服务中执行doc/数据库/synergy_spot.sql 及 doc/数据库/synergy_spot_init.sql
 
 # 技术部分
 
