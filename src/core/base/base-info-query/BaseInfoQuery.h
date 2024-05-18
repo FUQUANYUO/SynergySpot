@@ -1,0 +1,13 @@
+//
+// Created by FU-QAQ on 2024/5/17.
+//
+
+#ifndef SYNERGYSPOT_BASEINFOQUERY_H
+#define SYNERGYSPOT_BASEINFOQUERY_H
+
+
+class BaseInfoQuery {
+};
+
+
+#endif//SYNERGYSPOT_BASEINFOQUERY_H

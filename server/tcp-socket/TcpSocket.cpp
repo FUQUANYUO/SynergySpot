@@ -51,7 +51,9 @@ int TcpSocket::recvMsg(string &msg, char &business_type) {
     // 接收数据
     int len = 0;
     business_type = -1;
-    readn((char *) &len, 4);
+    if(readn((char *) &len, 4) <= 0){
+        return -1;
+    }
     readn((char *) &business_type, 1);
     len = ntohl(len);
     cout << "数据块大小: " << len << endl;
@@ -83,8 +85,8 @@ int TcpSocket::readn(char *buf, int size) {
         if ((nread = read(m_fd, p, left)) > 0) {
             p += nread;
             left -= nread;
-        } else if (nread == -1) {
-            return -1;
+        } else {
+            return nread;
         }
     }
     return size;

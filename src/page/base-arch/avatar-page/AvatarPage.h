@@ -20,7 +20,6 @@ class AvatarPage : public QWidget {
 public:
     explicit AvatarPage(QWidget *parent = nullptr);
     ~AvatarPage() override;
-
 private:
     Ui::AvatarPage *ui;
 };

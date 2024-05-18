@@ -9,7 +9,18 @@
 #include "../../../src/utils/db-pool/ConnectionPool.h"
 #include "friend/FriendDTO.pb.h"
 
-std::string DoGetFriendList::execQueryFriendList(const string &dto) {
+extern std::mutex m;
+
+std::string DoGetFriendList::execQueryFriendListBySSID(std::string ssid) {
+    SSDTO::GetFriendList_DTO gfdto;
+    std::string out;
+    gfdto.set_type(SSDTO::GET_CONTACTLIST);
+    gfdto.set_request_ssid(ssid);
+    gfdto.SerializeToString(&out);
+    return execQueryFriendList(out);
+}
+
+std::string DoGetFriendList::execQueryFriendList(const std::string &dto) {
     SSDTO::GetFriendList_DTO gfdto;
     gfdto.ParseFromString(dto);
     if(gfdto.friend_infos_size() >= 1){
@@ -17,7 +28,7 @@ std::string DoGetFriendList::execQueryFriendList(const string &dto) {
     }
 
     // 查询好友
-    stringstream sqlForFriend;
+    std::stringstream sqlForFriend;
     sqlForFriend << "SELECT fs.friend_ssid,ub.ssname,uci.friendship_remark ";
     sqlForFriend << "FROM friendship fs JOIN user_base_info ub ON fs.friend_ssid = ub.ssid ";
     sqlForFriend << "LEFT JOIN user_contact_info uci ON uci.friendship_id = fs.id ";
@@ -25,13 +36,15 @@ std::string DoGetFriendList::execQueryFriendList(const string &dto) {
     sqlForFriend << gfdto.request_ssid() << "' order by fs.create_time DESC";
 
     // 查询群聊
-    stringstream sqlForGroup;
+    std::stringstream sqlForGroup;
     sqlForGroup << "SELECT gmi.ssid_group,gbi.name,uci.group_remark ";
     sqlForGroup << "FROM group_member_info gmi JOIN group_base_info gbi ON gmi.ssid_group = gbi.ssid_group ";
     sqlForGroup << "LEFT JOIN user_contact_info uci ON uci.group_id = gmi.id ";
     sqlForGroup << "WHERE gmi.ssid_member = '";
     sqlForGroup << gfdto.request_ssid() << "' order by gmi.create_time DESC";
 
+    // 读锁
+    std::lock_guard<std::mutex> lg(m);
     MYSQL_RES * mResF = ConnectionPool::getConnectPool()->getConnection()->query(sqlForFriend.str());
     MYSQL_RES * mResG = ConnectionPool::getConnectPool()->getConnection()->query(sqlForGroup.str());
     if(mResF == nullptr || mResG == nullptr){
@@ -66,7 +79,7 @@ std::string DoGetFriendList::execQueryFriendList(const string &dto) {
             gfdto.add_friend_infos()->CopyFrom(fi);
         }
     }
-    string outGfdto;
+    std::string outGfdto;
     gfdto.SerializeToString(&outGfdto);
     return outGfdto;
 }

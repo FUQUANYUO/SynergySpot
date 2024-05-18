@@ -7,6 +7,7 @@
 #include "AvatarPage.h"
 #include "ui_AvatarPage.h"
 
+#include <QMouseEvent>
 
 AvatarPage::AvatarPage(QWidget *parent) : QWidget(parent), ui(new Ui::AvatarPage) {
     ui->setupUi(this);

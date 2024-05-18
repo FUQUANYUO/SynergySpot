@@ -1,24 +1,39 @@
+#include <nlohmann/json.hpp>
+#include <thread>
 #include "Server.h"
 #include "ThreadPool.h"
 #include "yaml-cpp/yaml.h"
 
-#include "../src/protofile/DTO.pb.h"
-
+#include "DoBusinessBase.h"
 #include "do-forwardmsg/DoForwardMsg.h"
 #include "do-login/DoLogin.h"
 #include "do-get-friendlist/DoGetFriendList.h"
 #include "do-email-code/DoEmailCode.h"
+#include "do-enroll-account/DoEnrollAccount.h"
+#include "do-add-friend/DoAddFriend.h"
+#include "do-search-friend/DoSearchFriend.h"
 
 using namespace std;
 
 std::string yamlPath = "../../src/conf/serverInfo.yaml";
 
-//待发送的消息表      key: 发送人账号    v:发送的聊天记录
+// 待发送的消息表      key: 发送人账号    v:发送的聊天记录
 std::unordered_map<std::string, chatLog> sentLog;
-//在线人员表  key:账号  v:与这个账号通信的Socket指针
+// 在线人员表         key:账号          v:与这个账号通信的Socket指针
 std::unordered_map<std::string, SockInfo *> onlineList;
 // 文件描述符 : TcpSocket
 std::unordered_map<int,SockInfo*> fd_sockets;
+// 离线业务处理       key: 发送人账号    v:业务包 & 业务类型
+std::unordered_map<std::string,std::deque<std::pair<std::string,SSDTO::Business_Type>>> businessSent;
+// 构造json工具map   使用在并发环境下
+std::unordered_map<std::string,nlohmann::json> jmp;
+
+// 限制子线程操作数据库的并发操作
+std::mutex m;
+// 限制子线程添加群聊消息的并发操作
+std::mutex groupM;
+
+void writeRequestToEpoll(EpollEngine& en,int &fd,std::string &dto,char &business_type);
 
 void working(void *arg){
     string ssid;
@@ -31,13 +46,9 @@ void working(void *arg){
     string dto;
     SockInfo *info = fd_sockets[fd];
     int res = (info->tcp->recvMsg(dto,business_type));
-    if(dto.empty()){
-        LOG("dto is empty! occur error please check program！")
-        return ;
-    }
     // 断开连接
     if(res == -1){
-        LOG("client( " << fd << " , " << fd_sockets[fd]->ssid << " ) disconnected.")
+        LOG("client( " << fd << " , " << info->ssid << " ) disconnected.")
         // 从在线列表移除
         if(!info->ssid.empty())
             onlineList.erase(info->ssid);
@@ -47,6 +58,10 @@ void working(void *arg){
         delete info;
         en.deleteEvent(fd);
         LOG("user go offline")
+        return ;
+    }
+    if(dto.empty()){
+        LOG("dto is empty! occur error please check program！")
         return ;
     }
 
@@ -70,6 +85,11 @@ void working(void *arg){
             fd_sockets[fd]->ssid = ssid;
 
             DoForwardMsg::execForwardByMap(ssid);
+            DoBusinessBase::execBusinessForwardByMap(ssid);
+
+            // 回发联系人列表业务
+            DoGetFriendList dgflist;
+            info->tcp->sendMsg(dgflist.execQueryFriendList(dto), SSDTO::Business_Type::GET_CONTACTLIST);
         }
     }
     // 消息转发
@@ -81,8 +101,6 @@ void working(void *arg){
     else if (business_type == SSDTO::Business_Type::GET_CONTACTLIST) {
         DoGetFriendList dgflist;
         info->tcp->sendMsg(dgflist.execQueryFriendList(dto), SSDTO::Business_Type::GET_CONTACTLIST);
-
-        DoForwardMsg::execForwardByMap(ssid);
     }
     // 连接断开
     else if (business_type == SSDTO::Business_Type::DISCONNECT) {
@@ -94,8 +112,26 @@ void working(void *arg){
         DoEmailCode doEmailCode;
         info->tcp->sendMsg(doEmailCode.sendEmailCode(dto),SSDTO::Business_Type::GET_EMAILCODE);
     }
+    // 账号注册
+    else if(business_type == SSDTO::Business_Type::ENROLL){
+        DoEnrollAccount doEnrollAccount;
+        info->tcp->sendMsg(doEnrollAccount.execEnrollAccount(dto),SSDTO::Business_Type::ENROLL);
+    }
+    // 添加好友
+    else if(business_type == SSDTO::Business_Type::ADD_FRIEND){
+        DoAddFriend doAddFriend;
+        std::string out = doAddFriend.execAddFriend(dto);
+        if(!out.empty()) {
+            info->tcp->sendMsg(out, SSDTO::Business_Type::ADD_FRIEND);
+        }
+    }
+    // 搜索好友
+    else if(business_type == SSDTO::Business_Type::FRIEND_SEARCH){
+        DoSearchFriend doSearchFriend;
+        info->tcp->sendMsg(doSearchFriend.execSearchFriendByKeyword(dto),SSDTO::Business_Type::FRIEND_SEARCH);
+    }
     else {
-        LOG("some error occur in parse business!");
+        LOG("some error occur in parse business!")
     }
 }
 

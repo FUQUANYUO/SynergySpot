@@ -1,13 +1,13 @@
 #include <QApplication>
-#include <QDebug>
 #include <iostream>
-#include <qt_windows.h>
 
 #include "page/land-page/LandPage.h"
 #include "page/base-arch/arch-page/ArchPage.h"
 #include "db-pool/ConnectionPool.h"
 
-#include "SQLite/sqlite3.h"
+#include "page/base-arch/contact-page/friend-notice-page/FriendNoticePage.h"
+
+using namespace std;
 
 void GetQueryRes(MYSQL_RES * res,const vector<int> &index){
     MYSQL_ROW row;
@@ -20,10 +20,6 @@ void GetQueryRes(MYSQL_RES * res,const vector<int> &index){
     }
     mysql_free_result(res);
 }
-
-#include "db-lite/LiteConn.h"
-
-extern std::string CurSSID;
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
@@ -95,9 +91,5 @@ int main(int argc, char *argv[]) {
 //    if(lcon.update(insertSql)){
 //        LOG("success insert into val")
 //    }
-
-//    CurSSID = "18745496";
-//    ArchPage pg;
-//    pg.show();
     return QApplication::exec();
 }

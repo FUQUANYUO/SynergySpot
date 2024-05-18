@@ -19,7 +19,21 @@ message GetFriendList_DTO{
 }
 
 message AddFriend_DTO{
-    bytes add_ssid = 1;
-    bytes ip = 2;
-    SSDTO.Business_Type type = 3;
+    FriendInfo sender = 1;
+    FriendInfo receiver = 2;
+    bytes is_accept = 3;
+    bytes msg = 4;
+    bytes time = 5;
+    bytes ip = 6;
+    SSDTO.Business_Type type = 7;
+}
+
+message Search_DTO{
+    bytes request_ssid = 1;
+    bytes key_word = 2;
+    repeated FriendInfo search_infos = 3;
+    int32 page_size = 4;
+    int32 res_size = 5;
+    bytes ip = 6;
+    SSDTO.Business_Type type = 7;
 }

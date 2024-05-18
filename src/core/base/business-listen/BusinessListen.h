@@ -23,13 +23,19 @@
 #define DO_CALLBACK_CLASS(__CLASS_NAME__,__FUNC_NAME__,__FUNC_RETURN_TYPE__)    \
 class __CLASS_NAME__ : public QObject{                                          \
 public:                                                                         \
-    explicit __CLASS_NAME__(QObject * parent,std::string dto = "");             \
-    void __FUNC_NAME__();                                                       \
+    explicit __CLASS_NAME__(QObject * parent,std::string dto = "")              \
+        : QObject(parent), dto(std::move(dto)){}                                \
+    __FUNC_RETURN_TYPE__ __FUNC_NAME__();                                       \
     ~__CLASS_NAME__() = default;                                                \
 private:                                                                        \
     std::string dto;                                                            \
 };
 
+
+/*
+ * emit bl.signal -> alloc.slots
+ * emit alloc.signal -> bl.signal
+ * */
 
 namespace DoBusiness{
     // 分配业务
@@ -57,6 +63,15 @@ namespace DoBusiness{
 
         // 查询联系人
         void QueryContactList(const std::string& outGfdto);
+
+        // 注册账号
+        void QueryEnrollAccount(const std::string& outErdto);
+
+        // 收到好友请求
+        void AddFriend(const std::string& outFdto);
+
+        // 搜索好友请求
+        void QuerySearchRequest(const std::string& outSdto);
     signals:
         // 断开连接
         void DISCONNECTFROMSER();
@@ -76,19 +91,34 @@ namespace DoBusiness{
 
         // 收到联系人信息
         void GET_CONTACTLIST(const std::string rawGfdto);
+
+        // 获取注册账号结果
+        void GET_ENROLLRES(const std::string rawErdto);
+
+        // 添加好友
+        void RECV_FRIEND_REQUEST(const std::string rawFdto);
+
+        // 获取搜索好友结果
+        void GET_SEARCH_RES(const std::string rawSdto);
     private:
         ClientConServer * _ccon;
     };
+    // 下面的命令类需要手动去实现成员函数的实现
+
     // 获取登录验证结果
     DO_CALLBACK_CLASS(RecvVerifyRes,parseVerifyRes,void)
     // 获取注册结果
-
+    DO_CALLBACK_CLASS(GetEnrollRes,getEnrollRes,void)
     // 接收消息任务
     DO_CALLBACK_CLASS(RecvMsgTask,forwardMsg,void)
     // 获取联系人列表
     DO_CALLBACK_CLASS(GetContactList,getContactList,void)
     // 获取邮箱验证码
     DO_CALLBACK_CLASS(GetEmailCode,getEmailCode,void)
+    // 接收好友申请
+    DO_CALLBACK_CLASS(RecvFriendRequest,recvFriendRequest,void)
+    // 获取搜索好友结果
+    DO_CALLBACK_CLASS(GetRearchRes,getRearchRes,void)
 }
 
 class BusinessListen : public QObject{
@@ -116,6 +146,18 @@ signals:
     // 获取联系人列表
     void REQUEST_CONTACTLIST(const std::string outGfdto);
     void GET_CONTACTLIST(const std::string rawGfdto);
+
+    // 注册账号
+    void REQUEST_ENROLLACC(const std::string outErdto);
+    void GET_ENROLLRES(const std::string rawErdto);
+
+    // 添加好友
+    void ADD_FRIEND(const std::string outFdto);
+    void RECV_FRIEND_QUEST(const std::string rawFdto);
+
+    // 搜索好友
+    void REQUEST_SEARCH(const std::string outSdto);
+    void GET_SEARCH_RES(const std::string rawSdto);
 private:
     DoBusiness::AllocBusiness * allocBusiness;
     QThread * _t;

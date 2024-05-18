@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>MoreOptionPage</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QPushButton" name="loadHistoryMsg">

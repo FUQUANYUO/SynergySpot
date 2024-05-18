@@ -28,7 +28,7 @@ PROTOBUF_CONSTEXPR ForwardMsg_DTO::ForwardMsg_DTO(
   , /*decltype(_impl_.send_ssid_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.content_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.ip_sender_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
-  , /*decltype(_impl_.is_forward_success_)*/false
+  , /*decltype(_impl_.is_group_)*/false
   , /*decltype(_impl_.type_)*/0
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct ForwardMsg_DTODefaultTypeInternal {
@@ -57,7 +57,7 @@ const uint32_t TableStruct_ForwardMsgDTO_2eproto::offsets[] PROTOBUF_SECTION_VAR
   PROTOBUF_FIELD_OFFSET(::SSDTO::ForwardMsg_DTO, _impl_.send_ssid_),
   PROTOBUF_FIELD_OFFSET(::SSDTO::ForwardMsg_DTO, _impl_.content_),
   PROTOBUF_FIELD_OFFSET(::SSDTO::ForwardMsg_DTO, _impl_.ip_sender_),
-  PROTOBUF_FIELD_OFFSET(::SSDTO::ForwardMsg_DTO, _impl_.is_forward_success_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::ForwardMsg_DTO, _impl_.is_group_),
   PROTOBUF_FIELD_OFFSET(::SSDTO::ForwardMsg_DTO, _impl_.type_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -70,18 +70,18 @@ static const ::_pb::Message* const file_default_instances[] = {
 
 const char descriptor_table_protodef_ForwardMsgDTO_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\023ForwardMsgDTO.proto\022\005SSDTO\032\tDTO.proto\""
-  "\255\001\n\016ForwardMsg_DTO\022\021\n\tdate_time\030\001 \001(\014\022\021\n"
+  "\243\001\n\016ForwardMsg_DTO\022\021\n\tdate_time\030\001 \001(\014\022\021\n"
   "\trecv_ssid\030\002 \001(\014\022\021\n\tsend_ssid\030\003 \001(\014\022\017\n\007c"
-  "ontent\030\004 \001(\014\022\021\n\tip_sender\030\005 \001(\014\022\032\n\022is_fo"
-  "rward_success\030\006 \001(\010\022\"\n\004type\030\007 \001(\0162\024.SSDT"
-  "O.Business_Typeb\006proto3"
+  "ontent\030\004 \001(\014\022\021\n\tip_sender\030\005 \001(\014\022\020\n\010is_gr"
+  "oup\030\006 \001(\010\022\"\n\004type\030\007 \001(\0162\024.SSDTO.Business"
+  "_Typeb\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_ForwardMsgDTO_2eproto_deps[1] = {
   &::descriptor_table_DTO_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_ForwardMsgDTO_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_ForwardMsgDTO_2eproto = {
-    false, false, 223, descriptor_table_protodef_ForwardMsgDTO_2eproto,
+    false, false, 213, descriptor_table_protodef_ForwardMsgDTO_2eproto,
     "ForwardMsgDTO.proto",
     &descriptor_table_ForwardMsgDTO_2eproto_once, descriptor_table_ForwardMsgDTO_2eproto_deps, 1, 1,
     schemas, file_default_instances, TableStruct_ForwardMsgDTO_2eproto::offsets,
@@ -117,7 +117,7 @@ ForwardMsg_DTO::ForwardMsg_DTO(const ForwardMsg_DTO& from)
     , decltype(_impl_.send_ssid_){}
     , decltype(_impl_.content_){}
     , decltype(_impl_.ip_sender_){}
-    , decltype(_impl_.is_forward_success_){}
+    , decltype(_impl_.is_group_){}
     , decltype(_impl_.type_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
@@ -162,9 +162,9 @@ ForwardMsg_DTO::ForwardMsg_DTO(const ForwardMsg_DTO& from)
     _this->_impl_.ip_sender_.Set(from._internal_ip_sender(), 
       _this->GetArenaForAllocation());
   }
-  ::memcpy(&_impl_.is_forward_success_, &from._impl_.is_forward_success_,
+  ::memcpy(&_impl_.is_group_, &from._impl_.is_group_,
     static_cast<size_t>(reinterpret_cast<char*>(&_impl_.type_) -
-    reinterpret_cast<char*>(&_impl_.is_forward_success_)) + sizeof(_impl_.type_));
+    reinterpret_cast<char*>(&_impl_.is_group_)) + sizeof(_impl_.type_));
   // @@protoc_insertion_point(copy_constructor:SSDTO.ForwardMsg_DTO)
 }
 
@@ -178,7 +178,7 @@ inline void ForwardMsg_DTO::SharedCtor(
     , decltype(_impl_.send_ssid_){}
     , decltype(_impl_.content_){}
     , decltype(_impl_.ip_sender_){}
-    , decltype(_impl_.is_forward_success_){false}
+    , decltype(_impl_.is_group_){false}
     , decltype(_impl_.type_){0}
     , /*decltype(_impl_._cached_size_)*/{}
   };
@@ -237,9 +237,9 @@ void ForwardMsg_DTO::Clear() {
   _impl_.send_ssid_.ClearToEmpty();
   _impl_.content_.ClearToEmpty();
   _impl_.ip_sender_.ClearToEmpty();
-  ::memset(&_impl_.is_forward_success_, 0, static_cast<size_t>(
+  ::memset(&_impl_.is_group_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&_impl_.type_) -
-      reinterpret_cast<char*>(&_impl_.is_forward_success_)) + sizeof(_impl_.type_));
+      reinterpret_cast<char*>(&_impl_.is_group_)) + sizeof(_impl_.type_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -294,10 +294,10 @@ const char* ForwardMsg_DTO::_InternalParse(const char* ptr, ::_pbi::ParseContext
         } else
           goto handle_unusual;
         continue;
-      // bool is_forward_success = 6;
+      // bool is_group = 6;
       case 6:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 48)) {
-          _impl_.is_forward_success_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          _impl_.is_group_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -370,10 +370,10 @@ uint8_t* ForwardMsg_DTO::_InternalSerialize(
         5, this->_internal_ip_sender(), target);
   }
 
-  // bool is_forward_success = 6;
-  if (this->_internal_is_forward_success() != 0) {
+  // bool is_group = 6;
+  if (this->_internal_is_group() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(6, this->_internal_is_forward_success(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(6, this->_internal_is_group(), target);
   }
 
   // .SSDTO.Business_Type type = 7;
@@ -434,8 +434,8 @@ size_t ForwardMsg_DTO::ByteSizeLong() const {
         this->_internal_ip_sender());
   }
 
-  // bool is_forward_success = 6;
-  if (this->_internal_is_forward_success() != 0) {
+  // bool is_group = 6;
+  if (this->_internal_is_group() != 0) {
     total_size += 1 + 1;
   }
 
@@ -478,8 +478,8 @@ void ForwardMsg_DTO::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const :
   if (!from._internal_ip_sender().empty()) {
     _this->_internal_set_ip_sender(from._internal_ip_sender());
   }
-  if (from._internal_is_forward_success() != 0) {
-    _this->_internal_set_is_forward_success(from._internal_is_forward_success());
+  if (from._internal_is_group() != 0) {
+    _this->_internal_set_is_group(from._internal_is_group());
   }
   if (from._internal_type() != 0) {
     _this->_internal_set_type(from._internal_type());
@@ -526,9 +526,9 @@ void ForwardMsg_DTO::InternalSwap(ForwardMsg_DTO* other) {
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
       PROTOBUF_FIELD_OFFSET(ForwardMsg_DTO, _impl_.type_)
       + sizeof(ForwardMsg_DTO::_impl_.type_)
-      - PROTOBUF_FIELD_OFFSET(ForwardMsg_DTO, _impl_.is_forward_success_)>(
-          reinterpret_cast<char*>(&_impl_.is_forward_success_),
-          reinterpret_cast<char*>(&other->_impl_.is_forward_success_));
+      - PROTOBUF_FIELD_OFFSET(ForwardMsg_DTO, _impl_.is_group_)>(
+          reinterpret_cast<char*>(&_impl_.is_group_),
+          reinterpret_cast<char*>(&other->_impl_.is_group_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata ForwardMsg_DTO::GetMetadata() const {

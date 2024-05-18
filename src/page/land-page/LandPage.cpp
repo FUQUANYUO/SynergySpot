@@ -10,17 +10,16 @@
 #include "base-arch/arch-page/ArchPage.h"
 
 //----------- middle software -----------//
-// enroll_type protobuf
-#include "enroll/EnrollDTO.pb.h"
 // mysql connection pool
 #include "db-pool/ConnectionPool.h"
 // parse yaml file
 #include "yaml-cpp/yaml.h"
 
 // client info yaml file path
-string yamlPath = "../../conf/clientInfo.yaml";
+std::string yamlPath = "../../conf/clientInfo.yaml";
 
 std::string CurSSID;
+std::string CurSSname;
 
 LandPage::LandPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::LandPage) {
     ui->setupUi(this);

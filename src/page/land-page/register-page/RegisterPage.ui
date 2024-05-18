@@ -15,42 +15,6 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="3" column="1" colspan="4">
-     <widget class="QLineEdit" name="nickname">
-      <property name="readOnly">
-       <bool>false</bool>
-      </property>
-      <property name="placeholderText">
-       <string>昵称</string>
-      </property>
-     </widget>
-    </item>
-    <item row="13" column="1">
-     <spacer name="verticalSpacer">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>142</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="5" column="5">
-     <spacer name="horizontalSpacer_2">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>174</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
     <item row="0" column="1">
      <spacer name="verticalSpacer_2">
       <property name="orientation">
@@ -64,64 +28,6 @@
       </property>
      </spacer>
     </item>
-    <item row="2" column="1">
-     <widget class="QLabel" name="slogan">
-      <property name="text">
-       <string>这是slogan</string>
-      </property>
-     </widget>
-    </item>
-    <item row="7" column="1" colspan="4">
-     <widget class="QRadioButton" name="checkBox">
-      <property name="text">
-       <string>已阅读并同意服务协议和隐私保护指引</string>
-      </property>
-     </widget>
-    </item>
-    <item row="6" column="2" colspan="3">
-     <widget class="QPushButton" name="sendVerifyEmailCode">
-      <property name="text">
-       <string>发送验证码</string>
-      </property>
-     </widget>
-    </item>
-    <item row="6" column="1">
-     <widget class="QLineEdit" name="emailCode">
-      <property name="text">
-       <string/>
-      </property>
-      <property name="placeholderText">
-       <string>邮箱验证码</string>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="1" colspan="4">
-     <widget class="QLineEdit" name="password">
-      <property name="placeholderText">
-       <string>密码</string>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="0">
-     <spacer name="horizontalSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>175</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="5" column="1" colspan="4">
-     <widget class="QLineEdit" name="email">
-      <property name="placeholderText">
-       <string>邮箱</string>
-      </property>
-     </widget>
-    </item>
     <item row="1" column="1" colspan="2">
      <widget class="QLabel" name="title">
       <property name="font">
@@ -134,10 +40,117 @@
       </property>
      </widget>
     </item>
+    <item row="2" column="1">
+     <widget class="QLabel" name="slogan">
+      <property name="text">
+       <string>这是slogan</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0" rowspan="2">
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>175</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="5" column="3" rowspan="2">
+     <spacer name="horizontalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>174</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="7" column="1">
+     <widget class="QLineEdit" name="emailCode">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string>邮箱验证码</string>
+      </property>
+     </widget>
+    </item>
+    <item row="7" column="2">
+     <widget class="QPushButton" name="sendVerifyEmailCode">
+      <property name="text">
+       <string>发送验证码</string>
+      </property>
+     </widget>
+    </item>
     <item row="8" column="1">
+     <widget class="QRadioButton" name="checkBox">
+      <property name="text">
+       <string>已阅读并同意服务协议和隐私保护指引</string>
+      </property>
+     </widget>
+    </item>
+    <item row="9" column="1">
      <widget class="QPushButton" name="registerBtn">
       <property name="text">
        <string>立即注册</string>
+      </property>
+     </widget>
+    </item>
+    <item row="10" column="1">
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>142</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="6" column="1" colspan="2">
+     <widget class="QLineEdit" name="email">
+      <property name="placeholderText">
+       <string>邮箱</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1" colspan="2">
+     <widget class="QLineEdit" name="confirmPassword">
+      <property name="echoMode">
+       <enum>QLineEdit::Password</enum>
+      </property>
+      <property name="placeholderText">
+       <string>确认密码</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1" colspan="2">
+     <widget class="QLineEdit" name="password">
+      <property name="echoMode">
+       <enum>QLineEdit::Password</enum>
+      </property>
+      <property name="placeholderText">
+       <string>密码</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1" colspan="2">
+     <widget class="QLineEdit" name="nickname">
+      <property name="readOnly">
+       <bool>false</bool>
+      </property>
+      <property name="placeholderText">
+       <string>昵称</string>
       </property>
      </widget>
     </item>

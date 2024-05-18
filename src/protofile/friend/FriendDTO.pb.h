@@ -55,11 +55,15 @@ extern FriendInfoDefaultTypeInternal _FriendInfo_default_instance_;
 class GetFriendList_DTO;
 struct GetFriendList_DTODefaultTypeInternal;
 extern GetFriendList_DTODefaultTypeInternal _GetFriendList_DTO_default_instance_;
+class Search_DTO;
+struct Search_DTODefaultTypeInternal;
+extern Search_DTODefaultTypeInternal _Search_DTO_default_instance_;
 }  // namespace SSDTO
 PROTOBUF_NAMESPACE_OPEN
 template<> ::SSDTO::AddFriend_DTO* Arena::CreateMaybeMessage<::SSDTO::AddFriend_DTO>(Arena*);
 template<> ::SSDTO::FriendInfo* Arena::CreateMaybeMessage<::SSDTO::FriendInfo>(Arena*);
 template<> ::SSDTO::GetFriendList_DTO* Arena::CreateMaybeMessage<::SSDTO::GetFriendList_DTO>(Arena*);
+template<> ::SSDTO::Search_DTO* Arena::CreateMaybeMessage<::SSDTO::Search_DTO>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace SSDTO {
 
@@ -582,25 +586,57 @@ class AddFriend_DTO final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kAddSsidFieldNumber = 1,
-    kIpFieldNumber = 2,
-    kTypeFieldNumber = 3,
+    kIsAcceptFieldNumber = 3,
+    kMsgFieldNumber = 4,
+    kTimeFieldNumber = 5,
+    kIpFieldNumber = 6,
+    kSenderFieldNumber = 1,
+    kReceiverFieldNumber = 2,
+    kTypeFieldNumber = 7,
   };
-  // bytes add_ssid = 1;
-  void clear_add_ssid();
-  const std::string& add_ssid() const;
+  // bytes is_accept = 3;
+  void clear_is_accept();
+  const std::string& is_accept() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
-  void set_add_ssid(ArgT0&& arg0, ArgT... args);
-  std::string* mutable_add_ssid();
-  PROTOBUF_NODISCARD std::string* release_add_ssid();
-  void set_allocated_add_ssid(std::string* add_ssid);
+  void set_is_accept(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_is_accept();
+  PROTOBUF_NODISCARD std::string* release_is_accept();
+  void set_allocated_is_accept(std::string* is_accept);
   private:
-  const std::string& _internal_add_ssid() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_add_ssid(const std::string& value);
-  std::string* _internal_mutable_add_ssid();
+  const std::string& _internal_is_accept() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_is_accept(const std::string& value);
+  std::string* _internal_mutable_is_accept();
   public:
 
-  // bytes ip = 2;
+  // bytes msg = 4;
+  void clear_msg();
+  const std::string& msg() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_msg(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_msg();
+  PROTOBUF_NODISCARD std::string* release_msg();
+  void set_allocated_msg(std::string* msg);
+  private:
+  const std::string& _internal_msg() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_msg(const std::string& value);
+  std::string* _internal_mutable_msg();
+  public:
+
+  // bytes time = 5;
+  void clear_time();
+  const std::string& time() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_time(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_time();
+  PROTOBUF_NODISCARD std::string* release_time();
+  void set_allocated_time(std::string* time);
+  private:
+  const std::string& _internal_time() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_time(const std::string& value);
+  std::string* _internal_mutable_time();
+  public:
+
+  // bytes ip = 6;
   void clear_ip();
   const std::string& ip() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -614,7 +650,43 @@ class AddFriend_DTO final :
   std::string* _internal_mutable_ip();
   public:
 
-  // .SSDTO.Business_Type type = 3;
+  // .SSDTO.FriendInfo sender = 1;
+  bool has_sender() const;
+  private:
+  bool _internal_has_sender() const;
+  public:
+  void clear_sender();
+  const ::SSDTO::FriendInfo& sender() const;
+  PROTOBUF_NODISCARD ::SSDTO::FriendInfo* release_sender();
+  ::SSDTO::FriendInfo* mutable_sender();
+  void set_allocated_sender(::SSDTO::FriendInfo* sender);
+  private:
+  const ::SSDTO::FriendInfo& _internal_sender() const;
+  ::SSDTO::FriendInfo* _internal_mutable_sender();
+  public:
+  void unsafe_arena_set_allocated_sender(
+      ::SSDTO::FriendInfo* sender);
+  ::SSDTO::FriendInfo* unsafe_arena_release_sender();
+
+  // .SSDTO.FriendInfo receiver = 2;
+  bool has_receiver() const;
+  private:
+  bool _internal_has_receiver() const;
+  public:
+  void clear_receiver();
+  const ::SSDTO::FriendInfo& receiver() const;
+  PROTOBUF_NODISCARD ::SSDTO::FriendInfo* release_receiver();
+  ::SSDTO::FriendInfo* mutable_receiver();
+  void set_allocated_receiver(::SSDTO::FriendInfo* receiver);
+  private:
+  const ::SSDTO::FriendInfo& _internal_receiver() const;
+  ::SSDTO::FriendInfo* _internal_mutable_receiver();
+  public:
+  void unsafe_arena_set_allocated_receiver(
+      ::SSDTO::FriendInfo* receiver);
+  ::SSDTO::FriendInfo* unsafe_arena_release_receiver();
+
+  // .SSDTO.Business_Type type = 7;
   void clear_type();
   ::SSDTO::Business_Type type() const;
   void set_type(::SSDTO::Business_Type value);
@@ -631,8 +703,250 @@ class AddFriend_DTO final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
-    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr add_ssid_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr is_accept_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr msg_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr time_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr ip_;
+    ::SSDTO::FriendInfo* sender_;
+    ::SSDTO::FriendInfo* receiver_;
+    int type_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_FriendDTO_2eproto;
+};
+// -------------------------------------------------------------------
+
+class Search_DTO final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:SSDTO.Search_DTO) */ {
+ public:
+  inline Search_DTO() : Search_DTO(nullptr) {}
+  ~Search_DTO() override;
+  explicit PROTOBUF_CONSTEXPR Search_DTO(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  Search_DTO(const Search_DTO& from);
+  Search_DTO(Search_DTO&& from) noexcept
+    : Search_DTO() {
+    *this = ::std::move(from);
+  }
+
+  inline Search_DTO& operator=(const Search_DTO& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline Search_DTO& operator=(Search_DTO&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const Search_DTO& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const Search_DTO* internal_default_instance() {
+    return reinterpret_cast<const Search_DTO*>(
+               &_Search_DTO_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    3;
+
+  friend void swap(Search_DTO& a, Search_DTO& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(Search_DTO* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(Search_DTO* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  Search_DTO* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<Search_DTO>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const Search_DTO& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const Search_DTO& from) {
+    Search_DTO::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Search_DTO* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "SSDTO.Search_DTO";
+  }
+  protected:
+  explicit Search_DTO(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kSearchInfosFieldNumber = 3,
+    kRequestSsidFieldNumber = 1,
+    kKeyWordFieldNumber = 2,
+    kIpFieldNumber = 6,
+    kPageSizeFieldNumber = 4,
+    kResSizeFieldNumber = 5,
+    kTypeFieldNumber = 7,
+  };
+  // repeated .SSDTO.FriendInfo search_infos = 3;
+  int search_infos_size() const;
+  private:
+  int _internal_search_infos_size() const;
+  public:
+  void clear_search_infos();
+  ::SSDTO::FriendInfo* mutable_search_infos(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::FriendInfo >*
+      mutable_search_infos();
+  private:
+  const ::SSDTO::FriendInfo& _internal_search_infos(int index) const;
+  ::SSDTO::FriendInfo* _internal_add_search_infos();
+  public:
+  const ::SSDTO::FriendInfo& search_infos(int index) const;
+  ::SSDTO::FriendInfo* add_search_infos();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::FriendInfo >&
+      search_infos() const;
+
+  // bytes request_ssid = 1;
+  void clear_request_ssid();
+  const std::string& request_ssid() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_request_ssid(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_request_ssid();
+  PROTOBUF_NODISCARD std::string* release_request_ssid();
+  void set_allocated_request_ssid(std::string* request_ssid);
+  private:
+  const std::string& _internal_request_ssid() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_request_ssid(const std::string& value);
+  std::string* _internal_mutable_request_ssid();
+  public:
+
+  // bytes key_word = 2;
+  void clear_key_word();
+  const std::string& key_word() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_key_word(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_key_word();
+  PROTOBUF_NODISCARD std::string* release_key_word();
+  void set_allocated_key_word(std::string* key_word);
+  private:
+  const std::string& _internal_key_word() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_key_word(const std::string& value);
+  std::string* _internal_mutable_key_word();
+  public:
+
+  // bytes ip = 6;
+  void clear_ip();
+  const std::string& ip() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_ip(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_ip();
+  PROTOBUF_NODISCARD std::string* release_ip();
+  void set_allocated_ip(std::string* ip);
+  private:
+  const std::string& _internal_ip() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_ip(const std::string& value);
+  std::string* _internal_mutable_ip();
+  public:
+
+  // int32 page_size = 4;
+  void clear_page_size();
+  int32_t page_size() const;
+  void set_page_size(int32_t value);
+  private:
+  int32_t _internal_page_size() const;
+  void _internal_set_page_size(int32_t value);
+  public:
+
+  // int32 res_size = 5;
+  void clear_res_size();
+  int32_t res_size() const;
+  void set_res_size(int32_t value);
+  private:
+  int32_t _internal_res_size() const;
+  void _internal_set_res_size(int32_t value);
+  public:
+
+  // .SSDTO.Business_Type type = 7;
+  void clear_type();
+  ::SSDTO::Business_Type type() const;
+  void set_type(::SSDTO::Business_Type value);
+  private:
+  ::SSDTO::Business_Type _internal_type() const;
+  void _internal_set_type(::SSDTO::Business_Type value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:SSDTO.Search_DTO)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::FriendInfo > search_infos_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr request_ssid_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr key_word_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr ip_;
+    int32_t page_size_;
+    int32_t res_size_;
     int type_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
@@ -988,57 +1302,337 @@ inline void GetFriendList_DTO::set_type(::SSDTO::Business_Type value) {
 
 // AddFriend_DTO
 
-// bytes add_ssid = 1;
-inline void AddFriend_DTO::clear_add_ssid() {
-  _impl_.add_ssid_.ClearToEmpty();
+// .SSDTO.FriendInfo sender = 1;
+inline bool AddFriend_DTO::_internal_has_sender() const {
+  return this != internal_default_instance() && _impl_.sender_ != nullptr;
 }
-inline const std::string& AddFriend_DTO::add_ssid() const {
-  // @@protoc_insertion_point(field_get:SSDTO.AddFriend_DTO.add_ssid)
-  return _internal_add_ssid();
+inline bool AddFriend_DTO::has_sender() const {
+  return _internal_has_sender();
 }
-template <typename ArgT0, typename... ArgT>
-inline PROTOBUF_ALWAYS_INLINE
-void AddFriend_DTO::set_add_ssid(ArgT0&& arg0, ArgT... args) {
- 
- _impl_.add_ssid_.SetBytes(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:SSDTO.AddFriend_DTO.add_ssid)
+inline void AddFriend_DTO::clear_sender() {
+  if (GetArenaForAllocation() == nullptr && _impl_.sender_ != nullptr) {
+    delete _impl_.sender_;
+  }
+  _impl_.sender_ = nullptr;
 }
-inline std::string* AddFriend_DTO::mutable_add_ssid() {
-  std::string* _s = _internal_mutable_add_ssid();
-  // @@protoc_insertion_point(field_mutable:SSDTO.AddFriend_DTO.add_ssid)
-  return _s;
+inline const ::SSDTO::FriendInfo& AddFriend_DTO::_internal_sender() const {
+  const ::SSDTO::FriendInfo* p = _impl_.sender_;
+  return p != nullptr ? *p : reinterpret_cast<const ::SSDTO::FriendInfo&>(
+      ::SSDTO::_FriendInfo_default_instance_);
 }
-inline const std::string& AddFriend_DTO::_internal_add_ssid() const {
-  return _impl_.add_ssid_.Get();
+inline const ::SSDTO::FriendInfo& AddFriend_DTO::sender() const {
+  // @@protoc_insertion_point(field_get:SSDTO.AddFriend_DTO.sender)
+  return _internal_sender();
 }
-inline void AddFriend_DTO::_internal_set_add_ssid(const std::string& value) {
-  
-  _impl_.add_ssid_.Set(value, GetArenaForAllocation());
-}
-inline std::string* AddFriend_DTO::_internal_mutable_add_ssid() {
-  
-  return _impl_.add_ssid_.Mutable(GetArenaForAllocation());
-}
-inline std::string* AddFriend_DTO::release_add_ssid() {
-  // @@protoc_insertion_point(field_release:SSDTO.AddFriend_DTO.add_ssid)
-  return _impl_.add_ssid_.Release();
-}
-inline void AddFriend_DTO::set_allocated_add_ssid(std::string* add_ssid) {
-  if (add_ssid != nullptr) {
+inline void AddFriend_DTO::unsafe_arena_set_allocated_sender(
+    ::SSDTO::FriendInfo* sender) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.sender_);
+  }
+  _impl_.sender_ = sender;
+  if (sender) {
     
   } else {
     
   }
-  _impl_.add_ssid_.SetAllocated(add_ssid, GetArenaForAllocation());
-#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (_impl_.add_ssid_.IsDefault()) {
-    _impl_.add_ssid_.Set("", GetArenaForAllocation());
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:SSDTO.AddFriend_DTO.sender)
+}
+inline ::SSDTO::FriendInfo* AddFriend_DTO::release_sender() {
+  
+  ::SSDTO::FriendInfo* temp = _impl_.sender_;
+  _impl_.sender_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
   }
-#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:SSDTO.AddFriend_DTO.add_ssid)
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
+}
+inline ::SSDTO::FriendInfo* AddFriend_DTO::unsafe_arena_release_sender() {
+  // @@protoc_insertion_point(field_release:SSDTO.AddFriend_DTO.sender)
+  
+  ::SSDTO::FriendInfo* temp = _impl_.sender_;
+  _impl_.sender_ = nullptr;
+  return temp;
+}
+inline ::SSDTO::FriendInfo* AddFriend_DTO::_internal_mutable_sender() {
+  
+  if (_impl_.sender_ == nullptr) {
+    auto* p = CreateMaybeMessage<::SSDTO::FriendInfo>(GetArenaForAllocation());
+    _impl_.sender_ = p;
+  }
+  return _impl_.sender_;
+}
+inline ::SSDTO::FriendInfo* AddFriend_DTO::mutable_sender() {
+  ::SSDTO::FriendInfo* _msg = _internal_mutable_sender();
+  // @@protoc_insertion_point(field_mutable:SSDTO.AddFriend_DTO.sender)
+  return _msg;
+}
+inline void AddFriend_DTO::set_allocated_sender(::SSDTO::FriendInfo* sender) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete _impl_.sender_;
+  }
+  if (sender) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(sender);
+    if (message_arena != submessage_arena) {
+      sender = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, sender, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  _impl_.sender_ = sender;
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.AddFriend_DTO.sender)
 }
 
-// bytes ip = 2;
+// .SSDTO.FriendInfo receiver = 2;
+inline bool AddFriend_DTO::_internal_has_receiver() const {
+  return this != internal_default_instance() && _impl_.receiver_ != nullptr;
+}
+inline bool AddFriend_DTO::has_receiver() const {
+  return _internal_has_receiver();
+}
+inline void AddFriend_DTO::clear_receiver() {
+  if (GetArenaForAllocation() == nullptr && _impl_.receiver_ != nullptr) {
+    delete _impl_.receiver_;
+  }
+  _impl_.receiver_ = nullptr;
+}
+inline const ::SSDTO::FriendInfo& AddFriend_DTO::_internal_receiver() const {
+  const ::SSDTO::FriendInfo* p = _impl_.receiver_;
+  return p != nullptr ? *p : reinterpret_cast<const ::SSDTO::FriendInfo&>(
+      ::SSDTO::_FriendInfo_default_instance_);
+}
+inline const ::SSDTO::FriendInfo& AddFriend_DTO::receiver() const {
+  // @@protoc_insertion_point(field_get:SSDTO.AddFriend_DTO.receiver)
+  return _internal_receiver();
+}
+inline void AddFriend_DTO::unsafe_arena_set_allocated_receiver(
+    ::SSDTO::FriendInfo* receiver) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.receiver_);
+  }
+  _impl_.receiver_ = receiver;
+  if (receiver) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:SSDTO.AddFriend_DTO.receiver)
+}
+inline ::SSDTO::FriendInfo* AddFriend_DTO::release_receiver() {
+  
+  ::SSDTO::FriendInfo* temp = _impl_.receiver_;
+  _impl_.receiver_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
+}
+inline ::SSDTO::FriendInfo* AddFriend_DTO::unsafe_arena_release_receiver() {
+  // @@protoc_insertion_point(field_release:SSDTO.AddFriend_DTO.receiver)
+  
+  ::SSDTO::FriendInfo* temp = _impl_.receiver_;
+  _impl_.receiver_ = nullptr;
+  return temp;
+}
+inline ::SSDTO::FriendInfo* AddFriend_DTO::_internal_mutable_receiver() {
+  
+  if (_impl_.receiver_ == nullptr) {
+    auto* p = CreateMaybeMessage<::SSDTO::FriendInfo>(GetArenaForAllocation());
+    _impl_.receiver_ = p;
+  }
+  return _impl_.receiver_;
+}
+inline ::SSDTO::FriendInfo* AddFriend_DTO::mutable_receiver() {
+  ::SSDTO::FriendInfo* _msg = _internal_mutable_receiver();
+  // @@protoc_insertion_point(field_mutable:SSDTO.AddFriend_DTO.receiver)
+  return _msg;
+}
+inline void AddFriend_DTO::set_allocated_receiver(::SSDTO::FriendInfo* receiver) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete _impl_.receiver_;
+  }
+  if (receiver) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(receiver);
+    if (message_arena != submessage_arena) {
+      receiver = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, receiver, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  _impl_.receiver_ = receiver;
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.AddFriend_DTO.receiver)
+}
+
+// bytes is_accept = 3;
+inline void AddFriend_DTO::clear_is_accept() {
+  _impl_.is_accept_.ClearToEmpty();
+}
+inline const std::string& AddFriend_DTO::is_accept() const {
+  // @@protoc_insertion_point(field_get:SSDTO.AddFriend_DTO.is_accept)
+  return _internal_is_accept();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void AddFriend_DTO::set_is_accept(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.is_accept_.SetBytes(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:SSDTO.AddFriend_DTO.is_accept)
+}
+inline std::string* AddFriend_DTO::mutable_is_accept() {
+  std::string* _s = _internal_mutable_is_accept();
+  // @@protoc_insertion_point(field_mutable:SSDTO.AddFriend_DTO.is_accept)
+  return _s;
+}
+inline const std::string& AddFriend_DTO::_internal_is_accept() const {
+  return _impl_.is_accept_.Get();
+}
+inline void AddFriend_DTO::_internal_set_is_accept(const std::string& value) {
+  
+  _impl_.is_accept_.Set(value, GetArenaForAllocation());
+}
+inline std::string* AddFriend_DTO::_internal_mutable_is_accept() {
+  
+  return _impl_.is_accept_.Mutable(GetArenaForAllocation());
+}
+inline std::string* AddFriend_DTO::release_is_accept() {
+  // @@protoc_insertion_point(field_release:SSDTO.AddFriend_DTO.is_accept)
+  return _impl_.is_accept_.Release();
+}
+inline void AddFriend_DTO::set_allocated_is_accept(std::string* is_accept) {
+  if (is_accept != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.is_accept_.SetAllocated(is_accept, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.is_accept_.IsDefault()) {
+    _impl_.is_accept_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.AddFriend_DTO.is_accept)
+}
+
+// bytes msg = 4;
+inline void AddFriend_DTO::clear_msg() {
+  _impl_.msg_.ClearToEmpty();
+}
+inline const std::string& AddFriend_DTO::msg() const {
+  // @@protoc_insertion_point(field_get:SSDTO.AddFriend_DTO.msg)
+  return _internal_msg();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void AddFriend_DTO::set_msg(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.msg_.SetBytes(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:SSDTO.AddFriend_DTO.msg)
+}
+inline std::string* AddFriend_DTO::mutable_msg() {
+  std::string* _s = _internal_mutable_msg();
+  // @@protoc_insertion_point(field_mutable:SSDTO.AddFriend_DTO.msg)
+  return _s;
+}
+inline const std::string& AddFriend_DTO::_internal_msg() const {
+  return _impl_.msg_.Get();
+}
+inline void AddFriend_DTO::_internal_set_msg(const std::string& value) {
+  
+  _impl_.msg_.Set(value, GetArenaForAllocation());
+}
+inline std::string* AddFriend_DTO::_internal_mutable_msg() {
+  
+  return _impl_.msg_.Mutable(GetArenaForAllocation());
+}
+inline std::string* AddFriend_DTO::release_msg() {
+  // @@protoc_insertion_point(field_release:SSDTO.AddFriend_DTO.msg)
+  return _impl_.msg_.Release();
+}
+inline void AddFriend_DTO::set_allocated_msg(std::string* msg) {
+  if (msg != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.msg_.SetAllocated(msg, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.msg_.IsDefault()) {
+    _impl_.msg_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.AddFriend_DTO.msg)
+}
+
+// bytes time = 5;
+inline void AddFriend_DTO::clear_time() {
+  _impl_.time_.ClearToEmpty();
+}
+inline const std::string& AddFriend_DTO::time() const {
+  // @@protoc_insertion_point(field_get:SSDTO.AddFriend_DTO.time)
+  return _internal_time();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void AddFriend_DTO::set_time(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.time_.SetBytes(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:SSDTO.AddFriend_DTO.time)
+}
+inline std::string* AddFriend_DTO::mutable_time() {
+  std::string* _s = _internal_mutable_time();
+  // @@protoc_insertion_point(field_mutable:SSDTO.AddFriend_DTO.time)
+  return _s;
+}
+inline const std::string& AddFriend_DTO::_internal_time() const {
+  return _impl_.time_.Get();
+}
+inline void AddFriend_DTO::_internal_set_time(const std::string& value) {
+  
+  _impl_.time_.Set(value, GetArenaForAllocation());
+}
+inline std::string* AddFriend_DTO::_internal_mutable_time() {
+  
+  return _impl_.time_.Mutable(GetArenaForAllocation());
+}
+inline std::string* AddFriend_DTO::release_time() {
+  // @@protoc_insertion_point(field_release:SSDTO.AddFriend_DTO.time)
+  return _impl_.time_.Release();
+}
+inline void AddFriend_DTO::set_allocated_time(std::string* time) {
+  if (time != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.time_.SetAllocated(time, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.time_.IsDefault()) {
+    _impl_.time_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.AddFriend_DTO.time)
+}
+
+// bytes ip = 6;
 inline void AddFriend_DTO::clear_ip() {
   _impl_.ip_.ClearToEmpty();
 }
@@ -1088,7 +1682,7 @@ inline void AddFriend_DTO::set_allocated_ip(std::string* ip) {
   // @@protoc_insertion_point(field_set_allocated:SSDTO.AddFriend_DTO.ip)
 }
 
-// .SSDTO.Business_Type type = 3;
+// .SSDTO.Business_Type type = 7;
 inline void AddFriend_DTO::clear_type() {
   _impl_.type_ = 0;
 }
@@ -1108,9 +1702,265 @@ inline void AddFriend_DTO::set_type(::SSDTO::Business_Type value) {
   // @@protoc_insertion_point(field_set:SSDTO.AddFriend_DTO.type)
 }
 
+// -------------------------------------------------------------------
+
+// Search_DTO
+
+// bytes request_ssid = 1;
+inline void Search_DTO::clear_request_ssid() {
+  _impl_.request_ssid_.ClearToEmpty();
+}
+inline const std::string& Search_DTO::request_ssid() const {
+  // @@protoc_insertion_point(field_get:SSDTO.Search_DTO.request_ssid)
+  return _internal_request_ssid();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void Search_DTO::set_request_ssid(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.request_ssid_.SetBytes(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:SSDTO.Search_DTO.request_ssid)
+}
+inline std::string* Search_DTO::mutable_request_ssid() {
+  std::string* _s = _internal_mutable_request_ssid();
+  // @@protoc_insertion_point(field_mutable:SSDTO.Search_DTO.request_ssid)
+  return _s;
+}
+inline const std::string& Search_DTO::_internal_request_ssid() const {
+  return _impl_.request_ssid_.Get();
+}
+inline void Search_DTO::_internal_set_request_ssid(const std::string& value) {
+  
+  _impl_.request_ssid_.Set(value, GetArenaForAllocation());
+}
+inline std::string* Search_DTO::_internal_mutable_request_ssid() {
+  
+  return _impl_.request_ssid_.Mutable(GetArenaForAllocation());
+}
+inline std::string* Search_DTO::release_request_ssid() {
+  // @@protoc_insertion_point(field_release:SSDTO.Search_DTO.request_ssid)
+  return _impl_.request_ssid_.Release();
+}
+inline void Search_DTO::set_allocated_request_ssid(std::string* request_ssid) {
+  if (request_ssid != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.request_ssid_.SetAllocated(request_ssid, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.request_ssid_.IsDefault()) {
+    _impl_.request_ssid_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.Search_DTO.request_ssid)
+}
+
+// bytes key_word = 2;
+inline void Search_DTO::clear_key_word() {
+  _impl_.key_word_.ClearToEmpty();
+}
+inline const std::string& Search_DTO::key_word() const {
+  // @@protoc_insertion_point(field_get:SSDTO.Search_DTO.key_word)
+  return _internal_key_word();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void Search_DTO::set_key_word(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.key_word_.SetBytes(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:SSDTO.Search_DTO.key_word)
+}
+inline std::string* Search_DTO::mutable_key_word() {
+  std::string* _s = _internal_mutable_key_word();
+  // @@protoc_insertion_point(field_mutable:SSDTO.Search_DTO.key_word)
+  return _s;
+}
+inline const std::string& Search_DTO::_internal_key_word() const {
+  return _impl_.key_word_.Get();
+}
+inline void Search_DTO::_internal_set_key_word(const std::string& value) {
+  
+  _impl_.key_word_.Set(value, GetArenaForAllocation());
+}
+inline std::string* Search_DTO::_internal_mutable_key_word() {
+  
+  return _impl_.key_word_.Mutable(GetArenaForAllocation());
+}
+inline std::string* Search_DTO::release_key_word() {
+  // @@protoc_insertion_point(field_release:SSDTO.Search_DTO.key_word)
+  return _impl_.key_word_.Release();
+}
+inline void Search_DTO::set_allocated_key_word(std::string* key_word) {
+  if (key_word != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.key_word_.SetAllocated(key_word, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.key_word_.IsDefault()) {
+    _impl_.key_word_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.Search_DTO.key_word)
+}
+
+// repeated .SSDTO.FriendInfo search_infos = 3;
+inline int Search_DTO::_internal_search_infos_size() const {
+  return _impl_.search_infos_.size();
+}
+inline int Search_DTO::search_infos_size() const {
+  return _internal_search_infos_size();
+}
+inline void Search_DTO::clear_search_infos() {
+  _impl_.search_infos_.Clear();
+}
+inline ::SSDTO::FriendInfo* Search_DTO::mutable_search_infos(int index) {
+  // @@protoc_insertion_point(field_mutable:SSDTO.Search_DTO.search_infos)
+  return _impl_.search_infos_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::FriendInfo >*
+Search_DTO::mutable_search_infos() {
+  // @@protoc_insertion_point(field_mutable_list:SSDTO.Search_DTO.search_infos)
+  return &_impl_.search_infos_;
+}
+inline const ::SSDTO::FriendInfo& Search_DTO::_internal_search_infos(int index) const {
+  return _impl_.search_infos_.Get(index);
+}
+inline const ::SSDTO::FriendInfo& Search_DTO::search_infos(int index) const {
+  // @@protoc_insertion_point(field_get:SSDTO.Search_DTO.search_infos)
+  return _internal_search_infos(index);
+}
+inline ::SSDTO::FriendInfo* Search_DTO::_internal_add_search_infos() {
+  return _impl_.search_infos_.Add();
+}
+inline ::SSDTO::FriendInfo* Search_DTO::add_search_infos() {
+  ::SSDTO::FriendInfo* _add = _internal_add_search_infos();
+  // @@protoc_insertion_point(field_add:SSDTO.Search_DTO.search_infos)
+  return _add;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::FriendInfo >&
+Search_DTO::search_infos() const {
+  // @@protoc_insertion_point(field_list:SSDTO.Search_DTO.search_infos)
+  return _impl_.search_infos_;
+}
+
+// int32 page_size = 4;
+inline void Search_DTO::clear_page_size() {
+  _impl_.page_size_ = 0;
+}
+inline int32_t Search_DTO::_internal_page_size() const {
+  return _impl_.page_size_;
+}
+inline int32_t Search_DTO::page_size() const {
+  // @@protoc_insertion_point(field_get:SSDTO.Search_DTO.page_size)
+  return _internal_page_size();
+}
+inline void Search_DTO::_internal_set_page_size(int32_t value) {
+  
+  _impl_.page_size_ = value;
+}
+inline void Search_DTO::set_page_size(int32_t value) {
+  _internal_set_page_size(value);
+  // @@protoc_insertion_point(field_set:SSDTO.Search_DTO.page_size)
+}
+
+// int32 res_size = 5;
+inline void Search_DTO::clear_res_size() {
+  _impl_.res_size_ = 0;
+}
+inline int32_t Search_DTO::_internal_res_size() const {
+  return _impl_.res_size_;
+}
+inline int32_t Search_DTO::res_size() const {
+  // @@protoc_insertion_point(field_get:SSDTO.Search_DTO.res_size)
+  return _internal_res_size();
+}
+inline void Search_DTO::_internal_set_res_size(int32_t value) {
+  
+  _impl_.res_size_ = value;
+}
+inline void Search_DTO::set_res_size(int32_t value) {
+  _internal_set_res_size(value);
+  // @@protoc_insertion_point(field_set:SSDTO.Search_DTO.res_size)
+}
+
+// bytes ip = 6;
+inline void Search_DTO::clear_ip() {
+  _impl_.ip_.ClearToEmpty();
+}
+inline const std::string& Search_DTO::ip() const {
+  // @@protoc_insertion_point(field_get:SSDTO.Search_DTO.ip)
+  return _internal_ip();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void Search_DTO::set_ip(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.ip_.SetBytes(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:SSDTO.Search_DTO.ip)
+}
+inline std::string* Search_DTO::mutable_ip() {
+  std::string* _s = _internal_mutable_ip();
+  // @@protoc_insertion_point(field_mutable:SSDTO.Search_DTO.ip)
+  return _s;
+}
+inline const std::string& Search_DTO::_internal_ip() const {
+  return _impl_.ip_.Get();
+}
+inline void Search_DTO::_internal_set_ip(const std::string& value) {
+  
+  _impl_.ip_.Set(value, GetArenaForAllocation());
+}
+inline std::string* Search_DTO::_internal_mutable_ip() {
+  
+  return _impl_.ip_.Mutable(GetArenaForAllocation());
+}
+inline std::string* Search_DTO::release_ip() {
+  // @@protoc_insertion_point(field_release:SSDTO.Search_DTO.ip)
+  return _impl_.ip_.Release();
+}
+inline void Search_DTO::set_allocated_ip(std::string* ip) {
+  if (ip != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.ip_.SetAllocated(ip, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.ip_.IsDefault()) {
+    _impl_.ip_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.Search_DTO.ip)
+}
+
+// .SSDTO.Business_Type type = 7;
+inline void Search_DTO::clear_type() {
+  _impl_.type_ = 0;
+}
+inline ::SSDTO::Business_Type Search_DTO::_internal_type() const {
+  return static_cast< ::SSDTO::Business_Type >(_impl_.type_);
+}
+inline ::SSDTO::Business_Type Search_DTO::type() const {
+  // @@protoc_insertion_point(field_get:SSDTO.Search_DTO.type)
+  return _internal_type();
+}
+inline void Search_DTO::_internal_set_type(::SSDTO::Business_Type value) {
+  
+  _impl_.type_ = value;
+}
+inline void Search_DTO::set_type(::SSDTO::Business_Type value) {
+  _internal_set_type(value);
+  // @@protoc_insertion_point(field_set:SSDTO.Search_DTO.type)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

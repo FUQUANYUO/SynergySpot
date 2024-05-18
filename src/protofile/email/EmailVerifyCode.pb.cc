@@ -69,9 +69,9 @@ static const ::_pb::Message* const file_default_instances[] = {
 const char descriptor_table_protodef_EmailVerifyCode_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\025EmailVerifyCode.proto\022\005SSDTO\032\tDTO.prot"
   "o\"\241\001\n\023EmailVerifyCode_DTO\022\022\n\nis_request\030"
-  "\001 \001(\010\022\025\n\remail_address\030\002 \001(\t\022\023\n\013verify_c"
-  "ode\030\003 \001(\t\022\022\n\nstart_time\030\004 \001(\t\022\022\n\nvalid_t"
-  "ime\030\005 \001(\t\022\"\n\004type\030\006 \001(\0162\024.SSDTO.Business"
+  "\001 \001(\010\022\025\n\remail_address\030\002 \001(\014\022\023\n\013verify_c"
+  "ode\030\003 \001(\014\022\022\n\nstart_time\030\004 \001(\014\022\022\n\nvalid_t"
+  "ime\030\005 \001(\014\022\"\n\004type\030\006 \001(\0162\024.SSDTO.Business"
   "_Typeb\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_EmailVerifyCode_2eproto_deps[1] = {
@@ -239,43 +239,39 @@ const char* EmailVerifyCode_DTO::_InternalParse(const char* ptr, ::_pbi::ParseCo
         } else
           goto handle_unusual;
         continue;
-      // string email_address = 2;
+      // bytes email_address = 2;
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
           auto str = _internal_mutable_email_address();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-          CHK_(::_pbi::VerifyUTF8(str, "SSDTO.EmailVerifyCode_DTO.email_address"));
         } else
           goto handle_unusual;
         continue;
-      // string verify_code = 3;
+      // bytes verify_code = 3;
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
           auto str = _internal_mutable_verify_code();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-          CHK_(::_pbi::VerifyUTF8(str, "SSDTO.EmailVerifyCode_DTO.verify_code"));
         } else
           goto handle_unusual;
         continue;
-      // string start_time = 4;
+      // bytes start_time = 4;
       case 4:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
           auto str = _internal_mutable_start_time();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-          CHK_(::_pbi::VerifyUTF8(str, "SSDTO.EmailVerifyCode_DTO.start_time"));
         } else
           goto handle_unusual;
         continue;
-      // string valid_time = 5;
+      // bytes valid_time = 5;
       case 5:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 42)) {
           auto str = _internal_mutable_valid_time();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-          CHK_(::_pbi::VerifyUTF8(str, "SSDTO.EmailVerifyCode_DTO.valid_time"));
         } else
           goto handle_unusual;
         continue;
@@ -323,43 +319,27 @@ uint8_t* EmailVerifyCode_DTO::_InternalSerialize(
     target = ::_pbi::WireFormatLite::WriteBoolToArray(1, this->_internal_is_request(), target);
   }
 
-  // string email_address = 2;
+  // bytes email_address = 2;
   if (!this->_internal_email_address().empty()) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-      this->_internal_email_address().data(), static_cast<int>(this->_internal_email_address().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "SSDTO.EmailVerifyCode_DTO.email_address");
-    target = stream->WriteStringMaybeAliased(
+    target = stream->WriteBytesMaybeAliased(
         2, this->_internal_email_address(), target);
   }
 
-  // string verify_code = 3;
+  // bytes verify_code = 3;
   if (!this->_internal_verify_code().empty()) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-      this->_internal_verify_code().data(), static_cast<int>(this->_internal_verify_code().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "SSDTO.EmailVerifyCode_DTO.verify_code");
-    target = stream->WriteStringMaybeAliased(
+    target = stream->WriteBytesMaybeAliased(
         3, this->_internal_verify_code(), target);
   }
 
-  // string start_time = 4;
+  // bytes start_time = 4;
   if (!this->_internal_start_time().empty()) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-      this->_internal_start_time().data(), static_cast<int>(this->_internal_start_time().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "SSDTO.EmailVerifyCode_DTO.start_time");
-    target = stream->WriteStringMaybeAliased(
+    target = stream->WriteBytesMaybeAliased(
         4, this->_internal_start_time(), target);
   }
 
-  // string valid_time = 5;
+  // bytes valid_time = 5;
   if (!this->_internal_valid_time().empty()) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-      this->_internal_valid_time().data(), static_cast<int>(this->_internal_valid_time().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "SSDTO.EmailVerifyCode_DTO.valid_time");
-    target = stream->WriteStringMaybeAliased(
+    target = stream->WriteBytesMaybeAliased(
         5, this->_internal_valid_time(), target);
   }
 
@@ -386,31 +366,31 @@ size_t EmailVerifyCode_DTO::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // string email_address = 2;
+  // bytes email_address = 2;
   if (!this->_internal_email_address().empty()) {
     total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
         this->_internal_email_address());
   }
 
-  // string verify_code = 3;
+  // bytes verify_code = 3;
   if (!this->_internal_verify_code().empty()) {
     total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
         this->_internal_verify_code());
   }
 
-  // string start_time = 4;
+  // bytes start_time = 4;
   if (!this->_internal_start_time().empty()) {
     total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
         this->_internal_start_time());
   }
 
-  // string valid_time = 5;
+  // bytes valid_time = 5;
   if (!this->_internal_valid_time().empty()) {
     total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
         this->_internal_valid_time());
   }
 

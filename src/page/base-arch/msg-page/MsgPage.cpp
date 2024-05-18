@@ -6,13 +6,9 @@
 #include "MsgPage.h"
 #include "ui_MsgPage.h"
 
-
 #include "base-arch/arch-page/ArchPage.h"
 #include "forward_msg/ForwardMsgDTO.pb.h"
 #include "help.h"
-
-extern std::string CurSSID;
-
 
 // 每一个用户（好友/群）拥有一个MsgPage
 MsgPage::MsgPage(QWidget *parent) : ui(new Ui::MsgPage) {
@@ -50,7 +46,6 @@ MsgPage::MsgPage(QWidget *parent) : ui(new Ui::MsgPage) {
             fmdto.set_send_ssid(CurSSID);
             fmdto.set_date_time(timebuf);
             fmdto.set_content(inputTxt.toStdString());
-            fmdto.set_is_forward_success(false);
             fmdto.set_ip_sender("");
             std::string out;
             fmdto.SerializeToString(&out);

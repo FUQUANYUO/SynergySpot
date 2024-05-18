@@ -7,14 +7,13 @@
 #include <QStandardItemModel>
 #include <QPainter>
 #include <QMouseEvent>
+#include <nlohmann/json.hpp>
 
 #include "ContactList.h"
 #include "base-arch/arch-page/ArchPage.h"
 
 //-----------    protobuf    -----------//
 #include "friend/FriendDTO.pb.h"
-
-extern std::string CurSSID;
 
 // ssid(user) : {nickname,remark}
 std::map<std::string,std::pair<std::string,std::string>> sWithInfo;
@@ -43,6 +42,7 @@ ContactListModel::ContactListModel(QObject *parent,const QString& groupName) : Q
     auto * groupItem = new QStandardItem(groupName);
     groupItem->setEditable(false);
 
+    LOG("sWithInfo : " << sWithInfo.size() << "," << "gsWithInfo : " << gsWithInfo.size())
     // 目前项目需求只有两个 tab obj
     if(groupName == "好友")
         for(auto & it : sWithInfo){
@@ -143,7 +143,8 @@ ContactList::ContactList(QHash<QString,QTreeView*> ltv,QObject * obj) : _ltv(std
     connect(bl,&BusinessListen::GET_CONTACTLIST,this,[&](const std::string& rawGfdto){
         SSDTO::GetFriendList_DTO gfdto;
         gfdto.ParseFromString(rawGfdto);
-
+        gsWithInfo.clear();
+        sWithInfo.clear();
         if(CurSSID == gfdto.request_ssid()){
             for(int i = 0;i < gfdto.friend_infos_size();i++){
                 // 提取 FriendInfo
@@ -176,6 +177,8 @@ ContactList::ContactList(QHash<QString,QTreeView*> ltv,QObject * obj) : _ltv(std
             _ltv[tvName]->setMouseTracking(true);
             _ltv[tvName]->viewport()->setMouseTracking(true);
 
+            _ltv[tvName]->update();
+
             // 选中后发送选中的消息对象的 ssid/group_ssid
             connect(_ltv[tvName],&QListView::clicked,this,[=](const QModelIndex &index){
                 QString selectMsgItem = cModel->data(index,Qt::DisplayRole).toString();
@@ -185,6 +188,41 @@ ContactList::ContactList(QHash<QString,QTreeView*> ltv,QObject * obj) : _ltv(std
         }
     });
 
+    // 接收到服务端转发消息
+    connect(bl,&BusinessListen::RECV_MSG,this,[=](const std::string& rawFmdto){
+        SSDTO::ForwardMsg_DTO fdto;
+        fdto.ParseFromString(rawFmdto);
+        // 检查有没有创建MsgPage
+        std::string ssid = fdto.send_ssid();
+        emit ContactList::SELECTED_CONTACTITEM(ssid);
+        auto *arp = dynamic_cast<ArchPage*>(obj);
+        auto res = arp->getMsgPageMap().find(ssid);
+        if(res == arp->getMsgPageMap().end()){// 不存在这个好友的聊天页面
+            auto * p = new MsgPage(arp);
+            p->hide();
+            arp->addDelWidget(p);
+            p->setSendTo(ssid);// 消息包中需要sendToSSID
+
+            arp->getMsgPageMap().insert({ssid,p});
+        }
+        if(fdto.is_group()){
+            nlohmann::json jObj = nlohmann::json::parse(fdto.content());
+            for(const auto &it : jObj.items()){
+                arp->getMsgPageMap()[ssid]->addNewInfo({it.key(),it.value()});
+            }
+        }else{
+            arp->getMsgPageMap()[ssid]->addNewInfo({ssid,fdto.content()});
+        }
+    });
+}
+
+ContactList::~ContactList() {
+    for(auto it : delVec){
+        it->deleteLater();
+    }
+}
+
+void ContactList::getContactListRequest(QWidget* obj) {
     // 发送好友信息请求DTO
     SSDTO::GetFriendList_DTO dto;
     dto.set_type(SSDTO::Business_Type::GET_CONTACTLIST);
@@ -193,11 +231,5 @@ ContactList::ContactList(QHash<QString,QTreeView*> ltv,QObject * obj) : _ltv(std
     std::string outGfdto;
     dto.SerializeToString(&outGfdto);
 
-    emit bl->REQUEST_CONTACTLIST(outGfdto);
-}
-
-ContactList::~ContactList() {
-    for(auto it : delVec){
-        it->deleteLater();
-    }
+    emit dynamic_cast<BusinessListen*>(obj)->REQUEST_CONTACTLIST(outGfdto);
 }

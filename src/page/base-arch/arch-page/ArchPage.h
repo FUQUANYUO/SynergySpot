@@ -8,6 +8,7 @@
 #include <QMainWindow>
 #include <QtWidgets>
 
+#include "base-arch/msg-page/MsgPage.h"
 #include "base/business-listen/BusinessListen.h"
 
 QT_BEGIN_NAMESPACE
@@ -29,6 +30,10 @@ public:
 
     BusinessListen * getBusinessObj();
 
+    // 获取维护全部聊天页面map对象
+    std::unordered_map<std::string,MsgPage*>& getMsgPageMap();
+
+    void addDelWidget(QWidget * wid);
     ~ArchPage() override;
 signals:
     void over();    // 关闭释放资源信号
@@ -38,6 +43,8 @@ private:
 
     // 监听服务端事务
     BusinessListen * bl;
+    // 维护全部的好友聊天页面
+    std::unordered_map<std::string,MsgPage*> lmp;
 };
 
 

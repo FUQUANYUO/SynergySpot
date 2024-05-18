@@ -6,9 +6,9 @@ package SSDTO;
 
 message EmailVerifyCode_DTO{
     bool is_request = 1;
-    string email_address = 2;
-    string verify_code = 3;
-    string start_time = 4;
-    string valid_time = 5;
+    bytes email_address = 2;
+    bytes verify_code = 3;
+    bytes start_time = 4;
+    bytes valid_time = 5;
     SSDTO.Business_Type type = 6;
 }

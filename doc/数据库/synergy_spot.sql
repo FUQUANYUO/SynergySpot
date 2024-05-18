@@ -15,6 +15,7 @@ CREATE TABLE `user_base_info` (
     `sex` char(1) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '性别（M 男,F 女）',
     `personal_sign` VARCHAR(160) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '' COMMENT '个性签名',
     `birthday` DATE NOT NULL COMMENT '出生日期',
+    `region` SMALLINT NOT NULL DEFAULT 2 COMMENT '地区',
     PRIMARY KEY (`ssid`) USING BTREE
 )ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '用户基本信息' ROW_FORMAT = DYNAMIC;
 
@@ -38,7 +39,7 @@ CREATE TABLE `friendship` (
     `id` INT AUTO_INCREMENT,
     `ssid` VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'ss号',
     `friend_ssid` VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '好友的ss号',
-    `ship_stauts` TINYINT NOT NULL COMMENT '关系状态(1正常)',
+    `ship_status` TINYINT NOT NULL COMMENT '关系状态(1正常)',
     `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '添加时间',
     PRIMARY KEY (`id`) USING BTREE ,
     INDEX `ssid_index`(`ssid` ASC) USING BTREE
@@ -119,3 +120,43 @@ CREATE TABLE `district` (
   KEY `parent_id` (`pid`),
   KEY `region_type` (`level`)
 )ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '地区' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- TRIGGER FOR base and private table
+-- ----------------------------
+DROP TRIGGER IF EXISTS `after_insert_user_private_info`;
+CREATE TRIGGER `after_insert_user_private_info`
+    BEFORE INSERT ON `user_private_info`
+    FOR EACH ROW
+    BEGIN
+        INSERT INTO `user_base_info` (ssid, ssname, sex, birthday, region)
+            VALUES (NEW.ssid, CONCAT('用户',NEW.ssid), 'F', TIME(NOW()), 2);
+    END
+;
+
+-- ----------------------------
+-- TRIGGER FOR contact and friendship or group_member
+-- ----------------------------
+DROP TRIGGER IF EXISTS `after_insert_friendship`;
+CREATE TRIGGER `after_insert_friendship`
+    AFTER INSERT ON `friendship`
+    FOR EACH ROW
+    BEGIN
+        IF NOT EXISTS (
+            SELECT 1 FROM `user_contact_info` WHERE ssid = NEW.ssid AND friendship_id = NEW.id
+        ) THEN
+            INSERT INTO `user_contact_info` (ssid, friendship_id, friendship_remark)
+                VALUES (NEW.ssid, NEW.id, '');
+        END IF;
+    END
+;
+
+DROP TRIGGER IF EXISTS `after_insert_group_member`;
+CREATE TRIGGER `after_insert_group_member`
+    AFTER INSERT ON `group_member_info`
+    FOR EACH ROW
+    BEGIN
+        INSERT INTO `user_contact_info` (ssid, group_id, group_remark, user_name_in_group)
+            VALUES (NEW.ssid_member, NEW.id, '', '');
+    END
+;

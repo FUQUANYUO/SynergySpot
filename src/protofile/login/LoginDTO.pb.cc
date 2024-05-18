@@ -24,6 +24,7 @@ namespace SSDTO {
 PROTOBUF_CONSTEXPR Login_DTO::Login_DTO(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.ssid_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.ssname_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.password_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.email_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.ip_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
@@ -52,6 +53,7 @@ const uint32_t TableStruct_LoginDTO_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::SSDTO::Login_DTO, _impl_.ssid_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::Login_DTO, _impl_.ssname_),
   PROTOBUF_FIELD_OFFSET(::SSDTO::Login_DTO, _impl_.password_),
   PROTOBUF_FIELD_OFFSET(::SSDTO::Login_DTO, _impl_.is_pass_),
   PROTOBUF_FIELD_OFFSET(::SSDTO::Login_DTO, _impl_.email_),
@@ -67,18 +69,18 @@ static const ::_pb::Message* const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_LoginDTO_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\016LoginDTO.proto\022\005SSDTO\032\tDTO.proto\"{\n\tLo"
-  "gin_DTO\022\014\n\004ssid\030\001 \001(\014\022\020\n\010password\030\002 \001(\014\022"
-  "\017\n\007is_pass\030\003 \001(\010\022\r\n\005email\030\004 \001(\014\022\n\n\002ip\030\005 "
-  "\001(\014\022\"\n\004type\030\006 \001(\0162\024.SSDTO.Business_Typeb"
-  "\006proto3"
+  "\n\016LoginDTO.proto\022\005SSDTO\032\tDTO.proto\"\213\001\n\tL"
+  "ogin_DTO\022\014\n\004ssid\030\001 \001(\014\022\016\n\006ssname\030\002 \001(\014\022\020"
+  "\n\010password\030\003 \001(\014\022\017\n\007is_pass\030\004 \001(\010\022\r\n\005ema"
+  "il\030\005 \001(\014\022\n\n\002ip\030\006 \001(\014\022\"\n\004type\030\007 \001(\0162\024.SSD"
+  "TO.Business_Typeb\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_LoginDTO_2eproto_deps[1] = {
   &::descriptor_table_DTO_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_LoginDTO_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_LoginDTO_2eproto = {
-    false, false, 167, descriptor_table_protodef_LoginDTO_2eproto,
+    false, false, 184, descriptor_table_protodef_LoginDTO_2eproto,
     "LoginDTO.proto",
     &descriptor_table_LoginDTO_2eproto_once, descriptor_table_LoginDTO_2eproto_deps, 1, 1,
     schemas, file_default_instances, TableStruct_LoginDTO_2eproto::offsets,
@@ -110,6 +112,7 @@ Login_DTO::Login_DTO(const Login_DTO& from)
   Login_DTO* const _this = this; (void)_this;
   new (&_impl_) Impl_{
       decltype(_impl_.ssid_){}
+    , decltype(_impl_.ssname_){}
     , decltype(_impl_.password_){}
     , decltype(_impl_.email_){}
     , decltype(_impl_.ip_){}
@@ -124,6 +127,14 @@ Login_DTO::Login_DTO(const Login_DTO& from)
   #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (!from._internal_ssid().empty()) {
     _this->_impl_.ssid_.Set(from._internal_ssid(), 
+      _this->GetArenaForAllocation());
+  }
+  _impl_.ssname_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.ssname_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_ssname().empty()) {
+    _this->_impl_.ssname_.Set(from._internal_ssname(), 
       _this->GetArenaForAllocation());
   }
   _impl_.password_.InitDefault();
@@ -162,6 +173,7 @@ inline void Login_DTO::SharedCtor(
   (void)is_message_owned;
   new (&_impl_) Impl_{
       decltype(_impl_.ssid_){}
+    , decltype(_impl_.ssname_){}
     , decltype(_impl_.password_){}
     , decltype(_impl_.email_){}
     , decltype(_impl_.ip_){}
@@ -172,6 +184,10 @@ inline void Login_DTO::SharedCtor(
   _impl_.ssid_.InitDefault();
   #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
     _impl_.ssid_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.ssname_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.ssname_.Set("", GetArenaForAllocation());
   #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   _impl_.password_.InitDefault();
   #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
@@ -199,6 +215,7 @@ Login_DTO::~Login_DTO() {
 inline void Login_DTO::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
   _impl_.ssid_.Destroy();
+  _impl_.ssname_.Destroy();
   _impl_.password_.Destroy();
   _impl_.email_.Destroy();
   _impl_.ip_.Destroy();
@@ -215,6 +232,7 @@ void Login_DTO::Clear() {
   (void) cached_has_bits;
 
   _impl_.ssid_.ClearToEmpty();
+  _impl_.ssname_.ClearToEmpty();
   _impl_.password_.ClearToEmpty();
   _impl_.email_.ClearToEmpty();
   _impl_.ip_.ClearToEmpty();
@@ -239,44 +257,53 @@ const char* Login_DTO::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx
         } else
           goto handle_unusual;
         continue;
-      // bytes password = 2;
+      // bytes ssname = 2;
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
+          auto str = _internal_mutable_ssname();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // bytes password = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
           auto str = _internal_mutable_password();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
-      // bool is_pass = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
+      // bool is_pass = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
           _impl_.is_pass_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
-      // bytes email = 4;
-      case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
+      // bytes email = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 42)) {
           auto str = _internal_mutable_email();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
-      // bytes ip = 5;
-      case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 42)) {
+      // bytes ip = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 50)) {
           auto str = _internal_mutable_ip();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
-      // .SSDTO.Business_Type type = 6;
-      case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 48)) {
+      // .SSDTO.Business_Type type = 7;
+      case 7:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 56)) {
           uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
           _internal_set_type(static_cast<::SSDTO::Business_Type>(val));
@@ -318,35 +345,41 @@ uint8_t* Login_DTO::_InternalSerialize(
         1, this->_internal_ssid(), target);
   }
 
-  // bytes password = 2;
+  // bytes ssname = 2;
+  if (!this->_internal_ssname().empty()) {
+    target = stream->WriteBytesMaybeAliased(
+        2, this->_internal_ssname(), target);
+  }
+
+  // bytes password = 3;
   if (!this->_internal_password().empty()) {
     target = stream->WriteBytesMaybeAliased(
-        2, this->_internal_password(), target);
+        3, this->_internal_password(), target);
   }
 
-  // bool is_pass = 3;
+  // bool is_pass = 4;
   if (this->_internal_is_pass() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(3, this->_internal_is_pass(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(4, this->_internal_is_pass(), target);
   }
 
-  // bytes email = 4;
+  // bytes email = 5;
   if (!this->_internal_email().empty()) {
     target = stream->WriteBytesMaybeAliased(
-        4, this->_internal_email(), target);
+        5, this->_internal_email(), target);
   }
 
-  // bytes ip = 5;
+  // bytes ip = 6;
   if (!this->_internal_ip().empty()) {
     target = stream->WriteBytesMaybeAliased(
-        5, this->_internal_ip(), target);
+        6, this->_internal_ip(), target);
   }
 
-  // .SSDTO.Business_Type type = 6;
+  // .SSDTO.Business_Type type = 7;
   if (this->_internal_type() != 0) {
     target = stream->EnsureSpace(target);
     target = ::_pbi::WireFormatLite::WriteEnumToArray(
-      6, this->_internal_type(), target);
+      7, this->_internal_type(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -372,33 +405,40 @@ size_t Login_DTO::ByteSizeLong() const {
         this->_internal_ssid());
   }
 
-  // bytes password = 2;
+  // bytes ssname = 2;
+  if (!this->_internal_ssname().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+        this->_internal_ssname());
+  }
+
+  // bytes password = 3;
   if (!this->_internal_password().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
         this->_internal_password());
   }
 
-  // bytes email = 4;
+  // bytes email = 5;
   if (!this->_internal_email().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
         this->_internal_email());
   }
 
-  // bytes ip = 5;
+  // bytes ip = 6;
   if (!this->_internal_ip().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
         this->_internal_ip());
   }
 
-  // bool is_pass = 3;
+  // bool is_pass = 4;
   if (this->_internal_is_pass() != 0) {
     total_size += 1 + 1;
   }
 
-  // .SSDTO.Business_Type type = 6;
+  // .SSDTO.Business_Type type = 7;
   if (this->_internal_type() != 0) {
     total_size += 1 +
       ::_pbi::WireFormatLite::EnumSize(this->_internal_type());
@@ -424,6 +464,9 @@ void Login_DTO::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROT
 
   if (!from._internal_ssid().empty()) {
     _this->_internal_set_ssid(from._internal_ssid());
+  }
+  if (!from._internal_ssname().empty()) {
+    _this->_internal_set_ssname(from._internal_ssname());
   }
   if (!from._internal_password().empty()) {
     _this->_internal_set_password(from._internal_password());
@@ -462,6 +505,10 @@ void Login_DTO::InternalSwap(Login_DTO* other) {
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
       &_impl_.ssid_, lhs_arena,
       &other->_impl_.ssid_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.ssname_, lhs_arena,
+      &other->_impl_.ssname_, rhs_arena
   );
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
       &_impl_.password_, lhs_arena,

@@ -15,8 +15,15 @@ include_directories(tcp-server)
 include_directories(do-business)
 include_directories(../src/protofile)
 include_directories(../src/lib-common/include)
+include_directories(../src/utils)
 include_directories(${Protobuf_INCLUDE_DIRS})
 include_directories(${CURL_INCLUDE_DIR})
+
+# 指定 MySQL include
+include_directories(/usr/include/mysql)
+
+link_directories(/usr/lib64/mysql)
+link_directories(/usr/lib64/yaml)
 
 # protobuf
 file(GLOB_RECURSE ProCC ../src/protofile/*.cc)
@@ -24,8 +31,6 @@ file(GLOB_RECURSE ProCC ../src/protofile/*.cc)
 file(GLOB_RECURSE DoCpp do-business/*.cpp)
 # db pool
 file(GLOB_RECURSE DBCpp ../src/utils/db-pool/*.cpp)
-
-link_directories(../src/lib-common/lib)
 
 add_executable(Server
         Server.cpp
@@ -41,7 +46,7 @@ add_executable(Server
 
 target_link_libraries(Server PRIVATE
         Threads::Threads
-        libyaml-cpp.so
+        yaml-cpp.so
         mysqlclient
         ${PROTOBUF_LIBRARY}
         ${CURL_LIBRARIES}

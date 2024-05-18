@@ -185,7 +185,7 @@ class EmailVerifyCode_DTO final :
     kIsRequestFieldNumber = 1,
     kTypeFieldNumber = 6,
   };
-  // string email_address = 2;
+  // bytes email_address = 2;
   void clear_email_address();
   const std::string& email_address() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -199,7 +199,7 @@ class EmailVerifyCode_DTO final :
   std::string* _internal_mutable_email_address();
   public:
 
-  // string verify_code = 3;
+  // bytes verify_code = 3;
   void clear_verify_code();
   const std::string& verify_code() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -213,7 +213,7 @@ class EmailVerifyCode_DTO final :
   std::string* _internal_mutable_verify_code();
   public:
 
-  // string start_time = 4;
+  // bytes start_time = 4;
   void clear_start_time();
   const std::string& start_time() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -227,7 +227,7 @@ class EmailVerifyCode_DTO final :
   std::string* _internal_mutable_start_time();
   public:
 
-  // string valid_time = 5;
+  // bytes valid_time = 5;
   void clear_valid_time();
   const std::string& valid_time() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -309,7 +309,7 @@ inline void EmailVerifyCode_DTO::set_is_request(bool value) {
   // @@protoc_insertion_point(field_set:SSDTO.EmailVerifyCode_DTO.is_request)
 }
 
-// string email_address = 2;
+// bytes email_address = 2;
 inline void EmailVerifyCode_DTO::clear_email_address() {
   _impl_.email_address_.ClearToEmpty();
 }
@@ -321,7 +321,7 @@ template <typename ArgT0, typename... ArgT>
 inline PROTOBUF_ALWAYS_INLINE
 void EmailVerifyCode_DTO::set_email_address(ArgT0&& arg0, ArgT... args) {
  
- _impl_.email_address_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+ _impl_.email_address_.SetBytes(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
   // @@protoc_insertion_point(field_set:SSDTO.EmailVerifyCode_DTO.email_address)
 }
 inline std::string* EmailVerifyCode_DTO::mutable_email_address() {
@@ -359,7 +359,7 @@ inline void EmailVerifyCode_DTO::set_allocated_email_address(std::string* email_
   // @@protoc_insertion_point(field_set_allocated:SSDTO.EmailVerifyCode_DTO.email_address)
 }
 
-// string verify_code = 3;
+// bytes verify_code = 3;
 inline void EmailVerifyCode_DTO::clear_verify_code() {
   _impl_.verify_code_.ClearToEmpty();
 }
@@ -371,7 +371,7 @@ template <typename ArgT0, typename... ArgT>
 inline PROTOBUF_ALWAYS_INLINE
 void EmailVerifyCode_DTO::set_verify_code(ArgT0&& arg0, ArgT... args) {
  
- _impl_.verify_code_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+ _impl_.verify_code_.SetBytes(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
   // @@protoc_insertion_point(field_set:SSDTO.EmailVerifyCode_DTO.verify_code)
 }
 inline std::string* EmailVerifyCode_DTO::mutable_verify_code() {
@@ -409,7 +409,7 @@ inline void EmailVerifyCode_DTO::set_allocated_verify_code(std::string* verify_c
   // @@protoc_insertion_point(field_set_allocated:SSDTO.EmailVerifyCode_DTO.verify_code)
 }
 
-// string start_time = 4;
+// bytes start_time = 4;
 inline void EmailVerifyCode_DTO::clear_start_time() {
   _impl_.start_time_.ClearToEmpty();
 }
@@ -421,7 +421,7 @@ template <typename ArgT0, typename... ArgT>
 inline PROTOBUF_ALWAYS_INLINE
 void EmailVerifyCode_DTO::set_start_time(ArgT0&& arg0, ArgT... args) {
  
- _impl_.start_time_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+ _impl_.start_time_.SetBytes(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
   // @@protoc_insertion_point(field_set:SSDTO.EmailVerifyCode_DTO.start_time)
 }
 inline std::string* EmailVerifyCode_DTO::mutable_start_time() {
@@ -459,7 +459,7 @@ inline void EmailVerifyCode_DTO::set_allocated_start_time(std::string* start_tim
   // @@protoc_insertion_point(field_set_allocated:SSDTO.EmailVerifyCode_DTO.start_time)
 }
 
-// string valid_time = 5;
+// bytes valid_time = 5;
 inline void EmailVerifyCode_DTO::clear_valid_time() {
   _impl_.valid_time_.ClearToEmpty();
 }
@@ -471,7 +471,7 @@ template <typename ArgT0, typename... ArgT>
 inline PROTOBUF_ALWAYS_INLINE
 void EmailVerifyCode_DTO::set_valid_time(ArgT0&& arg0, ArgT... args) {
  
- _impl_.valid_time_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+ _impl_.valid_time_.SetBytes(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
   // @@protoc_insertion_point(field_set:SSDTO.EmailVerifyCode_DTO.valid_time)
 }
 inline std::string* EmailVerifyCode_DTO::mutable_valid_time() {

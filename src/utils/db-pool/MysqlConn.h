@@ -2,8 +2,7 @@
 #include "mysql/mysql.h"
 #include <chrono>
 #include <iostream>
-using namespace std;
-using namespace chrono;
+using namespace std::chrono;
 
 #include "../help.h"
 
@@ -15,11 +14,11 @@ public:
     // 释放数据库连接
     ~MysqlConn();
     // 连接数据库
-    bool connect(string ip, string user, string passwd, string dbName, unsigned short port = 3306);
+    bool connect(std::string ip, std::string user, std::string passwd, std::string dbName, unsigned short port = 3306);
     // 更新数据库: insert, update, delete
-    bool update(const string sql);
+    bool update(const std::string sql);
     // 查询数据库
-    MYSQL_RES * query(const string sql);
+    MYSQL_RES * query(const std::string sql);
     // 事务操作
     bool transaction();
     // 提交事务

@@ -6,9 +6,10 @@ package SSDTO;
 
 message Login_DTO{
     bytes ssid = 1;
-    bytes password = 2;
-    bool is_pass = 3;
-    bytes email = 4;
-    bytes ip = 5;
-    SSDTO.Business_Type type = 6;
+    bytes ssname = 2;
+    bytes password = 3;
+    bool  is_pass = 4;
+    bytes email = 5;
+    bytes ip = 6;
+    SSDTO.Business_Type type = 7;
 }

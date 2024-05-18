@@ -10,4 +10,5 @@ enum Business_Type{
     GET_CONTACTLIST = 4;
     ADD_FRIEND = 5;
     GET_EMAILCODE = 6;
+    FRIEND_SEARCH = 7;
 }

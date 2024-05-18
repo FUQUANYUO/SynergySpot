@@ -10,6 +10,6 @@ message ForwardMsg_DTO{
     bytes send_ssid = 3;
     bytes content = 4;
     bytes ip_sender = 5;
-    bool is_forward_success = 6;
+    bool is_group = 6;
     SSDTO.Business_Type type = 7;
 }

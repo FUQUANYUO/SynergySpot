@@ -15,7 +15,6 @@ public:
 private:
     int readn(char *buf, int size);
     int writen(const char *msg, int size);
-
 private:
     int m_fd;// 通信的套接字
 };

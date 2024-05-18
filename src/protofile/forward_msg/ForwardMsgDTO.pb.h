@@ -183,7 +183,7 @@ class ForwardMsg_DTO final :
     kSendSsidFieldNumber = 3,
     kContentFieldNumber = 4,
     kIpSenderFieldNumber = 5,
-    kIsForwardSuccessFieldNumber = 6,
+    kIsGroupFieldNumber = 6,
     kTypeFieldNumber = 7,
   };
   // bytes date_time = 1;
@@ -256,13 +256,13 @@ class ForwardMsg_DTO final :
   std::string* _internal_mutable_ip_sender();
   public:
 
-  // bool is_forward_success = 6;
-  void clear_is_forward_success();
-  bool is_forward_success() const;
-  void set_is_forward_success(bool value);
+  // bool is_group = 6;
+  void clear_is_group();
+  bool is_group() const;
+  void set_is_group(bool value);
   private:
-  bool _internal_is_forward_success() const;
-  void _internal_set_is_forward_success(bool value);
+  bool _internal_is_group() const;
+  void _internal_set_is_group(bool value);
   public:
 
   // .SSDTO.Business_Type type = 7;
@@ -287,7 +287,7 @@ class ForwardMsg_DTO final :
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr send_ssid_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr content_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr ip_sender_;
-    bool is_forward_success_;
+    bool is_group_;
     int type_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
@@ -555,24 +555,24 @@ inline void ForwardMsg_DTO::set_allocated_ip_sender(std::string* ip_sender) {
   // @@protoc_insertion_point(field_set_allocated:SSDTO.ForwardMsg_DTO.ip_sender)
 }
 
-// bool is_forward_success = 6;
-inline void ForwardMsg_DTO::clear_is_forward_success() {
-  _impl_.is_forward_success_ = false;
+// bool is_group = 6;
+inline void ForwardMsg_DTO::clear_is_group() {
+  _impl_.is_group_ = false;
 }
-inline bool ForwardMsg_DTO::_internal_is_forward_success() const {
-  return _impl_.is_forward_success_;
+inline bool ForwardMsg_DTO::_internal_is_group() const {
+  return _impl_.is_group_;
 }
-inline bool ForwardMsg_DTO::is_forward_success() const {
-  // @@protoc_insertion_point(field_get:SSDTO.ForwardMsg_DTO.is_forward_success)
-  return _internal_is_forward_success();
+inline bool ForwardMsg_DTO::is_group() const {
+  // @@protoc_insertion_point(field_get:SSDTO.ForwardMsg_DTO.is_group)
+  return _internal_is_group();
 }
-inline void ForwardMsg_DTO::_internal_set_is_forward_success(bool value) {
+inline void ForwardMsg_DTO::_internal_set_is_group(bool value) {
   
-  _impl_.is_forward_success_ = value;
+  _impl_.is_group_ = value;
 }
-inline void ForwardMsg_DTO::set_is_forward_success(bool value) {
-  _internal_set_is_forward_success(value);
-  // @@protoc_insertion_point(field_set:SSDTO.ForwardMsg_DTO.is_forward_success)
+inline void ForwardMsg_DTO::set_is_group(bool value) {
+  _internal_set_is_group(value);
+  // @@protoc_insertion_point(field_set:SSDTO.ForwardMsg_DTO.is_group)
 }
 
 // .SSDTO.Business_Type type = 7;

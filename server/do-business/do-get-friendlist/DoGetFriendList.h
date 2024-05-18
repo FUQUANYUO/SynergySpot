@@ -5,7 +5,7 @@
 #ifndef SERVER_DOGETFRIENDLIST_H
 #define SERVER_DOGETFRIENDLIST_H
 
-#include <iostream>
+#include "help.h"
 
 class DoGetFriendList {
 public:
@@ -14,6 +14,8 @@ public:
 
     // 查询请求request_ssid的好友列表
     std::string execQueryFriendList(const std::string &dto);
+
+    std::string execQueryFriendListBySSID(std::string ssid);
 };
 
 

@@ -8,13 +8,16 @@
 #include "login/LoginDTO.pb.h"
 
 #include "base/business-listen/BusinessListen.h"
+#include "../../safety/encrypt-passwd/EncryptPasswd.h"
 
 void LoginVerify::verifyInServer(std::string ssid, std::string password) {
     // 验证 ssid 对应的 password
+    EncryptPasswd ep;
+
     SSDTO::Login_DTO ldto;
     ldto.set_type(SSDTO::Business_Type::LOGIN);
     ldto.set_ssid(ssid);
-    ldto.set_password(password);
+    ldto.set_password(ep.encrypt(password));
     ldto.set_is_pass(false);
     ldto.set_ip("");
     ldto.set_email("");

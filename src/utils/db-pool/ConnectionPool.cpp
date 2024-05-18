@@ -2,9 +2,8 @@
 #include "yaml-cpp/yaml.h"
 
 #include <thread>
-#include <utility>
 
-extern string yamlPath;
+using namespace std;
 
 ConnectionPool* ConnectionPool::getConnectPool()
 {

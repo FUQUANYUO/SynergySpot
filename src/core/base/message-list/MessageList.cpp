@@ -11,8 +11,6 @@
 
 #include "db-lite/LiteConn.h"
 
-extern std::string CurSSID;
-
 // ssid(user) : {nickname,remark}
 extern std::map<std::string,std::pair<std::string,std::string>> sWithInfo;
 // ssid(group) : {nickname,remark}
@@ -229,8 +227,6 @@ MessageList::MessageList(QListView &lv) {
         LOG(selectMsgItem.toStdString())
         emit MessageList::SELECTED_MSGITEM(selectMsgItem.toStdString());
     });
-
-    // 在接收到信息后添加消息显示
 }
 
 MessageList::~MessageList() {
@@ -242,4 +238,3 @@ void MessageList::Add_ContactItem(std::string ssid){
     if(res == addContactVec.end())
         mModel->addItem(ssid);
 }
-

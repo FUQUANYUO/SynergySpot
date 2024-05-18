@@ -8,6 +8,7 @@
 #include <QWidget>
 
 #include "base/contact-list/ContactList.h"          // 联系人列表
+#include "friend-notice-page/FriendNoticePage.h"    // 好友通知
 
 
 QT_BEGIN_NAMESPACE
@@ -23,6 +24,7 @@ public:
     explicit ContactPage(QWidget *parent = nullptr);
 
     ContactList * getContactList();
+    FriendNoticePage * getFriendNoticePage();
 
     ~ContactPage() override;
 private:
@@ -30,6 +32,9 @@ private:
 
     // ContactList delegate obj
     ContactList *cl;
+
+    // FriendNotice obj
+    FriendNoticePage *fnp;
 };
 
 

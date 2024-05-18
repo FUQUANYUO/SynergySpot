@@ -7,6 +7,8 @@
 #include "TaskQueue.h"
 #include "ThreadPool.h"
 #include "../Server.h"
+#include "EpollEngine.h"
+
 
 // 服务端对象
 extern TcpServer s;

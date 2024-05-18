@@ -6,8 +6,8 @@
 
 #include "DoEmailCode.h"
 
-#include <curl/curl.h>
 #include "yaml-cpp/yaml.h"
+#include "curl/curl.h"
 #include "email/EmailVerifyCode.pb.h"
 
 extern std::string yamlPath;

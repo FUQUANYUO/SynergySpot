@@ -55,12 +55,13 @@ enum Business_Type : int {
   GET_CONTACTLIST = 4,
   ADD_FRIEND = 5,
   GET_EMAILCODE = 6,
+  FRIEND_SEARCH = 7,
   Business_Type_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
   Business_Type_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
 };
 bool Business_Type_IsValid(int value);
 constexpr Business_Type Business_Type_MIN = LOGIN;
-constexpr Business_Type Business_Type_MAX = GET_EMAILCODE;
+constexpr Business_Type Business_Type_MAX = FRIEND_SEARCH;
 constexpr int Business_Type_ARRAYSIZE = Business_Type_MAX + 1;
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* Business_Type_descriptor();

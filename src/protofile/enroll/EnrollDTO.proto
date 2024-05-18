@@ -9,7 +9,6 @@ message Enroll_DTO{
     bytes user_name = 2;
     bytes password = 3;
     bytes email = 4;
-    bool is_pass = 5;
-    bytes ip = 6;
-    SSDTO.Business_Type type = 7;
+    bytes ip = 5;
+    SSDTO.Business_Type type = 6;
 }

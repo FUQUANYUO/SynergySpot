@@ -21,8 +21,6 @@
     _ccon->getQSocket()->waitForBytesWritten();             \
     LOG(__LOG__)                                            \
 
-extern std::string CurSSID;
-
 BusinessListen::BusinessListen() {
     allocBusiness = new DoBusiness::AllocBusiness();
     _t = new QThread(allocBusiness);
@@ -40,6 +38,9 @@ BusinessListen::BusinessListen() {
     connect(this,&BusinessListen::FORWARD_MSG,allocBusiness,&DoBusiness::AllocBusiness::ForwardBySer);
     connect(this,&BusinessListen::REQUEST_CONTACTLIST,allocBusiness,&DoBusiness::AllocBusiness::QueryContactList);
     connect(this,&BusinessListen::REQUEST_EMAILCODE,allocBusiness,&DoBusiness::AllocBusiness::QueryEmailVerifyCode);
+    connect(this,&BusinessListen::REQUEST_ENROLLACC,allocBusiness,&DoBusiness::AllocBusiness::QueryEnrollAccount);
+    connect(this,&BusinessListen::ADD_FRIEND,allocBusiness,&DoBusiness::AllocBusiness::AddFriend);
+    connect(this,&BusinessListen::REQUEST_SEARCH,allocBusiness,&DoBusiness::AllocBusiness::QuerySearchRequest);
 
     // 转发子线程的信号
     connect(allocBusiness,&DoBusiness::AllocBusiness::LAND_SUCCESS,this,[=](){
@@ -57,6 +58,15 @@ BusinessListen::BusinessListen() {
     connect(allocBusiness,&DoBusiness::AllocBusiness::GET_EMAILCODE,this,[=](std::string rawEdto){
         emit GET_EMAILCODE(std::move(rawEdto));
     });
+    connect(allocBusiness,&DoBusiness::AllocBusiness::GET_ENROLLRES,this,[=](std::string rawErdto){
+        emit GET_ENROLLRES(std::move(rawErdto));
+    });
+    connect(allocBusiness,&DoBusiness::AllocBusiness::RECV_FRIEND_REQUEST,this,[=](std::string rawFdto){
+        emit RECV_FRIEND_QUEST(std::move(rawFdto));
+    });
+    connect(allocBusiness,&DoBusiness::AllocBusiness::GET_SEARCH_RES,this,[=](std::string rawFdto){
+        emit GET_SEARCH_RES(std::move(rawFdto));
+    });
 
     // 开启事务监听
     _t->start();
@@ -69,40 +79,43 @@ BusinessListen::~BusinessListen() {
     _t->deleteLater();
 }
 
-DoBusiness::RecvMsgTask::RecvMsgTask(QObject * parent,std::string dto) : QObject(parent), dto(std::move(dto)){
-}
 
+// 命令执行函数
 void DoBusiness::RecvMsgTask::forwardMsg() {
     dynamic_cast<AllocBusiness*>(parent())->RECV_MSG(dto);
 }
 
-DoBusiness::RecvVerifyRes::RecvVerifyRes(QObject * parent,std::string dto) : QObject(parent), dto(std::move(dto)){
-}
+extern std::string CurSSname;
 
 void DoBusiness::RecvVerifyRes::parseVerifyRes() {
     LOG("recv server verify [" << CurSSID << "] res")
     SSDTO::Login_DTO ldto;
     ldto.ParseFromString(dto);
-    if(ldto.is_pass())
+    if(ldto.is_pass()){
+        CurSSname = ldto.ssname();
         emit dynamic_cast<AllocBusiness*>(parent())->LAND_SUCCESS();
-    else
+    }
+    else{
         emit dynamic_cast<AllocBusiness*>(parent())->LAND_FAIL();
+    }
 }
-
-DoBusiness::GetContactList::GetContactList(QObject * parent,std::string dto) : QObject(parent), dto(std::move(dto)) {
-}
-
 void DoBusiness::GetContactList::getContactList() {
     emit dynamic_cast<AllocBusiness*>(parent())->GET_CONTACTLIST(dto);
 }
-
-DoBusiness::GetEmailCode::GetEmailCode(QObject *parent, std::string dto) : QObject(parent), dto(std::move(dto)){
-}
-
 void DoBusiness::GetEmailCode::getEmailCode() {
     emit dynamic_cast<AllocBusiness*>(parent())->GET_EMAILCODE(dto);
 }
+void DoBusiness::GetEnrollRes::getEnrollRes(){
+    emit dynamic_cast<AllocBusiness*>(parent())->GET_ENROLLRES(dto);
+}
+void DoBusiness::RecvFriendRequest::recvFriendRequest() {
+    emit dynamic_cast<AllocBusiness*>(parent())->RECV_FRIEND_REQUEST(dto);
+}
+void DoBusiness::GetRearchRes::getRearchRes() {
+    emit dynamic_cast<AllocBusiness*>(parent())->GET_SEARCH_RES(dto);
+}
 
+// 子线程及槽函数
 DoBusiness::AllocBusiness::AllocBusiness() {
     _ccon = new ClientConServer();
 }
@@ -147,7 +160,8 @@ void DoBusiness::AllocBusiness::run() {
         DoBusiness::RecvVerifyRes vres(this, dto.toStdString());
         vres.parseVerifyRes();
     } else if (type == SSDTO::ENROLL) {
-        // DoBusiness::RecvEnrollRes eres();
+        DoBusiness::GetEnrollRes gerres(this,dto.toStdString());
+        gerres.getEnrollRes();
     } else if(type == SSDTO::GET_EMAILCODE){
         DoBusiness::GetEmailCode gec(this,dto.toStdString());
         gec.getEmailCode();
@@ -157,13 +171,19 @@ void DoBusiness::AllocBusiness::run() {
     } else if(type == SSDTO::GET_CONTACTLIST){
         DoBusiness::GetContactList gcl(this,dto.toStdString());
         gcl.getContactList();
+    }else if(type == SSDTO::ADD_FRIEND){
+        DoBusiness::RecvFriendRequest rfr(this,dto.toStdString());
+        rfr.recvFriendRequest();
+    }else if(type == SSDTO::FRIEND_SEARCH){
+        DoBusiness::GetRearchRes grr(this,dto.toStdString());
+        grr.getRearchRes();
     }
     LOG("recv some business to do from server : " + std::to_string(type))
 }
 
 void DoBusiness::AllocBusiness::VerifyAcc(const std::string& outLdto) {
     // 发送检验包
-    SEND_PACKAGE(outLdto,SSDTO::LOGIN,"dto has been send to server...")
+    SEND_PACKAGE(outLdto,SSDTO::LOGIN,"login dto has been send to server...")
 }
 
 void DoBusiness::AllocBusiness::ForwardBySer(const std::string& outFmdto) {
@@ -185,10 +205,21 @@ void DoBusiness::AllocBusiness::DisConnFromSer() {
 
 void DoBusiness::AllocBusiness::QueryContactList(const std::string &outGfdto) {
     // 发送查询联系人列表请求
-    SEND_PACKAGE(outGfdto,SSDTO::GET_CONTACTLIST,"query contact list dto has been send to server...")
+    SEND_PACKAGE(outGfdto,SSDTO::GET_CONTACTLIST,"query of contact list dto has been send to server...")
 }
-
 void DoBusiness::AllocBusiness::QueryEmailVerifyCode(const std::string &outEdto) {
     // 发送请求邮箱验证码
-    SEND_PACKAGE(outEdto,SSDTO::GET_EMAILCODE,"query email code dto has been send to server...")
+    SEND_PACKAGE(outEdto,SSDTO::GET_EMAILCODE,"query of email code dto has been send to server...")
+}
+void DoBusiness::AllocBusiness::QueryEnrollAccount(const std::string &outErdto) {
+    // 发送注册账号请求
+    SEND_PACKAGE(outErdto,SSDTO::ENROLL,"query of enroll dto has been send to server...")
+}
+void DoBusiness::AllocBusiness::AddFriend(const std::string &outFdto) {
+    // 发送好友申请
+    SEND_PACKAGE(outFdto,SSDTO::ADD_FRIEND,"query of add friend dto has been send to server...")
+}
+void DoBusiness::AllocBusiness::QuerySearchRequest(const std::string &outSdto) {
+    // 发送搜索好友申请
+    SEND_PACKAGE(outSdto,SSDTO::FRIEND_SEARCH,"query of search friend dto has been send to server...")
 }

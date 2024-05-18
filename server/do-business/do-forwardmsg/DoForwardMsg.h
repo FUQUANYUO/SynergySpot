@@ -5,7 +5,7 @@
 #ifndef SERVER_DOFORWARDMSG_H
 #define SERVER_DOFORWARDMSG_H
 
-#include <iostream>
+#include "help.h"
 
 class DoForwardMsg {
 public:
@@ -16,6 +16,10 @@ public:
     void execForward(const std::string &dto);
 
     // 离线转发
-    static void execForwardByMap(std::string curSSID);
+    static void execForwardByMap(const std::string& curSSID);
+private:
+    bool isGroup(const std::string& ssid);
+    std::string makeJsonData(const std::string& ssid,const std::string& content);
+    std::vector<std::string> getGroupMember(const std::string& ssid);
 };
 #endif//SERVER_DOFORWARDMSG_H

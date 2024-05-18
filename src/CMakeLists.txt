@@ -66,6 +66,8 @@ target_link_libraries(SynergySpot PRIVATE
         sqlite3
         libmysql
         yaml-cppd
+        libcrypto
+        libssl
 )
 
 # 移动 protobuf.dll 到 out 文件夹

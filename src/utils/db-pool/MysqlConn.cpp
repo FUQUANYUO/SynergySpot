@@ -1,5 +1,7 @@
 #include "MysqlConn.h"
 
+using namespace std;
+
 MysqlConn::MysqlConn()
 {
     m_conn = mysql_init(nullptr);
@@ -21,6 +23,7 @@ bool MysqlConn::connect(string ip, string user, string passwd, string dbName, un
         return true;
     }
     LOG("DataBase Connection Failed");
+    LOG(mysql_error(m_conn))
     return false;
 }
 
@@ -28,7 +31,8 @@ bool MysqlConn::update(const string sql)
 {
     if (mysql_query(m_conn, sql.c_str()))
     {
-        LOG("UPDATE FAILED: " + sql);
+        LOG("UPDATE FAILED: " + sql)
+        LOG(mysql_error(m_conn))
         return false;
     }
     return true;
@@ -39,6 +43,7 @@ MYSQL_RES* MysqlConn::query(const string sql)
     if (mysql_query(m_conn, sql.c_str()))
     {
         LOG("QUERY FAILED: " + sql);
+        LOG(mysql_error(m_conn))
         return nullptr;
     }
     return mysql_store_result(m_conn);

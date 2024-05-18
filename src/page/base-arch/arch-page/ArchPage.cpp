@@ -7,27 +7,46 @@
 #include "ui_ArchPage.h"
 #include "help.h"
 
-#include "../contact-page/ContactPage.h"            // 联系人模块
-#include "../msg-page/MsgPage.h"                    // 消息模块
-#include "../more-option-page/MoreOptionPage.h"     // 更多选项模块
-#include "../avatar-page/AvatarPage.h"              // 头像模块
+#include "../contact-page/ContactPage.h"                            // 联系人模块
+#include "../more-option-page/MoreOptionPage.h"                     // 更多选项模块
+#include "../avatar-page/AvatarPage.h"                              // 头像模块
+#include "../add-button-page/AddButtonPage.h"                       // 添加按钮
 
-#include "base/message-list/MessageList.h"          // 消息列表
+#include "base/message-list/MessageList.h"                          // 消息列表
 
-#define SHOW_CONTACT_PAGE                           // 测试联系人模块
-#define SHOW_MSG_PAGE                               // 测试消息模块
-#define SHOW_MORE_OPTION_PAGE                       // 测试更多设置模块
-#define SHOW_AVATAR_PAGE                            // 测试头像模块
+#define SHOW_CONTACT_PAGE                                           // 测试联系人模块
+#define SHOW_MSG_PAGE                                               // 测试消息模块
+#define SHOW_MORE_OPTION_PAGE                                       // 测试更多设置模块
+#define SHOW_AVATAR_PAGE                                            // 测试头像模块
 
-std::unordered_map<std::string,MsgPage*> lmp;       // 维护全部的好友聊天页面
+#include "friend/FriendDTO.pb.h"
 
 ArchPage::ArchPage(QObject * obj,QWidget *parent) : QMainWindow(parent), ui(new Ui::ArchPage) {
     ui->setupUi(this);
     bl = dynamic_cast<BusinessListen*>(obj);
+    setMouseTracking(true);
 
+    AddButtonPage * abp = new AddButtonPage(this);
+    // 设为模态
+    abp->setWindowFlags(Qt::Popup);
+    delVec.push_back(abp);
+    // 隐藏
+    abp->hide();
+    // 添加按钮槽函数
+    connect(ui->add,&QPushButton::clicked,this,[=](){
+        // 设置出现的位置（经验值）
+        QPoint targetP = this->pos() + QPoint(ui->add->x()+40,(ui->add->y())+30);
+        abp->move(targetP);
+        abp->show();
+    });
+
+    // 搜索结果响应
+    connect(bl,&BusinessListen::GET_SEARCH_RES,abp->getSearchFriendPageObj(),&SearchFriendPage::UpdateSearchRes);
 #ifdef SHOW_MSG_PAGE
     // 消息列表
     QListView * lv = new QListView(this);
+    lv->setMouseTracking(true);
+    lv->installEventFilter(this);
 
     MessageList * ml = new MessageList(*lv);
     delVec.push_back(reinterpret_cast<QObject*>(ml));
@@ -40,6 +59,9 @@ ArchPage::ArchPage(QObject * obj,QWidget *parent) : QMainWindow(parent), ui(new 
 
     // 联系人激活
     connect(cp->getContactList(),&ContactList::SELECTED_CONTACTITEM,ml,&MessageList::Add_ContactItem);
+    // 好友通知
+    connect(bl,&BusinessListen::ADD_FRIEND,cp->getFriendNoticePage(),&FriendNoticePage::AddNewNotice);
+    connect(bl,&BusinessListen::RECV_FRIEND_QUEST,cp->getFriendNoticePage(),&FriendNoticePage::AddNewNotice);
 #endif
 
     // 当点击后获取待发送的消息对象
@@ -81,51 +103,32 @@ ArchPage::ArchPage(QObject * obj,QWidget *parent) : QMainWindow(parent), ui(new 
             }
         }
     });
-
-    // 接收到服务端转发消息
-    connect(bl,&BusinessListen::RECV_MSG,this,[=](const std::string& rawFmdto){
-        SSDTO::ForwardMsg_DTO fdto;
-        fdto.ParseFromString(rawFmdto);
-        // 检查有没有创建MsgPage
-        std::string ssid = fdto.send_ssid();
-
-        emit cp->getContactList()->SELECTED_CONTACTITEM(ssid);
-
-        auto res = lmp.find(ssid);
-        if(res == lmp.end()){// 不存在这个好友的聊天页面
-            auto * p = new MsgPage(this);
-            p->hide();
-            delVec.push_back(p);
-            p->setSendTo(ssid);// 消息包中需要sendToSSID
-
-            lmp.insert({ssid,p});
-        }
-        // 收到的信息可能是 群/用户
-        // TODO 群
-
-        // 用户
-        lmp[ssid]->addNewInfo({ssid,fdto.content()});
-    });
 #endif
 
 #ifdef SHOW_MORE_OPTION_PAGE
     MoreOptionPage * mop = new MoreOptionPage(this);
+    // 设为模态
+    mop->setWindowFlags(Qt::Popup);
     // 隐藏
     mop->hide();
     // 更多设置按钮槽函数
     connect(ui->option,&QPushButton::clicked,this,[=](){
-        //设置出现的位置（经验值）
-        mop->move(95,(ui->option->y())-(mop->height())+30);
+        // 设置出现的位置（经验值）
+        QPoint targetP = this->pos() + QPoint(95,(ui->option->y())-(mop->height())+30);
+        mop->move(targetP);
         mop->show();
     });
 #endif
 
 #ifdef SHOW_AVATAR_PAGE
     AvatarPage * ap = new AvatarPage(this);
+    // 设为模态
+    ap->setWindowFlags(Qt::Popup);
     ap->hide();
     connect(ui->avatar,&QPushButton::clicked,this,[=](){
        // 设置出现的位置
-       ap->move(30,50);
+       QPoint targetP = this->pos() + QPoint(30,50);
+       ap->move(targetP);
        ap->show();
     });
 #endif
@@ -163,4 +166,12 @@ ArchPage::~ArchPage() {
 
 BusinessListen* ArchPage::getBusinessObj() {
     return bl;
+}
+
+std::unordered_map<std::string, MsgPage *> &ArchPage::getMsgPageMap() {
+    return lmp;
+}
+
+void ArchPage::addDelWidget(QWidget * wid){
+    delVec.push_back(wid);
 }

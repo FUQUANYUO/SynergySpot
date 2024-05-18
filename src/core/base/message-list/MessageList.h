@@ -6,6 +6,8 @@
 #define SYNERGYSPOT_MESSAGELIST_H
 #include <QListView>
 
+#include "help.h"
+
 class MessageList : public QObject{
     Q_OBJECT
 public:

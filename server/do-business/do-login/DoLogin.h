@@ -5,7 +5,7 @@
 #ifndef SERVER_DOLOGIN_H
 #define SERVER_DOLOGIN_H
 
-#include <iostream>
+#include "../../src/utils/help.h"
 
 class DoLogin {
 public:
@@ -17,6 +17,8 @@ public:
 
     // 查询结果包装为dto 返回值为protobuf序列化值
     std::string sendVerifyRes(bool isPass);
+private:
+    std::string execQueryUsrSSname(const std::string& ssid);
 };
 
 

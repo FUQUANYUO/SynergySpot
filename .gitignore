@@ -1,11 +1,15 @@
-#clion generate some file or dir
-/src/cmake-build-debug
+# clion generate some file or dir
+/src/cmake-build*
 /src/.idea
 /src/.clang-format
 /server/.idea
-/server/cmake-build-debug-wsl-ubuntu
+/server/cmake-build*
 /server/.clang-format
 
 # out-put dir
 /server/out
 /src/out
+
+# real config file
+/src/conf/clientInfo.yaml
+/src/conf/serverInfo.yaml

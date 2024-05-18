@@ -5,7 +5,7 @@
 #ifndef SERVER_DOEMAILCODE_H
 #define SERVER_DOEMAILCODE_H
 
-#include "../../src/utils/help.h"
+#include "help.h"
 #include <vector>
 
 class DoEmailCode {

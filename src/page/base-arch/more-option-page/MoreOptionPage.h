@@ -20,7 +20,6 @@ class MoreOptionPage : public QWidget {
 public:
     explicit MoreOptionPage(QWidget *parent = nullptr);
     ~MoreOptionPage() override;
-
 private:
     Ui::MoreOptionPage *ui;
 };

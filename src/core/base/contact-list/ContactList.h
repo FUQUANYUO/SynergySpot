@@ -19,6 +19,8 @@ public:
 signals:
     void SELECTED_CONTACTITEM(std::string ssid);
 private:
+    void getContactListRequest(QWidget* obj);
+private:
     QHash<QString,QTreeView*> _ltv;
 
     std::vector<QObject*> delVec;
