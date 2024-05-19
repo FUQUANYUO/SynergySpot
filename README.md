@@ -4,7 +4,7 @@
 本项目部署缺少的依赖可以参考CMakeLists.txt即src/CMakeLists.txt、server/CMakeLists.txt
 
 ## 服务端部署
-**服务端确保CMake版本>= 3.x.x;编译套件支持C++11及以上版本**
+**服务端确保在Linux环境下且CMake版本>= 3.x.x;编译套件支持C++11及以上版本**
 
 ```CMakeLists
 find_package(Threads REQUIRED)
