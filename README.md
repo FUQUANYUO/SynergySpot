@@ -62,7 +62,7 @@ email-info:
 
 ## 客户端
 
-** V1.x.x 针对于windows平台做扩展，后续尝试移植到Linux**
+**V1.x.x 针对于windows平台做扩展，后续尝试移植到Linux**
 - 使用QT6进行客户端搭建、CMake做项目管理
 - 使用QT Widget 作为Ui框架，核心内容大部分使用纯cpp及利用lib*库
 - 使用SQlite3 做客户端数据持久化
