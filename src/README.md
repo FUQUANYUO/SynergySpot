@@ -58,7 +58,7 @@
 
 
 
-![BToA](..\doc\Static\bToA.png)
+![..\doc\Static\bToA.png](https://github.com/FUQUANYUO/SynergySpot/blob/V0.0.1/doc/Static/BToA.png)
 
 
 
