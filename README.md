@@ -7,7 +7,8 @@
 <p align="center">
   中文名 “灵犀一点”，源自诗句"心有灵犀一点通"，形容即时的心灵沟通。
 </p>
-![win-badge] ![release-badge] ![download-badge] ![download-latest]
+
+
 # 部署项目
 **本项目分为两个部分：客户端(src)与服务端(server)**
 
