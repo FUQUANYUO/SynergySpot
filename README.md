@@ -3,9 +3,11 @@
 </h1>
 <p align="center">
   SynergySpot 是一款以 QQ9 为参考并精心打造的聊天软件，力求提供丰富的功能和完善的用户体验。
-
+</p>
+<p align="center">
   中文名 “灵犀一点”，源自诗句"心有灵犀一点通"，形容即时的心灵沟通。
 </p>
+![win-badge] ![release-badge] ![download-badge] ![download-latest]
 # 部署项目
 **本项目分为两个部分：客户端(src)与服务端(server)**
 
