@@ -8,6 +8,9 @@
 
 #include "base-arch/arch-page/ArchPage.h"
 #include "forward_msg/ForwardMsgDTO.pb.h"
+
+#include "get-time/GetCurTime.h"
+
 #include "help.h"
 
 // 每一个用户（好友/群）拥有一个MsgPage
@@ -32,19 +35,12 @@ MsgPage::MsgPage(QWidget *parent) : ui(new Ui::MsgPage) {
             // 在 ui listview 中显示
             emit mcs->PRESENT_SENDCONTENT(inputTxt);
 
-            // 获取当前时间
-            std::time_t now = std::time(nullptr);
-            char timebuf[20];
-            tm localTime{};
-            localtime_s(&localTime,&now);
-            std::strftime(timebuf,sizeof(timebuf),"%Y-%m-%d %H:%M:%S",&localTime);
-
             // 封装 forward_dto
             SSDTO::ForwardMsg_DTO fmdto;
             fmdto.set_type(SSDTO::Business_Type::FOWARD_MSG);
             fmdto.set_recv_ssid(_sendTo);
             fmdto.set_send_ssid(CurSSID);
-            fmdto.set_date_time(timebuf);
+            fmdto.set_date_time(GetCurTime::getTimeObj()->getCurTime());
             fmdto.set_content(inputTxt.toStdString());
             fmdto.set_ip_sender("");
             std::string out;

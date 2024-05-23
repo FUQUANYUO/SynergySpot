@@ -16,11 +16,17 @@
 
 extern std::string CurSSname;
 
+#ifdef WIN32
+std::string yamlPathServer = "../../conf/serverInfo.yaml";
+#else
+std::string yamlPathServer = "../conf/serverInfo.yaml";
+#endif
+
 SearchForm::SearchForm(QWidget *parent) :  ui(new Ui::SearchForm) {
     ui->setupUi(this);
     BusinessListen * bl = dynamic_cast<ArchPage*>(parent->parent()->parent())->getBusinessObj();
 
-    YAML::Node nodeServer = YAML::LoadFile("../../conf/serverInfo.yaml");
+    YAML::Node nodeServer = YAML::LoadFile(yamlPathServer);
     auto acceptStr = nodeServer["request-friend-status"]["acceptStr"].as<std::string>();
     auto rejectStr = nodeServer["request-friend-status"]["rejectStr"].as<std::string>();
     auto waitedStr = nodeServer["request-friend-status"]["waitedStr"].as<std::string>();

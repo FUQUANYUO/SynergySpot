@@ -5,6 +5,7 @@
 /server/.idea
 /server/cmake-build*
 /server/.clang-format
+.idea
 
 # out-put dir
 /server/out

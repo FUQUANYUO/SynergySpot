@@ -5,6 +5,7 @@
 #ifndef SERVER_USERBASEINFOAPI_H
 #define SERVER_USERBASEINFOAPI_H
 
+#include <vector>
 #include "help.h"
 
 struct UserBaseInfo{
