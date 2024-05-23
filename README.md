@@ -17,21 +17,18 @@
 ## 服务端部署
 **服务端确保在Linux环境下且CMake版本>= 3.x.x;编译套件支持C++11及以上版本**
 
-```CMakeLists
-find_package(Threads REQUIRED)
-find_package(Protobuf REQUIRED)
-find_package(CURL REQUIRED)
-```
 - 项目使用的Protobuf版本为21.12：如果改换版本需要根据.proto文件重新生成protofile目录下的*.cc及*.h文件
 - CURL版本为8.7.1
 
+⚠ 自V.0.0.1a版本起src/lib-common/Linux 下配齐了项目的整个依赖库，如果库文件出现问题请提交issue!
 ⚠ find_package的使用需要依赖提供 `*.cmake` 文件，也可以自行更改 CMakeLists 指定好库文件目录及头文件目录
 
 ## 客户端部署
 **客户端确保Qt版本为6.x.x；项目当前V0.0.1编译套件使用 `msvc`**
 
-⚠ 注意src/CMakeLists.txt需要修改，将其改为Qt msvc编译套件的绝对路径；
+⚠ 注意src/CMakeLists.txt需要修改，将其改为Qt msvc编译套件的绝对路径(linux 改为Qt gcc编译套件的绝对路径)；
 ```CMakeLists
+# win
 set(CMAKE_PREFIX_PATH "D:/QT/6.5.3/msvc2019_64")
 ```
 ## 配置文件
@@ -74,7 +71,7 @@ email-info:
 ## 客户端
 
 **V1.x.x 针对于windows平台做扩展，后续尝试移植到Linux**
-- 使用QT6进行客户端搭建、CMake做项目管理
+- 使用QT6进行客户端搭建、CMake做项目管理并**完成跨平台**
 - 使用QT Widget 作为Ui框架，核心内容大部分使用纯cpp及利用lib*库
 - 使用SQlite3 做客户端数据持久化
 
@@ -91,6 +88,7 @@ email-info:
 |MySQL|8.0.20|https://www.mysql.com/cn/|
 |Json|3.11.3|https://github.com/nlohmann/json|
 |Qt|6.5.3|https://www.qt.io/zh-cn/|
+|OpenSSL|1.1.1l|https://www.openssl.org/|
 
 # 功能部分
 
