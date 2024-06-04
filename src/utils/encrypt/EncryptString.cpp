@@ -13,6 +13,7 @@ void handleError(){
 }
 
 EncryptString *EncryptString::obj = nullptr;
+<<<<<<< HEAD
 std::string toHex(const unsigned char *buf, size_t len) {
     std::ostringstream oss;
     oss << std::hex << std::setfill('0');
@@ -33,6 +34,20 @@ std::string EncryptString::encryptString(const std::string& str) {
     return ss.str();
 }
 
+=======
+
+std::string EncryptString::encryptString(const std::string& str) {
+    // md5
+    unsigned char encryptArr[MD5_DIGEST_LENGTH];
+    MD5(reinterpret_cast<const unsigned char*>(str.c_str()), str.length(), encryptArr);
+    std::stringstream ss;
+    for(unsigned char i : encryptArr){
+        ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(i);
+    }
+    return ss.str();
+}
+
+>>>>>>> remotes/origin/V0.0.1a-dev-bug
 EncryptString *EncryptString::getEncryptObj() {
     if(obj == nullptr){
         obj = new EncryptString;
