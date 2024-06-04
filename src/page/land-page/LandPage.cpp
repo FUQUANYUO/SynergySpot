@@ -16,7 +16,11 @@
 #include "yaml-cpp/yaml.h"
 
 // client info yaml file path
+#ifdef WIN32
 std::string yamlPath = "../../conf/clientInfo.yaml";
+#else
+std::string yamlPath = "../conf/clientInfo.yaml";
+#endif
 
 std::string CurSSID;
 std::string CurSSname;

@@ -133,8 +133,8 @@ void MsgContentShowDelegate::paint(QPainter *painter, const QStyleOptionViewItem
 }
 
 
-MsgContentShowModel *mModel = nullptr;
-MsgContentShowDelegate *mDelegate = nullptr;
+static MsgContentShowModel *mModel = nullptr;
+static MsgContentShowDelegate *mDelegate = nullptr;
 MsgContentShow::MsgContentShow(QListView *lv,QObject *obl) : _lv(lv){
     mModel = new MsgContentShowModel(_lv);
     mDelegate = new MsgContentShowDelegate();

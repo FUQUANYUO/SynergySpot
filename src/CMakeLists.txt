@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.27)
+cmake_minimum_required(VERSION 3.20)
 project(SynergySpot)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -6,8 +6,12 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-set(CMAKE_PREFIX_PATH "D:/QT/6.5.3/msvc2019_64")
-
+# set qt path
+if(WIN32)
+        set(CMAKE_PREFIX_PATH "D:/QT/6.5.3/msvc2019_64")
+else() 
+        set(CMAKE_PREFIX_PATH "/home/fuqaq/Qt/6.5.3/gcc_64")
+endif()
 # 设置输出路径
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/out)
 
@@ -51,35 +55,57 @@ target_compile_definitions(SynergySpot PUBLIC
         #LOC_TEST
 )
 
-target_link_directories(SynergySpot PRIVATE
-        lib-common/lib
-)
+# select win or linux
+if(WIN32)
+        target_link_directories(SynergySpot PRIVATE
+                lib-common/lib/Win
+        )
 
-target_link_libraries(SynergySpot PRIVATE
-        Qt::Core
-        Qt::Gui
-        Qt::Widgets
-        Qt::Network
-        libprotobufd
-        sqlite3
-        libmysql
-        yaml-cppd
-        libcrypto
-        libssl
-)
+        target_link_libraries(SynergySpot PRIVATE
+                Qt::Core
+                Qt::Gui
+                Qt::Widgets
+                Qt::Network
+                libprotobufd
+                libprotobuf-lited
+                libprotocd
+                sqlite3
+                libmysql
+                yaml-cppd
+                libcrypto
+                libssl
+        )
 
-# 移动 protobuf.dll 到 out 文件夹
-file(GLOB PROTOBUF_DLLS "${CMAKE_CURRENT_SOURCE_DIR}/lib-common/lib/libproto*.dll")
-set(DLL_DESTINATION_DIR "${CMAKE_CURRENT_SOURCE_DIR}/out/Debug")
-foreach(DLL_FILE ${PROTOBUF_DLLS})
-    get_filename_component(DLL_NAME "${DLL_FILE}" NAME)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy
-            "${DLL_FILE}"
-            "${DLL_DESTINATION_DIR}/${DLL_NAME}"
-            COMMENT "Copying ${DLL_NAME} to ${DLL_DESTINATION_DIR}"
-    )
-endforeach()
+        # 移动 protobuf.dll 到 out 文件夹
+        file(GLOB PROTOBUF_DLLS "${CMAKE_CURRENT_SOURCE_DIR}/lib-common/lib/libproto*.dll")
+        set(DLL_DESTINATION_DIR "${CMAKE_CURRENT_SOURCE_DIR}/out/Debug")
+        foreach(DLL_FILE ${PROTOBUF_DLLS})
+        get_filename_component(DLL_NAME "${DLL_FILE}" NAME)
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy
+                "${DLL_FILE}"
+                "${DLL_DESTINATION_DIR}/${DLL_NAME}"
+                COMMENT "Copying ${DLL_NAME} to ${DLL_DESTINATION_DIR}"
+        )
+        endforeach()
+else()
+        target_link_directories(SynergySpot PRIVATE
+                lib-common/lib/Linux
+        )
+
+        target_link_libraries(SynergySpot PRIVATE
+                Qt::Core
+                Qt::Gui
+                Qt::Widgets
+                Qt::Network
+                protobuf
+                sqlite3
+                mysqlclient
+                yaml-cpp
+                crypto
+                ssl
+        )
+endif()
 
 if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(DEBUG_SUFFIX)

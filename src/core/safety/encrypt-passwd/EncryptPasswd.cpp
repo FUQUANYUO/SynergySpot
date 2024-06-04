@@ -6,7 +6,6 @@
 
 #include "encrypt/EncryptString.h"
 
-static std::string pubKey = "*(&(${%synergy_spot_pub%}))";
 
 std::string EncryptPasswd::encrypt(const std::string &doEncryptObj) {
     std::string str = EncryptString::getEncryptObj()->encryptString(doEncryptObj);

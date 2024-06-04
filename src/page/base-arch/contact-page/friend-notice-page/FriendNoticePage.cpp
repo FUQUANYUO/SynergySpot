@@ -13,6 +13,13 @@
 
 QWidget * _parent;
 
+#ifdef WIN32
+static std::string yamlPathServer = "../../conf/serverInfo.yaml";
+#else
+static std::string yamlPathServer = "../conf/serverInfo.yaml";
+#endif
+
+
 FriendNoticePage::FriendNoticePage(QWidget *parent) : ui(new Ui::FriendNoticePage) {
     _parent = parent;
     ui->setupUi(this);
@@ -37,7 +44,7 @@ FriendNoticePage::~FriendNoticePage() {
 }
 
 void FriendNoticePage::AddNewNotice(const std::string &outdto) {
-    YAML::Node node = YAML::LoadFile("../../conf/serverInfo.yaml");
+    YAML::Node node = YAML::LoadFile(yamlPathServer);
     auto acceptStr = node["request-friend-status"]["acceptStr"].as<std::string>();
     auto rejectStr = node["request-friend-status"]["rejectStr"].as<std::string>();
     auto waitedStr = node["request-friend-status"]["waitedStr"].as<std::string>();

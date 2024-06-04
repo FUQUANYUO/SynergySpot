@@ -14,11 +14,17 @@
 #include "get-time/GetCurTime.h"
 #include "yaml-cpp/yaml.h"
 
+#ifdef WIN32
+static std::string yamlPathServer = "../../conf/serverInfo.yaml";
+#else
+static std::string yamlPathServer = "../conf/serverInfo.yaml";
+#endif
+
 
 NoticeForm::NoticeForm(QWidget *parent) : ui(new Ui::NoticeForm) {
     ui->setupUi(this);
     BusinessListen * bl = dynamic_cast<ArchPage*>(parent->parent()->parent())->getBusinessObj();
-    YAML::Node node = YAML::LoadFile("../../conf/serverInfo.yaml");
+    YAML::Node node = YAML::LoadFile(yamlPathServer);
     auto acceptStr = node["request-friend-status"]["acceptStr"].as<std::string>();
     auto rejectStr = node["request-friend-status"]["rejectStr"].as<std::string>();
     auto waitedStr = node["request-friend-status"]["waitedStr"].as<std::string>();
