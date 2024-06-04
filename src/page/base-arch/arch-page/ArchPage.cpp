@@ -52,17 +52,17 @@ ArchPage::ArchPage(QObject * obj,QWidget *parent) : QMainWindow(parent), ui(new 
     delVec.push_back(reinterpret_cast<QObject*>(ml));
     ui->Vlayout->addWidget(lv);
 
-#ifdef SHOW_CONTACT_PAGE
-    ContactPage * cp = new ContactPage(this);
-    ui->Vlayout->addWidget(cp);
-    cp->hide();
+    #ifdef SHOW_CONTACT_PAGE
+        ContactPage * cp = new ContactPage(this);
+        ui->Vlayout->addWidget(cp);
+        cp->hide();
 
-    // 联系人激活
-    connect(cp->getContactList(),&ContactList::SELECTED_CONTACTITEM,ml,&MessageList::Add_ContactItem);
-    // 好友通知
-    connect(bl,&BusinessListen::ADD_FRIEND,cp->getFriendNoticePage(),&FriendNoticePage::AddNewNotice);
-    connect(bl,&BusinessListen::RECV_FRIEND_QUEST,cp->getFriendNoticePage(),&FriendNoticePage::AddNewNotice);
-#endif
+        // 联系人激活
+        connect(cp->getContactList(),&ContactList::SELECTED_CONTACTITEM,ml,&MessageList::Add_ContactItem);
+        // 好友通知
+        connect(bl,&BusinessListen::ADD_FRIEND,cp->getFriendNoticePage(),&FriendNoticePage::AddNewNotice);
+        connect(bl,&BusinessListen::RECV_FRIEND_QUEST,cp->getFriendNoticePage(),&FriendNoticePage::AddNewNotice);
+    #endif
 
     // 当点击后获取待发送的消息对象
     connect(ml,&MessageList::SELECTED_MSGITEM,this,[=](const std::string &ssid){

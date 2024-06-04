@@ -20,7 +20,7 @@ QT_END_NAMESPACE
 class MsgPage : public QWidget {
     Q_OBJECT
 public:
-    explicit MsgPage(QWidget *parent = nullptr);
+    explicit MsgPage(QWidget *parent = nullptr,QObject * obj = nullptr);
     void setSendTo(std::string sendTo);
 
     // 添加新的信息

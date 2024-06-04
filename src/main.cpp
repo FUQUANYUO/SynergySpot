@@ -5,8 +5,6 @@
 #include "page/base-arch/arch-page/ArchPage.h"
 #include "db-pool/ConnectionPool.h"
 
-#include "page/base-arch/contact-page/friend-notice-page/FriendNoticePage.h"
-
 using namespace std;
 
 void GetQueryRes(MYSQL_RES * res,const vector<int> &index){

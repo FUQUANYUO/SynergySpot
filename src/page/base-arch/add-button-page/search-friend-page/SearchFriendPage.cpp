@@ -51,8 +51,34 @@ void SearchFriendPage::UpdateSearchRes(const std::string& outdto){
     sizePage = sdto.page_size();
     sizeRes = sdto.res_size();
 
-    LOG(sdto.search_infos_size())
+    // 清空上次搜索记录
     res.clear();
+    auto * uitem = ui->All->widget();
+    auto * gitem = ui->Usr->widget();
+    auto * litem = ui->Group->widget();
+
+    if(uitem && gitem && litem){
+        uitem->hide();
+        gitem->hide();
+        litem->hide();
+        uitem->deleteLater();
+        gitem->deleteLater();
+        litem->deleteLater();
+    }
+
+    auto newU = new QWidget(ui->Usr);
+    auto newG = new QWidget(ui->Group);
+    auto newL = new QWidget(ui->All);
+    auto * VU = new QVBoxLayout(newU);
+    auto * VG = new QVBoxLayout(newG);
+    auto * VL = new QVBoxLayout(newL);
+    newU->setLayout(VU);
+    newG->setLayout(VG);
+    newL->setLayout(VL);
+    ui->Usr->setWidget(newU);
+    ui->Group->setWidget(newG);
+    ui->All->setWidget(newL);
+
     for(const auto& it : (*sdto.mutable_search_infos())){
         if(it.is_group()){
             auto findGroupSSID = gsWithInfo.find(it.ssid());
@@ -69,28 +95,24 @@ void SearchFriendPage::UpdateSearchRes(const std::string& outdto){
         delVec.push_back(sf);
         sf->setSearchFormDisplay(res.back());
 
-        // 全部
-        QLayout * litem = ui->lall->layout();
-        litem->addWidget(sf);
+        VL->addWidget(sf);
         // 用户
         if(!it.is_group()){
-            QLayout * uitem = ui->lusr->layout();
             SearchForm * usf = new SearchForm(this);
             delVec.push_back(usf);
             usf->setSearchFormDisplay(res.back());
             usf->setApplyBtnText("添加好友");
 
-            uitem->addWidget(usf);
+            VU->addWidget(usf);
         }
         // 群组
         else{
-            QLayout * gitem = ui->lusr->layout();
             SearchForm * gsf = new SearchForm(this);
             delVec.push_back(gsf);
             gsf->setSearchFormDisplay(res.back());
             gsf->setApplyBtnText("申请加群");
 
-            gitem->addWidget(gsf);
+            VG->addWidget(gsf);
         }
     }
 }

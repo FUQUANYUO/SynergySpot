@@ -61,8 +61,6 @@ target_link_libraries(SynergySpot PRIVATE
         Qt::Widgets
         Qt::Network
         libprotobufd
-        libprotobuf-lited
-        libprotocd
         sqlite3
         libmysql
         yaml-cppd
