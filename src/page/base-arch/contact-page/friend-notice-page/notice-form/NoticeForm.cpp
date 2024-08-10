@@ -14,11 +14,17 @@
 #include "get-time/GetCurTime.h"
 #include "yaml-cpp/yaml.h"
 
+#ifdef WIN32
+static std::string yamlPathServer = "../../conf/serverInfo.yaml";
+#else
+static std::string yamlPathServer = "../conf/serverInfo.yaml";
+#endif
+
 
 NoticeForm::NoticeForm(QWidget *parent) : ui(new Ui::NoticeForm) {
     ui->setupUi(this);
     BusinessListen * bl = dynamic_cast<ArchPage*>(parent->parent()->parent())->getBusinessObj();
-    YAML::Node node = YAML::LoadFile("../../conf/serverInfo.yaml");
+    YAML::Node node = YAML::LoadFile(yamlPathServer);
     auto acceptStr = node["request-friend-status"]["acceptStr"].as<std::string>();
     auto rejectStr = node["request-friend-status"]["rejectStr"].as<std::string>();
     auto waitedStr = node["request-friend-status"]["waitedStr"].as<std::string>();
@@ -54,17 +60,13 @@ NoticeForm::NoticeForm(QWidget *parent) : ui(new Ui::NoticeForm) {
         fdto.SerializeToString(&out);
         emit bl->ADD_FRIEND(out);
 
-        QTimer t;
-        connect(&t,&QTimer::timeout,this,[=,&out](){
-            // 请求更新联系人表
-            SSDTO::GetFriendList_DTO gfldto;
-            gfldto.set_type(SSDTO::GET_CONTACTLIST);
-            gfldto.set_request_ssid(CurSSID);
-            out.clear();
-            gfldto.SerializeToString(&out);
-            emit bl->GET_CONTACTLIST(out);
-        });
-        t.start(1000);
+        // 请求更新联系人表
+        SSDTO::GetFriendList_DTO gfldto;
+        gfldto.set_type(SSDTO::GET_CONTACTLIST);
+        gfldto.set_request_ssid(CurSSID);
+        out.clear();
+        gfldto.SerializeToString(&out);
+        emit bl->GET_CONTACTLIST(out);
     });
 }
 

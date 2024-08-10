@@ -5,6 +5,7 @@
 #ifndef SYNERGYSPOT_GETCURTIME_H
 #define SYNERGYSPOT_GETCURTIME_H
 
+#include <ctime>
 #include "help.h"
 
 class GetCurTime {

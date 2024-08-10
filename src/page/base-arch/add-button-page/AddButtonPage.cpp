@@ -17,7 +17,6 @@ AddButtonPage::AddButtonPage(QWidget *parent) : QWidget(parent), ui(new Ui::AddB
     connect(ui->search,&QPushButton::clicked,this,[=](){
         sfp->show();
     });
-
 }
 
 AddButtonPage::~AddButtonPage() {

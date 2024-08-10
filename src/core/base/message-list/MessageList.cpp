@@ -208,8 +208,8 @@ void MessageListModel::addItem(const std::string &ssid) {
 //        }
 //    }
 
-MessageListModel *mModel = nullptr;
-MessageListDelegate *mDelegate = nullptr;
+static MessageListModel *mModel = nullptr;
+static MessageListDelegate *mDelegate = nullptr;
 
 MessageList::MessageList(QListView &lv) {
     mModel = new MessageListModel(&lv);

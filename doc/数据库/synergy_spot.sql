@@ -125,19 +125,23 @@ CREATE TABLE `district` (
 -- TRIGGER FOR base and private table
 -- ----------------------------
 DROP TRIGGER IF EXISTS `after_insert_user_private_info`;
+DELIMITER //
 CREATE TRIGGER `after_insert_user_private_info`
     BEFORE INSERT ON `user_private_info`
     FOR EACH ROW
     BEGIN
         INSERT INTO `user_base_info` (ssid, ssname, sex, birthday, region)
             VALUES (NEW.ssid, CONCAT('用户',NEW.ssid), 'F', TIME(NOW()), 2);
-    END
-;
+    END;
+//
+DELIMITER ;
+
 
 -- ----------------------------
 -- TRIGGER FOR contact and friendship or group_member
 -- ----------------------------
 DROP TRIGGER IF EXISTS `after_insert_friendship`;
+DELIMITER //
 CREATE TRIGGER `after_insert_friendship`
     AFTER INSERT ON `friendship`
     FOR EACH ROW
@@ -148,15 +152,18 @@ CREATE TRIGGER `after_insert_friendship`
             INSERT INTO `user_contact_info` (ssid, friendship_id, friendship_remark)
                 VALUES (NEW.ssid, NEW.id, '');
         END IF;
-    END
-;
+    END;
+//
+DELIMITER ;
 
 DROP TRIGGER IF EXISTS `after_insert_group_member`;
+DELIMITER //
 CREATE TRIGGER `after_insert_group_member`
     AFTER INSERT ON `group_member_info`
     FOR EACH ROW
     BEGIN
         INSERT INTO `user_contact_info` (ssid, group_id, group_remark, user_name_in_group)
             VALUES (NEW.ssid_member, NEW.id, '', '');
-    END
-;
+    END;
+//
+DELIMITER

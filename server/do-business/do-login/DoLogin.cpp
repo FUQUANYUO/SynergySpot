@@ -16,7 +16,8 @@ bool DoLogin::execVerifyLogin(const std::string& dto,std::string &ssid) {
     ldto.ParseFromString(dto);
     ssid = ldto.ssid();
     char sqlStr[100];
-    sprintf(sqlStr,"SELECT UNHEX(`password`),`email` from user_private_info WHERE `ssid`='%s'",
+    LOG(ldto.password())
+    sprintf(sqlStr,"SELECT `password`,`email` from user_private_info WHERE `ssid`='%s'",
             ldto.ssid().c_str());
     MYSQL_RES * mRes = ConnectionPool::getConnectPool()->getConnection()->query(sqlStr);
     if(mRes == nullptr) {

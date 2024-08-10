@@ -9,7 +9,7 @@
 
 class EncryptString {
 public:
-    static EncryptString *getEncryptObj(const std::string& pub_key = "");
+    static EncryptString *getEncryptObj();
     std::string encryptString(const std::string& str);
 
     void destroyObj();

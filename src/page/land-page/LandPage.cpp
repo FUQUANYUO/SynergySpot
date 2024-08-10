@@ -16,7 +16,11 @@
 #include "yaml-cpp/yaml.h"
 
 // client info yaml file path
+#ifdef WIN32
 std::string yamlPath = "../../conf/clientInfo.yaml";
+#else
+std::string yamlPath = "../conf/clientInfo.yaml";
+#endif
 
 std::string CurSSID;
 std::string CurSSname;
@@ -65,7 +69,7 @@ LandPage::LandPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::LandPage) 
 #else
             // 云端检验
             CurSSID = ui->ssidInput->text().toStdString();
-            lver->verifyInServer(inputSSID.toStdString(),inputPassword.toStdString());
+            lver->verifyInServer(inputSSID.toLocal8Bit().data(),inputPassword.toLocal8Bit().data());
 #endif
         }
     });

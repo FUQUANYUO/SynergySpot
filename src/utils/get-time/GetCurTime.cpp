@@ -22,7 +22,7 @@ std::string GetCurTime::getCurTime() {
 #ifdef WIN32
     localtime_s(&local_time,&now);
 #else
-    localtime_r(&local_time,&now);
+    localtime_r(&now,&local_time);
 #endif
     // 创建一个足够大的字符串来存储格式化的时间
     std::array<char, 80> buffer{};
@@ -44,7 +44,7 @@ std::string GetCurTime::transformTimeStampToStr(std::time_t timestamp) {
 #ifdef WIN32
     localtime_s(&local_time,&timestamp);
 #else
-    localtime_r(&local_time,&timestamp);
+    localtime_r(&timestamp,&local_time);
 #endif
     // 创建一个足够大的字符串来存储格式化的时间
     std::array<char, 80> buffer{};

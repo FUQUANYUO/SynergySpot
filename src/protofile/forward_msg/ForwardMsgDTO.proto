@@ -4,12 +4,47 @@ import "DTO.proto";
 
 package SSDTO;
 
-message ForwardMsg_DTO{
-    bytes date_time = 1;
-    bytes recv_ssid = 2;
-    bytes send_ssid = 3;
-    bytes content = 4;
-    bytes ip_sender = 5;
+// 文件传输请求消息
+message FileTransferRequest_DTO {
+    string filename = 1;
+    int64 filesize = 2;
+    bool is_save_in_server = 3;
+    SSDTO.Business_Type type = 4;
+}
+
+// 文件块消息
+message FileChunk_DTO {
+    string filename = 1;
+    int64 offset = 2;
+    bytes data = 3;
+    bool is_last_chunk = 4;
+    SSDTO.Business_Type type = 5;
+}
+
+// 缺失块请求消息
+message MissingChunkRequest_DTO {
+    string filename = 1;
+    repeated int64 offset = 2;
+    SSDTO.Business_Type type = 3;
+}
+
+// 纯文本消息转发
+message ForwardMsg_DTO {
+    string date_time = 1;
+    string recv_ssid = 2;
+    string send_ssid = 3;
+    string content = 4;
+    string ip_sender = 5;
     bool is_group = 6;
     SSDTO.Business_Type type = 7;
+}
+
+// 总消息体
+message ChatMessage {
+    oneof message_type {
+        ForwardMsg_DTO text_message = 1;
+        FileTransferRequest_DTO file_transfer_request = 2;
+        FileChunk_DTO file_chunk = 3;
+        MissingChunkRequest_DTO missing_chunk_request = 4;
+    }
 }

@@ -190,30 +190,60 @@ ContactList::ContactList(QHash<QString,QTreeView*> ltv,QObject * obj) : _ltv(std
 
     // 接收到服务端转发消息
     connect(bl,&BusinessListen::RECV_MSG,this,[=](const std::string& rawFmdto){
-        SSDTO::ForwardMsg_DTO fdto;
-        fdto.ParseFromString(rawFmdto);
-        // 检查有没有创建MsgPage
-        std::string ssid = fdto.send_ssid();
-        emit ContactList::SELECTED_CONTACTITEM(ssid);
-        auto *arp = dynamic_cast<ArchPage*>(obj);
-        auto res = arp->getMsgPageMap().find(ssid);
-        if(res == arp->getMsgPageMap().end()){// 不存在这个好友的聊天页面
-            auto * p = new MsgPage(arp);
-            p->hide();
-            arp->addDelWidget(p);
-            p->setSendTo(ssid);// 消息包中需要sendToSSID
+        SSDTO::ChatMessage chatMessage;
 
-            arp->getMsgPageMap().insert({ssid,p});
-        }
-        if(fdto.is_group()){
-            nlohmann::json jObj = nlohmann::json::parse(fdto.content());
-            for(const auto &it : jObj.items()){
-                arp->getMsgPageMap()[ssid]->addNewInfo({it.key(),it.value()});
+        switch(chatMessage.message_type_case()){
+            // 文本消息
+            case SSDTO::ChatMessage::kTextMessage:
+            {
+                const SSDTO::ForwardMsg_DTO& textMessage = chatMessage.text_message();
+                // 检查有没有创建MsgPage
+                std::string ssid = textMessage.send_ssid();
+                emit ContactList::SELECTED_CONTACTITEM(ssid);
+                auto *arp = dynamic_cast<ArchPage*>(obj);
+                auto res = arp->getMsgPageMap().find(ssid);
+                if(res == arp->getMsgPageMap().end()){// 不存在这个好友的聊天页面
+                    auto * p = new MsgPage(arp);
+                    p->hide();
+                    arp->addDelWidget(p);
+                    p->setSendTo(ssid);// 消息包中需要sendToSSID
+
+                    arp->getMsgPageMap().insert({ssid,p});
+                }
+                if(textMessage.is_group()){
+                    nlohmann::json jObj = nlohmann::json::parse(textMessage.content());
+                    for(const auto &it : jObj.items()){
+                        arp->getMsgPageMap()[ssid]->addNewInfo({it.key(),it.value()});
+                    }
+                }else{
+                    arp->getMsgPageMap()[ssid]->addNewInfo({ssid,textMessage.content()});
+                }
+                break;
             }
-        }else{
-            arp->getMsgPageMap()[ssid]->addNewInfo({ssid,fdto.content()});
+            // 文件消息
+            case SSDTO::ChatMessage::kFileTransferRequest:
+            {
+                break;
+            }
+            // 接收文件
+            case SSDTO::ChatMessage::kFileChunk:
+            {
+                break;
+            }
+            // 重传文件
+            case SSDTO::ChatMessage::kMissingChunkRequest:
+            {
+                break;
+            }
+            case SSDTO::ChatMessage::MESSAGE_TYPE_NOT_SET:
+            {
+                break;
+            }
         }
     });
+
+    // 初始化获取联系人列表
+    getContactListRequest(bl);
 }
 
 ContactList::~ContactList() {
@@ -222,7 +252,7 @@ ContactList::~ContactList() {
     }
 }
 
-void ContactList::getContactListRequest(QWidget* obj) {
+void ContactList::getContactListRequest(QObject* obj) {
     // 发送好友信息请求DTO
     SSDTO::GetFriendList_DTO dto;
     dto.set_type(SSDTO::Business_Type::GET_CONTACTLIST);
