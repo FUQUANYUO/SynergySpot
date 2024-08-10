@@ -60,17 +60,13 @@ NoticeForm::NoticeForm(QWidget *parent) : ui(new Ui::NoticeForm) {
         fdto.SerializeToString(&out);
         emit bl->ADD_FRIEND(out);
 
-        QTimer t;
-        connect(&t,&QTimer::timeout,this,[=,&out](){
-            // 请求更新联系人表
-            SSDTO::GetFriendList_DTO gfldto;
-            gfldto.set_type(SSDTO::GET_CONTACTLIST);
-            gfldto.set_request_ssid(CurSSID);
-            out.clear();
-            gfldto.SerializeToString(&out);
-            emit bl->GET_CONTACTLIST(out);
-        });
-        t.start(1000);
+        // 请求更新联系人表
+        SSDTO::GetFriendList_DTO gfldto;
+        gfldto.set_type(SSDTO::GET_CONTACTLIST);
+        gfldto.set_request_ssid(CurSSID);
+        out.clear();
+        gfldto.SerializeToString(&out);
+        emit bl->GET_CONTACTLIST(out);
     });
 }
 

@@ -39,7 +39,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="all">
        <property name="styleSheet">
@@ -50,7 +50,7 @@
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QScrollArea" name="scrollArea">
+         <widget class="QScrollArea" name="All">
           <property name="styleSheet">
            <string notr="true">color : rgb(242, 242, 242)</string>
           </property>
@@ -84,7 +84,7 @@
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
-         <widget class="QScrollArea" name="scrollArea_3">
+         <widget class="QScrollArea" name="Usr">
           <property name="styleSheet">
            <string notr="true">color : rgb(242, 242, 242)</string>
           </property>
@@ -96,8 +96,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>507</width>
-             <height>244</height>
+             <width>98</width>
+             <height>28</height>
             </rect>
            </property>
            <property name="styleSheet">
@@ -109,7 +109,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="group">
+      <widget class="QWidget" name="widget">
        <property name="styleSheet">
         <string notr="true">color : rgb(242, 242, 242)</string>
        </property>
@@ -118,7 +118,7 @@
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
-         <widget class="QScrollArea" name="scrollArea_2">
+         <widget class="QScrollArea" name="Group">
           <property name="styleSheet">
            <string notr="true">color : rgb(242, 242, 242)</string>
           </property>

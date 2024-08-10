@@ -45,7 +45,7 @@ void DoEnrollAccount::execStoreAccountInfo(const UserPrivateInfo& uinfo) {
                    << SQL_STR(uinfo.ssid) << ","
                    << SQL_STR(uinfo.status) << ","
                    << SQL_STR(uinfo.email) << ","
-                   << "HEX("<< SQL_STR(uinfo.password) << ")" <<  ")";
+                   << SQL_STR(uinfo.password) << ")";
 
     // 写入加锁
     std::lock_guard<std::mutex> lg(m);

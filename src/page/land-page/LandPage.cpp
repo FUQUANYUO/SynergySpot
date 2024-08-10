@@ -69,7 +69,7 @@ LandPage::LandPage(QWidget *parent) : QMainWindow(parent), ui(new Ui::LandPage) 
 #else
             // 云端检验
             CurSSID = ui->ssidInput->text().toStdString();
-            lver->verifyInServer(inputSSID.toStdString(),inputPassword.toStdString());
+            lver->verifyInServer(inputSSID.toLocal8Bit().data(),inputPassword.toLocal8Bit().data());
 #endif
         }
     });

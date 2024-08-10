@@ -7,6 +7,8 @@
 #include "ui_MsgPage.h"
 
 #include "base-arch/arch-page/ArchPage.h"
+#include "base-arch/contact-page/ContactPage.h"
+
 #include "forward_msg/ForwardMsgDTO.pb.h"
 
 #include "get-time/GetCurTime.h"
@@ -14,7 +16,7 @@
 #include "help.h"
 
 // 每一个用户（好友/群）拥有一个MsgPage
-MsgPage::MsgPage(QWidget *parent) : ui(new Ui::MsgPage) {
+MsgPage::MsgPage(QWidget *parent,QObject * obj) : ui(new Ui::MsgPage) {
     ui->setupUi(this);
     BusinessListen * bl = dynamic_cast<ArchPage*>(parent)->getBusinessObj();
     mcs = new MsgContentShow(ui->msgList,bl);
@@ -26,30 +28,38 @@ MsgPage::MsgPage(QWidget *parent) : ui(new Ui::MsgPage) {
     );
 
     // 发送信息
-    connect(ui->send,&QPushButton::clicked,this,[=](){
+    connect(ui->send, &QPushButton::clicked, this, [=]() {
         QString inputTxt = ui->text->toPlainText();
-        if(!inputTxt.isEmpty()){
-            // 清空信息
+        if (!inputTxt.isEmpty()) {
+            // 清空输入框
             ui->text->clear();
 
             // 在 ui listview 中显示
             emit mcs->PRESENT_SENDCONTENT(inputTxt);
 
-            // 封装 forward_dto
-            SSDTO::ForwardMsg_DTO fmdto;
-            fmdto.set_type(SSDTO::Business_Type::FOWARD_MSG);
-            fmdto.set_recv_ssid(_sendTo);
-            fmdto.set_send_ssid(CurSSID);
-            fmdto.set_date_time(GetCurTime::getTimeObj()->getCurTime());
-            fmdto.set_content(inputTxt.toStdString());
-            fmdto.set_ip_sender("");
-            std::string out;
-            fmdto.SerializeToString(&out);
+            // 封装 ChatMessage 及其包含的 ForwardMsg_DTO 消息
+            SSDTO::ChatMessage chatMessage;
+            auto * fmdto = new SSDTO::ForwardMsg_DTO();
 
-            // 发送转发请求信号
+            fmdto->set_type(SSDTO::Business_Type::FOWARD_MSG);
+            fmdto->set_recv_ssid(_sendTo);
+            fmdto->set_send_ssid(CurSSID);
+            fmdto->set_date_time(GetCurTime::getTimeObj()->getCurTime());
+            fmdto->set_content(inputTxt.toStdString());
+            fmdto->set_ip_sender("");
+
+            // 设置消息体的 ForwardMsg_DTO 类型
+            chatMessage.set_allocated_text_message(fmdto);
+
+            std::string out;
+            chatMessage.SerializeToString(&out);
             emit bl->FORWARD_MSG(out);
         }
     });
+
+    /*
+     * 接收信息于 core/base/contact-list/ContactList.cpp 中，其接收会触发message-list的更新
+     * */
 }
 
 MsgPage::~MsgPage() {

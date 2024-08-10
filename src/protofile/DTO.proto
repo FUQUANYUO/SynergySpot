@@ -11,4 +11,7 @@ enum Business_Type{
     ADD_FRIEND = 5;
     GET_EMAILCODE = 6;
     FRIEND_SEARCH = 7;
+    FILE_TRANSFER_REQUEST = 8;
+    FILE_CHUNK = 9;
+    MISSING_CHUNK_REQUEST = 10;
 }

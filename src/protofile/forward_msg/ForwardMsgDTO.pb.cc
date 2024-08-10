@@ -21,6 +21,55 @@ namespace _pb = ::PROTOBUF_NAMESPACE_ID;
 namespace _pbi = _pb::internal;
 
 namespace SSDTO {
+PROTOBUF_CONSTEXPR FileTransferRequest_DTO::FileTransferRequest_DTO(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.filename_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.filesize_)*/int64_t{0}
+  , /*decltype(_impl_.is_save_in_server_)*/false
+  , /*decltype(_impl_.type_)*/0
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct FileTransferRequest_DTODefaultTypeInternal {
+  PROTOBUF_CONSTEXPR FileTransferRequest_DTODefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~FileTransferRequest_DTODefaultTypeInternal() {}
+  union {
+    FileTransferRequest_DTO _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 FileTransferRequest_DTODefaultTypeInternal _FileTransferRequest_DTO_default_instance_;
+PROTOBUF_CONSTEXPR FileChunk_DTO::FileChunk_DTO(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.filename_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.data_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.offset_)*/int64_t{0}
+  , /*decltype(_impl_.is_last_chunk_)*/false
+  , /*decltype(_impl_.type_)*/0
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct FileChunk_DTODefaultTypeInternal {
+  PROTOBUF_CONSTEXPR FileChunk_DTODefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~FileChunk_DTODefaultTypeInternal() {}
+  union {
+    FileChunk_DTO _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 FileChunk_DTODefaultTypeInternal _FileChunk_DTO_default_instance_;
+PROTOBUF_CONSTEXPR MissingChunkRequest_DTO::MissingChunkRequest_DTO(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.offset_)*/{}
+  , /*decltype(_impl_._offset_cached_byte_size_)*/{0}
+  , /*decltype(_impl_.filename_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.type_)*/0
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct MissingChunkRequest_DTODefaultTypeInternal {
+  PROTOBUF_CONSTEXPR MissingChunkRequest_DTODefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~MissingChunkRequest_DTODefaultTypeInternal() {}
+  union {
+    MissingChunkRequest_DTO _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 MissingChunkRequest_DTODefaultTypeInternal _MissingChunkRequest_DTO_default_instance_;
 PROTOBUF_CONSTEXPR ForwardMsg_DTO::ForwardMsg_DTO(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.date_time_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
@@ -40,12 +89,56 @@ struct ForwardMsg_DTODefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ForwardMsg_DTODefaultTypeInternal _ForwardMsg_DTO_default_instance_;
+PROTOBUF_CONSTEXPR ChatMessage::ChatMessage(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.message_type_)*/{}
+  , /*decltype(_impl_._cached_size_)*/{}
+  , /*decltype(_impl_._oneof_case_)*/{}} {}
+struct ChatMessageDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR ChatMessageDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~ChatMessageDefaultTypeInternal() {}
+  union {
+    ChatMessage _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 ChatMessageDefaultTypeInternal _ChatMessage_default_instance_;
 }  // namespace SSDTO
-static ::_pb::Metadata file_level_metadata_ForwardMsgDTO_2eproto[1];
+static ::_pb::Metadata file_level_metadata_ForwardMsgDTO_2eproto[5];
 static constexpr ::_pb::EnumDescriptor const** file_level_enum_descriptors_ForwardMsgDTO_2eproto = nullptr;
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_ForwardMsgDTO_2eproto = nullptr;
 
 const uint32_t TableStruct_ForwardMsgDTO_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::SSDTO::FileTransferRequest_DTO, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::SSDTO::FileTransferRequest_DTO, _impl_.filename_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::FileTransferRequest_DTO, _impl_.filesize_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::FileTransferRequest_DTO, _impl_.is_save_in_server_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::FileTransferRequest_DTO, _impl_.type_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::SSDTO::FileChunk_DTO, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::SSDTO::FileChunk_DTO, _impl_.filename_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::FileChunk_DTO, _impl_.offset_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::FileChunk_DTO, _impl_.data_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::FileChunk_DTO, _impl_.is_last_chunk_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::FileChunk_DTO, _impl_.type_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::SSDTO::MissingChunkRequest_DTO, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::SSDTO::MissingChunkRequest_DTO, _impl_.filename_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::MissingChunkRequest_DTO, _impl_.offset_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::MissingChunkRequest_DTO, _impl_.type_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::SSDTO::ForwardMsg_DTO, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -59,31 +152,65 @@ const uint32_t TableStruct_ForwardMsgDTO_2eproto::offsets[] PROTOBUF_SECTION_VAR
   PROTOBUF_FIELD_OFFSET(::SSDTO::ForwardMsg_DTO, _impl_.ip_sender_),
   PROTOBUF_FIELD_OFFSET(::SSDTO::ForwardMsg_DTO, _impl_.is_group_),
   PROTOBUF_FIELD_OFFSET(::SSDTO::ForwardMsg_DTO, _impl_.type_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::SSDTO::ChatMessage, _internal_metadata_),
+  ~0u,  // no _extensions_
+  PROTOBUF_FIELD_OFFSET(::SSDTO::ChatMessage, _impl_._oneof_case_[0]),
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  ::_pbi::kInvalidFieldOffsetTag,
+  ::_pbi::kInvalidFieldOffsetTag,
+  ::_pbi::kInvalidFieldOffsetTag,
+  ::_pbi::kInvalidFieldOffsetTag,
+  PROTOBUF_FIELD_OFFSET(::SSDTO::ChatMessage, _impl_.message_type_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, -1, sizeof(::SSDTO::ForwardMsg_DTO)},
+  { 0, -1, -1, sizeof(::SSDTO::FileTransferRequest_DTO)},
+  { 10, -1, -1, sizeof(::SSDTO::FileChunk_DTO)},
+  { 21, -1, -1, sizeof(::SSDTO::MissingChunkRequest_DTO)},
+  { 30, -1, -1, sizeof(::SSDTO::ForwardMsg_DTO)},
+  { 43, -1, -1, sizeof(::SSDTO::ChatMessage)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
+  &::SSDTO::_FileTransferRequest_DTO_default_instance_._instance,
+  &::SSDTO::_FileChunk_DTO_default_instance_._instance,
+  &::SSDTO::_MissingChunkRequest_DTO_default_instance_._instance,
   &::SSDTO::_ForwardMsg_DTO_default_instance_._instance,
+  &::SSDTO::_ChatMessage_default_instance_._instance,
 };
 
 const char descriptor_table_protodef_ForwardMsgDTO_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\023ForwardMsgDTO.proto\022\005SSDTO\032\tDTO.proto\""
-  "\243\001\n\016ForwardMsg_DTO\022\021\n\tdate_time\030\001 \001(\014\022\021\n"
-  "\trecv_ssid\030\002 \001(\014\022\021\n\tsend_ssid\030\003 \001(\014\022\017\n\007c"
-  "ontent\030\004 \001(\014\022\021\n\tip_sender\030\005 \001(\014\022\020\n\010is_gr"
-  "oup\030\006 \001(\010\022\"\n\004type\030\007 \001(\0162\024.SSDTO.Business"
-  "_Typeb\006proto3"
+  "|\n\027FileTransferRequest_DTO\022\020\n\010filename\030\001"
+  " \001(\t\022\020\n\010filesize\030\002 \001(\003\022\031\n\021is_save_in_ser"
+  "ver\030\003 \001(\010\022\"\n\004type\030\004 \001(\0162\024.SSDTO.Business"
+  "_Type\"z\n\rFileChunk_DTO\022\020\n\010filename\030\001 \001(\t"
+  "\022\016\n\006offset\030\002 \001(\003\022\014\n\004data\030\003 \001(\014\022\025\n\ris_las"
+  "t_chunk\030\004 \001(\010\022\"\n\004type\030\005 \001(\0162\024.SSDTO.Busi"
+  "ness_Type\"_\n\027MissingChunkRequest_DTO\022\020\n\010"
+  "filename\030\001 \001(\t\022\016\n\006offset\030\002 \003(\003\022\"\n\004type\030\003"
+  " \001(\0162\024.SSDTO.Business_Type\"\243\001\n\016ForwardMs"
+  "g_DTO\022\021\n\tdate_time\030\001 \001(\t\022\021\n\trecv_ssid\030\002 "
+  "\001(\t\022\021\n\tsend_ssid\030\003 \001(\t\022\017\n\007content\030\004 \001(\t\022"
+  "\021\n\tip_sender\030\005 \001(\t\022\020\n\010is_group\030\006 \001(\010\022\"\n\004"
+  "type\030\007 \001(\0162\024.SSDTO.Business_Type\"\372\001\n\013Cha"
+  "tMessage\022-\n\014text_message\030\001 \001(\0132\025.SSDTO.F"
+  "orwardMsg_DTOH\000\022\?\n\025file_transfer_request"
+  "\030\002 \001(\0132\036.SSDTO.FileTransferRequest_DTOH\000"
+  "\022*\n\nfile_chunk\030\003 \001(\0132\024.SSDTO.FileChunk_D"
+  "TOH\000\022\?\n\025missing_chunk_request\030\004 \001(\0132\036.SS"
+  "DTO.MissingChunkRequest_DTOH\000B\016\n\014message"
+  "_typeb\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_ForwardMsgDTO_2eproto_deps[1] = {
   &::descriptor_table_DTO_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_ForwardMsgDTO_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_ForwardMsgDTO_2eproto = {
-    false, false, 213, descriptor_table_protodef_ForwardMsgDTO_2eproto,
+    false, false, 813, descriptor_table_protodef_ForwardMsgDTO_2eproto,
     "ForwardMsgDTO.proto",
-    &descriptor_table_ForwardMsgDTO_2eproto_once, descriptor_table_ForwardMsgDTO_2eproto_deps, 1, 1,
+    &descriptor_table_ForwardMsgDTO_2eproto_once, descriptor_table_ForwardMsgDTO_2eproto_deps, 1, 5,
     schemas, file_default_instances, TableStruct_ForwardMsgDTO_2eproto::offsets,
     file_level_metadata_ForwardMsgDTO_2eproto, file_level_enum_descriptors_ForwardMsgDTO_2eproto,
     file_level_service_descriptors_ForwardMsgDTO_2eproto,
@@ -95,6 +222,906 @@ PROTOBUF_ATTRIBUTE_WEAK const ::_pbi::DescriptorTable* descriptor_table_ForwardM
 // Force running AddDescriptors() at dynamic initialization time.
 PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::_pbi::AddDescriptorsRunner dynamic_init_dummy_ForwardMsgDTO_2eproto(&descriptor_table_ForwardMsgDTO_2eproto);
 namespace SSDTO {
+
+// ===================================================================
+
+class FileTransferRequest_DTO::_Internal {
+ public:
+};
+
+FileTransferRequest_DTO::FileTransferRequest_DTO(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:SSDTO.FileTransferRequest_DTO)
+}
+FileTransferRequest_DTO::FileTransferRequest_DTO(const FileTransferRequest_DTO& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  FileTransferRequest_DTO* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.filename_){}
+    , decltype(_impl_.filesize_){}
+    , decltype(_impl_.is_save_in_server_){}
+    , decltype(_impl_.type_){}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _impl_.filename_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.filename_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_filename().empty()) {
+    _this->_impl_.filename_.Set(from._internal_filename(), 
+      _this->GetArenaForAllocation());
+  }
+  ::memcpy(&_impl_.filesize_, &from._impl_.filesize_,
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.type_) -
+    reinterpret_cast<char*>(&_impl_.filesize_)) + sizeof(_impl_.type_));
+  // @@protoc_insertion_point(copy_constructor:SSDTO.FileTransferRequest_DTO)
+}
+
+inline void FileTransferRequest_DTO::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.filename_){}
+    , decltype(_impl_.filesize_){int64_t{0}}
+    , decltype(_impl_.is_save_in_server_){false}
+    , decltype(_impl_.type_){0}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+  _impl_.filename_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.filename_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+}
+
+FileTransferRequest_DTO::~FileTransferRequest_DTO() {
+  // @@protoc_insertion_point(destructor:SSDTO.FileTransferRequest_DTO)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
+  SharedDtor();
+}
+
+inline void FileTransferRequest_DTO::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.filename_.Destroy();
+}
+
+void FileTransferRequest_DTO::SetCachedSize(int size) const {
+  _impl_._cached_size_.Set(size);
+}
+
+void FileTransferRequest_DTO::Clear() {
+// @@protoc_insertion_point(message_clear_start:SSDTO.FileTransferRequest_DTO)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.filename_.ClearToEmpty();
+  ::memset(&_impl_.filesize_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&_impl_.type_) -
+      reinterpret_cast<char*>(&_impl_.filesize_)) + sizeof(_impl_.type_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* FileTransferRequest_DTO::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // string filename = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
+          auto str = _internal_mutable_filename();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "SSDTO.FileTransferRequest_DTO.filename"));
+        } else
+          goto handle_unusual;
+        continue;
+      // int64 filesize = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
+          _impl_.filesize_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // bool is_save_in_server = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
+          _impl_.is_save_in_server_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // .SSDTO.Business_Type type = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
+          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+          _internal_set_type(static_cast<::SSDTO::Business_Type>(val));
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* FileTransferRequest_DTO::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:SSDTO.FileTransferRequest_DTO)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string filename = 1;
+  if (!this->_internal_filename().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_filename().data(), static_cast<int>(this->_internal_filename().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "SSDTO.FileTransferRequest_DTO.filename");
+    target = stream->WriteStringMaybeAliased(
+        1, this->_internal_filename(), target);
+  }
+
+  // int64 filesize = 2;
+  if (this->_internal_filesize() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt64ToArray(2, this->_internal_filesize(), target);
+  }
+
+  // bool is_save_in_server = 3;
+  if (this->_internal_is_save_in_server() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(3, this->_internal_is_save_in_server(), target);
+  }
+
+  // .SSDTO.Business_Type type = 4;
+  if (this->_internal_type() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteEnumToArray(
+      4, this->_internal_type(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:SSDTO.FileTransferRequest_DTO)
+  return target;
+}
+
+size_t FileTransferRequest_DTO::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:SSDTO.FileTransferRequest_DTO)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string filename = 1;
+  if (!this->_internal_filename().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_filename());
+  }
+
+  // int64 filesize = 2;
+  if (this->_internal_filesize() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(this->_internal_filesize());
+  }
+
+  // bool is_save_in_server = 3;
+  if (this->_internal_is_save_in_server() != 0) {
+    total_size += 1 + 1;
+  }
+
+  // .SSDTO.Business_Type type = 4;
+  if (this->_internal_type() != 0) {
+    total_size += 1 +
+      ::_pbi::WireFormatLite::EnumSize(this->_internal_type());
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData FileTransferRequest_DTO::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    FileTransferRequest_DTO::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*FileTransferRequest_DTO::GetClassData() const { return &_class_data_; }
+
+
+void FileTransferRequest_DTO::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<FileTransferRequest_DTO*>(&to_msg);
+  auto& from = static_cast<const FileTransferRequest_DTO&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:SSDTO.FileTransferRequest_DTO)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_filename().empty()) {
+    _this->_internal_set_filename(from._internal_filename());
+  }
+  if (from._internal_filesize() != 0) {
+    _this->_internal_set_filesize(from._internal_filesize());
+  }
+  if (from._internal_is_save_in_server() != 0) {
+    _this->_internal_set_is_save_in_server(from._internal_is_save_in_server());
+  }
+  if (from._internal_type() != 0) {
+    _this->_internal_set_type(from._internal_type());
+  }
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void FileTransferRequest_DTO::CopyFrom(const FileTransferRequest_DTO& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:SSDTO.FileTransferRequest_DTO)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool FileTransferRequest_DTO::IsInitialized() const {
+  return true;
+}
+
+void FileTransferRequest_DTO::InternalSwap(FileTransferRequest_DTO* other) {
+  using std::swap;
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.filename_, lhs_arena,
+      &other->_impl_.filename_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(FileTransferRequest_DTO, _impl_.type_)
+      + sizeof(FileTransferRequest_DTO::_impl_.type_)
+      - PROTOBUF_FIELD_OFFSET(FileTransferRequest_DTO, _impl_.filesize_)>(
+          reinterpret_cast<char*>(&_impl_.filesize_),
+          reinterpret_cast<char*>(&other->_impl_.filesize_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata FileTransferRequest_DTO::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_ForwardMsgDTO_2eproto_getter, &descriptor_table_ForwardMsgDTO_2eproto_once,
+      file_level_metadata_ForwardMsgDTO_2eproto[0]);
+}
+
+// ===================================================================
+
+class FileChunk_DTO::_Internal {
+ public:
+};
+
+FileChunk_DTO::FileChunk_DTO(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:SSDTO.FileChunk_DTO)
+}
+FileChunk_DTO::FileChunk_DTO(const FileChunk_DTO& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  FileChunk_DTO* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.filename_){}
+    , decltype(_impl_.data_){}
+    , decltype(_impl_.offset_){}
+    , decltype(_impl_.is_last_chunk_){}
+    , decltype(_impl_.type_){}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _impl_.filename_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.filename_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_filename().empty()) {
+    _this->_impl_.filename_.Set(from._internal_filename(), 
+      _this->GetArenaForAllocation());
+  }
+  _impl_.data_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.data_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_data().empty()) {
+    _this->_impl_.data_.Set(from._internal_data(), 
+      _this->GetArenaForAllocation());
+  }
+  ::memcpy(&_impl_.offset_, &from._impl_.offset_,
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.type_) -
+    reinterpret_cast<char*>(&_impl_.offset_)) + sizeof(_impl_.type_));
+  // @@protoc_insertion_point(copy_constructor:SSDTO.FileChunk_DTO)
+}
+
+inline void FileChunk_DTO::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.filename_){}
+    , decltype(_impl_.data_){}
+    , decltype(_impl_.offset_){int64_t{0}}
+    , decltype(_impl_.is_last_chunk_){false}
+    , decltype(_impl_.type_){0}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+  _impl_.filename_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.filename_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.data_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.data_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+}
+
+FileChunk_DTO::~FileChunk_DTO() {
+  // @@protoc_insertion_point(destructor:SSDTO.FileChunk_DTO)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
+  SharedDtor();
+}
+
+inline void FileChunk_DTO::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.filename_.Destroy();
+  _impl_.data_.Destroy();
+}
+
+void FileChunk_DTO::SetCachedSize(int size) const {
+  _impl_._cached_size_.Set(size);
+}
+
+void FileChunk_DTO::Clear() {
+// @@protoc_insertion_point(message_clear_start:SSDTO.FileChunk_DTO)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.filename_.ClearToEmpty();
+  _impl_.data_.ClearToEmpty();
+  ::memset(&_impl_.offset_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&_impl_.type_) -
+      reinterpret_cast<char*>(&_impl_.offset_)) + sizeof(_impl_.type_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* FileChunk_DTO::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // string filename = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
+          auto str = _internal_mutable_filename();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "SSDTO.FileChunk_DTO.filename"));
+        } else
+          goto handle_unusual;
+        continue;
+      // int64 offset = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
+          _impl_.offset_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // bytes data = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
+          auto str = _internal_mutable_data();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // bool is_last_chunk = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
+          _impl_.is_last_chunk_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // .SSDTO.Business_Type type = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
+          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+          _internal_set_type(static_cast<::SSDTO::Business_Type>(val));
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* FileChunk_DTO::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:SSDTO.FileChunk_DTO)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string filename = 1;
+  if (!this->_internal_filename().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_filename().data(), static_cast<int>(this->_internal_filename().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "SSDTO.FileChunk_DTO.filename");
+    target = stream->WriteStringMaybeAliased(
+        1, this->_internal_filename(), target);
+  }
+
+  // int64 offset = 2;
+  if (this->_internal_offset() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt64ToArray(2, this->_internal_offset(), target);
+  }
+
+  // bytes data = 3;
+  if (!this->_internal_data().empty()) {
+    target = stream->WriteBytesMaybeAliased(
+        3, this->_internal_data(), target);
+  }
+
+  // bool is_last_chunk = 4;
+  if (this->_internal_is_last_chunk() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(4, this->_internal_is_last_chunk(), target);
+  }
+
+  // .SSDTO.Business_Type type = 5;
+  if (this->_internal_type() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteEnumToArray(
+      5, this->_internal_type(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:SSDTO.FileChunk_DTO)
+  return target;
+}
+
+size_t FileChunk_DTO::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:SSDTO.FileChunk_DTO)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string filename = 1;
+  if (!this->_internal_filename().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_filename());
+  }
+
+  // bytes data = 3;
+  if (!this->_internal_data().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+        this->_internal_data());
+  }
+
+  // int64 offset = 2;
+  if (this->_internal_offset() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(this->_internal_offset());
+  }
+
+  // bool is_last_chunk = 4;
+  if (this->_internal_is_last_chunk() != 0) {
+    total_size += 1 + 1;
+  }
+
+  // .SSDTO.Business_Type type = 5;
+  if (this->_internal_type() != 0) {
+    total_size += 1 +
+      ::_pbi::WireFormatLite::EnumSize(this->_internal_type());
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData FileChunk_DTO::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    FileChunk_DTO::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*FileChunk_DTO::GetClassData() const { return &_class_data_; }
+
+
+void FileChunk_DTO::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<FileChunk_DTO*>(&to_msg);
+  auto& from = static_cast<const FileChunk_DTO&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:SSDTO.FileChunk_DTO)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_filename().empty()) {
+    _this->_internal_set_filename(from._internal_filename());
+  }
+  if (!from._internal_data().empty()) {
+    _this->_internal_set_data(from._internal_data());
+  }
+  if (from._internal_offset() != 0) {
+    _this->_internal_set_offset(from._internal_offset());
+  }
+  if (from._internal_is_last_chunk() != 0) {
+    _this->_internal_set_is_last_chunk(from._internal_is_last_chunk());
+  }
+  if (from._internal_type() != 0) {
+    _this->_internal_set_type(from._internal_type());
+  }
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void FileChunk_DTO::CopyFrom(const FileChunk_DTO& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:SSDTO.FileChunk_DTO)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool FileChunk_DTO::IsInitialized() const {
+  return true;
+}
+
+void FileChunk_DTO::InternalSwap(FileChunk_DTO* other) {
+  using std::swap;
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.filename_, lhs_arena,
+      &other->_impl_.filename_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.data_, lhs_arena,
+      &other->_impl_.data_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(FileChunk_DTO, _impl_.type_)
+      + sizeof(FileChunk_DTO::_impl_.type_)
+      - PROTOBUF_FIELD_OFFSET(FileChunk_DTO, _impl_.offset_)>(
+          reinterpret_cast<char*>(&_impl_.offset_),
+          reinterpret_cast<char*>(&other->_impl_.offset_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata FileChunk_DTO::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_ForwardMsgDTO_2eproto_getter, &descriptor_table_ForwardMsgDTO_2eproto_once,
+      file_level_metadata_ForwardMsgDTO_2eproto[1]);
+}
+
+// ===================================================================
+
+class MissingChunkRequest_DTO::_Internal {
+ public:
+};
+
+MissingChunkRequest_DTO::MissingChunkRequest_DTO(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:SSDTO.MissingChunkRequest_DTO)
+}
+MissingChunkRequest_DTO::MissingChunkRequest_DTO(const MissingChunkRequest_DTO& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  MissingChunkRequest_DTO* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.offset_){from._impl_.offset_}
+    , /*decltype(_impl_._offset_cached_byte_size_)*/{0}
+    , decltype(_impl_.filename_){}
+    , decltype(_impl_.type_){}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _impl_.filename_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.filename_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_filename().empty()) {
+    _this->_impl_.filename_.Set(from._internal_filename(), 
+      _this->GetArenaForAllocation());
+  }
+  _this->_impl_.type_ = from._impl_.type_;
+  // @@protoc_insertion_point(copy_constructor:SSDTO.MissingChunkRequest_DTO)
+}
+
+inline void MissingChunkRequest_DTO::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.offset_){arena}
+    , /*decltype(_impl_._offset_cached_byte_size_)*/{0}
+    , decltype(_impl_.filename_){}
+    , decltype(_impl_.type_){0}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+  _impl_.filename_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.filename_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+}
+
+MissingChunkRequest_DTO::~MissingChunkRequest_DTO() {
+  // @@protoc_insertion_point(destructor:SSDTO.MissingChunkRequest_DTO)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
+  SharedDtor();
+}
+
+inline void MissingChunkRequest_DTO::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.offset_.~RepeatedField();
+  _impl_.filename_.Destroy();
+}
+
+void MissingChunkRequest_DTO::SetCachedSize(int size) const {
+  _impl_._cached_size_.Set(size);
+}
+
+void MissingChunkRequest_DTO::Clear() {
+// @@protoc_insertion_point(message_clear_start:SSDTO.MissingChunkRequest_DTO)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.offset_.Clear();
+  _impl_.filename_.ClearToEmpty();
+  _impl_.type_ = 0;
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* MissingChunkRequest_DTO::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // string filename = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
+          auto str = _internal_mutable_filename();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "SSDTO.MissingChunkRequest_DTO.filename"));
+        } else
+          goto handle_unusual;
+        continue;
+      // repeated int64 offset = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedInt64Parser(_internal_mutable_offset(), ptr, ctx);
+          CHK_(ptr);
+        } else if (static_cast<uint8_t>(tag) == 16) {
+          _internal_add_offset(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr));
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // .SSDTO.Business_Type type = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
+          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+          _internal_set_type(static_cast<::SSDTO::Business_Type>(val));
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* MissingChunkRequest_DTO::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:SSDTO.MissingChunkRequest_DTO)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string filename = 1;
+  if (!this->_internal_filename().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_filename().data(), static_cast<int>(this->_internal_filename().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "SSDTO.MissingChunkRequest_DTO.filename");
+    target = stream->WriteStringMaybeAliased(
+        1, this->_internal_filename(), target);
+  }
+
+  // repeated int64 offset = 2;
+  {
+    int byte_size = _impl_._offset_cached_byte_size_.load(std::memory_order_relaxed);
+    if (byte_size > 0) {
+      target = stream->WriteInt64Packed(
+          2, _internal_offset(), byte_size, target);
+    }
+  }
+
+  // .SSDTO.Business_Type type = 3;
+  if (this->_internal_type() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteEnumToArray(
+      3, this->_internal_type(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:SSDTO.MissingChunkRequest_DTO)
+  return target;
+}
+
+size_t MissingChunkRequest_DTO::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:SSDTO.MissingChunkRequest_DTO)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated int64 offset = 2;
+  {
+    size_t data_size = ::_pbi::WireFormatLite::
+      Int64Size(this->_impl_.offset_);
+    if (data_size > 0) {
+      total_size += 1 +
+        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
+    }
+    int cached_size = ::_pbi::ToCachedSize(data_size);
+    _impl_._offset_cached_byte_size_.store(cached_size,
+                                    std::memory_order_relaxed);
+    total_size += data_size;
+  }
+
+  // string filename = 1;
+  if (!this->_internal_filename().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_filename());
+  }
+
+  // .SSDTO.Business_Type type = 3;
+  if (this->_internal_type() != 0) {
+    total_size += 1 +
+      ::_pbi::WireFormatLite::EnumSize(this->_internal_type());
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData MissingChunkRequest_DTO::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    MissingChunkRequest_DTO::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*MissingChunkRequest_DTO::GetClassData() const { return &_class_data_; }
+
+
+void MissingChunkRequest_DTO::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<MissingChunkRequest_DTO*>(&to_msg);
+  auto& from = static_cast<const MissingChunkRequest_DTO&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:SSDTO.MissingChunkRequest_DTO)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  _this->_impl_.offset_.MergeFrom(from._impl_.offset_);
+  if (!from._internal_filename().empty()) {
+    _this->_internal_set_filename(from._internal_filename());
+  }
+  if (from._internal_type() != 0) {
+    _this->_internal_set_type(from._internal_type());
+  }
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void MissingChunkRequest_DTO::CopyFrom(const MissingChunkRequest_DTO& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:SSDTO.MissingChunkRequest_DTO)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool MissingChunkRequest_DTO::IsInitialized() const {
+  return true;
+}
+
+void MissingChunkRequest_DTO::InternalSwap(MissingChunkRequest_DTO* other) {
+  using std::swap;
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _impl_.offset_.InternalSwap(&other->_impl_.offset_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.filename_, lhs_arena,
+      &other->_impl_.filename_, rhs_arena
+  );
+  swap(_impl_.type_, other->_impl_.type_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata MissingChunkRequest_DTO::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_ForwardMsgDTO_2eproto_getter, &descriptor_table_ForwardMsgDTO_2eproto_once,
+      file_level_metadata_ForwardMsgDTO_2eproto[2]);
+}
 
 // ===================================================================
 
@@ -249,48 +1276,53 @@ const char* ForwardMsg_DTO::_InternalParse(const char* ptr, ::_pbi::ParseContext
     uint32_t tag;
     ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
-      // bytes date_time = 1;
+      // string date_time = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           auto str = _internal_mutable_date_time();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "SSDTO.ForwardMsg_DTO.date_time"));
         } else
           goto handle_unusual;
         continue;
-      // bytes recv_ssid = 2;
+      // string recv_ssid = 2;
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
           auto str = _internal_mutable_recv_ssid();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "SSDTO.ForwardMsg_DTO.recv_ssid"));
         } else
           goto handle_unusual;
         continue;
-      // bytes send_ssid = 3;
+      // string send_ssid = 3;
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
           auto str = _internal_mutable_send_ssid();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "SSDTO.ForwardMsg_DTO.send_ssid"));
         } else
           goto handle_unusual;
         continue;
-      // bytes content = 4;
+      // string content = 4;
       case 4:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
           auto str = _internal_mutable_content();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "SSDTO.ForwardMsg_DTO.content"));
         } else
           goto handle_unusual;
         continue;
-      // bytes ip_sender = 5;
+      // string ip_sender = 5;
       case 5:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 42)) {
           auto str = _internal_mutable_ip_sender();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "SSDTO.ForwardMsg_DTO.ip_sender"));
         } else
           goto handle_unusual;
         continue;
@@ -340,33 +1372,53 @@ uint8_t* ForwardMsg_DTO::_InternalSerialize(
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // bytes date_time = 1;
+  // string date_time = 1;
   if (!this->_internal_date_time().empty()) {
-    target = stream->WriteBytesMaybeAliased(
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_date_time().data(), static_cast<int>(this->_internal_date_time().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "SSDTO.ForwardMsg_DTO.date_time");
+    target = stream->WriteStringMaybeAliased(
         1, this->_internal_date_time(), target);
   }
 
-  // bytes recv_ssid = 2;
+  // string recv_ssid = 2;
   if (!this->_internal_recv_ssid().empty()) {
-    target = stream->WriteBytesMaybeAliased(
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_recv_ssid().data(), static_cast<int>(this->_internal_recv_ssid().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "SSDTO.ForwardMsg_DTO.recv_ssid");
+    target = stream->WriteStringMaybeAliased(
         2, this->_internal_recv_ssid(), target);
   }
 
-  // bytes send_ssid = 3;
+  // string send_ssid = 3;
   if (!this->_internal_send_ssid().empty()) {
-    target = stream->WriteBytesMaybeAliased(
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_send_ssid().data(), static_cast<int>(this->_internal_send_ssid().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "SSDTO.ForwardMsg_DTO.send_ssid");
+    target = stream->WriteStringMaybeAliased(
         3, this->_internal_send_ssid(), target);
   }
 
-  // bytes content = 4;
+  // string content = 4;
   if (!this->_internal_content().empty()) {
-    target = stream->WriteBytesMaybeAliased(
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_content().data(), static_cast<int>(this->_internal_content().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "SSDTO.ForwardMsg_DTO.content");
+    target = stream->WriteStringMaybeAliased(
         4, this->_internal_content(), target);
   }
 
-  // bytes ip_sender = 5;
+  // string ip_sender = 5;
   if (!this->_internal_ip_sender().empty()) {
-    target = stream->WriteBytesMaybeAliased(
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_ip_sender().data(), static_cast<int>(this->_internal_ip_sender().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "SSDTO.ForwardMsg_DTO.ip_sender");
+    target = stream->WriteStringMaybeAliased(
         5, this->_internal_ip_sender(), target);
   }
 
@@ -399,38 +1451,38 @@ size_t ForwardMsg_DTO::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // bytes date_time = 1;
+  // string date_time = 1;
   if (!this->_internal_date_time().empty()) {
     total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_date_time());
   }
 
-  // bytes recv_ssid = 2;
+  // string recv_ssid = 2;
   if (!this->_internal_recv_ssid().empty()) {
     total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_recv_ssid());
   }
 
-  // bytes send_ssid = 3;
+  // string send_ssid = 3;
   if (!this->_internal_send_ssid().empty()) {
     total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_send_ssid());
   }
 
-  // bytes content = 4;
+  // string content = 4;
   if (!this->_internal_content().empty()) {
     total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_content());
   }
 
-  // bytes ip_sender = 5;
+  // string ip_sender = 5;
   if (!this->_internal_ip_sender().empty()) {
     total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_ip_sender());
   }
 
@@ -534,15 +1586,452 @@ void ForwardMsg_DTO::InternalSwap(ForwardMsg_DTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata ForwardMsg_DTO::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_ForwardMsgDTO_2eproto_getter, &descriptor_table_ForwardMsgDTO_2eproto_once,
-      file_level_metadata_ForwardMsgDTO_2eproto[0]);
+      file_level_metadata_ForwardMsgDTO_2eproto[3]);
+}
+
+// ===================================================================
+
+class ChatMessage::_Internal {
+ public:
+  static const ::SSDTO::ForwardMsg_DTO& text_message(const ChatMessage* msg);
+  static const ::SSDTO::FileTransferRequest_DTO& file_transfer_request(const ChatMessage* msg);
+  static const ::SSDTO::FileChunk_DTO& file_chunk(const ChatMessage* msg);
+  static const ::SSDTO::MissingChunkRequest_DTO& missing_chunk_request(const ChatMessage* msg);
+};
+
+const ::SSDTO::ForwardMsg_DTO&
+ChatMessage::_Internal::text_message(const ChatMessage* msg) {
+  return *msg->_impl_.message_type_.text_message_;
+}
+const ::SSDTO::FileTransferRequest_DTO&
+ChatMessage::_Internal::file_transfer_request(const ChatMessage* msg) {
+  return *msg->_impl_.message_type_.file_transfer_request_;
+}
+const ::SSDTO::FileChunk_DTO&
+ChatMessage::_Internal::file_chunk(const ChatMessage* msg) {
+  return *msg->_impl_.message_type_.file_chunk_;
+}
+const ::SSDTO::MissingChunkRequest_DTO&
+ChatMessage::_Internal::missing_chunk_request(const ChatMessage* msg) {
+  return *msg->_impl_.message_type_.missing_chunk_request_;
+}
+void ChatMessage::set_allocated_text_message(::SSDTO::ForwardMsg_DTO* text_message) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  clear_message_type();
+  if (text_message) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(text_message);
+    if (message_arena != submessage_arena) {
+      text_message = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, text_message, submessage_arena);
+    }
+    set_has_text_message();
+    _impl_.message_type_.text_message_ = text_message;
+  }
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.ChatMessage.text_message)
+}
+void ChatMessage::set_allocated_file_transfer_request(::SSDTO::FileTransferRequest_DTO* file_transfer_request) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  clear_message_type();
+  if (file_transfer_request) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(file_transfer_request);
+    if (message_arena != submessage_arena) {
+      file_transfer_request = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, file_transfer_request, submessage_arena);
+    }
+    set_has_file_transfer_request();
+    _impl_.message_type_.file_transfer_request_ = file_transfer_request;
+  }
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.ChatMessage.file_transfer_request)
+}
+void ChatMessage::set_allocated_file_chunk(::SSDTO::FileChunk_DTO* file_chunk) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  clear_message_type();
+  if (file_chunk) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(file_chunk);
+    if (message_arena != submessage_arena) {
+      file_chunk = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, file_chunk, submessage_arena);
+    }
+    set_has_file_chunk();
+    _impl_.message_type_.file_chunk_ = file_chunk;
+  }
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.ChatMessage.file_chunk)
+}
+void ChatMessage::set_allocated_missing_chunk_request(::SSDTO::MissingChunkRequest_DTO* missing_chunk_request) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  clear_message_type();
+  if (missing_chunk_request) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(missing_chunk_request);
+    if (message_arena != submessage_arena) {
+      missing_chunk_request = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, missing_chunk_request, submessage_arena);
+    }
+    set_has_missing_chunk_request();
+    _impl_.message_type_.missing_chunk_request_ = missing_chunk_request;
+  }
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.ChatMessage.missing_chunk_request)
+}
+ChatMessage::ChatMessage(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:SSDTO.ChatMessage)
+}
+ChatMessage::ChatMessage(const ChatMessage& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  ChatMessage* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.message_type_){}
+    , /*decltype(_impl_._cached_size_)*/{}
+    , /*decltype(_impl_._oneof_case_)*/{}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  clear_has_message_type();
+  switch (from.message_type_case()) {
+    case kTextMessage: {
+      _this->_internal_mutable_text_message()->::SSDTO::ForwardMsg_DTO::MergeFrom(
+          from._internal_text_message());
+      break;
+    }
+    case kFileTransferRequest: {
+      _this->_internal_mutable_file_transfer_request()->::SSDTO::FileTransferRequest_DTO::MergeFrom(
+          from._internal_file_transfer_request());
+      break;
+    }
+    case kFileChunk: {
+      _this->_internal_mutable_file_chunk()->::SSDTO::FileChunk_DTO::MergeFrom(
+          from._internal_file_chunk());
+      break;
+    }
+    case kMissingChunkRequest: {
+      _this->_internal_mutable_missing_chunk_request()->::SSDTO::MissingChunkRequest_DTO::MergeFrom(
+          from._internal_missing_chunk_request());
+      break;
+    }
+    case MESSAGE_TYPE_NOT_SET: {
+      break;
+    }
+  }
+  // @@protoc_insertion_point(copy_constructor:SSDTO.ChatMessage)
+}
+
+inline void ChatMessage::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.message_type_){}
+    , /*decltype(_impl_._cached_size_)*/{}
+    , /*decltype(_impl_._oneof_case_)*/{}
+  };
+  clear_has_message_type();
+}
+
+ChatMessage::~ChatMessage() {
+  // @@protoc_insertion_point(destructor:SSDTO.ChatMessage)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
+  SharedDtor();
+}
+
+inline void ChatMessage::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  if (has_message_type()) {
+    clear_message_type();
+  }
+}
+
+void ChatMessage::SetCachedSize(int size) const {
+  _impl_._cached_size_.Set(size);
+}
+
+void ChatMessage::clear_message_type() {
+// @@protoc_insertion_point(one_of_clear_start:SSDTO.ChatMessage)
+  switch (message_type_case()) {
+    case kTextMessage: {
+      if (GetArenaForAllocation() == nullptr) {
+        delete _impl_.message_type_.text_message_;
+      }
+      break;
+    }
+    case kFileTransferRequest: {
+      if (GetArenaForAllocation() == nullptr) {
+        delete _impl_.message_type_.file_transfer_request_;
+      }
+      break;
+    }
+    case kFileChunk: {
+      if (GetArenaForAllocation() == nullptr) {
+        delete _impl_.message_type_.file_chunk_;
+      }
+      break;
+    }
+    case kMissingChunkRequest: {
+      if (GetArenaForAllocation() == nullptr) {
+        delete _impl_.message_type_.missing_chunk_request_;
+      }
+      break;
+    }
+    case MESSAGE_TYPE_NOT_SET: {
+      break;
+    }
+  }
+  _impl_._oneof_case_[0] = MESSAGE_TYPE_NOT_SET;
+}
+
+
+void ChatMessage::Clear() {
+// @@protoc_insertion_point(message_clear_start:SSDTO.ChatMessage)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  clear_message_type();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* ChatMessage::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // .SSDTO.ForwardMsg_DTO text_message = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
+          ptr = ctx->ParseMessage(_internal_mutable_text_message(), ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // .SSDTO.FileTransferRequest_DTO file_transfer_request = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
+          ptr = ctx->ParseMessage(_internal_mutable_file_transfer_request(), ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // .SSDTO.FileChunk_DTO file_chunk = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
+          ptr = ctx->ParseMessage(_internal_mutable_file_chunk(), ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // .SSDTO.MissingChunkRequest_DTO missing_chunk_request = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
+          ptr = ctx->ParseMessage(_internal_mutable_missing_chunk_request(), ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* ChatMessage::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:SSDTO.ChatMessage)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .SSDTO.ForwardMsg_DTO text_message = 1;
+  if (_internal_has_text_message()) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(1, _Internal::text_message(this),
+        _Internal::text_message(this).GetCachedSize(), target, stream);
+  }
+
+  // .SSDTO.FileTransferRequest_DTO file_transfer_request = 2;
+  if (_internal_has_file_transfer_request()) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(2, _Internal::file_transfer_request(this),
+        _Internal::file_transfer_request(this).GetCachedSize(), target, stream);
+  }
+
+  // .SSDTO.FileChunk_DTO file_chunk = 3;
+  if (_internal_has_file_chunk()) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(3, _Internal::file_chunk(this),
+        _Internal::file_chunk(this).GetCachedSize(), target, stream);
+  }
+
+  // .SSDTO.MissingChunkRequest_DTO missing_chunk_request = 4;
+  if (_internal_has_missing_chunk_request()) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(4, _Internal::missing_chunk_request(this),
+        _Internal::missing_chunk_request(this).GetCachedSize(), target, stream);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:SSDTO.ChatMessage)
+  return target;
+}
+
+size_t ChatMessage::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:SSDTO.ChatMessage)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  switch (message_type_case()) {
+    // .SSDTO.ForwardMsg_DTO text_message = 1;
+    case kTextMessage: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *_impl_.message_type_.text_message_);
+      break;
+    }
+    // .SSDTO.FileTransferRequest_DTO file_transfer_request = 2;
+    case kFileTransferRequest: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *_impl_.message_type_.file_transfer_request_);
+      break;
+    }
+    // .SSDTO.FileChunk_DTO file_chunk = 3;
+    case kFileChunk: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *_impl_.message_type_.file_chunk_);
+      break;
+    }
+    // .SSDTO.MissingChunkRequest_DTO missing_chunk_request = 4;
+    case kMissingChunkRequest: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *_impl_.message_type_.missing_chunk_request_);
+      break;
+    }
+    case MESSAGE_TYPE_NOT_SET: {
+      break;
+    }
+  }
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData ChatMessage::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    ChatMessage::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*ChatMessage::GetClassData() const { return &_class_data_; }
+
+
+void ChatMessage::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<ChatMessage*>(&to_msg);
+  auto& from = static_cast<const ChatMessage&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:SSDTO.ChatMessage)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  switch (from.message_type_case()) {
+    case kTextMessage: {
+      _this->_internal_mutable_text_message()->::SSDTO::ForwardMsg_DTO::MergeFrom(
+          from._internal_text_message());
+      break;
+    }
+    case kFileTransferRequest: {
+      _this->_internal_mutable_file_transfer_request()->::SSDTO::FileTransferRequest_DTO::MergeFrom(
+          from._internal_file_transfer_request());
+      break;
+    }
+    case kFileChunk: {
+      _this->_internal_mutable_file_chunk()->::SSDTO::FileChunk_DTO::MergeFrom(
+          from._internal_file_chunk());
+      break;
+    }
+    case kMissingChunkRequest: {
+      _this->_internal_mutable_missing_chunk_request()->::SSDTO::MissingChunkRequest_DTO::MergeFrom(
+          from._internal_missing_chunk_request());
+      break;
+    }
+    case MESSAGE_TYPE_NOT_SET: {
+      break;
+    }
+  }
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void ChatMessage::CopyFrom(const ChatMessage& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:SSDTO.ChatMessage)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool ChatMessage::IsInitialized() const {
+  return true;
+}
+
+void ChatMessage::InternalSwap(ChatMessage* other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_.message_type_, other->_impl_.message_type_);
+  swap(_impl_._oneof_case_[0], other->_impl_._oneof_case_[0]);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata ChatMessage::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_ForwardMsgDTO_2eproto_getter, &descriptor_table_ForwardMsgDTO_2eproto_once,
+      file_level_metadata_ForwardMsgDTO_2eproto[4]);
 }
 
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace SSDTO
 PROTOBUF_NAMESPACE_OPEN
+template<> PROTOBUF_NOINLINE ::SSDTO::FileTransferRequest_DTO*
+Arena::CreateMaybeMessage< ::SSDTO::FileTransferRequest_DTO >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::SSDTO::FileTransferRequest_DTO >(arena);
+}
+template<> PROTOBUF_NOINLINE ::SSDTO::FileChunk_DTO*
+Arena::CreateMaybeMessage< ::SSDTO::FileChunk_DTO >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::SSDTO::FileChunk_DTO >(arena);
+}
+template<> PROTOBUF_NOINLINE ::SSDTO::MissingChunkRequest_DTO*
+Arena::CreateMaybeMessage< ::SSDTO::MissingChunkRequest_DTO >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::SSDTO::MissingChunkRequest_DTO >(arena);
+}
 template<> PROTOBUF_NOINLINE ::SSDTO::ForwardMsg_DTO*
 Arena::CreateMaybeMessage< ::SSDTO::ForwardMsg_DTO >(Arena* arena) {
   return Arena::CreateMessageInternal< ::SSDTO::ForwardMsg_DTO >(arena);
+}
+template<> PROTOBUF_NOINLINE ::SSDTO::ChatMessage*
+Arena::CreateMaybeMessage< ::SSDTO::ChatMessage >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::SSDTO::ChatMessage >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

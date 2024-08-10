@@ -11,9 +11,7 @@
 void handleError(){
     LOG("ERROR : " << ERR_error_string(ERR_get_error(), nullptr))
 }
-
 EncryptString *EncryptString::obj = nullptr;
-
 std::string EncryptString::encryptString(const std::string& str) {
     // md5
     unsigned char encryptArr[MD5_DIGEST_LENGTH];

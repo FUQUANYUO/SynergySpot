@@ -1,0 +1,9 @@
+version: '3'
+services:
+  synergy_spot:
+    image: synergy_spot
+    ports:
+      - "12993:12993"
+      - "3307:3306"
+    volumes:
+      - /root/SynergySpot:/SynergySpotWorkSpace
