@@ -1,0 +1,2 @@
+singleton TabItemPage 1.0 arch-page/tab-item-page/TabItemPage.qml
+singleton MessageItemPage 1.0 message-container-page/message-item-page/MessageItemPage.qml

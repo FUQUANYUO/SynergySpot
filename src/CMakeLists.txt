@@ -9,6 +9,9 @@ set(CMAKE_AUTOUIC ON)
 # 子模块 添加的子项目放到这个变量下面即可
 set(SUB_PROS
         land-page
+        arch-page
+        message-container-page
+        contact-page
 )
 
 # 设置输出路径
@@ -60,7 +63,7 @@ qt_add_big_resources(QRC_RESOURCES ${APP_QRC_PATH})
 set_property(SOURCE ${APP_QRC_PATH} PROPERTY SKIP_AUTORCC ON)
 
 # 清空App.qrc文件，准备覆写
-file(WRITE ${APP_QRC_PATH} "<RCC>\n       <qresource prefix=\"/\">\n           <file>App.qml</file>\n")
+file(WRITE ${APP_QRC_PATH} "<RCC>\n       <qresource prefix=\"/\">\n           <file>App.qml</file>\n           <file>qmldir</file>\n")
 
 # 遍历子项目
 foreach(SUB_PATH ${SUB_PROS})
@@ -88,13 +91,14 @@ foreach(SUB_PATH ${SUB_PROS})
             # 将QML文件路径添加到App.qrc文件中
             file(APPEND ${APP_QRC_PATH} "           <file>${SUB_PATH}/${QML_RELATIVE_PATH}</file>\n")
         endforeach()
-
-        # 结束子项目的<file>标签
-        file(APPEND ${APP_QRC_PATH} "       </qresource>\n")
     else()
         message(WARNING "Subproject path page-qml/${SUB_PATH} does not exist!")
     endif()
 endforeach()
+
+# 结束子项目的<file>标签
+file(APPEND ${APP_QRC_PATH} "       </qresource>\n")
+
 
 # 结束<qresource>和<RCC>标签
 file(APPEND ${APP_QRC_PATH} "</RCC>\n")
