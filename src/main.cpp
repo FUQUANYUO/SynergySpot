@@ -1,9 +1,6 @@
-//#include <QApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
-#include <QGuiApplication>
+#include <QApplication>
 
-//#include "page/land-page/LandPage.h"
+// #include "page/land-page/LandPage.h"
 //#include "page/base-arch/arch-page/ArchPage.h"
 //#include "db-pool/ConnectionPool.h"
 
@@ -24,7 +21,6 @@ using namespace std;
 //}
 
 int main(int argc, char *argv[]) {
-//    QApplication a(argc, argv);
 //    a.setStyleSheet(R"(
 //        QMainWindow,QWidget {
 //            background-color: white; /* 设置背景为白色 */
@@ -89,20 +85,6 @@ int main(int argc, char *argv[]) {
 //    if(lcon.update(insertSql)){
 ////    insertSql = R"(INSERT INTO user_message(`friendship_id`,`content`) VALUES(3,"this is test2");)"; /    if(lcon.update(insertSql)){ / LOG("success insert into val") /    }        LOG("success insert into val")
 //    }
-
-    // 注册类型到QML，如果需要的话
-    // engine.rootContext()->setContextProperty("mySingleton", &mySingleton);
-    QGuiApplication app(argc, argv);
-    QQmlApplicationEngine engine;
-
-    engine.addImportPath("qrc:/arch-page/tab-item-page");
-    engine.addImportPath("qrc:/message-container-page/message-item-page");
-    // //定义后端对象
-    // LoginBackEnd loginBackEnd;
-    // //将后端对象注册到QML中
-    // engine.rootContext()->setContextProperty("loginBackEnd", &loginBackEnd);
-    const QUrl url(QStringLiteral("qrc:/App.qml"));
-
-    engine.load(url);
-    return app.exec();
+    QApplication a(argc, argv);
+    return a.exec();
 }
