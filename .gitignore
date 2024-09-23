@@ -8,10 +8,12 @@
 /src/3rdparty/*/camke-build*
 .idea
 cmake-build*
+/**/cmake-build*
 
 # out-put dir
 /server/out
 /src/out
+out
 
 # real config file
 /src/conf/clientInfo.yaml
