@@ -12,6 +12,7 @@ set(SUB_PROS
         arch-page
         message-container-page
         contact-page
+        component
 )
 
 # 设置输出路径
@@ -36,9 +37,9 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS
         Qml
 )
 
-file(GLOB_RECURSE   CoreCpp         ${CMAKE_SOURCE_DIR}/core/*.cpp      )
-file(GLOB_RECURSE   ProtoCC         ${CMAKE_SOURCE_DIR}/protofile/*.cc  )
-file(GLOB_RECURSE   UtilsCpp        ${CMAKE_SOURCE_DIR}/utils/*.cpp     )
+file(GLOB_RECURSE   CoreCpp         ${CMAKE_CURRENT_SOURCE_DIR}/core/*.cpp      )
+file(GLOB_RECURSE   ProtoCC         ${CMAKE_CURRENT_SOURCE_DIR}/protofile/*.cc  )
+file(GLOB_RECURSE   UtilsCpp        ${CMAKE_CURRENT_SOURCE_DIR}/utils/*.cpp     )
 
 # 即将优化掉
 #file(GLOB_RECURSE PageCpp ${CMAKE_SOURCE_DIR}/page/*.cpp)
@@ -97,18 +98,14 @@ foreach(SUB_PATH ${SUB_PROS})
 endforeach()
 
 # 结束子项目的<file>标签
-file(APPEND ${APP_QRC_PATH} "       </qresource>\n")
+file(APPEND ${APP_QRC_PATH} "       </qresource>\n</RCC>")
 
-
-# 结束<qresource>和<RCC>标签
-file(APPEND ${APP_QRC_PATH} "</RCC>\n")
-
-qt_add_executable(${PROJECT_NAME} main.cpp MANUAL_FINALIZATION
-        ${CoreCpp}
-        ${PageCpp}
-        ${ProtoCC}
-        ${UtilsCpp}
-        ${PageUi}
+qt_add_executable(${PROJECT_NAME} main.cpp
+#        ${CoreCpp}
+#        ${PageCpp}
+#        ${ProtoCC}
+#        ${UtilsCpp}
+#        ${PageUi}
         ${QRC_RESOURCES}
 )
 
@@ -124,7 +121,6 @@ if(WIN32)
         target_link_directories(${PROJECT_NAME} PRIVATE
                 lib-common/lib/Win
         )
-
         target_link_libraries(${PROJECT_NAME} PRIVATE
                 Qt::Core
                 Qt::Gui
@@ -173,14 +169,4 @@ else()
                 crypto
                 ssl
         )
-endif()
-
-#set_target_properties(${PROJECT_NAME} PROPERTIES
-#        ${BUNDLE_ID_OPTION}
-#        WIN32_EXECUTABLE TRUE
-#)
-
-if(QT_VERSION_MAJOR EQUAL 6)
-    qt_import_qml_plugins(${PROJECT_NAME})
-    qt_finalize_executable(${PROJECT_NAME})
 endif()

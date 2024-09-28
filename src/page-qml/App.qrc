@@ -4,6 +4,7 @@
            <file>qmldir</file>
            <file>land-page/rc-page/img/avatar.jpg</file>
            <file>land-page/rc-page/img/backgroundImage.gif</file>
+           <file>land-page/rc-page/img/backgroundImg.gif</file>
            <file>land-page/rc-page/img/logo.ico</file>
 
            <file>land-page/LandPage.qml</file>
@@ -28,5 +29,7 @@
            <file>contact-page/rc-page/img/logo.ico</file>
 
            <file>contact-page/ContactPage.qml</file>
+
+           <file>component/RandomAvatar.qml</file>
        </qresource>
 </RCC>

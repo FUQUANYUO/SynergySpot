@@ -95,6 +95,7 @@ int main(int argc, char *argv[]) {
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
 
+    engine.addImportPath("qrc:/component");
     engine.addImportPath("qrc:/arch-page/tab-item-page");
     engine.addImportPath("qrc:/message-container-page/message-item-page");
     // //定义后端对象

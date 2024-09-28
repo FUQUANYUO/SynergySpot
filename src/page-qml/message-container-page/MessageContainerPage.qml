@@ -38,9 +38,6 @@ FluNavigationView {
 
             FluMenuItem {
                 font: FluTextStyle.Caption
-                // onClicked: {
-                //     FluRouter.navigate("/pageWindow",{title:modelData.title,url:modelData.url})
-                // }
                 text: qsTr("Open in Separate Window")
             }
         }
