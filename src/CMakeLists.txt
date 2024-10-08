@@ -16,8 +16,11 @@ set(SUB_PROS
 )
 
 # 设置输出路径
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/out)
-
+if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/out/Debug)
+elseif(${CMAKE_BUILD_TYPE} STREQUAL "Release")
+    set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}out/Release)
+endif()
 # Qt module
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS
         Core
@@ -63,43 +66,6 @@ qt_add_big_resources(QRC_RESOURCES ${APP_QRC_PATH})
 
 set_property(SOURCE ${APP_QRC_PATH} PROPERTY SKIP_AUTORCC ON)
 
-# 清空App.qrc文件，准备覆写
-file(WRITE ${APP_QRC_PATH} "<RCC>\n       <qresource prefix=\"/\">\n           <file>App.qml</file>\n           <file>qmldir</file>\n")
-
-# 遍历子项目
-foreach(SUB_PATH ${SUB_PROS})
-    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/page-qml/${SUB_PATH}/CMakeLists.txt)
-        add_subdirectory(page-qml/${SUB_PATH})
-
-        # 遍历子项目中的QML文件
-        file(GLOB_RECURSE QML_FILES ${CMAKE_CURRENT_SOURCE_DIR}/page-qml/${SUB_PATH}/*.qml)
-        file(GLOB_RECURSE RC_FILES  ${CMAKE_CURRENT_SOURCE_DIR}/page-qml/${SUB_PATH}/rc-page/*.*)
-
-        foreach(RC_FILE ${RC_FILES})
-            file(REAL_PATH ${RC_FILE} REAL_RC_FILE)
-            file(RELATIVE_PATH RC_RELATIVE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/page-qml/${SUB_PATH} ${REAL_RC_FILE})
-
-            # 将QML文件路径添加到App.qrc文件中
-            file(APPEND ${APP_QRC_PATH} "           <file>${SUB_PATH}/${RC_RELATIVE_PATH}</file>\n")
-        endforeach()
-
-        # 注意资源文件与QML文件的资源顺序
-        file(APPEND ${APP_QRC_PATH} "\n")
-        foreach(QML_FILE ${QML_FILES})
-            file(REAL_PATH ${QML_FILE} REAL_QML_FILE)
-            file(RELATIVE_PATH QML_RELATIVE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/page-qml/${SUB_PATH} ${REAL_QML_FILE})
-
-            # 将QML文件路径添加到App.qrc文件中
-            file(APPEND ${APP_QRC_PATH} "           <file>${SUB_PATH}/${QML_RELATIVE_PATH}</file>\n")
-        endforeach()
-    else()
-        message(WARNING "Subproject path page-qml/${SUB_PATH} does not exist!")
-    endif()
-endforeach()
-
-# 结束子项目的<file>标签
-file(APPEND ${APP_QRC_PATH} "       </qresource>\n</RCC>")
-
 qt_add_executable(${PROJECT_NAME} main.cpp
 #        ${CoreCpp}
 #        ${PageCpp}
@@ -136,11 +102,17 @@ if(WIN32)
                 yaml-cppd
                 libcrypto
                 libssl
+
+                fluentuiplugind
         )
 
         # 移动 dll 到 out 文件夹
         file(GLOB DLLS "${CMAKE_CURRENT_SOURCE_DIR}/lib-common/lib/Win/lib*.dll")
-        set(DLL_DESTINATION_DIR "${CMAKE_CURRENT_SOURCE_DIR}/out/Debug")
+        if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+            set(DLL_DESTINATION_DIR "${CMAKE_CURRENT_SOURCE_DIR}/out/Debug")
+        elseif(${CMAKE_BUILD_TYPE} STREQUAL "Release")
+            set(DLL_DESTINATION_DIR "${CMAKE_CURRENT_SOURCE_DIR}/out/Release")
+        endif()
         foreach(DLL_FILE ${DLLS})
         get_filename_component(DLL_NAME "${DLL_FILE}" NAME)
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
@@ -170,3 +142,41 @@ else()
                 ssl
         )
 endif()
+
+## 清空App.qrc文件，准备覆写
+#file(WRITE ${APP_QRC_PATH} "")
+#file(WRITE ${APP_QRC_PATH} "<RCC>\n       <qresource prefix=\"/\">\n           <file>App.qml</file>\n           <file>qmldir</file>\n")
+#
+## 遍历子项目
+#foreach(SUB_PATH ${SUB_PROS})
+#    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/page-qml/${SUB_PATH}/CMakeLists.txt)
+#        add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/page-qml/${SUB_PATH})
+#
+#        # 遍历子项目中的QML文件
+#        file(GLOB_RECURSE QML_FILES ${CMAKE_CURRENT_SOURCE_DIR}/page-qml/${SUB_PATH}/*.qml)
+#        file(GLOB_RECURSE RC_FILES  ${CMAKE_CURRENT_SOURCE_DIR}/page-qml/${SUB_PATH}/rc-page/*.*)
+#
+#        foreach(RC_FILE ${RC_FILES})
+#            file(REAL_PATH ${RC_FILE} REAL_RC_FILE)
+#            file(RELATIVE_PATH RC_RELATIVE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/page-qml/${SUB_PATH} ${REAL_RC_FILE})
+#
+#            # 将QML文件路径添加到App.qrc文件中
+#            file(APPEND ${APP_QRC_PATH} "           <file>${SUB_PATH}/${RC_RELATIVE_PATH}</file>\n")
+#        endforeach()
+#
+#        # 注意资源文件与QML文件的资源顺序
+#        file(APPEND ${APP_QRC_PATH} "\n")
+#        foreach(QML_FILE ${QML_FILES})
+#            file(REAL_PATH ${QML_FILE} REAL_QML_FILE)
+#            file(RELATIVE_PATH QML_RELATIVE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/page-qml/${SUB_PATH} ${REAL_QML_FILE})
+#
+#            # 将QML文件路径添加到App.qrc文件中
+#            file(APPEND ${APP_QRC_PATH} "           <file>${SUB_PATH}/${QML_RELATIVE_PATH}</file>\n")
+#        endforeach()
+#    else()
+#        message(WARNING "Subproject path page-qml/${SUB_PATH} does not exist!")
+#    endif()
+#endforeach()
+#
+## 结束子项目的<file>标签
+#file(APPEND ${APP_QRC_PATH} "       </qresource>\n</RCC>")

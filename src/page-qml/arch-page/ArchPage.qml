@@ -7,16 +7,16 @@ import "qrc:/message-container-page/chat-page"
 import ".."
 
 FluWindow {
-    id: window
-
-    fitsAppBarWindows: false
-    height: 668
-    launchMode: FluWindowType.SingleTask
-    minimumHeight: 320
-    minimumWidth: 668
-    title: "FluentUI"
+    id: arch_page
+    title: "SynergySpot"
     width: 1000
+    height: 620
+    minimumHeight: 420
+    minimumWidth: 668
+    visible: true
+    launchMode: FluWindowType.SingleTask
 
+    // 标题栏
     appBar: FluAppBar {
         id: title_bar
 
@@ -33,12 +33,12 @@ FluWindow {
             top: parent.top
         }
     }
-
     Component.onCompleted: {
         nav_view.displayMode = FluNavigationViewType.Compact;
         nav_view.hideNavAppBar = true;
     }
 
+    // 关闭对话
     FluContentDialog {
         id: dialog_close
 
@@ -69,6 +69,8 @@ FluWindow {
             }
         }
     }
+
+    // 边栏
     FluNavigationView {
         id: nav_view
         navCompactWidth: Screen.width * 0.04625

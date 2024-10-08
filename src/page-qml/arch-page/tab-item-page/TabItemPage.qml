@@ -13,6 +13,7 @@ FluObject {
         }
     }
 
+    // 头像
     FluPaneItem {
         id: avatar
 
@@ -39,6 +40,8 @@ FluObject {
             }
         }
     }
+
+    // 消息内容
     FluPaneItem {
         id: item_home
 
@@ -59,6 +62,8 @@ FluObject {
             navigationView.push(url);
         }
     }
+
+    // 联系人
     FluPaneItem {
         id: item_friends
 

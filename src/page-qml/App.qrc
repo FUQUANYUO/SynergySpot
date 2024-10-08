@@ -2,34 +2,35 @@
        <qresource prefix="/">
            <file>App.qml</file>
            <file>qmldir</file>
+           <file>arch-page/tab-item-page/TabItemPage.qml</file>
+           <file>message-container-page/rc-page/img/avatar.jpg</file>
            <file>land-page/rc-page/img/avatar.jpg</file>
+           <file>message-container-page/rc-page/img/backgroundImage.gif</file>
            <file>land-page/rc-page/img/backgroundImage.gif</file>
+           <file>message-container-page/rc-page/img/logo.ico</file>
+
            <file>land-page/rc-page/img/backgroundImg.gif</file>
+           <file>message-container-page/MessageContainerPage.qml</file>
            <file>land-page/rc-page/img/logo.ico</file>
 
+           <file>message-container-page/chat-page/ChatPage.qml</file>
            <file>land-page/LandPage.qml</file>
+           <file>message-container-page/message-item-page/MessageItemPage.qml</file>
            <file>land-page/recover-pw-page/RecoverPWPage.qml</file>
            <file>land-page/recover-pw-page/RecoverSuccessPage.qml</file>
            <file>land-page/register-page/RegisterPage.qml</file>
+           <file>contact-page/rc-page/img/avatar.jpg</file>
+           <file>contact-page/rc-page/img/backgroundImage.gif</file>
            <file>arch-page/rc-page/img/avatar.jpg</file>
+           <file>contact-page/rc-page/img/logo.ico</file>
+
            <file>arch-page/rc-page/img/backgroundImage.gif</file>
+           <file>contact-page/ContactPage.qml</file>
            <file>arch-page/rc-page/img/logo.ico</file>
 
            <file>arch-page/ArchPage.qml</file>
+
            <file>arch-page/tab-item-page/TabItemPage.qml</file>
-           <file>message-container-page/rc-page/img/avatar.jpg</file>
-           <file>message-container-page/rc-page/img/backgroundImage.gif</file>
-           <file>message-container-page/rc-page/img/logo.ico</file>
-
-           <file>message-container-page/MessageContainerPage.qml</file>
-           <file>message-container-page/chat-page/ChatPage.qml</file>
-           <file>message-container-page/message-item-page/MessageItemPage.qml</file>
-           <file>contact-page/rc-page/img/avatar.jpg</file>
-           <file>contact-page/rc-page/img/backgroundImage.gif</file>
-           <file>contact-page/rc-page/img/logo.ico</file>
-
-           <file>contact-page/ContactPage.qml</file>
-
            <file>component/RandomAvatar.qml</file>
        </qresource>
 </RCC>
