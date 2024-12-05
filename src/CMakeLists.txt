@@ -73,6 +73,7 @@ qt_add_executable(${PROJECT_NAME} main.cpp
 #        ${UtilsCpp}
 #        ${PageUi}
         ${QRC_RESOURCES}
+        page-qml/message-container-page/ChatListTest.qml
 )
 
 # 使用 yaml 静态库

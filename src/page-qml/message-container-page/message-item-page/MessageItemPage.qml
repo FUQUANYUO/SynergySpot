@@ -1,7 +1,7 @@
 pragma Singleton
 import QtQuick.Layouts
 import QtQuick 2.15
-import FluentUI 1.0
+import FluentUI
 
 FluObject {
     id: group

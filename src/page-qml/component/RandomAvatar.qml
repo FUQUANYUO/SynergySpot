@@ -21,7 +21,7 @@ Rectangle {
     FluBadge {
         count: online
         isDot: true
-        color: FluTheme.primaryColor.lighter
+        color: "gray"
         anchors {
             right: parent.right
             bottom: parent.bottom

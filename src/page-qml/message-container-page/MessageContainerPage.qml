@@ -1,118 +1,114 @@
-import QtQuick 2.15
+import QtQuick
 import QtQuick.Window
 import QtQuick.Controls
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
-import FluentUI 1.0
+import FluentUI
 import ".."
-import "qrc:/component"
+import "../component"
 
 Item {
-    id: container
-
+    id: control
+    property string url
+    property var chatList : ChatListTest{
+        items: [{id: "10001", name: "Chat 1" ,type: "twin"},
+                {id: "10002", name: "Chat 2" ,type: "other"},
+                {id: "10003", name: "Chat 3" ,type: "twin"}]
+    }
+    property FluObject footerItems
     property Component autoSuggestBox
-    property var chatList
     property double chat_item_height: 66
 
     Component {
         id: chat_item
-
         Item {
             clip: true
             height: chat_item_height
             visible: true
             width: layout_list.width
-
             FluControl {
                 id: item_control
-
-                // onClicked:
-                // chat_list.currentIndex = _idx
-                // store.control.openGroup(model)
-                // {}
-
                 anchors {
-                    bottom: parent.bottom
-                    bottomMargin: 2
-                    left: parent.left
-                    leftMargin: 6
-                    right: parent.right
-                    rightMargin: 6
                     top: parent.top
+                    bottom: parent.bottom
+                    left: parent.left
+                    right: parent.right
                     topMargin: 2
+                    bottomMargin: 2
+                    leftMargin: 6
+                    rightMargin: 6
                 }
-                anchors.fill: parent
-                // acceptedButtons: Qt.RightButton
-                // onClicked: function (mouse) {
-                //     if (mouse.button === Qt.RightButton) {
-                //         if (model.menuDelegate) {
-                //             loader_item_menu.sourceComponent = model.menuDelegate
-                //             loader_item_menu.item.popup();
-                //         }
-                //     }
-                // }
-                z: -100
                 MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.RightButton
+                    onClicked: function (mouse) {
+                        // if (mouse.button === Qt.RightButton) {
+                        //     if (model.menuDelegate) {
+                        //         loader_item_menu.sourceComponent = model.menuDelegate
+                        //         loader_item_menu.item.popup();
+                        //     }
+                        // }
+                    }
+                    z: -100
+                }
+                onClicked: {
+                    chat_list.currentIndex = _idx
+                    layout_footer.currentIndex = -1
+                    // store.control.openGroup(model)
                 }
                 Rectangle {
+                    radius: 4
                     anchors.fill: parent
                     color: {
                         if (FluTheme.dark) {
                             if (chat_list.currentIndex === _idx) {
-                                return Qt.rgba(1, 1, 1, 0.06);
+                                return Qt.rgba(1, 1, 1, 0.06)
                             }
                             if (item_control.hovered) {
-                                return Qt.rgba(1, 1, 1, 0.03);
+                                return Qt.rgba(1, 1, 1, 0.03)
                             }
-                            return Qt.rgba(0, 0, 0, 0);
+                            return Qt.rgba(0, 0, 0, 0)
                         } else {
                             if (chat_list.currentIndex === _idx) {
-                                return Qt.rgba(0, 0, 0, 0.06);
+                                return Qt.rgba(0, 0, 0, 0.06)
                             }
                             if (item_control.hovered) {
-                                return Qt.rgba(0, 0, 0, 0.03);
+                                return Qt.rgba(0, 0, 0, 0.03)
                             }
-                            return Qt.rgba(0, 0, 0, 0);
+                            return Qt.rgba(0, 0, 0, 0)
                         }
                     }
-                    radius: 4
 
                     RandomAvatar {
                         id: item_avatar
-
-                        // avatar: model.type === "twin" ? model.owner.avatar : model.avatar
-                        // bgColor: model.type === "twin" ? model.owner.color : model.color
-                        // online: model.type === "twin" ? model.owner.online : false
-                        avatar: "😂"
-                        bgColor: "#aff"
+                        avatar: "😀"
+                        bgColor: ""
                         online: true
                         size: 42
-
                         anchors {
+                            verticalCenter: parent.verticalCenter
                             left: parent.left
                             leftMargin: 10
-                            verticalCenter: parent.verticalCenter
                         }
                     }
+
                     FluText {
                         id: item_title
-
-                        color: {
-                            if (item_control.pressed) {
-                                return FluTheme.dark ? FluColors.Grey80 : FluColors.Grey120;
-                            }
-                            return FluTheme.dark ? FluColors.White : FluColors.Grey220;
-                        }
-                        elide: Text.ElideRight
-                        font.pixelSize: 16
-                        maximumLineCount: 1
                         text: {
                             // if (model.remark) return model.remark;
                             // if (model.type === "twin") return model.owner.remark ? model.owner.remark : model.owner.nickname
-                            // return model.name
-                            return "AAA";
+                            // return model.
+                            return "title test in 98 line"
                         }
-
+                        elide: Text.ElideRight
+                        maximumLineCount: 1
+                        font.pixelSize: 16
+                        color: {
+                            if (item_control.pressed) {
+                                return FluTheme.dark ? FluColors.Grey80 : FluColors.Grey120
+                            }
+                            return FluTheme.dark ? FluColors.White : FluColors.Grey220
+                        }
                         anchors {
                             left: item_avatar.right
                             leftMargin: 10
@@ -124,37 +120,35 @@ Item {
                     }
                     FluText {
                         id: item_text
-
-                        color: {
-                            if (item_control.pressed) {
-                                return FluTheme.dark ? FluColors.Grey120 : FluColors.Grey80;
-                            }
-                            return FluTheme.dark ? FluColors.Grey80 : FluColors.Grey120;
-                        }
-                        elide: Text.ElideRight
-                        font.pixelSize: 12
-                        maximumLineCount: 1
                         text: {
                             // if (!model.last) return ""
                             // let text = ""
                             // if (model.type !== "twin") text = model.last.user.remark ? model.last.user.remark : model.last.user.nickname + "："
-                            // switch (model.last.type) {
-                            //     case "text":
-                            //         text += model.last.content
-                            //         break
-                            //     case "image":
-                            //         text += "[图片]"
-                            //         break
-                            //     case "file":
-                            //         text += "[文件]"
-                            //         break
-                            //     case "p2p_file":
-                            //         text += "[P2P文件]"
-                            //         break
-                            // }
-                            return text;
+                            switch ("text") {
+                                case "text":
+                                    text += "this is last msg test in 126 line"
+                                    break
+                                case "image":
+                                    text += "[图片]"
+                                    break
+                                case "file":
+                                    text += "[文件]"
+                                    break
+                                case "p2p_file":
+                                    text += "[P2P文件]"
+                                    break
+                            }
+                            return text
                         }
-
+                        elide: Text.ElideRight
+                        maximumLineCount: 1
+                        font.pixelSize: 12
+                        color: {
+                            if (item_control.pressed) {
+                                return FluTheme.dark ? FluColors.Grey120 : FluColors.Grey80
+                            }
+                            return FluTheme.dark ? FluColors.Grey80 : FluColors.Grey120
+                        }
                         anchors {
                             left: item_avatar.right
                             leftMargin: 10
@@ -164,119 +158,163 @@ Item {
                             verticalCenterOffset: 10
                         }
                     }
+
                     FluText {
                         id: time_text
-
-                        color: item_text.color
-                        font.pixelSize: 10
-                        // text: model.last ? GlobalTool.formatTime(model.last.time) : ""
-                        text: "xxxx:xx:xx xx:xx"
-
                         anchors {
                             right: parent.right
-                            rightMargin: 10
                             verticalCenter: parent.verticalCenter
                             verticalCenterOffset: -10
+                            rightMargin: 10
                         }
+                        // text: model.last ? GlobalTool.formatTime(model.last.time) : ""
+                        text: "yyyy-MM-dd hh:mm:ss"
+                        font.pixelSize: 10
+                        color: item_text.color
                     }
+
                     Rectangle {
                         id: unread_badge
-
-                        border.width: 0
                         color: Qt.rgba(255 / 255, 77 / 255, 79 / 255, 1)
-                        height: 20
-                        radius: 10
-                        visible: true
                         width: {
                             // if (model.unreadNum < 10) {
-                            //     return 20;
+                            //     return 20
                             // } else if (model.unreadNum < 100) {
-                            //     return 30;
+                            //     return 30
                             // }
-                            return 35;
+                            return 35
                         }
-
+                        height: 20
+                        radius: 10
+                        border.width: 0
                         anchors {
                             right: parent.right
-                            rightMargin: 10
                             verticalCenter: parent.verticalCenter
                             verticalCenterOffset: 10
+                            rightMargin: 10
                         }
+                        // visible: model.unreadNum !== 0
+                        visible: true
                         Text {
-                            color: Qt.rgba(1, 1, 1, 1)
-                            font.bold: true
-                            font.pixelSize: 10
-                            text: {
-                                // if (model.unreadNum < 100)
-                                //     return model.unreadNum;
-                                return "99+";
-                            }
-
                             anchors {
-                                horizontalCenter: parent.horizontalCenter
                                 verticalCenter: parent.verticalCenter
+                                horizontalCenter: parent.horizontalCenter
                                 verticalCenterOffset: 1
                             }
+
+                            color: Qt.rgba(1, 1, 1, 1)
+                            text: {
+                                // if (model.unreadNum < 100)
+                                //     return model.unreadNum
+                                return "99+"
+                            }
+                            font.pixelSize: 10
+                            font.bold: true
                         }
                     }
                 }
             }
         }
     }
+
+    Component {
+        id: footer_item
+        Item {
+            clip: true
+            height: footer_item_height
+            visible: true
+            width: layout_list.width
+            FluControl {
+                id: item_control
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                    left: parent.left
+                    right: parent.right
+                    topMargin: 2
+                    bottomMargin: 2
+                    leftMargin: 6
+                    rightMargin: 6
+                }
+                onClicked: {
+                    model.tap()
+                    layout_footer.currentIndex = _idx
+                    chat_list.currentIndex = -1
+                    store.currentGroup = null
+                }
+                Rectangle {
+                    radius: 4
+                    anchors.fill: parent
+                    color: {
+                        if (FluTheme.dark) {
+                            if (item_control.hovered) {
+                                return Qt.rgba(1, 1, 1, 0.03)
+                            }
+                            return Qt.rgba(0, 0, 0, 0)
+                        } else {
+                            if (item_control.hovered) {
+                                return Qt.rgba(0, 0, 0, 0.03)
+                            }
+                            return Qt.rgba(0, 0, 0, 0)
+                        }
+                    }
+
+                    Item {
+                        id: item_icon
+                        width: 30
+                        height: 30
+                        anchors {
+                            verticalCenter: parent.verticalCenter
+                            left: parent.left
+                            leftMargin: 3
+                        }
+                        FluIcon {
+                            anchors.centerIn: parent
+                            iconSource: {
+                                if (model.icon) {
+                                    return model.icon
+                                }
+                                return 0
+                            }
+                            iconSize: 15
+                        }
+                    }
+                    FluText {
+                        id: item_title
+                        text: model.title
+                        elide: Text.ElideRight
+                        color: {
+                            if (item_control.pressed) {
+                                return FluTheme.dark ? FluColors.Grey80 : FluColors.Grey120
+                            }
+                            return FluTheme.dark ? FluColors.White : FluColors.Grey220
+                        }
+                        anchors {
+                            verticalCenter: parent.verticalCenter
+                            left: item_icon.right
+                            right: parent.right
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     Rectangle {
         id: layout_list
-
+        width: parent.width
+        anchors {
+            top: parent.top
+            bottom: parent.bottom
+        }
+        color: FluTheme.dark ? Window.active ? Qt.rgba(38 / 255, 44 / 255, 54 / 255, 1) : Qt.rgba(39 / 255, 39 / 255, 39 / 255, 1) : Qt.rgba(251 / 255, 251 / 255, 253 / 255, 1)
         border.color: FluTheme.dark ? Qt.rgba(45 / 255, 45 / 255, 45 / 255, 1) : Qt.rgba(226 / 255, 230 / 255, 234 / 255, 1)
         border.width: 1
-        color: FluTheme.dark ? Window.active ? Qt.rgba(38 / 255, 44 / 255, 54 / 255, 1) : Qt.rgba(39 / 255, 39 / 255, 39 / 255, 1) : Qt.rgba(251 / 255, 251 / 255, 253 / 255, 1)
-        width: parent.width
-
-        anchors {
-            bottom: parent.bottom
-            top: parent.top
-        }
         Item {
             id: layout_header
-
-            height: 50
             width: layout_list.width
-
+            height: 50
             FluAutoSuggestBox {
-                iconSource: FluentIcons.Search
-                items: {
-                    // var groups = store.groupList.items;
-                    // var result = [];
-                    // for (var i = 0; i < groups.length; i++) {
-                    //     var group = groups[i];
-                    //     if (group.type === "twin") {
-                    //         var user = group.owner;
-                    //         if (user.nickname.indexOf(text) !== -1 || user.remark.indexOf(text) !== -1 || user.username.indexOf(text) !== -1) {
-                    //             result.push({
-                    //                 title: user.remark ? user.remark : user.nickname,
-                    //                 key: group.id
-                    //             });
-                    //         }
-                    //     } else {
-                    //         if (group.name.indexOf(text) !== -1 || group.remark.indexOf(text) !== -1) {
-                    //             result.push({
-                    //                 title: group.remark ? user.remark : group.name,
-                    //                 key: group.id
-                    //             });
-                    //         }
-                    //     }
-                    // }
-                    var result = [
-                        {
-                            title: "AAA",
-                            key: 111
-                        }
-                    ];
-                    return result;
-                }
-                placeholderText: "搜索"
-
-                onItemClicked: data => {}
-
                 anchors {
                     left: parent.left
                     leftMargin: 15
@@ -284,153 +322,173 @@ Item {
                     rightMargin: 10
                     verticalCenter: parent.verticalCenter
                 }
+                iconSource: FluentIcons.Search
+                items: {
+                    // var groups = store.groupList.items
+                    var groups = chatList.items
+                    var result = []
+                    for (var i = 0; i < groups.length; i++) {
+                        var group = groups[i]
+                        if (group.type === "twin") {
+                            // var user = group.owner
+                            // if (user.nickname.indexOf(text) !== -1 || user.remark.indexOf(text) !== -1 || user.username.indexOf(text) !== -1) {
+                            //     result.push({title: user.remark ? user.remark : user.nickname, key: group.id})
+                            // }
+                            result.push({title: "test title twin" , key: group.id})
+                        } else {
+                            // if (group.name.indexOf(text) !== -1 || group.remark.indexOf(text) !== -1) {
+                            //     result.push({title: group.remark ? user.remark : group.name, key: group.id})
+                            // }
+                            result.push({title: "test title other" , key: group.id})
+                        }
+                    }
+                    return result
+                }
+                placeholderText: "搜索"
+                onItemClicked: (data) => {
+                    for (var i = 0; i < chatList.items.length; i++) {
+                        if (chatList.items[i].id === data.key) {
+                            chat_list.currentIndex = i
+                            layout_footer.currentIndex = -1
+                            // store.control.openGroup(store.groupList.items[i])
+                            return
+                        }
+                    }
+                }
             }
             FluIconButton {
                 id: add_button
-
-                iconColor: FluTheme.dark ? FluTheme.primaryColor.lighter : FluTheme.primaryColor.dark
-                iconSource: FluentIcons.AddBold
-
-                onClicked: {
-                    add_popup.visible = true;
-                }
-
                 anchors {
                     right: parent.right
                     rightMargin: 15
                     verticalCenter: parent.verticalCenter
                 }
+                iconSource: FluentIcons.AddBold
+                // iconColor: FluTheme.dark ? FluTheme.primaryColor.lighter : FluTheme.primaryColor.dark
+                onClicked: {
+                    add_popup.visible = true
+                }
             }
+
+
             Popup {
                 id: add_popup
-
-                bottomInset: 5
-                clip: true
-                leftInset: 5
                 modal: true
-                rightInset: 5
-                topInset: 5
                 visible: false
                 width: 150
                 x: add_button.x - (add_popup.width - add_button.width) / 2
                 y: add_button.y + add_button.height
+                topInset: 5
+                bottomInset: 5
+                leftInset: 5
+                rightInset: 5
+                clip: true
 
-                background: FluFrame {
-                    border.width: 0
-                    radius: 5
-                }
                 enter: Transition {
                     NumberAnimation {
+                        property: "height"
+                        from: 0
+                        to: 155
                         duration: 233
                         easing.type: Easing.InOutExpo
-                        from: 0
-                        property: "height"
-                        to: 155
                     }
+
                     NumberAnimation {
-                        duration: 233
-                        from: 0
-                        property: "opacity"
+                        property:"opacity"
+                        from:0
                         to: 1
+                        duration: 233
                     }
                 }
                 exit: Transition {
                     NumberAnimation {
+                        property: "height"
+                        from: 155
+                        to: 0
                         duration: 233
                         easing.type: Easing.InOutExpo
-                        from: 155
-                        property: "height"
-                        to: 0
                     }
+
                     NumberAnimation {
-                        duration: 233
-                        from: 1
-                        property: "opacity"
+                        property:"opacity"
+                        from:1
                         to: 0
+                        duration: 233
                     }
                 }
 
+                background: FluFrame {
+                    radius: 5
+                    border.width: 0
+                }
+
+
                 Column {
                     id: add_popup_column
-
-                    spacing: 5
                     width: parent.width
+                    spacing: 5
 
                     Repeater {
                         model: [
                             {
-                                text: "添加好友",
-                                icon: FluentIcons.AddFriend,
-                                onClick: () => {
-                                    add_user_dialog.visible = true;
+                                text: "添加好友", icon: FluentIcons.AddFriend, onClick: () => {
+                                    add_user_dialog.visible = true
                                 }
                             },
                             {
-                                text: "加入群聊",
-                                icon: FluentIcons.ChatBubbles,
-                                onClick: () => {
-                                    add_group_dialog.visible = true;
+                                text: "加入群聊", icon: FluentIcons.ChatBubbles, onClick: () => {
+                                    add_group_dialog.visible = true
                                 }
                             },
                             {
-                                text: "创建群聊",
-                                icon: FluentIcons.VideoChat,
-                                onClick: () => {
-                                    create_group_dialog.visible = true;
+                                text: "创建群聊", icon: FluentIcons.VideoChat, onClick: () => {
+                                    create_group_dialog.visible = true
                                 }
                             },
                         ]
 
                         delegate: Item {
-                            height: 40
                             width: add_popup_column.width
-
+                            height: 40
                             Rectangle {
                                 id: add_popup_item
-
                                 property bool hoverd: false
-
-                                color: hoverd ? (FluTheme.dark ? "#11FFFFFF" : "#11000000") : "transparent"
+                                width: parent.width
                                 height: parent.height
                                 radius: 5
-                                width: parent.width
+                                color: hoverd ? (FluTheme.dark ? "#11FFFFFF" : "#11000000") : "transparent"
 
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
-
                                     onClicked: {
-                                        add_popup.visible = false;
-                                        modelData.onClick();
+                                        add_popup.visible = false
+                                        modelData.onClick()
                                     }
                                     onEntered: {
-                                        add_popup_item.hoverd = true;
+                                        add_popup_item.hoverd = true
                                     }
                                     onExited: {
-                                        add_popup_item.hoverd = false;
+                                        add_popup_item.hoverd = false
                                     }
                                 }
+
                                 FluIcon {
                                     id: add_popup_icon
-
-                                    iconColor: FluTheme.primaryColor.normal
-                                    iconSize: 20
-
-                                    // iconSource: modelData.icon
-
                                     anchors {
                                         left: parent.left
                                         leftMargin: 10
                                         verticalCenter: parent.verticalCenter
                                     }
+                                    iconSource: modelData.icon
+                                    // iconColor: FluTheme.primaryColor.normal
+                                    iconSize: 20
                                 }
+
                                 FluText {
                                     id: add_popup_text
-
-                                    font.pixelSize: 14
                                     text: modelData.text
-                                    // text: "add popup text"
-
+                                    font.pixelSize: 14
                                     anchors {
                                         left: add_popup_icon.right
                                         leftMargin: 10
@@ -442,363 +500,342 @@ Item {
                     }
                 }
             }
+
         }
+
         Item {
             id: highlight_clip
-
             anchors.fill: chat_list
             clip: true
 
             Rectangle {
                 id: highlight_rectangle
-
-                property bool enableAnimation: true
-
-                color: FluTheme.primaryColor.normal
                 height: chat_item_height
-                radius: width / 2
-                // visible: store.groupList.length !== 0
-                visible: true
+                // color: FluTheme.primaryColor.normal
                 width: 4
-
-                Behavior on height {
-                    enabled: highlight_rectangle.enableAnimation & FluTheme.enableAnimation
-
-                    NumberAnimation {
-                        duration: 666
-                        easing.amplitude: 1
-                        easing.period: 0.75
-                        easing.type: Easing.OutElastic
-                    }
-                }
-                Behavior on y {
-                    enabled: highlight_rectangle.enableAnimation & FluTheme.enableAnimation
-
-                    NumberAnimation {
-                        duration: 666
-                        easing.amplitude: 1
-                        easing.period: 0.75
-                        easing.type: Easing.OutElastic
-                    }
-                }
-
+                radius: width / 2
                 anchors {
                     left: parent.left
                     leftMargin: 6
                 }
+                visible: true
+                property bool enableAnimation: true
+
+                Behavior on y {
+                    enabled: highlight_rectangle.enableAnimation & FluTheme.enableAnimation
+                    NumberAnimation {
+                        easing.period: 0.75
+                        easing.amplitude: 1
+                        duration: 666
+                        easing.type: Easing.OutElastic
+                    }
+                }
+
+                Behavior on height {
+                    enabled: highlight_rectangle.enableAnimation & FluTheme.enableAnimation
+                    NumberAnimation {
+                        easing.period: 0.75
+                        easing.amplitude: 1
+                        duration: 666
+                        easing.type: Easing.OutElastic
+                    }
+                }
             }
         }
+
+
         ListView {
             id: chat_list
-
-            property double lastContentY: 0
-            property var lastTopItem
-
-            boundsBehavior: Flickable.DragOverBounds
-            clip: true
-            currentIndex: -1
-
             model: chatList.items
-
-            ScrollBar.vertical: FluScrollBar {
-            }
-            delegate: Loader {
-                property var _idx: index
-                property var model: modelData
-                property int type: 0
-
-                sourceComponent: chat_item
-            }
-
-            onContentYChanged: {
-                var imm = (lastContentY - chat_list.contentY != 0.0); // 高亮是否关闭动画 用于滚动跟随
-                if (chat_list.lastTopItem === chatList.items[0]) {
-                    lastContentY = chat_list.contentY;
-                } else
-                    chat_list.lastTopItem = chatList.items[0];
-                if (chat_list.currentIndex !== -1 && chat_list.currentItem) {
-                    highlight_clip.clip = true;
-                    if (imm)
-                        highlight_rectangle.enableAnimation = false;
-                    highlight_rectangle.height = chat_item_height * 0.5;
-                    highlight_rectangle.y = chat_list.currentItem.y - chat_list.contentY + (chat_item_height - chat_item_height * 0.5) / 2;
-                    if (imm)
-                        highlight_rectangle.enableAnimation = true;
-                }
-            }
-            onCurrentIndexChanged: {
-                if (chat_list.currentIndex !== -1) {
-                    highlight_clip.clip = true;
-                    highlight_rectangle.height = chat_item_height * 0.5;
-                    highlight_rectangle.y = chat_list.currentItem.y - chat_list.contentY + (chat_item_height - chat_item_height * 0.5) / 2;
-                }
-            }
-
+            delegate: chat_item
+            clip: true
             anchors {
-                bottom: layout_footer.top
                 left: parent.left
                 right: parent.right
-                top: layout_header.bottom
             }
-            Connections {
-                function onItemsChanged() {
-                    updateList();
+            ScrollBar.vertical: FluScrollBar {
+            }
+            boundsBehavior: Flickable.DragOverBounds
+            currentIndex: -1
+
+            onCurrentIndexChanged: {
+                if (chat_list.currentIndex !== -1) {
+                    highlight_clip.clip = true
+                    highlight_rectangle.height = chat_item_height * 0.5
+                    highlight_rectangle.y = chat_list.currentItem.y - chat_list.contentY + (chat_item_height - chat_item_height * 0.5) / 2
                 }
+            }
+
+            Connections {
+                // 监听数据源变化
+                target: chatList
+
+                function onListUpdated() {
+                    updateList()
+                }
+
                 function updateList() {
                     for (var i = 0; i < chatList.items.length; i++) {
                         if (chatList.items[i] === chatList.currentItem) {
-                            chat_list.currentIndex = i;
+                            chat_list.currentIndex = i
                         }
                     }
 
                     // 防止列表更新时滚轮自动移动到选中项
-                    chat_list.contentY = chat_list.lastContentY;
+                    chat_list.contentY = chat_list.lastContentY
                 }
+            }
 
-                // 监听数据源变化
-                target: chatList
+            property var lastTopItem
+            property double lastContentY: 0
+            onContentYChanged: {
+                var imm = (lastContentY - chat_list.contentY != 0.0) // 高亮是否关闭动画 用于滚动跟随
+                if (chat_list.lastTopItem === chatList.items[0]) {
+                    lastContentY = chat_list.contentY
+                } else chat_list.lastTopItem = chatList.items[0]
+
+
+                if (chat_list.currentIndex !== -1 && chat_list.currentItem) {
+                    highlight_clip.clip = true
+                    if (imm) highlight_rectangle.enableAnimation = false
+                    highlight_rectangle.height = chat_item_height * 0.5
+                    highlight_rectangle.y = chat_list.currentItem.y - chat_list.contentY + (chat_item_height - chat_item_height * 0.5) / 2
+                    if (imm) highlight_rectangle.enableAnimation = true
+                }
+            }
+
+            // delegate: Loader {
+            //     property var model: chatList.items
+            //     property var _idx: index
+            //     property int type: 0
+            //     sourceComponent: chat_item
+            // }
+        }
+    }
+
+    Popup {
+        id: add_user_dialog
+        modal: true
+        width: 300
+        height: 250
+        visible: false
+        opacity: 0
+        anchors.centerIn: Overlay.overlay
+        background: Rectangle {
+            color: "transparent"
+        }
+        enter: Transition {
+            NumberAnimation {
+                property: "opacity";
+                from: 0.0;
+                to: 1.0
             }
         }
-        Popup {
-            id: add_user_dialog
-
-            anchors.centerIn: Overlay.overlay
-            height: 250
-            modal: true
-            opacity: 0
-            visible: false
-            width: 300
-
-            background: Rectangle {
-                color: "transparent"
-            }
-            enter: Transition {
-                NumberAnimation {
-                    from: 0.0
-                    property: "opacity"
-                    to: 1.0
-                }
-            }
-            exit: Transition {
-                NumberAnimation {
-                    from: 1.0
-                    property: "opacity"
-                    to: 0.0
-                }
-            }
-
-            FluFrame {
-                anchors.fill: parent
-                radius: 10
-
-                Column {
-                    id: add_user_dialog_column
-
-                    anchors.centerIn: parent
-                    spacing: 10
-                    width: 200
-
-                    RandomAvatar {
-                        id: add_user_avatar
-
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        avatar: "🤗"
-                        bgColor: "#aef"
-                        online: true
-                        size: 50
-                    }
-                    FluTextBox {
-                        id: add_user_textbox
-
-                        placeholderText: "用户名"
-
-                        anchors {
-                            left: parent.left
-                            right: parent.right
-                        }
-                    }
-                    FluButton {
-                        text: "添加好友"
-                        width: parent.width
-
-                        onClicked: {
-                            if (add_user_textbox.text) {
-                                // store.control.requestUser(add_user_textbox.text);
-                                add_user_dialog.visible = false;
-                            } else {
-                                showError("用户名不能为空");
-                            }
-                        }
-                    }
-                }
+        exit: Transition {
+            NumberAnimation {
+                property: "opacity";
+                from: 1.0;
+                to: 0.0
             }
         }
-        Popup {
-            id: add_group_dialog
 
-            anchors.centerIn: Overlay.overlay
-            height: 250
-            modal: true
-            opacity: 0
-            visible: false
-            width: 300
+        FluFrame {
+            anchors.fill: parent
+            radius: 10
 
-            background: Rectangle {
-                color: "transparent"
-            }
-            enter: Transition {
-                NumberAnimation {
-                    from: 0.0
-                    property: "opacity"
-                    to: 1.0
+            Column {
+                id: add_user_dialog_column
+                spacing: 10
+                anchors.centerIn: parent
+                width: 200
+
+                RandomAvatar {
+                    id: add_user_avatar
+                    bgColor: "#aef"
+                    avatar: "🤗"
+                    online: true
+                    size: 50
+                    anchors.horizontalCenter: parent.horizontalCenter
                 }
-            }
-            exit: Transition {
-                NumberAnimation {
-                    from: 1.0
-                    property: "opacity"
-                    to: 0.0
+
+                FluTextBox {
+                    id: add_user_textbox
+                    placeholderText: "用户名"
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                    }
                 }
-            }
 
-            FluFrame {
-                anchors.fill: parent
-                radius: 10
-
-                Column {
-                    id: add_group_dialog_column
-
-                    anchors.centerIn: parent
-                    spacing: 10
-                    width: 200
-
-                    RandomAvatar {
-                        id: add_group_avatar
-
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        avatar: "🥳"
-                        bgColor: "#aef"
-                        online: true
-                        size: 50
-                    }
-                    FluTextBox {
-                        id: add_group_textbox
-
-                        placeholderText: "群号"
-
-                        anchors {
-                            left: parent.left
-                            right: parent.right
-                        }
-                    }
-                    FluButton {
-                        text: "加入群组"
-                        width: parent.width
-
-                        onClicked: {
-                            if (add_group_textbox.text && !isNaN(add_group_textbox.text)) {
-                                // store.control.requestGroup(add_group_textbox.text);
-                                add_group_dialog.visible = false;
-                            } else {
-                                showError("群号不对哦");
-                            }
+                FluButton {
+                    text: "添加好友"
+                    width: parent.width
+                    onClicked: {
+                        if (add_user_textbox.text) {
+                            store.control.requestUser(add_user_textbox.text)
+                            add_user_dialog.visible = false
+                        } else {
+                            showError("用户名不能为空")
                         }
                     }
                 }
             }
         }
-        Popup {
-            id: create_group_dialog
+    }
 
-            anchors.centerIn: Overlay.overlay
-            height: 350
-            modal: true
-            opacity: 0
-            visible: false
-            width: 300
-
-            background: Rectangle {
-                color: "transparent"
+    Popup {
+        id: add_group_dialog
+        modal: true
+        width: 300
+        height: 250
+        visible: false
+        opacity: 0
+        anchors.centerIn: Overlay.overlay
+        background: Rectangle {
+            color: "transparent"
+        }
+        enter: Transition {
+            NumberAnimation {
+                property: "opacity";
+                from: 0.0;
+                to: 1.0
             }
-            enter: Transition {
-                NumberAnimation {
-                    from: 0.0
-                    property: "opacity"
-                    to: 1.0
+        }
+        exit: Transition {
+            NumberAnimation {
+                property: "opacity";
+                from: 1.0;
+                to: 0.0
+            }
+        }
+
+        FluFrame {
+            anchors.fill: parent
+            radius: 10
+
+            Column {
+                id: add_group_dialog_column
+                spacing: 10
+                anchors.centerIn: parent
+                width: 200
+
+                RandomAvatar {
+                    id: add_group_avatar
+                    bgColor: "#aef"
+                    avatar: "🥳"
+                    online: true
+                    size: 50
+                    anchors.horizontalCenter: parent.horizontalCenter
                 }
-            }
-            exit: Transition {
-                NumberAnimation {
-                    from: 1.0
-                    property: "opacity"
-                    to: 0.0
+
+                FluTextBox {
+                    id: add_group_textbox
+                    placeholderText: "群号"
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                    }
                 }
-            }
 
-            FluFrame {
-                anchors.fill: parent
-                radius: 10
-
-                Column {
-                    id: create_group_dialog_column
-
-                    anchors.centerIn: parent
-                    spacing: 10
-                    width: 200
-
-                    RandomAvatar {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        avatar: create_group_avatar.text
-                        bgColor: create_group_color.colorValue
-                        online: true
-                        size: 50
-                    }
-                    FluTextBox {
-                        id: create_group_name
-
-                        placeholderText: "群名"
-                        width: parent.width
-                    }
-                    FluTextBox {
-                        id: create_group_avatar
-
-                        placeholderText: "头像字（可为Emoji）"
-                        width: parent.width
-                    }
-                    FluColorPicker {
-                        id: create_group_color
-
-                        width: parent.width
-
-                        Component.onCompleted: {
-                            create_group_color.colorValue = FluTheme.primaryColor.normal;
-                        }
-
-                        FluText {
-                            anchors.centerIn: parent
-                            color: "white"
-                            text: "头像色"
-                        }
-                    }
-                    FluButton {
-                        text: "创建群组"
-                        width: parent.width
-
-                        onClicked: {
-                            if (create_group_name.text) {
-                                // store.control.createGroup(create_group_name.text, create_group_avatar.text, create_group_color.colorValue);
-                                create_group_dialog.visible = false;
-                            } else {
-                                showError("群名不能为空");
-                            }
+                FluButton {
+                    text: "加入群组"
+                    width: parent.width
+                    onClicked: {
+                        if (add_group_textbox.text && !isNaN(add_group_textbox.text)) {
+                            store.control.requestGroup(add_group_textbox.text)
+                            add_group_dialog.visible = false
+                        } else {
+                            showError("群号不对哦")
                         }
                     }
                 }
             }
         }
-        Component.onCompleted: {
-            chatList.
+    }
 
+    Popup {
+        id: create_group_dialog
+        modal: true
+        width: 300
+        height: 350
+        visible: false
+        opacity: 0
+        anchors.centerIn: Overlay.overlay
+        background: Rectangle {
+            color: "transparent"
+        }
+        enter: Transition {
+            NumberAnimation {
+                property: "opacity";
+                from: 0.0;
+                to: 1.0
+            }
+        }
+        exit: Transition {
+            NumberAnimation {
+                property: "opacity";
+                from: 1.0;
+                to: 0.0
+            }
+        }
+
+        FluFrame {
+            anchors.fill: parent
+            radius: 10
+
+            Column {
+                id: create_group_dialog_column
+                spacing: 10
+                anchors.centerIn: parent
+                width: 200
+
+                RandomAvatar {
+                    // bgColor: create_group_color.colorValue
+                    avatar: create_group_avatar.text
+                    online: true
+                    size: 50
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+
+                FluTextBox {
+                    id: create_group_name
+                    width: parent.width
+                    placeholderText: "群名"
+                }
+
+                FluTextBox {
+                    id: create_group_avatar
+                    width: parent.width
+                    placeholderText: "头像字（可为Emoji）"
+                }
+                FluColorPicker {
+                    id: create_group_color
+                    width: parent.width
+
+                    FluText {
+                        text: "头像色"
+                        color: "white"
+                        anchors.centerIn: parent
+                    }
+
+                    Component.onCompleted: {
+                        // create_group_color.colorValue = FluTheme.primaryColor.normal
+                    }
+                }
+
+                FluButton {
+                    text: "创建群组"
+                    width: parent.width
+                    onClicked: {
+                        if (create_group_name.text) {
+                            store.control.createGroup(create_group_name.text, create_group_avatar.text, create_group_color.colorValue)
+                            create_group_dialog.visible = false
+                        } else {
+                            showError("群名不能为空")
+                        }
+                    }
+                }
+            }
         }
     }
 }
