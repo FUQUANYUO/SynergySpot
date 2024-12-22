@@ -1,162 +1,168 @@
 //
 // Created by FU-QAQ on 2024/9/10.
 //
-#include <QMovie>
-#include <QPainter>
-#include <QVBoxLayout>
-#include <QTimer>
-#include <QGraphicsScene>
-#include <QGraphicsView>
 
 #include "ArchPage.h"
-#include "../effect-component/EffectComponent.h"
+#include "../CommonFunc.hpp"
+#include "../about-page/AboutPage.h"
+#include "../message-page/MessagePage.h"
+#include "../contact-page/ContactPage.h"
+#include "../settings-page/SettingsPage.h"
+#include "../file-manager-page/FileManagerPage.h"
+#include "../user-page/UserPage.h"
 
-namespace SSUi {
-    ArchPageWindow::ArchPageWindow(QWidget *parent)
-        : ElaWindow(parent)
-    {
-    }
-    ArchPageWindow::~ArchPageWindow()
-    {
-    }
-    void ArchPageWindow::setGifForBackground(QWidget *target, QMovie *m) {
-        if(m->isValid()){
-            _m = m;
+#include "ela-widget-tools/ElaContentDialog.h"
+#include "ela-widget-tools/ElaStatusBar.h"
+#include "ela-widget-tools/ElaText.h"
+#include "ela-widget-tools/ElaToolBar.h"
+#include "ela-widget-tools/ElaToolButton.h"
+#include "ela-widget-tools/ElaSuggestBox.h"
+#include "ela-widget-tools/ElaMenu.h"
+#include "ela-widget-tools/ElaDockWidget.h"
+
+#include <QHBoxLayout>
+#include <mutex>
+
+static std::mutex m;
+ArchPage * ArchPage::_obj = nullptr;
+
+ArchPage *ArchPage::getInstance() {
+    if(!_obj){
+        m.lock();
+        if(!_obj){
+            _obj = new ArchPage();
         }
-        else {
-            LOG("setGifForBackground : " << m->lastErrorString().toStdString())
-            return;
+        m.unlock();
+    }
+    return _obj;
+}
+
+void ArchPage::destroyInstance() {
+    if(_obj){
+        m.lock();
+        if(_obj){
+            _obj->deleteLater();
         }
-        _m->setCacheMode(QMovie::CacheAll);
-        _m->start();
-
-        _t = new QTimer(this);
-        connect(_t,&QTimer::timeout,this,[=](){
-            update();
-        });
-        _t->start(16);
-
-        // 云母材质
-        setIsEnableMica(true);
+        m.unlock();
     }
-    void ArchPageWindow::paintEvent(QPaintEvent *event) {
-        ElaWindow::paintEvent(event);
-        QPainter painter(this);
-        if (_m && _m->isValid()) {
-            QPixmap pixmap = _m->currentPixmap();
+}
 
-            painter.drawPixmap(0, 0, width(), height(), pixmap);
+
+ArchPage::ArchPage(QWidget *parent) : ElaWindow(parent) {
+    initWindow();
+
+    initEdgeLayout();
+
+    initContent();
+
+    initConnectFunc();
+
+    // intercept close event
+    _closeDialog = new ElaContentDialog(this);
+    connect(_closeDialog, &ElaContentDialog::rightButtonClicked, this, &ArchPage::closeWindow);
+    connect(_closeDialog, &ElaContentDialog::middleButtonClicked, this, [=]() {
+        _closeDialog->close();
+        showMinimized();
+    });
+    this->setIsDefaultClosed(false);
+    connect(this, &ArchPage::closeButtonClicked, this, [=]() {
+        _closeDialog->exec();
+    });
+
+    moveToCenter();
+}
+
+ArchPage::~ArchPage() {
+}
+
+void ArchPage::initWindow() {
+    setWindowIcon(QIcon(":/arch-page/rc-page/img/SS-default-icon.jpg"));
+    setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    setMinimumSize(400,500);
+    resize(800, 650);
+
+    setUserInfoCardPixmap(QPixmap(":/arch-page/rc-page/img/SS-default-icon-flat.jpg"));
+    setUserInfoCardTitle("{test name}");
+    setUserInfoCardSubTitle("{ssid}");
+    setWindowTitle("Synergy-Spot \t\t version:  " + QString(SS_VERSION));
+
+    _statusBar      =   new ElaStatusBar(this);
+    _statusText     =   new ElaText("初始化成功！", this);
+    _toolBar        =   new ElaToolBar("Tool Bar", this);
+    _addButton      =   new ElaToolButton(this);
+    _searchSuggest  =   new ElaSuggestBox(this);
+}
+
+void ArchPage::initEdgeLayout() {
+    // status bar
+    _statusText->setTextPixelSize(14);
+    _statusBar->addWidget(_statusText);
+
+    // toolbar
+    _toolBar->setAllowedAreas(Qt::TopToolBarArea | Qt::BottomToolBarArea);
+    _toolBar->setToolBarSpacing(5);
+    _toolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    _toolBar->setIconSize(QSize(25,25));
+
+    // suggest and add
+    _searchSuggest->setMinimumWidth(200);
+    _searchSuggest->setMaximumWidth(this->maximumWidth());
+    _searchSuggest->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
+    _searchSuggest->setContentsMargins(0,0,0,0);
+
+    _addButton->setFixedSize(60,40);
+    _addButton->setBorderRadius(8);
+
+    _toolBar->addWidget(_searchSuggest);
+    _toolBar->addWidget(_addButton);
+
+    addToolBar(Qt::TopToolBarArea, _toolBar);
+}
+
+void ArchPage::initContent() {
+    // message page
+    addPageNode("Message", g_pMessagePage,  _msgNoticeNum, ElaIconType::Comment);
+
+    // contact page
+    addPageNode("Contact", g_pContactPage, _contactNoticeNum, ElaIconType::User);
+
+    // file manager
+    addFooterNode("FileManager", g_pFileManagerPage, _fileManagerKey, 0, ElaIconType::Folders);
+
+    // setting
+    addFooterNode("Settings", g_pSettingsPage, _settingsKey, 0, ElaIconType::GearComplex);
+
+    // about
+    addFooterNode("About", nullptr, _aboutKey, 0, ElaIconType::CircleInfo);
+
+    _addButton->setElaIcon(ElaIconType::CirclePlus);
+    _addButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    _addButton->setIsTransparent(false);
+    auto * addMenu      =   new ElaMenu(_addButton);
+    _createAction       =   addMenu->addElaIconAction(ElaIconType::CommentPlus, "创建群聊");
+    _addAction          =   addMenu->addElaIconAction(ElaIconType::UserPlus, "添加好友/群聊");
+    _addButton->setMenu(addMenu);
+    _searchSuggest->setPlaceholderText("Search...");
+
+    setStatusBar(_statusBar);
+}
+
+void ArchPage::initConnectFunc() {
+    connect(this, &ElaWindow::navigationNodeClicked, this, [=](ElaNavigationType::NavigationNodeType nodeType, QString nodeKey) {
+        if (_aboutKey == nodeKey)
+        {
+            g_pAboutPage->setFixedSize(400, 700);
+            g_pAboutPage->moveToCenter();
+            g_pAboutPage->show();
         }
-    }
-    void ArchPageWindow::focusInEvent(QFocusEvent *event)  {
-        QWidget::focusInEvent(event);
-        if (_m && _m->state() != QMovie::Running) {
-            _m->start();
-            _t->start(16);
-        }
-    }
-    void ArchPageWindow::focusOutEvent(QFocusEvent *event)  {
-        QWidget::focusOutEvent(event);
-        if (_m && _m->state() == QMovie::Running) {
-            _m->stop();
-            _t->stop();
-        }
-    }
-    bool ArchPageWindow::eventFilter(QObject *watched, QEvent *event) {
-        return ElaWindow::eventFilter(watched, event);
-    }
-    void ArchPageWindow::resizeEvent(QResizeEvent *event) {
-        ElaWindow::resizeEvent(event);
-    }
-    void ArchPageWindow::moveEvent(QMoveEvent *event) {
-        ElaWindow::moveEvent(event);
-    }
-    QMenu *ArchPageWindow::createPopupMenu() {
-        return ElaWindow::createPopupMenu();
-    }
+    });
+    connect(this, &ElaWindow::userInfoCardClicked, this, [=](){
+        UserInfo info;
+        UserPage * wid = g_pUserPage(UserType::Myself,info);
 
+        QPoint globalPos = QCursor::pos();
+        wid->showAt(globalPos + QPoint{10,10});
+    });
+}
 
-    ArchPageWidget::ArchPageWidget(QWidget *parent)
-        : ElaWidget(parent)
-    {
-    }
-    ArchPageWidget::~ArchPageWidget()
-    {
-    }
-    void ArchPageWidget::setGifForBackground(QWidget *target, QMovie *m) {
-        if(m->isValid()){
-            _m = m;
-        }
-        else {
-            LOG("setGifForBackground : " << m->lastErrorString().toStdString())
-            return;
-        }
-        _m->setCacheMode(QMovie::CacheAll);
-        _m->start();
-
-        _t = new QTimer(this);
-        connect(_t,&QTimer::timeout,this,[=](){
-            update();
-        });
-        _t->start(16);
-    }
-    void ArchPageWidget::paintEvent(QPaintEvent *event) {
-        ElaWidget::paintEvent(event);
-        QPainter painter(this);
-        painter.setRenderHint(QPainter::Antialiasing);
-        if (_m && _m->isValid()) {
-            QPixmap pixmap = _m->currentPixmap();
-
-            painter.drawPixmap(0, 0, width(), height(), pixmap);
-        }
-    }
-
-    void ArchPageWidget::focusInEvent(QFocusEvent *event) {
-        QWidget::focusInEvent(event);
-        if (_m && _m->state() != QMovie::Running) {
-            _m->start();
-            _t->start(16);
-        }
-    }
-    void ArchPageWidget::focusOutEvent(QFocusEvent *event) {
-        QWidget::focusOutEvent(event);
-        if (_m && _m->state() == QMovie::Running) {
-            _m->stop();
-            _t->stop();
-        }
-    }
-    void ArchPageWidget::moveEvent(QMoveEvent *event) {
-        QWidget::moveEvent(event);
-    }
-    void ArchPageWidget::resizeEvent(QResizeEvent *event) {
-        QWidget::resizeEvent(event);
-    }
-    bool ArchPageWidget::eventFilter(QObject *watched, QEvent *event) {
-        return QObject::eventFilter(watched, event);
-    }
-    QMenu *ArchPageWidget::createPopupMenu() {
-        return nullptr;
-    }
-    void ArchPageWidget::setAcrylicMaskAboveBackground(QWidget * target) {
-        if(_layout == nullptr)
-            _layout = new QVBoxLayout(target);
-        auto scene = new QGraphicsScene();
-        auto view = new QGraphicsView(scene);
-        auto acyWidget = new AcrylicWidget();
-        acyWidget->setMinimumSize(0,0);
-        acyWidget->setMaximumSize(target->width(),target->height());
-        acyWidget->resize(target->width(),target->height()-55);
-        scene->addItem(acyWidget);
-
-        view->setObjectName("view");
-        view->setStyleSheet("QGraphicsView#view{background-color: rgba(0,0,0,0);border: none;}");
-        view->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
-        view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-        _layout->addWidget(view);
-        _layout->setContentsMargins(0, 0, 0, 0);
-        target->setLayout(_layout);
-    }
-
-} // SSUi

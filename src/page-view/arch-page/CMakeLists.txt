@@ -8,9 +8,19 @@ SET(
 SET(
         CMAKE_RUNTIME_OUTPUT_DIRECTORY                          ${CMAKE_SOURCE_DIR}/src/out
 )
-SET(
-        PLUGINS_NAME                 ArchPagePlugins
+# preprocess define
+ADD_DEFINITIONS(
+        -DSS_ARCH_PAGE_EXPORTS
 )
+#--------------------------------     need you revise      ----------------------------------   BEGIN
+
+SET(
+        PLUGINS_NAME                 ArchPagePlugin
+)
+SET(
+        QRC_PREFIX                   arch-page
+)
+#--------------------------------     need you revise      ----------------------------------   END
 set(
         CMAKE_AUTOMOC                ON
 )
@@ -28,7 +38,7 @@ ELSEIF  (LINUX)
 ENDIF   ()
 
 PROJECT(
-        ${PLUGINS_NAME}
+        ${PLUGINS_NAME}              LANGUAGES                  CXX
 )
 
 FIND_PACKAGE(Qt6
@@ -38,6 +48,7 @@ FIND_PACKAGE(Qt6
 
 # 头文件路径添加       add head file path
 #--------------------------------   third party include    ----------------------------------   BEGIN
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/lib-common/include)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/utils)
 #--------------------------------   third party include    ----------------------------------   END
@@ -47,11 +58,12 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/utils)
 LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/lib-common/lib/${CUR_PLATFORM})
 LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/out)
 #--------------------------------      third party lib     ----------------------------------   END
-
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 FILE(
-        GLOB_RECURSE                 SRC_CPP                    ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
-
+        GLOB_RECURSE                 SRC_CPP                    ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
+)
+QT_ADD_RESOURCES(
+        QRC_FILES                    ${PLUGINS_NAME}.qrc
+)
 ADD_LIBRARY(
         ${PLUGINS_NAME}              SHARED
         ${SRC_CPP}
@@ -63,11 +75,66 @@ SET_TARGET_PROPERTIES(
         OUTPUT_NAME_DEBUG            ${PLUGINS_NAME}d
         OUTPUT_NAME_RELEASE          ${PLUGINS_NAME}
 )
+IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        TARGET_LINK_LIBRARIES(
+                ${PLUGINS_NAME}              PUBLIC
+                Qt6::Core                    Qt6::Gui                   Qt6::Widgets
+        #--------------------------------    your lib file name    ----------------------------------   BEGIN
+                PluginManagerd               AboutPagePlugind           SettingsPagePlugind
+                ContactPagePlugind           FileManagerPagePlugind     MessagePagePlugind
+                UserPagePlugind
+        #--------------------------------    your lib file name    ----------------------------------   END
+        )
+ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Release")
+        TARGET_LINK_LIBRARIES(
+                ${PLUGINS_NAME}              PUBLIC
+                Qt6::Core                    Qt6::Gui                   Qt6::Widgets
+        #--------------------------------    your lib file name    ----------------------------------   BEGIN
+                PluginManager                AboutPagePlugin            SettingsPagePlugin
+                ContactPagePlugin            FileManagerPagePlugin      MessagePagePlugin
+                UserPagePlugin
+        #--------------------------------    your lib file name    ----------------------------------   END
+        )
+ENDIF ()
+# auto search rc file fill into *.qrc
+# 清空*.qrc文件，准备覆写
+file(
+        GLOB_RECURSE                 RC_FILES
+        ${CMAKE_SOURCE_DIR}/src/page-view/${QRC_PREFIX}/rc-page/*.*
+)
+FILE(
+        WRITE                        ${PROJECT_NAME}.qrc
+        ""
+)
+FILE(
+        WRITE                        ${PROJECT_NAME}.qrc
+        "<RCC>\n"
+        "     <qresource prefix=\"/${QRC_PREFIX}\/\">\n"
+)
+foreach(
+        RC_FILE                      ${RC_FILES}
+)
+        file(
+                REAL_PATH            ${RC_FILE}                 REAL_RC_FILE
+        )
+        file(
+                RELATIVE_PATH        RC_RELATIVE_PATH
+                ${CMAKE_SOURCE_DIR}/src/page-view/${QRC_PREFIX}     ${REAL_RC_FILE}
+        )
+        file(
+                APPEND               ${PROJECT_NAME}.qrc
+                "           <file>${RC_RELATIVE_PATH}</file>\n"
+        )
+endforeach(
 
-TARGET_LINK_LIBRARIES(
-        ${PLUGINS_NAME}              PUBLIC
-        Qt6::Core                    Qt6::Gui                   Qt6::Widgets
-#--------------------------------    your lib file name    ----------------------------------   BEGIN
-        elawidgettools.lib           EffectComponentPlugins.lib
-#--------------------------------    your lib file name    ----------------------------------   END
+)
+file(
+        APPEND                       ${PROJECT_NAME}.qrc
+        "     </qresource>\n"
+        "</RCC>\n"
+)
+
+TARGET_SOURCES(
+        ${PLUGINS_NAME}              PRIVATE
+        ${QRC_FILES}
 )

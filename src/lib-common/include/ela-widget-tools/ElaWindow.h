@@ -4,9 +4,9 @@
 #include <QMainWindow>
 
 #include "Def.h"
+#include "ElaAppBar.h"
 #include "stdafx.h"
 class ElaWindowPrivate;
-class QStackedWidget;
 class ELA_EXPORT ElaWindow : public QMainWindow
 {
     Q_OBJECT
@@ -18,9 +18,8 @@ class ELA_EXPORT ElaWindow : public QMainWindow
     Q_PROPERTY_CREATE_Q_H(int, CustomWidgetMaximumWidth)
     Q_PROPERTY_CREATE_Q_H(int, ThemeChangeTime)
     Q_PROPERTY_CREATE_Q_H(bool, IsCentralStackedWidgetTransparent)
-    Q_PROPERTY_CREATE_Q_H(bool, IsEnableMica)
-    Q_PROPERTY_CREATE_Q_H(QString, MicaImagePath)
     Q_PROPERTY_CREATE_Q_H(ElaNavigationType::NavigationDisplayMode, NavigationBarDisplayMode)
+    Q_TAKEOVER_NATIVEEVENT_H
 public:
     explicit ElaWindow(QWidget* parent = nullptr);
     ~ElaWindow();
@@ -60,8 +59,6 @@ Q_SIGNALS:
     Q_SIGNAL void customWidgetChanged();
 
 protected:
-    virtual void moveEvent(QMoveEvent* event) override;
-    virtual void resizeEvent(QResizeEvent* event) override;
     virtual bool eventFilter(QObject* watched, QEvent* event) override;
     virtual QMenu* createPopupMenu() override;
 };

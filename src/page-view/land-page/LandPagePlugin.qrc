@@ -1,0 +1,8 @@
+<RCC>
+     <qresource prefix="/land-page/">
+           <file>rc-page/img/SS-default-icon.jpg</file>
+           <file>rc-page/img/default-avatar.jpg</file>
+           <file>rc-page/img/drop-down.png</file>
+           <file>rc-page/video/bk_src.mp4</file>
+     </qresource>
+</RCC>

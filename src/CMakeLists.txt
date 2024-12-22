@@ -6,15 +6,22 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+# 输出路径
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/out)
+
 # 子模块 添加的子项目放到这个变量下面即可
 set(SUB_PROS
+        plugin-manager
         effect-component
         arch-page
         land-page
+        message-page
+        contact-page
+        file-manager-page
+        settings-page
+        about-page
+        user-page
 )
-
-# 设置输出路径
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/out)
 
 # Qt module
 find_package(Qt6 REQUIRED COMPONENTS
@@ -22,6 +29,8 @@ find_package(Qt6 REQUIRED COMPONENTS
         Gui
         Widgets
         Network
+
+        OpenGLWidgets
 )
 
 #file(GLOB_RECURSE   CoreCpp         ${CMAKE_SOURCE_DIR}/core/*.cpp      )
@@ -46,7 +55,7 @@ include_directories(protofile)
 # utils
 include_directories(utils)
 
-qt_add_executable(${PROJECT_NAME} main.cpp
+qt_add_executable(${PROJECT_NAME} main.cpp MainLogic.cpp lib-common/include/ela-widget-tools/ElaWidgetTools.qrc
         ${CoreCpp}
         ${PageCpp}
         ${ProtoCC}
@@ -73,6 +82,7 @@ if(WIN32)
                         Qt::Gui
                         Qt::Widgets
                         Qt::Network
+                        Qt::OpenGLWidgets
                         libprotobufd
                         libprotobuf-lited
                         libprotocd
@@ -82,8 +92,9 @@ if(WIN32)
                         libcrypto
                         libssl
 
-                        ArchPagePluginsd.lib
-                        LandPagePluginsd.lib
+                        PluginManagerd
+                        ArchPagePlugind
+                        LandPagePlugind
                 )
         elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
                 target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -91,6 +102,7 @@ if(WIN32)
                         Qt::Gui
                         Qt::Widgets
                         Qt::Network
+                        Qt::OpenGLWidgets
                         libprotobufd
                         libprotobuf-lited
                         libprotocd
@@ -100,9 +112,9 @@ if(WIN32)
                         libcrypto
                         libssl
 
-                        elawidgettools.lib
-                        ArchPagePlugins.lib
-                        LandPagePlugins.lib
+                        PluginManager
+                        ArchPagePlugin
+                        LandPagePlugin
                 )
         endif ()
 

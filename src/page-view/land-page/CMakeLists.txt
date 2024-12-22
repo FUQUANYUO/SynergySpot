@@ -8,10 +8,13 @@ SET(
 SET(
         CMAKE_RUNTIME_OUTPUT_DIRECTORY                          ${CMAKE_SOURCE_DIR}/src/out
 )
+ADD_DEFINITIONS(
+        -DSS_LAND_PAGE_EXPORTS
+)
 #--------------------------------     need you revise      ----------------------------------   BEGIN
 
 SET(
-        PLUGINS_NAME                 LandPagePlugins
+        PLUGINS_NAME                 LandPagePlugin
 )
 SET(
         QRC_PREFIX                   land-page
@@ -40,6 +43,7 @@ PROJECT(
 FIND_PACKAGE(Qt6
         REQUIRED                     COMPONENTS
         Core                         Gui                        Widgets
+        OpenGLWidgets
 )
 
 # 头文件路径添加       add head file path
@@ -75,16 +79,18 @@ IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
         TARGET_LINK_LIBRARIES(
                 ${PLUGINS_NAME}              PUBLIC
                 Qt6::Core                    Qt6::Gui                   Qt6::Widgets
+                Qt6::OpenGLWidgets
         #--------------------------------    your lib file name    ----------------------------------   BEGIN
-                elawidgettools.lib           ArchPagePluginsd.lib
+                PluginManagerd               ElaWidgetToolsd
         #--------------------------------    your lib file name    ----------------------------------   END
         )
 ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Release")
         TARGET_LINK_LIBRARIES(
                 ${PLUGINS_NAME}              PUBLIC
                 Qt6::Core                    Qt6::Gui                   Qt6::Widgets
+                Qt6::OpenGLWidgets
         #--------------------------------    your lib file name    ----------------------------------   BEGIN
-                elawidgettools.lib           ArchPagePlugins.lib
+                PluginManager                ElaWidgetTools
         #--------------------------------    your lib file name    ----------------------------------   END
         )
 ENDIF ()

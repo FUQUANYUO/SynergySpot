@@ -10,70 +10,70 @@
 #include "ela-widget-tools/ElaWindow.h"
 #include "ela-widget-tools/ElaWidget.h"
 
-class QMovie;
-class QVBoxLayout;
+#ifdef SS_PLATFORM_WINDOWS
+    #ifdef SS_ARCH_PAGE_EXPORTS
+        #define SS_API __declspec(dllexport)
+    #else
+        #define SS_API __declspec(dllimport)
+    #endif
+#elif defined SS_PLATFORM_LINUX
+    #ifdef SS_ARCH_PAGE_EXPORTS
+        #define SS_API __attribute__((visibility("default")))
+    #else
+        #define SS_API
+    #endif
+#endif
 
-namespace SSUi {
-    class SS_API_OUT ArchPageWindow : public ElaWindow {
-    public:
-        virtual void initWindow() = 0;
-        virtual void initEdgeLayout() = 0;
-        virtual void initContent() = 0;
-    protected:
-        virtual void initConnectFunc() = 0;
 
-        explicit ArchPageWindow(QWidget *parent = nullptr);
-        ~ArchPageWindow() override;
+class ElaContentDialog;
+class ElaStatusBar;
+class ElaText;
+class ElaToolBar;
+class ElaToolButton;
+class ElaSuggestBox;
+class MessagePage;
+class AboutPage;
+class ContactPage;
+class FileManagerPage;
+class SettingsPage;
 
-        // you must set strategy for free movie sc when you didn't focus it
-        virtual void setGifForBackground(QWidget* target, QMovie* m);
-        void paintEvent(QPaintEvent *event) override;
-        void focusInEvent(QFocusEvent *event) override;
-        void focusOutEvent(QFocusEvent *event) override;
+#define g_pArchPage ArchPage::getInstance()
 
-        void moveEvent(QMoveEvent* event) override;
-        void resizeEvent(QResizeEvent* event) override;
-        bool eventFilter(QObject* watched, QEvent* event) override;
-        QMenu* createPopupMenu() override;
-    private:
-        // if you want to have a gif as BG, that variable can help you storage sc of gif
-        QMovie* _m = nullptr;
-        QTimer* _t = nullptr;
-    protected:
+class SS_API ArchPage : public ElaWindow{
+public:
+    static ArchPage * getInstance();
+    static void destroyInstance();
+private:
+    explicit ArchPage(QWidget * parent = nullptr);
+    ~ArchPage() override;
+protected:
+    void initWindow();
+    void initEdgeLayout();
+    void initContent();
+    void initConnectFunc();
+private:
+    // ----------------- UI -----------------
+    ElaContentDialog * _closeDialog      = nullptr;
+    ElaStatusBar     * _statusBar        = nullptr;
+    ElaText          * _statusText       = nullptr;
+    ElaToolBar       * _toolBar          = nullptr;
+    ElaToolButton    * _addButton        = nullptr;
+    ElaSuggestBox    * _searchSuggest    = nullptr;
 
-    };
+    QAction          * _createAction     = nullptr;
+    QAction          * _addAction        = nullptr;
 
-    class SS_API_OUT ArchPageWidget : public ElaWidget{
-    public:
-        virtual void initWindow() = 0;
-        virtual void initEdgeLayout() = 0;
-        virtual void initContent() = 0;
-    protected:
-        virtual void initConnectFunc() = 0;
+    int                _msgNoticeNum     = 0;
+    int                _contactNoticeNum = 0;
+    QString            _aboutKey         = "about";
+    QString            _settingsKey      = "settings";
+    QString            _fileManagerKey   = "fileManager";
+    // ----------------- UI -----------------
 
-        explicit ArchPageWidget(QWidget *parent = nullptr);
-        ~ArchPageWidget() override;
+    // --------------- BackEnd --------------
+    // --------------- BackEnd --------------
 
-        // you must set strategy for free movie sc when you didn't focus it
-        virtual void setGifForBackground(QWidget* target, QMovie* m);
-        void paintEvent(QPaintEvent *event) override;
-        void focusInEvent(QFocusEvent *event) override;
-        void focusOutEvent(QFocusEvent *event) override;
-
-        // set an Acrylic style mask for BG
-        void setAcrylicMaskAboveBackground(QWidget * target);
-
-        void moveEvent(QMoveEvent* event) override;
-        void resizeEvent(QResizeEvent* event) override;
-        bool eventFilter(QObject* watched, QEvent* event) override;
-        virtual QMenu* createPopupMenu();
-    private:
-        // if you want to have a gif as BG, that variable can help you storage sc of gif
-        QMovie* _m = nullptr;
-        QTimer* _t = nullptr;
-        QVBoxLayout* _layout = nullptr;
-    };
-
-} // SSUi
+    static ArchPage * _obj;
+};
 
 #endif //SYNERGYSPOT_ARCHPAGE_H

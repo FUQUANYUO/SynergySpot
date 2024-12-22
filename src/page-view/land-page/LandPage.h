@@ -5,25 +5,91 @@
 #ifndef SYNERGYSPOT_LANDPAGE_H
 #define SYNERGYSPOT_LANDPAGE_H
 
-#include "../arch-page/ArchPage.h"
+#include <QOpenGLWidget>
+#include "define.h"
 
-#define pLandPage LandPage::getLandPage()
+#ifdef SS_PLATFORM_WINDOWS
+    #ifdef SS_LAND_PAGE_EXPORTS
+        #define SS_API __declspec(dllexport)
+    #else
+        #define SS_API __declspec(dllimport)
+    #endif
+#elif defined SS_PLATFORM_LINUX
+    #ifdef SS_LAND_PAGE_EXPORTS
+        #define SS_API __attribute__((visibility("default")))
+    #else
+        #define SS_API
+    #endif
+#endif
 
-class SS_API_OUT LandPage : public SSUi::ArchPageWidget {
+#define g_pLandPage LandPage::getLandPage()
+
+class QTimer;
+class ElaRadioButton;
+class ElaText;
+class ElaPushButton;
+class ElaImageCard;
+class QGridLayout;
+class QHBoxLayout;
+class QPushButton;
+class QComboBox;
+
+class SS_API LandPage : public QOpenGLWidget  {
+    Q_OBJECT
 public:
     static LandPage * getLandPage();
     static void destroyLandPage();
+    // save qrc to file
+    bool saveQrcToFile(const QString& qrcPath, const QString& targetFilePath);
+signals:
+    // sign in request
+    void sigSignInRequest(const QString& SSID,const QString& password);
+    // jump to sign up page request
+    void sigGotoSignUpPageRequest();
+    // jump to recover password page request;
+    void sigGotoRecoverPWPageRequest();
+    // jump to read personal protocol page request;
+    void sigGotoPersonalProtoPageRequest();
 private:
     explicit LandPage(QWidget *parent = nullptr);
     ~LandPage() override;
 
-    void initWindow() override;
-    void initEdgeLayout() override;
-    void initContent() override;
 protected:
-    void initConnectFunc() override;
+    void initConnectFunc();
+    void initWindow();
+    void initEdgeLayout();
+    void initContent();
+
+    void setAcrylicForBKMaterial(bool enable = true);
+
+    void paintEvent(QPaintEvent* event);
+protected slots:
+    void sltUpdateFrame();
 private:
+    // ----------------- UI -----------------
+    QGridLayout   *  _GLayoutMain               =   nullptr;
+    QHBoxLayout   *  _HLayoutForJumpURL         =   nullptr;
+    QHBoxLayout   *  _HLayoutForAcceptProtocol  =   nullptr;
+
+    ElaImageCard  *  _avatar                    =   nullptr;
+    QComboBox     *  _accountComboBox           =   nullptr;
+    QComboBox     *  _inputPassword             =   nullptr;
+    ElaRadioButton*  _acceptButton              =   nullptr;
+    ElaText       *  _protocolText              =   nullptr;
+    QPushButton   *  _signInButton              =   nullptr;
+    QPushButton   *  _signUpButton              =   nullptr;
+    QPushButton   *  _recoverPWButton           =   nullptr;
+    // ----------------- UI -----------------
+
+    // --------------- BackEnd --------------
+
+
+
+    // --------------- BackEnd --------------
+
     static LandPage* _landPage;
+    bool _enableAcrylic;
+    QTimer *timer;
 };
 
 

@@ -8,10 +8,14 @@ SET(
 SET(
         CMAKE_RUNTIME_OUTPUT_DIRECTORY                          ${CMAKE_SOURCE_DIR}/src/out
 )
+# preprocess define
+ADD_DEFINITIONS(
+        -DSS_EFFECT_COMPONENT_EXPORTS
+)
 #--------------------------------     need you revise      ----------------------------------   BEGIN
 
 SET(
-        PLUGINS_NAME                 EffectComponentPlugins
+        PLUGINS_NAME                 EffectComponentPlugin
 )
 SET(
         QRC_PREFIX                   effect-component
@@ -76,7 +80,7 @@ IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
                 ${PLUGINS_NAME}              PUBLIC
                 Qt6::Core                    Qt6::Gui                   Qt6::Widgets
         #--------------------------------    your lib file name    ----------------------------------   BEGIN
-
+                opencv_world490d
         #--------------------------------    your lib file name    ----------------------------------   END
         )
 ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -84,7 +88,7 @@ ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Release")
                 ${PLUGINS_NAME}              PUBLIC
                 Qt6::Core                    Qt6::Gui                   Qt6::Widgets
         #--------------------------------    your lib file name    ----------------------------------   BEGIN
-
+                opencv_world490
         #--------------------------------    your lib file name    ----------------------------------   END
         )
 ENDIF ()

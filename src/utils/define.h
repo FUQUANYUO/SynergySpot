@@ -5,6 +5,10 @@
 #ifndef SYNERGYSPOT_DEFINE_H
 #define SYNERGYSPOT_DEFINE_H
 
+// ---------------- version ----------------
+#define SS_VERSION "0.01b"
+// ---------------- version ----------------
+
 #ifdef _WIN32
     #define SS_PLATFORM_WINDOWS
 #elif defined(__linux__)
@@ -13,19 +17,46 @@
     #error "Unsupported platform"
 #endif
 
-#ifdef SS_PLATFORM_WINDOWS
-    #define SS_API_OUT __declspec(dllexport)
-    #define SS_API_IN __declspec(dllimport)
-#elif defined(SS_PLATFORM_LINUX)
-    #ifdef SS_EXPORTS
-        #define SS_API __attribute__((visibility("default")))
-    #else
-        #define SS_API
-    #endif
-#else
-    #error "Neither SS_PLATFORM_WINDOWS nor SS_PLATFORM_LINUX is defined"
-#endif
+#include <QObject>
 
+class SS_Plugin : public QObject{
+public:
+    virtual ~SS_Plugin() = default;
+    virtual const char* getPluginName() = 0;
+};
+Q_DECLARE_INTERFACE(SS_Plugin, "org.synergy-spot.SS_PluginInterface")
+
+enum UserType{
+    Myself,
+    Strangers,
+    Friends
+};
+
+struct LocalInfo{
+    QString country;
+    QString province;
+    QString city;
+};
+Q_DECLARE_METATYPE(LocalInfo)
+
+struct UserInfo{
+    UserType    _type;
+    int         _joinDay;
+    int         _likeCount;
+    QString     _ssid;
+    QString     _name;
+    QString     _remark;
+    QString     _signContent;
+    QString     _picPath;
+    LocalInfo   _localInfo;
+    bool isEmpty() const {
+        if(_ssid.isEmpty() && _name.isEmpty() &&
+           _remark.isEmpty() && _signContent.isEmpty())
+            return true;
+        return false;
+    }
+};
+Q_DECLARE_METATYPE(UserInfo)
 
 
 #endif//SYNERGYSPOT_DEFINE_H

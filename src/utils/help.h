@@ -5,7 +5,6 @@
 #ifndef SYNERGYSPOT_HELP_H
 #define SYNERGYSPOT_HELP_H
 
-#include <QString>
 #include <iostream>
 #include <algorithm>
 
