@@ -14,8 +14,6 @@ include_directories(do-business)
 include_directories(../src/protofile)
 include_directories(../src/lib-common/include)
 include_directories(../src/utils)
-include_directories(${Protobuf_INCLUDE_DIRS})
-include_directories(${CURL_INCLUDE_DIR})
 
 # protobuf
 file(GLOB_RECURSE ProCC ../src/protofile/*.cc)
@@ -46,6 +44,4 @@ target_link_libraries(Server PRIVATE
         protobuf
         yaml-cpp
         mysqlclient
-        ${PROTOBUF_LIBRARY}
-        ${CURL_LIBRARIES}
 )

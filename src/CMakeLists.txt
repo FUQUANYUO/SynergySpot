@@ -71,7 +71,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
 )
 
 # select win or linux
-if(WIN32)
+if(SS_CLIENT)
         target_link_directories(${PROJECT_NAME} PRIVATE
                 lib-common/lib/Win
                 out
@@ -140,16 +140,62 @@ else()
                 out
         )
 
-        target_link_libraries(${PROJECT_NAME} PRIVATE
-                Qt::Core
-                Qt::Gui
-                Qt::Widgets
-                Qt::Network
-                protobuf
-                sqlite3
-                mysqlclient
-                yaml-cpp
-                crypto
-                ssl
-        )
+        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+                target_link_libraries(${PROJECT_NAME} PRIVATE
+                        Qt::Core
+                        Qt::Gui
+                        Qt::Widgets
+                        Qt::Network
+                        Qt::OpenGLWidgets
+                        libprotobufd
+                        libprotobuf-lited
+                        libprotocd
+                        sqlite3
+                        libmysql
+                        yaml-cppd
+                        libcrypto
+                        libssl
+
+                        PluginManagerd
+                        ArchPagePlugind
+                        LandPagePlugind
+                )
+        elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
+                target_link_libraries(${PROJECT_NAME} PRIVATE
+                        Qt::Core
+                        Qt::Gui
+                        Qt::Widgets
+                        Qt::Network
+                        Qt::OpenGLWidgets
+                        libprotobufd
+                        libprotobuf-lited
+                        libprotocd
+                        sqlite3
+                        libmysql
+                        yaml-cppd
+                        libcrypto
+                        libssl
+
+                        PluginManager
+                        ArchPagePlugin
+                        LandPagePlugin
+                )
+        endif ()
+
+        # 移动 dll 到 out 文件夹
+        file(GLOB DLLS "${CMAKE_CURRENT_SOURCE_DIR}/lib-common/lib/Linux/*.so")
+        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+                set(DLL_DESTINATION_DIR "${CMAKE_SOURCE_DIR}/src/out/Debug")
+        elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+                set(DLL_DESTINATION_DIR "${CMAKE_SOURCE_DIR}/src/out/Release")
+        endif()
+        foreach(DLL_FILE ${DLLS})
+                get_filename_component(DLL_NAME "${DLL_FILE}" NAME)
+                add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E copy
+                        "${DLL_FILE}"
+                        "${DLL_DESTINATION_DIR}/${DLL_NAME}"
+                        COMMENT "Copying ${DLL_NAME} to ${DLL_DESTINATION_DIR}"
+                )
+        endforeach()
 endif()
