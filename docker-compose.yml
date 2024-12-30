@@ -1,7 +1,7 @@
 version: '3'
 services:
   synergy_spot:
-    image: synergy_spot
+    image: synergy_spot:V0.0.1b
     ports:
       - "12993:12993"
       - "3307:3306"

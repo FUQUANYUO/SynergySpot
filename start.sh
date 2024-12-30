@@ -3,13 +3,25 @@
 set -e
 
 
-if [[ ! -d "./server/cmake-build" ]]; then
+if [ ! -d "./server/cmake-build" ]; then
     mkdir ./server/cmake-build && cd ./server/cmake-build
 else
     cd ./server/cmake-build
 fi
 
 cmake ..
+
+# 解压LinuxLib
+cd ../../src/lib-common/lib/Linux
+if [ $(ls -A | grep -cE "^LinuxLib.tar.gz") -eq 1 ]; then
+  echo "lack of linux lib , then uncompress from LinuxLib.tar.gz"
+  tar -xzvf LinuxLib.tar.gz
+else
+  echo "skip get linux lib..."
+fi
+tar -xzvf LinuxLib.tar.gz
+
+cd ../../../../server/cmake-build
 
 # 执行 make 命令
 make 

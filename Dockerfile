@@ -37,6 +37,7 @@ COPY . /SynergySpotWorkSpace
 
 # 编译 server 项目源码
 RUN cd /SynergySpotWorkSpace \
+    && mkdir ./server/cmake-build \
     && cd ./server/cmake-build \
     && cmake ..
 
