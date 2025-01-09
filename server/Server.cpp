@@ -86,10 +86,6 @@ void working(void *arg){
 
             DoForwardMsg::execForwardByMap(ssid);
             DoBusinessBase::execBusinessForwardByMap(ssid);
-
-            // 回发联系人列表业务
-            DoGetFriendList dgflist;
-            info->tcp->sendMsg(dgflist.execQueryFriendList(dto), SSDTO::Business_Type::GET_CONTACTLIST);
         }
     }
     // 消息转发

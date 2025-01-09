@@ -3,54 +3,77 @@
 //
 
 #include "EmailVerify.h"
-
 #include "help.h"
 
 // protobuf 登录业务
 #include "email/EmailVerifyCode.pb.h"
 
-#include "base/business-listen/BusinessListen.h"
+#include "base/client-request-handler/ClientRequestHandler.h"
 
-BusinessListen *bl = nullptr;
+EmailVerify * EmailVerify::_instance = nullptr;
+static std::mutex m;
 
-EmailVerify::EmailVerify(QObject * bobj,const std::string& queryTime) {
-    bl = dynamic_cast<BusinessListen*>(bobj);
-    this->validTime = "10";
-    this->verifyCode = "-1";
-    this->startTime = queryTime;
+EmailVerify * EmailVerify::getInstance(){
+    if(_instance == nullptr) {
+        m.lock();
+        if(_instance == nullptr) {
+            _instance = new EmailVerify();
+        }
+        m.unlock();
+    }
+    return _instance;
 }
 
-void EmailVerify::sendEmailVerifyCode(const std::string& emailAddress) {
+void EmailVerify::destroyInstance(){
+    if(_instance != nullptr) {
+        m.lock();
+        if(_instance != nullptr) {
+            delete _instance;
+        }
+        m.unlock();
+    }
+}
+
+EmailVerify::EmailVerify(QObject * bobj) {
+    this->validTime = "10";
+}
+
+void EmailVerify::sendEmailVerifyCode(const std::string& emailAddress,const std::string& queryTime) {
+    startTime.clear();
+    startTime = queryTime;
+
     std::string outEdto;
     SSDTO::EmailVerifyCode_DTO evdto;
     evdto.set_type(SSDTO::Business_Type::GET_EMAILCODE);
     evdto.set_is_request(true);
     evdto.set_email_address(emailAddress);
     evdto.set_start_time(startTime);
-    evdto.set_valid_time("");
+    evdto.set_valid_time(validTime);
     evdto.set_verify_code("");
     evdto.SerializeToString(&outEdto);
 
-    emit bl->REQUEST_EMAILCODE(outEdto);
+    g_pClientRequestHandler->addRequest(SSDTO::Business_Type::GET_EMAILCODE,outEdto);
 }
 
-void EmailVerify::parseEmailVerifyCode(const std::string& rawdto) {
+std::string EmailVerify::parseEmailVerifyCode(const std::string& rawdto) {
+    validTime.clear();
     SSDTO::EmailVerifyCode_DTO evdto;
     evdto.ParseFromString(rawdto);
 
     LOG(evdto.start_time())
-    if(evdto.start_time() != this->startTime)
+    if(evdto.start_time() != this->startTime) {
         LOG("the email verify code maybe revise,client start time doesn't equal server start time!!!")
+        return "-1";
+    }
 
-    this->verifyCode = evdto.verify_code();
     this->validTime = evdto.valid_time();
+    return evdto.verify_code();
 }
-std::string EmailVerify::getVerifyCode() {
-    return verifyCode;
-}
+
 std::string EmailVerify::getStartTime() {
     return startTime;
 }
+
 std::string EmailVerify::getValidTime() {
     return validTime;
 }

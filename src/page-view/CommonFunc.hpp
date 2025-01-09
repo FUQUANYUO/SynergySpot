@@ -1,8 +1,10 @@
-#ifndef SYNERGYSPOT_COMMONFUNC_H
-#define SYNERGYSPOT_COMMONFUNC_H
+#ifndef SYNERGYSPOT_COMMONFUNC_HPP
+#define SYNERGYSPOT_COMMONFUNC_HPP
 
-#include <QGuiApplication>
+#pragma once
+
 #include <QScreen>
+#include <QGuiApplication>
 #include <QWidget>
 
 namespace ComFunc {

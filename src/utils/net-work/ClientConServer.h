@@ -14,6 +14,8 @@ public:
     QTcpSocket *getQSocket();
     void connToSer();
     ~ClientConServer();
+
+    inline QString getServerIP() const { return _host_ip + ":" + QString::number(_port); }
 private:
     QString _host_ip;
     qintptr _port;

@@ -6,23 +6,26 @@
 #include "../CommonFunc.hpp"
 #include "../effect-component/cv-process-video-strategy/CVProVideoStrategy.h"
 #include "../plugin-manager/StrategyManager.h"
+#include "sign-up-page/SignUpPage.h"
 
 
 #include "ela-widget-tools/ElaImageCard.h"
 #include "ela-widget-tools/ElaRadioButton.h"
 #include "ela-widget-tools/ElaText.h"
-#include "ela-widget-tools/ElaPushButton.h"
 
-#include <QTimer>
-#include <QMovie>
-#include <mutex>
-#include <QPainter>
-#include <QResource>
-#include <QGridLayout>
-#include <QPushButton>
+#include <QTextBrowser>
+#include <QCheckBox>
 #include <QComboBox>
+#include <QGridLayout>
 #include <QLineEdit>
+#include <QListWidget>
+#include <QMovie>
+#include <QPainter>
+#include <QPushButton>
+#include <QResource>
 #include <QThread>
+#include <QTimer>
+#include <mutex>
 
 LandPage * LandPage::_landPage = nullptr;
 static std::mutex m;
@@ -52,13 +55,13 @@ void LandPage::destroyLandPage() {
 LandPage::LandPage(QWidget *parent)
     : QOpenGLWidget(parent)
 {
-    LandPage::initWindow();
+    initWindow();
 
-    LandPage::initEdgeLayout();
+    initEdgeLayout();
 
-    LandPage::initContent();
+    initContent();
 
-    LandPage::initConnectFunc();
+    initConnectFunc();
 
     ComFunc::moveToCenter(this);
 }
@@ -77,12 +80,13 @@ void LandPage::initWindow() {
 
     _avatar          = new ElaImageCard(this);
     _accountComboBox = new QComboBox(this);
-    _inputPassword   = new QComboBox(this);
+    _inputPassword   = new QLineEdit(this);
     _acceptButton    = new ElaRadioButton(this);
-    _protocolText    = new ElaText(this);
+    _protocolText    = new QTextBrowser(this);
     _signInButton    = new QPushButton(this);
     _signUpButton    = new QPushButton(this);
     _recoverPWButton = new QPushButton(this);
+    _hideOrShowBtn   = new QCheckBox(_inputPassword);
 
     _GLayoutMain              = new QGridLayout;
     _HLayoutForJumpURL        = new QHBoxLayout;
@@ -117,8 +121,11 @@ void LandPage::initContent() {
     _lineEditAcc->setEnabled(true);
     _lineEditAcc->setPlaceholderText("请输入SSID");
     _lineEditAcc->setAlignment(Qt::AlignCenter);
+    _accountComboBox->setContentsMargins(0,0,0,0);
     _accountComboBox->setLineEdit(_lineEditAcc);
     _accountComboBox->setFixedSize(260,50);
+    _accountComboBox->view()->parentWidget()->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
+    _accountComboBox->view()->parentWidget()->setAttribute(Qt::WA_TranslucentBackground);
     _accountComboBox->setStyleSheet(R"(
         QComboBox {
             background: rgba(255, 255, 255, 100);
@@ -129,47 +136,84 @@ void LandPage::initContent() {
         QComboBox::drop-down {
             width: 20px;
             image: url(":/land-page/rc-page/img/drop-down.png");
+            padding-right: 10px;
         }
         QComboBox QAbstractItemView {
-            background-color: rgb(255, 255, 255);
-            alignment: center;
+            background-color: rgba(255, 255, 255, 220);
+            border: none;
+            font-size: 16px;
             border-radius: 10px;
         }
         QComboBox QAbstractItemView::item {
-            text-align: center;
-            alignment: center;
+            font-size: 16px;
             height: 40px;
         }
     )");
 
     // TODO: read local cache to fill _accountComboBox
-    _accountComboBox->addItem("1266789");
-    _accountComboBox->addItem("1100231");
+    auto * testList = new QListWidget(this);
+    testList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    testList->setContentsMargins(0,0,0,0);
+    testList->setFixedWidth(240);
+    testList->setMaximumHeight(120);
+    testList->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Maximum);
+    auto * data_1 = new QListWidgetItem("12121212");
+    auto * data_2 = new QListWidgetItem("44455402");
+    auto * data_3 = new QListWidgetItem("55484816");
+    data_1->setTextAlignment(Qt::AlignCenter);
+    data_1->setSizeHint(QSize(240,50));
+    data_2->setTextAlignment(Qt::AlignCenter);
+    data_2->setSizeHint(QSize(240,50));
+    data_3->setTextAlignment(Qt::AlignCenter);
+    data_3->setSizeHint(QSize(240,50));
+    testList->addItem(data_1);testList->addItem(data_2);testList->addItem(data_3);
+    _accountComboBox->setModel(testList->model());
+    _accountComboBox->setView(testList);
 
-    auto* _lineEditPW = new QLineEdit(_inputPassword);
-    _lineEditPW->setEnabled(true);
-    _lineEditPW->setPlaceholderText("请输入SS密码");
-    _lineEditPW->setEchoMode(QLineEdit::Password);
-    _lineEditPW->setAlignment(Qt::AlignCenter);
-    _inputPassword->setLineEdit(_lineEditPW);
+    _inputPassword->setEnabled(true);
+    _inputPassword->setPlaceholderText("请输入SS密码");
+    _inputPassword->setEchoMode(QLineEdit::Password);
+    _inputPassword->setAlignment(Qt::AlignCenter);
     _inputPassword->setFixedSize(260,50);
     _inputPassword->setStyleSheet(R"(
-        QComboBox {
+        QLineEdit {
             background: rgba(255, 255, 255, 100);
             border-radius: 10px;
             border: none;
             font-size: 16px;
+            padding-right: 30px;
         }
-        QComboBox::drop-down {
-            width: 20px;
+    )");
+
+    _hideOrShowBtn->setGeometry(_inputPassword->pos().x()+230,_inputPassword->pos().y()+15,20,20);
+    _hideOrShowBtn->setStyleSheet(R"(
+        QCheckBox {
+            spacing: 5px;
             border: none;
+            background-color: transparent;
+        }
+        QCheckBox::indicator {
+            width: 20px;
+            height: 20px;
+            border: none;
+            image: url(":/land-page/rc-page/img/eyes-opened.png");
+        }
+        QCheckBox::indicator:checked {
+            image: url(":/land-page/rc-page/img/eyes-closed.png");
         }
     )");
 
     // TODO: jump to protocol page
-    _protocolText->setText(u8"已阅读并同意服务协议和SS隐私保护指引");
-    _protocolText->setTextPixelSize(12);
-    _protocolText->setFixedSize(230,50);
+    _protocolText->setOpenLinks(false);
+    _protocolText->setOpenExternalLinks(false);
+    _protocolText->setHtml(R"(
+        <style>
+            body {font-size: 10px;align-items: center; }
+            a {color: blue;text-decoration:none;}
+        </style>
+        已阅读并同意<a href=service_agreement>服务协议</a>和<a href=privacy_policy>隐私保护指引</a>
+    )");
+    _protocolText->setFixedSize(235,27);
     _protocolText->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
 
     _acceptButton->setFixedSize(20,20);
@@ -194,17 +238,35 @@ void LandPage::initConnectFunc() {
     // TODO: receiver Backend data change avatar
 
     connect(timer, &QTimer::timeout, this, &LandPage::sltUpdateFrame);
-    connect(_signUpButton,&QPushButton::clicked,this,&LandPage::sigGotoSignUpPageRequest);
-    connect(_recoverPWButton,&QPushButton::clicked,this,&LandPage::sigGotoRecoverPWPageRequest);
+    connect(_signUpButton,&QPushButton::clicked,this,[=]() {
+        g_pSignUpPage->show();
+        emit sigCurrentWidChanged(g_pSignUpPage);
+    });
+    connect(_recoverPWButton,&QPushButton::clicked,this,[=]() {
+        // emit sigCurrentWidChanged();
+    });
     connect(_signInButton,&QPushButton::clicked,this,[=](){
         QString acc =  _accountComboBox->currentText();
-        QString pw  =  _inputPassword->currentText();
+        QString pw  =  _inputPassword->text();
         if(!acc.isEmpty() && !pw.isEmpty())
         {
             emit sigSignInRequest(acc,pw);
         }
     });
-
+    connect(_hideOrShowBtn,&QCheckBox::stateChanged,this,[=](int state) {
+        if (state) {
+            _inputPassword->setEchoMode(QLineEdit::Normal);
+        }else {
+            _inputPassword->setEchoMode(QLineEdit::Password);
+        }
+    });
+    connect(_protocolText,&QTextBrowser::anchorClicked,this,[=](const QUrl &url) {
+        if (url.toString() == "service_agreement") {
+            LOG("service test success")
+        }else if (url.toString() == "privacy_policy") {
+            LOG("privacy test success")
+        }
+    });
 
     timer->start(16);
 }

@@ -33,9 +33,11 @@ find_package(Qt6 REQUIRED COMPONENTS
         OpenGLWidgets
 )
 
-#file(GLOB_RECURSE   CoreCpp         ${CMAKE_SOURCE_DIR}/core/*.cpp      )
-#file(GLOB_RECURSE   ProtoCC         ${CMAKE_SOURCE_DIR}/protofile/*.cc  )
-#file(GLOB_RECURSE   UtilsCpp        ${CMAKE_SOURCE_DIR}/utils/*.cpp     )
+#file(GLOB_RECURSE   CoreCpp         ${CMAKE_CURRENT_SOURCE_DIR}/core/*.cpp      )
+file(GLOB_RECURSE   ProtoCC         ${CMAKE_CURRENT_SOURCE_DIR}/protofile/*.cc  )
+file(GLOB_RECURSE   UtilsCpp        ${CMAKE_CURRENT_SOURCE_DIR}/utils/*.cpp     )
+
+set(CoreCpp ${CMAKE_CURRENT_SOURCE_DIR}/core/base/client-request-handler/ClientRequestHandler.cpp ${CMAKE_CURRENT_SOURCE_DIR}/core/safety/email-check/EmailVerify.cpp)
 
 # 遍历子项目
 foreach(SUB_PATH ${SUB_PROS})
@@ -57,15 +59,12 @@ include_directories(utils)
 
 qt_add_executable(${PROJECT_NAME} main.cpp MainLogic.cpp lib-common/include/ela-widget-tools/ElaWidgetTools.qrc
         ${CoreCpp}
-        ${PageCpp}
         ${ProtoCC}
         ${UtilsCpp}
-        ${PageUi}
 )
 
 # 使用 yaml 静态库
 target_compile_definitions(${PROJECT_NAME} PUBLIC
-        YAML_CPP_STATIC_DEFINE
         PROTOBUF_USE_DLLS
         #LOC_TEST
 )
@@ -84,14 +83,13 @@ if(SS_CLIENT)
                         Qt::Network
                         Qt::OpenGLWidgets
                         libprotobufd
-                        libprotobuf-lited
-                        libprotocd
                         sqlite3
                         libmysql
                         yaml-cppd
                         libcrypto
                         libssl
 
+                        ElaWidgetToolsd
                         PluginManagerd
                         ArchPagePlugind
                         LandPagePlugind
@@ -103,12 +101,10 @@ if(SS_CLIENT)
                         Qt::Widgets
                         Qt::Network
                         Qt::OpenGLWidgets
-                        libprotobufd
-                        libprotobuf-lited
-                        libprotocd
+                        libprotobuf
                         sqlite3
                         libmysql
-                        yaml-cppd
+                        yaml-cpp
                         libcrypto
                         libssl
 
@@ -172,7 +168,7 @@ else()
                         libprotocd
                         sqlite3
                         libmysql
-                        yaml-cppd
+                        yaml-cpp
                         libcrypto
                         libssl
 

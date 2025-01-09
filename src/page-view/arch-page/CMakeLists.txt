@@ -82,7 +82,7 @@ IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
         #--------------------------------    your lib file name    ----------------------------------   BEGIN
                 PluginManagerd               AboutPagePlugind           SettingsPagePlugind
                 ContactPagePlugind           FileManagerPagePlugind     MessagePagePlugind
-                UserPagePlugind
+                UserPagePlugind              ElaWidgetToolsd
         #--------------------------------    your lib file name    ----------------------------------   END
         )
 ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Release")

@@ -80,7 +80,7 @@ IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
                 ${PLUGINS_NAME}              PUBLIC
                 Qt6::Core                    Qt6::Gui                   Qt6::Widgets
         #--------------------------------    your lib file name    ----------------------------------   BEGIN
-                PluginManagerd               UserPagePlugind
+                PluginManagerd               UserPagePlugind            ElaWidgetToolsd
         #--------------------------------    your lib file name    ----------------------------------   END
         )
 ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Release")

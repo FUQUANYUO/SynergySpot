@@ -5,8 +5,6 @@
 #include "AccountRegister.h"
 
 #include "base/business-listen/BusinessListen.h"
-#include "land-page/LandPage.h"
-#include "land-page/register-page/RegisterPage.h"
 
 #include "get-time/GetCurTime.h"
 

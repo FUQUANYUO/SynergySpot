@@ -12,8 +12,8 @@ public:
     EncryptPasswd() = default;
     ~EncryptPasswd() = default;
 
-    std::string encrypt(const std::string& doEncryptObj);
-    bool verifyPasswd(const std::string& inputPasswd,const std::string& encryptPasswd);
+    static std::string encrypt(const std::string& doEncryptObj);
+    static bool verifyPasswd(const std::string& inputPasswd,const std::string& encryptPasswd);
 };
 
 

@@ -29,10 +29,13 @@ class ElaRadioButton;
 class ElaText;
 class ElaPushButton;
 class ElaImageCard;
+class QTextBrowser;
 class QGridLayout;
 class QHBoxLayout;
 class QPushButton;
 class QComboBox;
+class QLineEdit;
+class QCheckBox;
 
 class SS_API LandPage : public QOpenGLWidget  {
     Q_OBJECT
@@ -44,12 +47,9 @@ public:
 signals:
     // sign in request
     void sigSignInRequest(const QString& SSID,const QString& password);
-    // jump to sign up page request
-    void sigGotoSignUpPageRequest();
-    // jump to recover password page request;
-    void sigGotoRecoverPWPageRequest();
-    // jump to read personal protocol page request;
-    void sigGotoPersonalProtoPageRequest();
+
+    // change cur widget in top
+    void sigCurrentWidChanged(QWidget * curWid);
 private:
     explicit LandPage(QWidget *parent = nullptr);
     ~LandPage() override;
@@ -73,9 +73,10 @@ private:
 
     ElaImageCard  *  _avatar                    =   nullptr;
     QComboBox     *  _accountComboBox           =   nullptr;
-    QComboBox     *  _inputPassword             =   nullptr;
+    QLineEdit     *  _inputPassword             =   nullptr;
+    QCheckBox     *  _hideOrShowBtn             =   nullptr;
     ElaRadioButton*  _acceptButton              =   nullptr;
-    ElaText       *  _protocolText              =   nullptr;
+    QTextBrowser  *  _protocolText              =   nullptr;
     QPushButton   *  _signInButton              =   nullptr;
     QPushButton   *  _signUpButton              =   nullptr;
     QPushButton   *  _recoverPWButton           =   nullptr;
