@@ -6,14 +6,14 @@
 #define SYNERGYSPOT_GETCURTIME_H
 
 #include <ctime>
-#include "help.h"
+#include <string>
 
 class GetCurTime {
 public:
     static GetCurTime * getTimeObj();
 
     // 返回格式 'xxxx-xx-xx xx:xx:xx' 当前时间
-    std::string getCurTime();
+    std::string getCurTime(std::string format = "%Y-%m-%d %H:%M:%S");
 
     // 返回当前时间的时间戳
     std::time_t getCurTimeStamp();

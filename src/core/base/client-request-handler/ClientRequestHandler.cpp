@@ -7,6 +7,7 @@
 #include "help.h"
 
 #include <QThread>
+#include <QTimer>
 #include <functional>
 
 //-----------    proto-file   -----------//
@@ -17,10 +18,6 @@
 
 //-----------      core      -----------//
 #include "net-work/ClientConServer.h"
-
-#include <QTimer>
-#include <db-pool/ConnectionPool.h>
-#include <filesystem>
 
 // 发送包装宏
 #define SEND_PACKAGE(__DTO_OBJ__, __DTO_TYPE__, __LOG__)    \
@@ -34,6 +31,16 @@
     LOG(__LOG__)
 
 
+// 任务类定义
+#define TASK_CLASS(__CLASS_NAME__,__DTO__,__DTO_TYPE__,__LOG__) \
+class __CLASS_NAME__ : public TaskBase { \
+public: \
+    void __CLASS_NAME__() = default;    \
+    void ~__CLASS_NAME__() = default;   \
+    void process() override { \
+        SEND_PACKAGE(__DTO__, __DTO_TYPE__, __LOG__) \
+    } \
+};
 
 ClientRequestHandler* ClientRequestHandler::_instance = nullptr;
 static std::mutex m;
@@ -112,7 +119,7 @@ ClientRequestHandler::ClientRequestHandler(QObject* parent) : QObject(parent) {
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigFriendRequestResponse, this, &ClientRequestHandler::sigFriendRequestResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigSearchFriendResponse,  this, &ClientRequestHandler::sigSearchFriendResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigConnServerFailed,      this, &ClientRequestHandler::sigConnServerFailed);
-
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigStartGRPCService,      this, &ClientRequestHandler::sigStartGRPCService);
     // 启动业务线程
     _handlerThread->start();
 }
@@ -128,12 +135,22 @@ ClientRequestHandler::~ClientRequestHandler() {
 BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(parent) {
     _ccon = new ClientConServer();
     connect(_ccon->getQSocket(), &QTcpSocket::connected,this, [=]() {
-        LOG("Connected the server :" << _ccon->getServerIP().toStdString());
+        if (_ccon->getQSocket()->state() == QTcpSocket::ConnectedState) {
+            LOG("Connected the server : " << _ccon->getServerIP().toStdString());
+        }
+        else {
+            LOG("Can't connect the server : " << _ccon->getServerIP().toStdString());
+        }
     });
 
+    // wait 6s check net stable which the net connected the server
     QTimer::singleShot(6000,this, [=]() {
         if (_ccon->getQSocket()->state() != QAbstractSocket::ConnectedState) {
             emit sigConnServerFailed();
+        }
+        else {
+            // start to emit heart check by grpc
+            emit sigStartGRPCService();
         }
     });
 
@@ -265,6 +282,8 @@ void BusinessLayer::BusinessProcessor::handleResponse(SSDTO::Business_Type type,
     switch (type) {
         case SSDTO::FILE_TRANSFER_REQUEST:
             // _pool.enqueue(new FileTransferTask(dto));  // 提交到文件传输线程池
+            break;
+        case SSDTO::HEART_BEAT:
             break;
         // 其他任务类型
         default:

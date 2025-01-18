@@ -1,4 +1,5 @@
 #include "MainLogic.h"
+
 using namespace std;
 
 int main(int argc, char *argv[]) {
@@ -13,5 +14,5 @@ int main(int argc, char *argv[]) {
         qputenv("QT_SCALE_FACTOR", "1.5");
     #endif
 #endif
-    return MainLogic().startMainLogic();
+    return MainLogic().startMainLogic(&a);
 }

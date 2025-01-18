@@ -1,15 +1,21 @@
 mysql-info:
  ip: 127.0.0.1
  port: 3306
- userName: root
- password: xxxxx
+ userName: xxxxxxxxx
+ password: xxxxxxxxx
  dbName: synergy_spot
  minSize: 10
  maxSize: 1024
  maxIdleTime: 60 # 最大空闲事件（单位秒）
  timeout: 100    # 连接超时时间（单位毫秒）
 server-host-info:
- ip: 127.0.0.1
- port: 12345
+ ip: xxxxxxxxx
+ port: xxxxxxxxx
+log:
+ logName: log/SynergySpot
 request-friend-msg:
  default: 久闻大名，能否交流交流~
+realtime-info:
+ grpcIP: xxxxxxxxx
+ grpcPort: xxxxxxxxx
+ maxRetryCount: 5              # 重连最大尝试次数

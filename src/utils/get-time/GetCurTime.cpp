@@ -13,7 +13,7 @@ GetCurTime *GetCurTime::getTimeObj() {
     return instance;
 }
 
-std::string GetCurTime::getCurTime() {
+std::string GetCurTime::getCurTime(std::string format) {
     // 获取当前时间
     std::time_t now = std::time(nullptr);
     // tm 结构体
@@ -29,7 +29,7 @@ std::string GetCurTime::getCurTime() {
 
     // 使用sprintf来格式化时间
     // %Y 表示四位数的年份，%m 表示月份，%d 表示日，%H 表示小时（24小时制），%M 表示分钟
-    std::strftime(buffer.data(), buffer.size(), "%Y-%m-%d %H:%M:%S",&local_time);
+    std::strftime(buffer.data(), buffer.size(), format.c_str(), &local_time);
     return buffer.data();
 }
 

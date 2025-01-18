@@ -1,3 +1,7 @@
 [submodule "src/3rdparty/ela-widget-tools"]
     path = src/3rdparty/ela-widget-tools
     url = https://github.com/Liniyous/ElaWidgetTools.git
+[submodule "src/3rdparty/grpc"]
+    path = src/3rdparty/grpc
+    url = https://gitee.com/mirrors/grpc.git
+    branch = v1.46.5

@@ -16,42 +16,36 @@
 #include <google/protobuf/port_def.inc>
 
 PROTOBUF_PRAGMA_INIT_SEG
-
-namespace _pb = ::PROTOBUF_NAMESPACE_ID;
-namespace _pbi = _pb::internal;
-
 namespace SSDTO {
 }  // namespace SSDTO
-static const ::_pb::EnumDescriptor* file_level_enum_descriptors_DTO_2eproto[1];
-static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_DTO_2eproto = nullptr;
+static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_DTO_2eproto[1];
+static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_DTO_2eproto = nullptr;
 const uint32_t TableStruct_DTO_2eproto::offsets[1] = {};
-static constexpr ::_pbi::MigrationSchema* schemas = nullptr;
-static constexpr ::_pb::Message* const* file_default_instances = nullptr;
+static constexpr ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema* schemas = nullptr;
+static constexpr ::PROTOBUF_NAMESPACE_ID::Message* const* file_default_instances = nullptr;
 
 const char descriptor_table_protodef_DTO_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\tDTO.proto\022\005SSDTO*\327\001\n\rBusiness_Type\022\t\n\005"
+  "\n\tDTO.proto\022\005SSDTO*\355\001\n\rBusiness_Type\022\t\n\005"
   "LOGIN\020\000\022\n\n\006ENROLL\020\001\022\016\n\nFOWARD_MSG\020\002\022\016\n\nD"
   "ISCONNECT\020\003\022\023\n\017GET_CONTACTLIST\020\004\022\016\n\nADD_"
   "FRIEND\020\005\022\021\n\rGET_EMAILCODE\020\006\022\021\n\rFRIEND_SE"
   "ARCH\020\007\022\031\n\025FILE_TRANSFER_REQUEST\020\010\022\016\n\nFIL"
-  "E_CHUNK\020\t\022\031\n\025MISSING_CHUNK_REQUEST\020\nb\006pr"
-  "oto3"
+  "E_CHUNK\020\t\022\031\n\025MISSING_CHUNK_REQUEST\020\n\022\024\n\020"
+  "REALTIME_SERVICE\020\013b\006proto3"
   ;
-static ::_pbi::once_flag descriptor_table_DTO_2eproto_once;
-const ::_pbi::DescriptorTable descriptor_table_DTO_2eproto = {
-    false, false, 244, descriptor_table_protodef_DTO_2eproto,
-    "DTO.proto",
-    &descriptor_table_DTO_2eproto_once, nullptr, 0, 0,
-    schemas, file_default_instances, TableStruct_DTO_2eproto::offsets,
-    nullptr, file_level_enum_descriptors_DTO_2eproto,
-    file_level_service_descriptors_DTO_2eproto,
+static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_DTO_2eproto_once;
+const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_DTO_2eproto = {
+  false, false, 266, descriptor_table_protodef_DTO_2eproto, "DTO.proto", 
+  &descriptor_table_DTO_2eproto_once, nullptr, 0, 0,
+  schemas, file_default_instances, TableStruct_DTO_2eproto::offsets,
+  nullptr, file_level_enum_descriptors_DTO_2eproto, file_level_service_descriptors_DTO_2eproto,
 };
-PROTOBUF_ATTRIBUTE_WEAK const ::_pbi::DescriptorTable* descriptor_table_DTO_2eproto_getter() {
+PROTOBUF_ATTRIBUTE_WEAK const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable* descriptor_table_DTO_2eproto_getter() {
   return &descriptor_table_DTO_2eproto;
 }
 
 // Force running AddDescriptors() at dynamic initialization time.
-PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::_pbi::AddDescriptorsRunner dynamic_init_dummy_DTO_2eproto(&descriptor_table_DTO_2eproto);
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY static ::PROTOBUF_NAMESPACE_ID::internal::AddDescriptorsRunner dynamic_init_dummy_DTO_2eproto(&descriptor_table_DTO_2eproto);
 namespace SSDTO {
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* Business_Type_descriptor() {
   ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_DTO_2eproto);
@@ -70,6 +64,7 @@ bool Business_Type_IsValid(int value) {
     case 8:
     case 9:
     case 10:
+    case 11:
       return true;
     default:
       return false;

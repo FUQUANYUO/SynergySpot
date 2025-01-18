@@ -1,46 +1,50 @@
 cmake_minimum_required(VERSION 3.20)
 project(Server)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/out)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/out/${CMAKE_BUILD_TYPE})
+
+add_subdirectory(realtime-business-process)
 
 find_package(Threads REQUIRED)
 
-include_directories(thread-pool)
-include_directories(tcp-socket)
-include_directories(tcp-server)
-include_directories(do-business)
-include_directories(../src/protofile)
-include_directories(../src/lib-common/include)
-include_directories(../src/utils)
+include_directories(normal-business-process)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../src/protofile)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../src/lib-common/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../src/lib-common/include/grpc-inc)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../src/utils)
 
 # protobuf
-file(GLOB_RECURSE ProCC ../src/protofile/*.cc)
+file(GLOB_RECURSE ProCC ${CMAKE_CURRENT_SOURCE_DIR}/../src/protofile/*.cc)
 # do business
-file(GLOB_RECURSE DoCpp do-business/*.cpp)
+file(GLOB_RECURSE NormalCpp ${CMAKE_CURRENT_SOURCE_DIR}/normal-business-process/*.cpp)
 # db pool
-file(GLOB_RECURSE DBCpp ../src/utils/db-pool/*.cpp)
+file(GLOB_RECURSE DBCpp ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/db-pool/*.cpp)
+# log
+file(GLOB_RECURSE LOGCpp ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/log/*.cpp)
+# get time
+file(GLOB_RECURSE TimeCpp ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/get-time/*.cpp)
 
 add_executable(Server
-        Server.cpp
-        tcp-server/TcpServer.cpp
-        tcp-server/EpollEngine.cpp
-        tcp-socket/TcpSocket.cpp
-        thread-pool/ThreadPool.cpp
-        thread-pool/TaskQueue.cpp
+        ${NormalCpp}
         ${DBCpp}
         ${DoCpp}
         ${ProCC}
+        ${LOGCpp}
+        ${TimeCpp}
 )
 
 target_link_directories(Server PRIVATE
-        ../src/lib-common/lib/Linux
+        ${CMAKE_CURRENT_SOURCE_DIR}/../src/lib-common/lib/Linux
 )
 
 target_link_libraries(Server PRIVATE
         Threads::Threads
         curl
+        ssl
+        crypto
         protobuf
         yaml-cpp
         mysqlclient

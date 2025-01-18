@@ -7,12 +7,40 @@
 
 #include <iostream>
 #include <algorithm>
+#include <sstream>
 
 extern std::string yamlPath;
 extern std::string CurSSID;
 extern std::string CurSSname;
 
-#define LOG(__STR__) \
-    std::cout << "[" << __FILE__ << "] |in " << __LINE__ << " line |at " << __TIME__ << "] : " << __STR__ << std::endl;
+#include "log/Log.h"
 
+// 日志宏
+#define LOG_INFO(__EXPR__) \
+    do { \
+        std::ostringstream oss; \
+        oss << __EXPR__; \
+        SSLog::log(SSLog::LogLevel::SS_INFO, __FILE__, __LINE__, oss.str()); \
+    } while (0);
+
+#define LOG_WARNING(__EXPR__) \
+    do { \
+        std::ostringstream oss; \
+        oss << __EXPR__; \
+        SSLog::log(SSLog::LogLevel::SS_WARNING, __FILE__, __LINE__, oss.str()); \
+    } while (0);
+
+#define LOG_ERROR(__EXPR__) \
+    do { \
+        std::ostringstream oss; \
+        oss << __EXPR__; \
+        SSLog::log(SSLog::LogLevel::SS_ERROR, __FILE__, __LINE__, oss.str()); \
+    } while (0);
+
+#define LOG(__EXPR__) \
+    do { \
+        std::ostringstream oss; \
+        oss << __EXPR__; \
+        SSLog::log(SSLog::LogLevel::SS_DEFAULT, __FILE__, __LINE__, oss.str()); \
+    } while (0);
 #endif//SYNERGYSPOT_HELP_H

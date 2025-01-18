@@ -18,6 +18,8 @@ namespace BusinessLayer {
 
 #define g_pClientRequestHandler ClientRequestHandler::getInstance()
 
+class BusinessLayer::BusinessProcessor;
+
 class ClientRequestHandler : public QObject {
     Q_OBJECT
 public:
@@ -54,6 +56,7 @@ signals:
     void sigSearchFriendResponse(const std::string& dto);
 
     void sigConnServerFailed();
+    void sigStartGRPCService();
 private:
     explicit ClientRequestHandler(QObject* parent = nullptr);
     ~ClientRequestHandler();
@@ -93,6 +96,7 @@ namespace BusinessLayer {
         void sigSearchFriendResponse(const std::string& dto);
 
         void sigConnServerFailed();
+        void sigStartGRPCService();
     private:
         void handleResponse(SSDTO::Business_Type type,const std::string& dto);
 

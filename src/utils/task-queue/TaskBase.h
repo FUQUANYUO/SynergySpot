@@ -20,7 +20,7 @@ protected:
 class FunctionTask : public TaskBase {
 public:
     explicit FunctionTask(std::function<void()> func) : _func(std::move(func)) {}
-
+    ~FunctionTask() override = default;
     void process() override {
         if (_func) {
             _func();
@@ -30,7 +30,5 @@ public:
 private:
     std::function<void()> _func;
 };
-
-
 
 #endif //TASKBASE_H

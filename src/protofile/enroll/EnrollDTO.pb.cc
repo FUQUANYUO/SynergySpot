@@ -16,33 +16,29 @@
 #include <google/protobuf/port_def.inc>
 
 PROTOBUF_PRAGMA_INIT_SEG
-
-namespace _pb = ::PROTOBUF_NAMESPACE_ID;
-namespace _pbi = _pb::internal;
-
 namespace SSDTO {
-PROTOBUF_CONSTEXPR Enroll_DTO::Enroll_DTO(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_.ssid_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
-  , /*decltype(_impl_.user_name_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
-  , /*decltype(_impl_.password_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
-  , /*decltype(_impl_.email_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
-  , /*decltype(_impl_.ip_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
-  , /*decltype(_impl_.type_)*/0
-  , /*decltype(_impl_._cached_size_)*/{}} {}
+constexpr Enroll_DTO::Enroll_DTO(
+  ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
+  : ssid_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , user_name_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , password_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , email_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , ip_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , type_(0)
+{}
 struct Enroll_DTODefaultTypeInternal {
-  PROTOBUF_CONSTEXPR Enroll_DTODefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
+  constexpr Enroll_DTODefaultTypeInternal()
+    : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
   ~Enroll_DTODefaultTypeInternal() {}
   union {
     Enroll_DTO _instance;
   };
 };
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 Enroll_DTODefaultTypeInternal _Enroll_DTO_default_instance_;
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT Enroll_DTODefaultTypeInternal _Enroll_DTO_default_instance_;
 }  // namespace SSDTO
-static ::_pb::Metadata file_level_metadata_EnrollDTO_2eproto[1];
-static constexpr ::_pb::EnumDescriptor const** file_level_enum_descriptors_EnrollDTO_2eproto = nullptr;
-static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_EnrollDTO_2eproto = nullptr;
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_EnrollDTO_2eproto[1];
+static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_EnrollDTO_2eproto = nullptr;
+static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_EnrollDTO_2eproto = nullptr;
 
 const uint32_t TableStruct_EnrollDTO_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
@@ -51,19 +47,19 @@ const uint32_t TableStruct_EnrollDTO_2eproto::offsets[] PROTOBUF_SECTION_VARIABL
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::SSDTO::Enroll_DTO, _impl_.ssid_),
-  PROTOBUF_FIELD_OFFSET(::SSDTO::Enroll_DTO, _impl_.user_name_),
-  PROTOBUF_FIELD_OFFSET(::SSDTO::Enroll_DTO, _impl_.password_),
-  PROTOBUF_FIELD_OFFSET(::SSDTO::Enroll_DTO, _impl_.email_),
-  PROTOBUF_FIELD_OFFSET(::SSDTO::Enroll_DTO, _impl_.ip_),
-  PROTOBUF_FIELD_OFFSET(::SSDTO::Enroll_DTO, _impl_.type_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::Enroll_DTO, ssid_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::Enroll_DTO, user_name_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::Enroll_DTO, password_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::Enroll_DTO, email_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::Enroll_DTO, ip_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::Enroll_DTO, type_),
 };
-static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::SSDTO::Enroll_DTO)},
 };
 
-static const ::_pb::Message* const file_default_instances[] = {
-  &::SSDTO::_Enroll_DTO_default_instance_._instance,
+static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SSDTO::_Enroll_DTO_default_instance_),
 };
 
 const char descriptor_table_protodef_EnrollDTO_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
@@ -73,24 +69,22 @@ const char descriptor_table_protodef_EnrollDTO_2eproto[] PROTOBUF_SECTION_VARIAB
   "p\030\005 \001(\014\022\"\n\004type\030\006 \001(\0162\024.SSDTO.Business_T"
   "ypeb\006proto3"
   ;
-static const ::_pbi::DescriptorTable* const descriptor_table_EnrollDTO_2eproto_deps[1] = {
+static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_EnrollDTO_2eproto_deps[1] = {
   &::descriptor_table_DTO_2eproto,
 };
-static ::_pbi::once_flag descriptor_table_EnrollDTO_2eproto_once;
-const ::_pbi::DescriptorTable descriptor_table_EnrollDTO_2eproto = {
-    false, false, 171, descriptor_table_protodef_EnrollDTO_2eproto,
-    "EnrollDTO.proto",
-    &descriptor_table_EnrollDTO_2eproto_once, descriptor_table_EnrollDTO_2eproto_deps, 1, 1,
-    schemas, file_default_instances, TableStruct_EnrollDTO_2eproto::offsets,
-    file_level_metadata_EnrollDTO_2eproto, file_level_enum_descriptors_EnrollDTO_2eproto,
-    file_level_service_descriptors_EnrollDTO_2eproto,
+static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_EnrollDTO_2eproto_once;
+const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_EnrollDTO_2eproto = {
+  false, false, 171, descriptor_table_protodef_EnrollDTO_2eproto, "EnrollDTO.proto", 
+  &descriptor_table_EnrollDTO_2eproto_once, descriptor_table_EnrollDTO_2eproto_deps, 1, 1,
+  schemas, file_default_instances, TableStruct_EnrollDTO_2eproto::offsets,
+  file_level_metadata_EnrollDTO_2eproto, file_level_enum_descriptors_EnrollDTO_2eproto, file_level_service_descriptors_EnrollDTO_2eproto,
 };
-PROTOBUF_ATTRIBUTE_WEAK const ::_pbi::DescriptorTable* descriptor_table_EnrollDTO_2eproto_getter() {
+PROTOBUF_ATTRIBUTE_WEAK const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable* descriptor_table_EnrollDTO_2eproto_getter() {
   return &descriptor_table_EnrollDTO_2eproto;
 }
 
 // Force running AddDescriptors() at dynamic initialization time.
-PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::_pbi::AddDescriptorsRunner dynamic_init_dummy_EnrollDTO_2eproto(&descriptor_table_EnrollDTO_2eproto);
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY static ::PROTOBUF_NAMESPACE_ID::internal::AddDescriptorsRunner dynamic_init_dummy_EnrollDTO_2eproto(&descriptor_table_EnrollDTO_2eproto);
 namespace SSDTO {
 
 // ===================================================================
@@ -102,121 +96,107 @@ class Enroll_DTO::_Internal {
 Enroll_DTO::Enroll_DTO(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+  SharedCtor();
+  if (!is_message_owned) {
+    RegisterArenaDtor(arena);
+  }
   // @@protoc_insertion_point(arena_constructor:SSDTO.Enroll_DTO)
 }
 Enroll_DTO::Enroll_DTO(const Enroll_DTO& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
-  Enroll_DTO* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_.ssid_){}
-    , decltype(_impl_.user_name_){}
-    , decltype(_impl_.password_){}
-    , decltype(_impl_.email_){}
-    , decltype(_impl_.ip_){}
-    , decltype(_impl_.type_){}
-    , /*decltype(_impl_._cached_size_)*/{}};
-
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  _impl_.ssid_.InitDefault();
+  ssid_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.ssid_.Set("", GetArenaForAllocation());
+    ssid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
   #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (!from._internal_ssid().empty()) {
-    _this->_impl_.ssid_.Set(from._internal_ssid(), 
-      _this->GetArenaForAllocation());
+    ssid_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_ssid(), 
+      GetArenaForAllocation());
   }
-  _impl_.user_name_.InitDefault();
+  user_name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.user_name_.Set("", GetArenaForAllocation());
+    user_name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
   #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (!from._internal_user_name().empty()) {
-    _this->_impl_.user_name_.Set(from._internal_user_name(), 
-      _this->GetArenaForAllocation());
+    user_name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_user_name(), 
+      GetArenaForAllocation());
   }
-  _impl_.password_.InitDefault();
+  password_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.password_.Set("", GetArenaForAllocation());
+    password_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
   #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (!from._internal_password().empty()) {
-    _this->_impl_.password_.Set(from._internal_password(), 
-      _this->GetArenaForAllocation());
+    password_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_password(), 
+      GetArenaForAllocation());
   }
-  _impl_.email_.InitDefault();
+  email_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.email_.Set("", GetArenaForAllocation());
+    email_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
   #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (!from._internal_email().empty()) {
-    _this->_impl_.email_.Set(from._internal_email(), 
-      _this->GetArenaForAllocation());
+    email_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_email(), 
+      GetArenaForAllocation());
   }
-  _impl_.ip_.InitDefault();
+  ip_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.ip_.Set("", GetArenaForAllocation());
+    ip_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
   #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (!from._internal_ip().empty()) {
-    _this->_impl_.ip_.Set(from._internal_ip(), 
-      _this->GetArenaForAllocation());
+    ip_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_ip(), 
+      GetArenaForAllocation());
   }
-  _this->_impl_.type_ = from._impl_.type_;
+  type_ = from.type_;
   // @@protoc_insertion_point(copy_constructor:SSDTO.Enroll_DTO)
 }
 
-inline void Enroll_DTO::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_.ssid_){}
-    , decltype(_impl_.user_name_){}
-    , decltype(_impl_.password_){}
-    , decltype(_impl_.email_){}
-    , decltype(_impl_.ip_){}
-    , decltype(_impl_.type_){0}
-    , /*decltype(_impl_._cached_size_)*/{}
-  };
-  _impl_.ssid_.InitDefault();
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.ssid_.Set("", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  _impl_.user_name_.InitDefault();
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.user_name_.Set("", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  _impl_.password_.InitDefault();
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.password_.Set("", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  _impl_.email_.InitDefault();
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.email_.Set("", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  _impl_.ip_.InitDefault();
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.ip_.Set("", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+inline void Enroll_DTO::SharedCtor() {
+ssid_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  ssid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+user_name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  user_name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+password_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  password_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+email_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  email_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+ip_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  ip_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+type_ = 0;
 }
 
 Enroll_DTO::~Enroll_DTO() {
   // @@protoc_insertion_point(destructor:SSDTO.Enroll_DTO)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  if (GetArenaForAllocation() != nullptr) return;
   SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 inline void Enroll_DTO::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
-  _impl_.ssid_.Destroy();
-  _impl_.user_name_.Destroy();
-  _impl_.password_.Destroy();
-  _impl_.email_.Destroy();
-  _impl_.ip_.Destroy();
+  ssid_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  user_name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  password_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  email_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  ip_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
+void Enroll_DTO::ArenaDtor(void* object) {
+  Enroll_DTO* _this = reinterpret_cast< Enroll_DTO* >(object);
+  (void)_this;
+}
+void Enroll_DTO::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
 void Enroll_DTO::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
+  _cached_size_.Set(size);
 }
 
 void Enroll_DTO::Clear() {
@@ -225,26 +205,26 @@ void Enroll_DTO::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  _impl_.ssid_.ClearToEmpty();
-  _impl_.user_name_.ClearToEmpty();
-  _impl_.password_.ClearToEmpty();
-  _impl_.email_.ClearToEmpty();
-  _impl_.ip_.ClearToEmpty();
-  _impl_.type_ = 0;
+  ssid_.ClearToEmpty();
+  user_name_.ClearToEmpty();
+  password_.ClearToEmpty();
+  email_.ClearToEmpty();
+  ip_.ClearToEmpty();
+  type_ = 0;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* Enroll_DTO::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+const char* Enroll_DTO::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
     uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // bytes ssid = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           auto str = _internal_mutable_ssid();
-          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -253,7 +233,7 @@ const char* Enroll_DTO::_InternalParse(const char* ptr, ::_pbi::ParseContext* ct
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
           auto str = _internal_mutable_user_name();
-          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -262,7 +242,7 @@ const char* Enroll_DTO::_InternalParse(const char* ptr, ::_pbi::ParseContext* ct
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
           auto str = _internal_mutable_password();
-          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -271,7 +251,7 @@ const char* Enroll_DTO::_InternalParse(const char* ptr, ::_pbi::ParseContext* ct
       case 4:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
           auto str = _internal_mutable_email();
-          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -280,7 +260,7 @@ const char* Enroll_DTO::_InternalParse(const char* ptr, ::_pbi::ParseContext* ct
       case 5:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 42)) {
           auto str = _internal_mutable_ip();
-          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -356,12 +336,12 @@ uint8_t* Enroll_DTO::_InternalSerialize(
   // .SSDTO.Business_Type type = 6;
   if (this->_internal_type() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteEnumToArray(
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
       6, this->_internal_type(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:SSDTO.Enroll_DTO)
@@ -414,46 +394,50 @@ size_t Enroll_DTO::ByteSizeLong() const {
   // .SSDTO.Business_Type type = 6;
   if (this->_internal_type() != 0) {
     total_size += 1 +
-      ::_pbi::WireFormatLite::EnumSize(this->_internal_type());
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_type());
   }
 
-  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+  return MaybeComputeUnknownFieldsSize(total_size, &_cached_size_);
 }
 
 const ::PROTOBUF_NAMESPACE_ID::Message::ClassData Enroll_DTO::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSizeCheck,
     Enroll_DTO::MergeImpl
 };
 const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*Enroll_DTO::GetClassData() const { return &_class_data_; }
 
+void Enroll_DTO::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
+                      const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+  static_cast<Enroll_DTO *>(to)->MergeFrom(
+      static_cast<const Enroll_DTO &>(from));
+}
 
-void Enroll_DTO::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
-  auto* const _this = static_cast<Enroll_DTO*>(&to_msg);
-  auto& from = static_cast<const Enroll_DTO&>(from_msg);
-  // @@protoc_insertion_point(class_specific_merge_from_start:SSDTO.Enroll_DTO)
-  GOOGLE_DCHECK_NE(&from, _this);
+
+void Enroll_DTO::MergeFrom(const Enroll_DTO& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:SSDTO.Enroll_DTO)
+  GOOGLE_DCHECK_NE(&from, this);
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_ssid().empty()) {
-    _this->_internal_set_ssid(from._internal_ssid());
+    _internal_set_ssid(from._internal_ssid());
   }
   if (!from._internal_user_name().empty()) {
-    _this->_internal_set_user_name(from._internal_user_name());
+    _internal_set_user_name(from._internal_user_name());
   }
   if (!from._internal_password().empty()) {
-    _this->_internal_set_password(from._internal_password());
+    _internal_set_password(from._internal_password());
   }
   if (!from._internal_email().empty()) {
-    _this->_internal_set_email(from._internal_email());
+    _internal_set_email(from._internal_email());
   }
   if (!from._internal_ip().empty()) {
-    _this->_internal_set_ip(from._internal_ip());
+    _internal_set_ip(from._internal_ip());
   }
   if (from._internal_type() != 0) {
-    _this->_internal_set_type(from._internal_type());
+    _internal_set_type(from._internal_type());
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void Enroll_DTO::CopyFrom(const Enroll_DTO& from) {
@@ -473,30 +457,35 @@ void Enroll_DTO::InternalSwap(Enroll_DTO* other) {
   auto* rhs_arena = other->GetArenaForAllocation();
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
-      &_impl_.ssid_, lhs_arena,
-      &other->_impl_.ssid_, rhs_arena
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &ssid_, lhs_arena,
+      &other->ssid_, rhs_arena
   );
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
-      &_impl_.user_name_, lhs_arena,
-      &other->_impl_.user_name_, rhs_arena
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &user_name_, lhs_arena,
+      &other->user_name_, rhs_arena
   );
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
-      &_impl_.password_, lhs_arena,
-      &other->_impl_.password_, rhs_arena
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &password_, lhs_arena,
+      &other->password_, rhs_arena
   );
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
-      &_impl_.email_, lhs_arena,
-      &other->_impl_.email_, rhs_arena
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &email_, lhs_arena,
+      &other->email_, rhs_arena
   );
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
-      &_impl_.ip_, lhs_arena,
-      &other->_impl_.ip_, rhs_arena
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &ip_, lhs_arena,
+      &other->ip_, rhs_arena
   );
-  swap(_impl_.type_, other->_impl_.type_);
+  swap(type_, other->type_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata Enroll_DTO::GetMetadata() const {
-  return ::_pbi::AssignDescriptors(
+  return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_EnrollDTO_2eproto_getter, &descriptor_table_EnrollDTO_2eproto_once,
       file_level_metadata_EnrollDTO_2eproto[0]);
 }
@@ -504,8 +493,7 @@ void Enroll_DTO::InternalSwap(Enroll_DTO* other) {
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace SSDTO
 PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::SSDTO::Enroll_DTO*
-Arena::CreateMaybeMessage< ::SSDTO::Enroll_DTO >(Arena* arena) {
+template<> PROTOBUF_NOINLINE ::SSDTO::Enroll_DTO* Arena::CreateMaybeMessage< ::SSDTO::Enroll_DTO >(Arena* arena) {
   return Arena::CreateMessageInternal< ::SSDTO::Enroll_DTO >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE

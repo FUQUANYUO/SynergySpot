@@ -8,13 +8,17 @@
 #include <QObject>
 #include <QApplication>
 
+class QProcess;
+
 class MainLogic : public QObject{
     Q_OBJECT
 public:
-    explicit MainLogic()  = default;
-    ~MainLogic() override = default;
+    explicit MainLogic();
+    ~MainLogic();
 
-    int startMainLogic();
+    int startMainLogic(QApplication * app);
+private:
+    QProcess * _pGRPCProcess = nullptr;
 };
 
 

@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 project(SynergySpot VERSION 0.01 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
@@ -9,7 +10,7 @@ set(CMAKE_AUTOUIC ON)
 # 输出路径
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/out)
 
-# 子模块 添加的子项目放到这个变量下面即可
+# 前端Ui子模块 添加的子项目放到这个变量下面即可
 set(SUB_PROS
         plugin-manager
         effect-component
@@ -34,22 +35,29 @@ find_package(Qt6 REQUIRED COMPONENTS
 )
 
 #file(GLOB_RECURSE   CoreCpp         ${CMAKE_CURRENT_SOURCE_DIR}/core/*.cpp      )
-file(GLOB_RECURSE   ProtoCC         ${CMAKE_CURRENT_SOURCE_DIR}/protofile/*.cc  )
-file(GLOB_RECURSE   UtilsCpp        ${CMAKE_CURRENT_SOURCE_DIR}/utils/*.cpp     )
+file(GLOB_RECURSE   ProtoCC         ${CMAKE_CURRENT_SOURCE_DIR}/protofile/*.cc     )
+file(GLOB_RECURSE   UtilsCpp        ${CMAKE_CURRENT_SOURCE_DIR}/utils/*.cpp        )
 
-set(CoreCpp ${CMAKE_CURRENT_SOURCE_DIR}/core/base/client-request-handler/ClientRequestHandler.cpp ${CMAKE_CURRENT_SOURCE_DIR}/core/safety/email-check/EmailVerify.cpp)
+set(CoreCpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/core/base/client-request-handler/ClientRequestHandler.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/core/safety/email-check/EmailVerify.cpp
+)
 
-# 遍历子项目
+# 遍历前端Ui子项目
 foreach(SUB_PATH ${SUB_PROS})
         if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/page-view/${SUB_PATH}/CMakeLists.txt)
                 add_subdirectory(page-view/${SUB_PATH})
         endif ()
 endforeach()
 
+# 添加实时子项目
+add_subdirectory(core/realtime)
+
 # core
 include_directories(core)
 # lib-common
 include_directories(lib-common/include)
+include_directories(lib-common/include/grpc-inc)
 # page
 include_directories(page-view)
 # protofile
@@ -63,16 +71,16 @@ qt_add_executable(${PROJECT_NAME} main.cpp MainLogic.cpp lib-common/include/ela-
         ${UtilsCpp}
 )
 
-# 使用 yaml 静态库
 target_compile_definitions(${PROJECT_NAME} PUBLIC
         PROTOBUF_USE_DLLS
         #LOC_TEST
 )
 
 # select win or linux
-if(SS_CLIENT)
+if(SS_CLIENT_WIN)
         target_link_directories(${PROJECT_NAME} PRIVATE
                 lib-common/lib/Win
+                lib-common/lib/Win/grpc
                 out
         )
         if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -83,6 +91,8 @@ if(SS_CLIENT)
                         Qt::Network
                         Qt::OpenGLWidgets
                         libprotobufd
+                        absl_all
+                        grpc_all
                         sqlite3
                         libmysql
                         yaml-cppd
@@ -102,6 +112,8 @@ if(SS_CLIENT)
                         Qt::Network
                         Qt::OpenGLWidgets
                         libprotobuf
+                        absl_all
+                        grpc_all
                         sqlite3
                         libmysql
                         yaml-cpp
@@ -144,8 +156,6 @@ else()
                         Qt::Network
                         Qt::OpenGLWidgets
                         libprotobufd
-                        libprotobuf-lited
-                        libprotocd
                         sqlite3
                         libmysql
                         yaml-cppd
@@ -163,9 +173,7 @@ else()
                         Qt::Widgets
                         Qt::Network
                         Qt::OpenGLWidgets
-                        libprotobufd
-                        libprotobuf-lited
-                        libprotocd
+                        libprotobuf
                         sqlite3
                         libmysql
                         yaml-cpp

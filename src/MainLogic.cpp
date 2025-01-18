@@ -1,7 +1,6 @@
 //
 // Created by FU-QAQ on 2024/12/10.
 //
-
 #include "MainLogic.h"
 
 #include "core/base/client-request-handler/ClientRequestHandler.h"
@@ -22,7 +21,12 @@
 
 //------------   begin core   ------------//
 #include "safety/email-check/EmailVerify.h"
+
+#include <yaml-cpp/node/node.h>
+#include <yaml-cpp/node/parse.h>
 //------------   end core     ------------//
+
+#include <QProcess>
 
 
 // client info yaml file path
@@ -34,10 +38,24 @@ std::string yamlPath = "../conf/clientInfo.yaml";
 
 std::string CurSSID;
 std::string CurSSname;
+std::iostream * logFile;
 
 QWidget * curWindow = nullptr;
 
-int MainLogic::startMainLogic() {
+MainLogic::MainLogic() {
+    YAML::Node config = YAML::LoadFile(yamlPath);
+    std::string logName = config["log"]["logName"].as<std::string>();
+
+    // init log orient
+    SSLog::initLogFile(logName);
+    LOG_INFO("--------------------------- SynergySpot.exe Beginning ----------------------------")
+}
+
+MainLogic::~MainLogic() {
+    LOG_INFO("--------------------------- SynergySpot.exe Ending ----------------------------")
+}
+
+int MainLogic::startMainLogic(QApplication * app) {
     g_pClientRequestHandler;
     eApp->init();
 
@@ -71,6 +89,18 @@ int MainLogic::startMainLogic() {
 
         connect(g_pClientRequestHandler,&ClientRequestHandler::sigConnServerFailed,this,[=]() {
             ElaMessageBar::error(ElaMessageBarType::Top,"错误","无法连接到远程服务器!",6000, curWindow);
+        });
+        connect(g_pClientRequestHandler,&ClientRequestHandler::sigStartGRPCService,this,[=]() {
+            QString processName = "SynergySpot-GRPC-Client.exe";
+            _pGRPCProcess = new QProcess(app);
+            _pGRPCProcess->start(processName,{QString::fromStdString(CurSSID.empty()?"-1":CurSSID)});
+            connect(_pGRPCProcess,&QProcess::finished,this,[=](int exitCode, QProcess::ExitStatus exitStatus) {
+                if(exitStatus == QProcess::NormalExit) {
+                    if (exitCode != 0) {
+                        ElaMessageBar::error(ElaMessageBarType::Top,"错误","GRPC 服务端连接出现错误！!",12000, curWindow);
+                    }
+                }
+            });
         });
 
         // TODO : link to core code

@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+service MediaService {
+//    rpc StreamVideoHandler (stream VideoFrame) returns (stream VideoFrame) {}
+//    rpc StreamAudioHandler (stream AudioFrame) returns (stream AudioFrame) {}
+    rpc HeartbeatHandler (HeartbeatRequest) returns (HeartbeatResponse) {}
+}
+
+// 客户端心跳请求信息
+message HeartbeatRequest {
+    string client_id = 1;
+    int64 timestamp = 2;
+}
+
+// 服务端心跳响应消息
+message HeartbeatResponse {
+    bool alive = 1;
+}
