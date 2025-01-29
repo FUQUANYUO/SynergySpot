@@ -41,7 +41,7 @@ class SS_API LandPage : public QOpenGLWidget  {
     Q_OBJECT
 public:
     static LandPage * getLandPage();
-    static void destroyLandPage();
+    static void destroyInstance();
     // save qrc to file
     bool saveQrcToFile(const QString& qrcPath, const QString& targetFilePath);
 signals:

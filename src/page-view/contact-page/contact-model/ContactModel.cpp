@@ -25,7 +25,7 @@ void ContactModel::addGroupingItem(const QString &groupingName, const GroupingIt
     QStandardItem * gItem = new QStandardItem(item.name);
     gItem->setData(QIcon(item.pic),Qt::DecorationRole);
     gItem->setData(item.status,ContactDelegate::StatusRole);
-
+    gItem->setData(item.ssid);
     QStandardItem * parentItem = getGrouping(groupingName);
     parentItem->appendRow(gItem);
 }

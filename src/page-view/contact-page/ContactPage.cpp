@@ -39,6 +39,34 @@ void ContactPage::destroyContactPage() {
     }
 }
 
+void ContactPage::addFriendGrouping(const QString &name) {
+    if (_friendModel != nullptr)
+        _friendModel->addGrouping(name);
+    _groupingInfos["friend"].insert(name,{});
+}
+
+QList<QString> ContactPage::getFriendGrouping() {
+    return _groupingInfos["friend"].keys().toList();
+}
+
+void ContactPage::addContactInfo(const QString& groupingName,const MsgCardInfo &info) {
+    if (!info.isGroup) {
+        if (_groupingInfos["friend"].contains(groupingName)) {
+            _friendModel->addGroupingItem(groupingName,{
+                info.ssid,info.name,info.mark,"","离线",QPixmap(info.avatar)
+            });
+            _groupingInfos["friend"][groupingName].append(info);
+            _ssidToCardInfoHash[info.ssid] = info;
+        }
+    }else {
+        _groupModel->addGroupingItem(groupingName,{
+                        info.ssid,info.name,info.mark,"","离线",QPixmap(info.avatar)
+                    });
+        _groupingInfos["group"][groupingName].append(info);
+        _ssidToCardInfoHash[info.ssid] = info;
+    }
+}
+
 ContactPage::ContactPage(QWidget *parent) : ElaScrollPage(parent) {
     initWindow();
 
@@ -116,40 +144,23 @@ void ContactPage::initContent() {
 
     // init model
     // grouping
-    ContactModel * friendModel = new ContactModel(this);
-    ContactModel * groupModel = new ContactModel(this);
+    _friendModel = new ContactModel(this);
+    _groupModel = new ContactModel(this);
+    _groupingInfos["friend"] = {};
+    _groupingInfos["group"] = {};
     ContactDelegate * cDelegate = new ContactDelegate(this);
 
-    friendModel->addGrouping("测试好友分组一");
-    friendModel->addGrouping("测试好友分组二");
-    friendModel->addGroupingItem("测试好友分组一",
-                                 {"","小柴","","","在线",
-                                  QPixmap(":/contact-page/rc-page/img/default-avatar-1.jpg")});
-    friendModel->addGroupingItem("测试好友分组一",
-                                 {"","五花","","","在线",
-                                  QPixmap(":/contact-page/rc-page/img/default-avatar-2.jpg")});
-    friendModel->addGroupingItem("测试好友分组二",
-                                 {"","大黄","","","离线",
-                                  QPixmap(":/contact-page/rc-page/img/default-avatar-3.jpg")});
+    _groupModel->addGrouping("未命名群聊");
+    _groupModel->addGrouping("我创建的群聊");
+    _groupModel->addGrouping("我管理的群聊");
+    _groupModel->addGrouping("我加入的群聊");
 
-    groupModel->addGrouping("测试群组分组一");
-    groupModel->addGrouping("测试群组分组二");
-    groupModel->addGroupingItem("测试群组分组一",
-                                {"","Apollo交流群","","","",
-                                 QPixmap(":/contact-page/rc-page/img/default-avatar-4.jpg")});
-    groupModel->addGroupingItem("测试群组分组二",
-                                {"","Github交流群","","","",
-                                 QPixmap(":/contact-page/rc-page/img/default-avatar-5.jpg")});
-    groupModel->addGroupingItem("测试群组分组二",
-                                {"","铲屎官交流群","","","",
-                                 QPixmap(":/contact-page/rc-page/img/default-avatar-6.jpg")});
-
-    _friendTree->setModel(friendModel);
+    _friendTree->setModel(_friendModel);
     _friendTree->setItemDelegate(cDelegate);
     _friendTree->setEditTriggers(QTreeView::NoEditTriggers);
 
     _groupTree->hide();
-    _groupTree->setModel(groupModel);
+    _groupTree->setModel(_groupModel);
     _groupTree->setItemDelegate(cDelegate);
     _groupTree->setEditTriggers(QTreeView::NoEditTriggers);
 }
@@ -164,6 +175,20 @@ void ContactPage::initConnectFunc() {
         }else{
             _friendTree->hide();
             _groupTree->show();
+        }
+    });
+
+    // double-clicked add msg card and change to msg page
+    connect(_friendTree,&QTreeView::doubleClicked,[=](const QModelIndex &index) {
+        if (index.parent().isValid()) {
+            QString clickedSSID = index.data(Qt::UserRole + 1).toString();
+            emit sigTriggerAddMsgCard(_ssidToCardInfoHash.value(clickedSSID));
+        }
+    });
+    connect(_groupTree,&QTreeView::doubleClicked,[=](const QModelIndex &index) {
+        if (index.parent().isValid()) {
+            QString clickedSSID = index.data(Qt::UserRole + 1).toString();
+            emit sigTriggerAddMsgCard(_ssidToCardInfoHash.value(clickedSSID));
         }
     });
 }

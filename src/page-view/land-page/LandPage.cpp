@@ -40,13 +40,13 @@ LandPage *LandPage::getLandPage() {
     return _landPage;
 }
 
-void LandPage::destroyLandPage() {
-    if(_landPage == nullptr)
-        return;
-    else {
+void LandPage::destroyInstance() {
+    if (_landPage) {
         m.lock();
-        delete _landPage;
-        _landPage = nullptr;
+        if (_landPage) {
+            _landPage->deleteLater();
+            _landPage = nullptr;
+        }
         m.unlock();
     }
 }
@@ -67,6 +67,8 @@ LandPage::LandPage(QWidget *parent)
 }
 
 LandPage::~LandPage() {
+    timer->stop();
+    g_pPluginManager->releasePlugin(BK_PLUGIN_NAME);
 }
 
 void LandPage::initWindow() {

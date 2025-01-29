@@ -46,7 +46,8 @@ void SignUpPage::destroyInstance() {
     if (instance != nullptr) {
         m.lock();
         if (instance != nullptr) {
-            delete instance;
+            instance->deleteLater();
+            instance = nullptr;
         }
         m.unlock();
     }

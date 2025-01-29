@@ -51,6 +51,7 @@ FIND_PACKAGE(Qt6
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/lib-common/include)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/utils)
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/core)
 #--------------------------------   third party include    ----------------------------------   END
 
 # 库文件路径添加       add lib file path
@@ -61,6 +62,14 @@ LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/out)
 FILE(
         GLOB_RECURSE                 SRC_CPP                    ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
 )
+
+# utils src code
+SET(
+        SRC_CPP                      ${SRC_CPP}
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/log/Log.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/get-time/GetCurTime.cpp
+)
+
 QT_ADD_RESOURCES(
         QRC_FILES                    ${PLUGINS_NAME}.qrc
 )
@@ -81,6 +90,7 @@ IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
                 Qt6::Core                    Qt6::Gui                   Qt6::Widgets
         #--------------------------------    your lib file name    ----------------------------------   BEGIN
                 PluginManagerd               UserPagePlugind            ElaWidgetToolsd
+                CommonDataPlugind
         #--------------------------------    your lib file name    ----------------------------------   END
         )
 ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -88,7 +98,7 @@ ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Release")
                 ${PLUGINS_NAME}              PUBLIC
                 Qt6::Core                    Qt6::Gui                   Qt6::Widgets
         #--------------------------------    your lib file name    ----------------------------------   BEGIN
-                PluginManager                UserPagePlugin
+                PluginManager                UserPagePlugin             CommonDataPlugin
         #--------------------------------    your lib file name    ----------------------------------   END
         )
 ENDIF ()

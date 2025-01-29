@@ -9,10 +9,6 @@
 #include <algorithm>
 #include <sstream>
 
-extern std::string yamlPath;
-extern std::string CurSSID;
-extern std::string CurSSname;
-
 #include "log/Log.h"
 
 // 日志宏
@@ -41,6 +37,13 @@ extern std::string CurSSname;
     do { \
         std::ostringstream oss; \
         oss << __EXPR__; \
+        SSLog::log(SSLog::LogLevel::SS_DEFAULT, __FILE__, __LINE__, oss.str()); \
+    } while (0);
+
+#define QLOG(__EXPR__) \
+    do { \
+        std::ostringstream oss; \
+        oss << __EXPR__.toStdString(); \
         SSLog::log(SSLog::LogLevel::SS_DEFAULT, __FILE__, __LINE__, oss.str()); \
     } while (0);
 #endif//SYNERGYSPOT_HELP_H

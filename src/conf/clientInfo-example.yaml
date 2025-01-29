@@ -12,7 +12,7 @@ server-host-info:
  ip: xxxxxxxxx
  port: xxxxxxxxx
 log:
- logName: log/SynergySpot
+ logName: SynergySpot
 request-friend-msg:
  default: 久闻大名，能否交流交流~
 realtime-info:

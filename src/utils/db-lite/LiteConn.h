@@ -11,9 +11,9 @@
 class LiteConn {
 public:
     LiteConn() = default;
-    LiteConn(const char * dbName);
-    bool update(const std::string sql);
-    char ** query(const std::string &sql,int &nrow,int &ncolumn);
+    LiteConn(const char * dbName, std::string accessKey = "");
+    bool update(const std::string& sql, const std::vector<std::string>& params);
+    std::vector<std::vector<std::string>> query(const std::string& sql, const std::vector<std::string>& params = {});
     ~LiteConn();
 private:
     sqlite3 * qdb;

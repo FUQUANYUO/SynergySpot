@@ -32,6 +32,17 @@ enum UserType{
     Friends
 };
 
+struct MsgCardInfo {
+    QString name;
+    QString ssid;
+    QString mark;
+    QString content;
+    QString avatar;
+    qint64 timestamp;
+    bool isGroup;
+};
+Q_DECLARE_METATYPE(MsgCardInfo)
+
 struct LocalInfo{
     QString country;
     QString province;

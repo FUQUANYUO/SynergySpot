@@ -1,4 +1,7 @@
 #include "ConnectionPool.h"
+
+#include "common-data/CommonData.h"
+
 #include "yaml-cpp/yaml.h"
 
 #include <thread>
@@ -13,7 +16,7 @@ ConnectionPool* ConnectionPool::getConnectPool()
 
 bool ConnectionPool::parseYamlFile()
 {
-    YAML::Node conf = YAML::LoadFile(yamlPath);
+    YAML::Node conf = YAML::LoadFile(g_pCommonData->getYamlPath());
     if (!conf.IsNull())
     {
         m_ip = conf["mysql-info"]["ip"].as<std::string>();

@@ -39,6 +39,7 @@ namespace RealtimeComm {
     }
 
     void RealtimeCommHandler::setupGRPCChannel() {
+        std::string yamlPath = g_pCommonData->getYamlPath();
         YAML::Node conf = YAML::LoadFile(yamlPath);
         if(!conf.IsNull()){
             std::string ip = conf["realtime-info"]["grpcIP"].as<std::string>();
@@ -88,7 +89,7 @@ namespace RealtimeComm {
         // 发送心跳包到服务器
         if (_isHeartbeatActive) {
             HeartbeatRequest request;
-            request.set_client_id(CurSSID);
+            request.set_client_id(g_pCommonData->getCurUserInfo().CurSSID);
             request.set_timestamp(GetCurTime::getTimeObj()->getCurTimeStamp());
 
             HeartbeatResponse response;

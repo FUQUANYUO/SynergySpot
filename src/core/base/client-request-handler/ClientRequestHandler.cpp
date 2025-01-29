@@ -18,6 +18,9 @@
 
 //-----------      core      -----------//
 #include "net-work/ClientConServer.h"
+#include "common-data/CommonData.h"
+
+
 
 // 发送包装宏
 #define SEND_PACKAGE(__DTO_OBJ__, __DTO_TYPE__, __LOG__)    \
@@ -60,7 +63,7 @@ void ClientRequestHandler::destroyInstance() {
     if (_instance != nullptr) {
         m.lock();
         if (_instance != nullptr) {
-            delete _instance;
+            _instance->deleteLater();
             _instance = nullptr;
         }
         m.unlock();
@@ -225,11 +228,11 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
     {
         // login
         _responseHandlerMap[SSDTO::LOGIN] = [=](const std::string & dto) {
-            LOG("recv server verify [" << CurSSID << "] res")
             SSDTO::Login_DTO ldto;
             ldto.ParseFromString(dto);
+            LOG("recv server verify [" << ldto.ssid() << "] res")
             if(ldto.is_pass()){
-                CurSSname = ldto.ssname();
+                g_pCommonData->setCurUserInfo({ldto.ssid(),ldto.ssname()});
                 emit sigLoginSuccess();
             }
             else{
@@ -283,8 +286,6 @@ void BusinessLayer::BusinessProcessor::handleResponse(SSDTO::Business_Type type,
         case SSDTO::FILE_TRANSFER_REQUEST:
             // _pool.enqueue(new FileTransferTask(dto));  // 提交到文件传输线程池
             break;
-        case SSDTO::HEART_BEAT:
-            break;
         // 其他任务类型
         default:
             _responseHandlerMap[type](dto);// 默认处理方式
@@ -296,7 +297,7 @@ void BusinessLayer::BusinessProcessor::disConnectFromSer(){
     // out line notice
     std::string outDisDto;
     SSDTO::Disconnect_DTO ddto;
-    ddto.set_ssid(CurSSID);
+    ddto.set_ssid(g_pCommonData->getCurUserInfo().CurSSID);
     ddto.set_ip("");
     ddto.set_type(SSDTO::DISCONNECT);
     ddto.SerializeToString(&outDisDto);

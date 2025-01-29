@@ -19,6 +19,17 @@ PluginManager *PluginManager::getInstance() {
     return obj;
 }
 
+void PluginManager::destroyInstance() {
+    if(obj){
+        m.lock();
+        if(obj){
+            obj->deleteLater();
+            obj = nullptr;
+        }
+        m.unlock();
+    }
+}
+
 bool PluginManager::loadPlugin(const QString &pluginName,const QString &pluginPath) {
     QPluginLoader loader(pluginPath);
     QObject* plugin = loader.instance();

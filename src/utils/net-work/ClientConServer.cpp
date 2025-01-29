@@ -4,10 +4,12 @@
 #include "help.h"
 #include "yaml-cpp/yaml.h"
 
+#include "common-data/CommonData.h"
+
 #include "ClientConServer.h"
 
 ClientConServer::ClientConServer() {
-    YAML::Node conf = YAML::LoadFile(yamlPath);
+    YAML::Node conf = YAML::LoadFile(g_pCommonData->getYamlPath());
     if(!conf.IsNull()){
         _host_ip = QString::fromStdString(conf["server-host-info"]["ip"].as<std::string>());
         _port = conf["server-host-info"]["port"].as<int>();

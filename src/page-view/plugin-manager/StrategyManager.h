@@ -28,6 +28,7 @@ class PluginManager : public QObject {
     Q_OBJECT
 public:
     SS_API static PluginManager* getInstance();
+    SS_API static void destroyInstance();
 
     SS_API void unloadPlugin() {
         if(!_pluginsMap.isEmpty()){
@@ -43,6 +44,15 @@ public:
             return *res;
         }
         return nullptr;
+    }
+
+    SS_API void releasePlugin(const QString &pluginName) {
+        auto res = _pluginsMap.find(pluginName);
+        if(res != _pluginsMap.end()){
+            (*res)->deleteLater();
+            _pluginsMap[pluginName] = nullptr;
+            _pluginsMap.remove(pluginName);
+        }
     }
 
 private:

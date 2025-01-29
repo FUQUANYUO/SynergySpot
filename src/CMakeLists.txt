@@ -50,8 +50,12 @@ foreach(SUB_PATH ${SUB_PROS})
         endif ()
 endforeach()
 
-# 添加实时子项目
-add_subdirectory(core/realtime)
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+        # 添加实时子项目
+        add_subdirectory(core/realtime)
+endif ()
+# 公共数据插件
+add_subdirectory(core/common-data)
 
 # core
 include_directories(core)
@@ -73,6 +77,7 @@ qt_add_executable(${PROJECT_NAME} main.cpp MainLogic.cpp lib-common/include/ela-
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC
         PROTOBUF_USE_DLLS
+        SQLITE_HAS_CODEC
         #LOC_TEST
 )
 
@@ -91,17 +96,20 @@ if(SS_CLIENT_WIN)
                         Qt::Network
                         Qt::OpenGLWidgets
                         libprotobufd
-                        absl_all
-                        grpc_all
-                        sqlite3
+                        libsqlite3
+                        sqlcipher
                         libmysql
                         yaml-cppd
                         libcrypto
                         libssl
 
+                        CommonDataPlugind
+
                         ElaWidgetToolsd
                         PluginManagerd
                         ArchPagePlugind
+                        ContactPagePlugind
+                        MessagePagePlugind
                         LandPagePlugind
                 )
         elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -112,13 +120,14 @@ if(SS_CLIENT_WIN)
                         Qt::Network
                         Qt::OpenGLWidgets
                         libprotobuf
-                        absl_all
-                        grpc_all
-                        sqlite3
+                        libsqlite3
+                        sqlcipher
                         libmysql
                         yaml-cpp
                         libcrypto
                         libssl
+
+                        CommonDataPlugin
 
                         PluginManager
                         ArchPagePlugin
@@ -155,7 +164,7 @@ else()
                         Qt::Widgets
                         Qt::Network
                         Qt::OpenGLWidgets
-                        libprotobufd
+                        libprotobuf
                         sqlite3
                         libmysql
                         yaml-cppd

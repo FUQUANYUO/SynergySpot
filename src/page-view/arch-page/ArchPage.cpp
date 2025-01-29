@@ -47,7 +47,6 @@ void ArchPage::destroyInstance() {
     }
 }
 
-
 ArchPage::ArchPage(QWidget *parent) : ElaWindow(parent) {
     initWindow();
 

@@ -23,6 +23,8 @@
     #endif
 #endif
 
+class ConversationPage;
+class ElaInteractiveCard;
 class ElaScrollPage;
 class ElaTabWidget;
 class ElaDockWidget;
@@ -32,9 +34,13 @@ class QVBoxLayout;
 
 class SS_API MessagePage : public QWidget{
     Q_OBJECT
+    // grandson class to link card and set content display
+    friend class ConversationPage;
 public:
     static MessagePage * getInstance();
     static void destroyMessagePage();
+public slots:
+    void addMsgCard(const MsgCardInfo& info);
 private:
     explicit MessagePage(QWidget *parent = nullptr);
     ~MessagePage() override;
@@ -45,13 +51,17 @@ protected:
     void initContent();
 private:
     // ----------------- UI -----------------
-    ElaScrollPage * _tempMsgList;
-    ElaTabWidget  * _conversionWid;
-    QVBoxLayout   * _tempMsgWidLayout;
-    QWidget       * _tempMsgWid;
+    ElaScrollPage               * _tempMsgList;
+    ElaTabWidget                * _conversionWid;
+    QVBoxLayout                 * _tempMsgWidLayout;
+    QWidget                     * _tempMsgWid;
     // ----------------- UI -----------------
 
     // --------------- BackEnd --------------
+    QMap<ElaInteractiveCard*,MsgCardInfo>        _tmpUserMsgList;
+    QHash<QString,int>                           _unreadMsgCount;
+    QHash<ElaInteractiveCard*,ConversationPage*> _cardLinkPageHash;
+    QHash<QString,ElaInteractiveCard*>           _ssidLinkCardHash;
     // --------------- BackEnd --------------
     static MessagePage* _messagePage;
 };

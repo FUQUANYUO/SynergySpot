@@ -3,20 +3,14 @@
 #include <string>
 #include "help.h"
 
-std::string CurSSID;
-
-#ifdef WIN32
-std::string yamlPath = "../../conf/clientInfo.yaml";
-#else
-std::string yamlPath = "../conf/clientInfo.yaml";
-#endif
-
 int main(int argc, char *argv[]){
     QCoreApplication a(argc,argv);
     std::string logName = "SynergySpot_gRPC";
     SSLog::initLogFile(logName);
     LOG_INFO("--------------------------- SynergySpot-GPRC-Client.exe Beginning ----------------------------")
-    // CurSSID = argv[1];
+
+    g_pCommonData->setCurUserInfo({argv[1], argv[2], argv[3]});
+
     RealtimeComm::RealtimeCommHandler realtime;
     int res = realtime.startGrpcService();
     LOG_INFO("--------------------------- SynergySpot-GPRC-Client.exe Ending ----------------------------")

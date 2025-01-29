@@ -1,52 +1,129 @@
 //
 // Created by FU-QAQ on 2024/12/12.
 //
-
 #include "ConversationPage.h"
 #include "msg-bubble-model/MsgBubbleModel.h"
 #include "msg-bubble-delegate/MsgBubbleDelegate.h"
 #include "msg-bubble-view/MsgBubbleView.h"
 #include "group-member-dock/GroupMemberDock.h"
 #include "../user-page/UserPage.h"
+#include "../MessagePage.h"
 
 #include "help.h"
+#include "common-data/CommonData.h"
 #include "ela-widget-tools/ElaToolButton.h"
 #include "ela-widget-tools/ElaDockWidget.h"
-#include "ela-widget-tools/ElaPlainTextEdit.h"
 #include "ela-widget-tools/ElaMenu.h"
 #include "ela-widget-tools/Def.h"
+#include "ela-widget-tools/ElaInteractiveCard.h"
 
 #include <QGridLayout>
+#include <QTextEdit>
+#include <QMimeData>
+#include <QDragEnterEvent>
 #include <QPainter>
 #include <QListView>
 #include <mutex>
-#include <ela-widget-tools/ElaPushButton.h>
 
-
-class InputWidget : public QWidget{
+// input text edit
+class SSTextEdit : public QTextEdit {
 public:
-    explicit InputWidget(QWidget * parent = nullptr);
-    ~InputWidget() override;
+    SSTextEdit(QWidget *parent = nullptr);
+
+    QMap<QString, QImage>& getImageTmpMap();
 protected:
-    void initConnectFunc();
-    void initWindow();
-    void initEdgeLayout();
-    void initContent();
+    // image from paste board
+    void insertFromMimeData(const QMimeData *source) override;
+
+    // drag image
+    void dragEnterEvent(QDragEnterEvent *event) override;
+    void dropEvent(QDropEvent *event) override;
+
+    // backspace event
+    void keyPressEvent(QKeyEvent *event) override;
+
+    // insert logic default scale is 0.3
+    void insertImage(const QImage &image, double scale = 0.3);
 private:
-    // ----------------- UI -----------------
-    ElaToolButton    * _emojiButton        =   nullptr;
-    ElaToolButton    * _screenCutButton    =   nullptr;
-    ElaToolButton    * _fileButton         =   nullptr;
-    ElaToolButton    * _picButton          =   nullptr;
-    ElaToolButton    * _voiceMsgButton     =   nullptr;
-    ElaToolButton    * _historyMsgButton   =   nullptr;
-    ElaPlainTextEdit * _inputEditFrame     =   nullptr;
-    QPushButton      * _sendButton         =   nullptr;
-    ElaToolButton    * _sendModButton      =   nullptr;
-    ElaMenu          * _sendMod            =   nullptr;
-    QGridLayout      * _inputLayout        =   nullptr;
-    // ----------------- UI -----------------
+    QMap<QString, QImage> _imagesTmpMap;
 };
+
+SSTextEdit::SSTextEdit(QWidget *parent): QTextEdit(parent) {
+    setAcceptDrops(true);
+}
+
+void SSTextEdit::insertFromMimeData(const QMimeData *source) {
+    if (source->hasImage()) {
+        QImage image = qvariant_cast<QImage>(source->imageData());
+        insertImage(image);
+    } else if (source->hasUrls()) {
+        QList<QUrl> urls = source->urls();
+        for (const QUrl &url : urls) {
+            if (url.isLocalFile()) {
+                QImage image(url.toLocalFile());
+                if (!image.isNull()) {
+                    insertImage(image);
+                }
+            }
+        }
+    } else {
+        QTextEdit::insertFromMimeData(source);
+    }
+}
+
+void SSTextEdit::dragEnterEvent(QDragEnterEvent *event) {
+    if (event->mimeData()->hasImage() || event->mimeData()->hasUrls()) {
+        event->acceptProposedAction();
+    }
+}
+
+void SSTextEdit::dropEvent(QDropEvent *event) {
+    const QMimeData *mimeData = event->mimeData();
+    if (mimeData->hasImage()) {
+        QImage image = qvariant_cast<QImage>(mimeData->imageData());
+        insertImage(image);
+    } else if (mimeData->hasUrls()) {
+        QList<QUrl> urls = mimeData->urls();
+        for (const QUrl &url : urls) {
+            if (url.isLocalFile()) {
+                QImage image(url.toLocalFile());
+                if (!image.isNull()) {
+                    insertImage(image);
+                }
+            }
+        }
+    }
+}
+
+void SSTextEdit::keyPressEvent(QKeyEvent *event) {
+    if (document()->isEmpty() && event->key() == Qt::Key_Backspace) {
+        _imagesTmpMap.clear();
+    }
+    QTextEdit::keyPressEvent(event);
+}
+
+void SSTextEdit::insertImage(const QImage &image, double scale) {
+    QTextCursor cursor = textCursor();
+    QTextDocument *document = this->document();
+
+    int width = static_cast<int>(image.width() * scale);
+    int height = static_cast<int>(image.height() * scale);
+
+    QString imageName = QString::number(GetCurTime::getTimeObj()->getCurTimeStamp());
+    document->addResource(QTextDocument::ImageResource, QUrl(imageName), QVariant(image));
+
+    QTextImageFormat imageFormat;
+    imageFormat.setName(imageName);
+    imageFormat.setWidth(width);
+    imageFormat.setHeight(height);
+    cursor.insertImage(imageFormat);
+
+    _imagesTmpMap.insert(imageName, image);
+}
+
+QMap<QString, QImage>& SSTextEdit::getImageTmpMap() {
+    return _imagesTmpMap;
+}
 
 InputWidget::InputWidget(QWidget *parent) : QWidget(parent)
 {
@@ -72,7 +149,7 @@ void InputWidget::initWindow() {
     _picButton           =      new ElaToolButton(this);
     _voiceMsgButton      =      new ElaToolButton(this);
     _historyMsgButton    =      new ElaToolButton(this);
-    _inputEditFrame      =      new ElaPlainTextEdit(this);
+    _inputEditFrame      =      new SSTextEdit(this);
     _sendButton          =      new QPushButton(this);
     _sendModButton       =      new ElaToolButton(this);
     _sendMod             =      new ElaMenu(this);
@@ -139,6 +216,11 @@ void InputWidget::initContent() {
 }
 
 void InputWidget::initConnectFunc() {
+    connect(_sendButton, &QPushButton::clicked, this, [=]() {
+        if (!_inputEditFrame->document()->isEmpty()) {
+            emit sigSendBtnClicked(_inputEditFrame->toHtml());
+        }
+    });
 }
 
 ConversationFriendPage::ConversationFriendPage(QWidget *parent)
@@ -154,6 +236,10 @@ ConversationFriendPage::ConversationFriendPage(QWidget *parent)
 }
 
 ConversationFriendPage::~ConversationFriendPage(){}
+
+void ConversationFriendPage::insertMsgBubble(const ChatMessage& msg) const {
+    _msgBubbleModel->addMsg(msg);
+}
 
 void ConversationFriendPage::initWindow() {
     setContentsMargins(0,0,0,0);
@@ -220,24 +306,6 @@ void ConversationFriendPage::initContent() {
     _moreOptionButton->setIconSize(QSize(32,32));
     _moreOptionButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
-    // TODO: connect end back
-    ChatMessage his_1{"00","11","hello",":/message-page/rc-page/img/default-avatar-2.jpg",false};
-    ChatMessage his_2{"00","11","哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈",":/message-page/rc-page/img/default-avatar-2.jpg",false};
-    ChatMessage my_1{"00","11","hi",":/message-page/rc-page/img/default-avatar-1.jpg",true};
-    ChatMessage my_2{"00","11","hi你好哇哇哇啊哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇<img src='qrc:/message-page/rc-page/img/default-avatar-3.jpg' width='150' height='90'/>",":/message-page/rc-page/img/default-avatar-1.jpg",true};
-    _msgBubbleModel->addMsg(his_1);
-    _msgBubbleModel->addMsg(my_1);
-    _msgBubbleModel->addMsg(my_2);
-    _msgBubbleModel->addMsg(his_2);
-    _msgBubbleModel->addMsg(his_2);
-    _msgBubbleModel->addMsg(my_2);
-    _msgBubbleModel->addMsg(my_1);
-    _msgBubbleModel->addMsg(my_2);
-    _msgBubbleModel->addMsg(my_2);
-    _msgBubbleModel->addMsg(my_2);
-    _msgBubbleModel->addMsg(my_2);
-    _msgBubbleModel->addMsg(my_1);
-
     // view setting
     _msgListView->setObjectName("_msgListView");
     _msgListView->setLayoutMode(QListView::Batched);
@@ -272,6 +340,10 @@ ConversationGroupPage::ConversationGroupPage(QWidget *parent)
 }
 
 ConversationGroupPage::~ConversationGroupPage(){}
+
+void ConversationGroupPage::insertMsgBubble(const ChatMessage& msg) const {
+    _msgBubbleModel->addMsg(msg);
+}
 
 void ConversationGroupPage::initWindow() {
     setContentsMargins(0,0,0,0);
@@ -344,24 +416,6 @@ void ConversationGroupPage::initContent() {
     _moreOptionButton->setIconSize(QSize(32,32));
     _moreOptionButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
-    // TODO: connect end back
-    ChatMessage his_1{"10002","五花","hello",":/message-page/rc-page/img/default-avatar-2.jpg",false};
-    ChatMessage his_2{"10002","五花","哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈",":/message-page/rc-page/img/default-avatar-2.jpg",false};
-    ChatMessage my_1{"10001","小柴","hi",":/message-page/rc-page/img/default-avatar-1.jpg",true};
-    ChatMessage my_2{"10001","小柴","hi你好哇哇哇啊哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇哇<img src='qrc:/message-page/rc-page/img/default-avatar-3.jpg' width='150' height='90'/>",":/message-page/rc-page/img/default-avatar-1.jpg",true};
-    _msgBubbleModel->addMsg(his_1);
-    _msgBubbleModel->addMsg(my_1);
-    _msgBubbleModel->addMsg(my_2);
-    _msgBubbleModel->addMsg(his_2);
-    _msgBubbleModel->addMsg(his_2);
-    _msgBubbleModel->addMsg(my_2);
-    _msgBubbleModel->addMsg(my_1);
-    _msgBubbleModel->addMsg(my_2);
-    _msgBubbleModel->addMsg(my_2);
-    _msgBubbleModel->addMsg(my_2);
-    _msgBubbleModel->addMsg(my_2);
-    _msgBubbleModel->addMsg(my_1);
-
     // view setting
     _msgBubbleDelegate->setGroupMode(true);
     _msgListView->setObjectName("_msgListView");
@@ -384,7 +438,7 @@ void ConversationGroupPage::initContent() {
 void ConversationGroupPage::initConnectFunc() {
 }
 
-ConversationPage::ConversationPage(ConversationType type,QWidget * parent)
+ConversationPage::ConversationPage(ConversationType type,const MsgCardInfo& info ,QWidget * parent)
     : QWidget(parent)
 {
     setWindowFlag(Qt::FramelessWindowHint);
@@ -392,10 +446,46 @@ ConversationPage::ConversationPage(ConversationType type,QWidget * parent)
     auto * _inputWid = new InputWidget(this);
     _layout->setContentsMargins(0,0,5,0);
     _layout->setSpacing(0);
+    QString _curSSID = QString::fromStdString(g_pCommonData->getCurUserInfo().CurSSID);
+    QString _curName = QString::fromStdString(g_pCommonData->getCurUserInfo().CurSSname);
     if(type == Friend){
         _cfP = new ConversationFriendPage(this);
         _layout->addWidget(_cfP);
         _layout->addWidget(_inputWid);
+
+        // send msg by myself
+        connect(_inputWid, &InputWidget::sigSendBtnClicked, this, [=](const QString& html) {
+            QString html_cp = html;
+            // add msg pic to the tmp
+            QMap<QString,QImage>& cacheImage = _inputWid->_inputEditFrame->getImageTmpMap();
+            if (!_inputWid->_inputEditFrame->getImageTmpMap().isEmpty()) {
+                for (auto imageIt = cacheImage.begin(); imageIt != cacheImage.end(); imageIt++) {
+                    std::string imageName = imageIt.key().toStdString();
+                    g_pCommonData->addMsgPicToTmp(imageIt.value(),imageName);
+                    html_cp.replace(imageIt.key(),QString::fromStdString(g_pCommonData->getDataPath(msgPic) + "/" + imageName + g_pCommonData->getImageEx()));
+                }
+                cacheImage.clear();
+            }
+            _inputWid->_inputEditFrame->clear();
+
+            _cfP->insertMsgBubble({_curSSID,_curName,
+                        html_cp,QString::fromStdString(g_pCommonData->getCurUserInfo().CurUserAvatarPath),true});
+
+            // get grandfather to link card and set content display
+            MessagePage * msgPage = static_cast<MessagePage*>(parent->parent());
+
+            // replace image url to [图片] placeholders
+            QRegularExpression imgRegex("<img[^>]*>", QRegularExpression::CaseInsensitiveOption);
+            html_cp.replace(imgRegex,"[图片]");
+            QFont font;
+            QTextDocument docu;
+            docu.setHtml(html_cp);
+            font.setPointSize(9);
+            msgPage->_ssidLinkCardHash[info.ssid]->setTimeContent(QString::fromStdString(
+                GetCurTime::getTimeObj()->getMsgTypeTime(GetCurTime::getTimeObj()->getCurTimeStamp())),
+                Qt::gray,font);
+            msgPage->_ssidLinkCardHash[info.ssid]->setSubTitle(docu.toPlainText());
+        });
     }
     else if(type == Group){
         _cgP = new ConversationGroupPage(this);
@@ -438,6 +528,38 @@ ConversationPage::ConversationPage(ConversationType type,QWidget * parent)
                 }
             }
         });
+
+        connect(_inputWid, &InputWidget::sigSendBtnClicked, this, [=](const QString& html) {
+            QString html_cp = html;
+            // add msg pic to the tmp
+            QMap<QString,QImage>& cacheImage = _inputWid->_inputEditFrame->getImageTmpMap();
+            if (!_inputWid->_inputEditFrame->getImageTmpMap().isEmpty()) {
+                for (auto imageIt = cacheImage.begin(); imageIt != cacheImage.end(); imageIt++) {
+                    std::string imageName = imageIt.key().toStdString();
+                    g_pCommonData->addMsgPicToTmp(imageIt.value(),imageName);
+                    html_cp.replace(imageIt.key(),QString::fromStdString(g_pCommonData->getDataPath(msgPic) + "/" + imageName + g_pCommonData->getImageEx()));
+                }
+                cacheImage.clear();
+            }
+            _inputWid->_inputEditFrame->clear();
+            _cgP->insertMsgBubble({_curSSID,_curName,
+                        html_cp,QString::fromStdString(g_pCommonData->getCurUserInfo().CurUserAvatarPath),true});
+
+            // get grandfather to link card and set content display
+            MessagePage * msgPage = static_cast<MessagePage*>(parent->parent());
+
+            // replace image url to [图片] placeholders
+            QRegularExpression imgRegex("<img[^>]*>", QRegularExpression::CaseInsensitiveOption);
+            html_cp.replace(imgRegex,"[图片]");
+            QFont font;
+            QTextDocument docu;
+            docu.setHtml(html_cp);
+            font.setPointSize(9);
+            msgPage->_ssidLinkCardHash[info.ssid]->setTimeContent(QString::fromStdString(
+                GetCurTime::getTimeObj()->getMsgTypeTime(GetCurTime::getTimeObj()->getCurTimeStamp())),
+                Qt::gray,font);
+            msgPage->_ssidLinkCardHash[info.ssid]->setSubTitle(docu.toPlainText());
+       });
     }
     this->setLayout(_layout);
     this->setObjectName("ConversationPage");

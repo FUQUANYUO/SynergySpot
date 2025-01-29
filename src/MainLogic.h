@@ -17,8 +17,11 @@ public:
     ~MainLogic();
 
     int startMainLogic(QApplication * app);
+
+    bool initUserDataDir();
 private:
     QProcess * _pGRPCProcess = nullptr;
+    QWidget  * _curWindow    = nullptr;
 };
 
 

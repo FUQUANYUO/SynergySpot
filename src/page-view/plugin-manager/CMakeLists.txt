@@ -53,7 +53,16 @@ LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/out)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 FILE(
-        GLOB_RECURSE                 SRC_CPP                    ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+        GLOB_RECURSE                 SRC_CPP                    ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
+)
+
+# utils src code
+SET(
+        SRC_CPP                      ${SRC_CPP}
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/log/Log.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/get-time/GetCurTime.cpp
+)
+
 ADD_LIBRARY(
         ${PLUGINS_NAME}              SHARED
         ${SRC_CPP}

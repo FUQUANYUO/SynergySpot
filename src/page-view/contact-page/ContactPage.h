@@ -26,14 +26,24 @@ class ElaToolButton;
 class ElaPivot;
 class ElaTreeView;
 class QVBoxLayout;
+class ContactModel;
 
 #define g_pContactPage ContactPage::getInstance()
 
 class SS_API ContactPage : public ElaScrollPage{
+    Q_OBJECT
 public:
     static ContactPage * getInstance();
     static void destroyContactPage();
+
+    void addFriendGrouping(const QString& name);
+
+    QList<QString> getFriendGrouping();
+
+public slots:
+    void addContactInfo(const QString& groupingName,const MsgCardInfo &info);
 signals:
+    void sigTriggerAddMsgCard(const MsgCardInfo &info);
 private:
     explicit ContactPage(QWidget *parent = nullptr);
     ~ContactPage() override;
@@ -43,8 +53,6 @@ protected:
     void initWindow();
     void initEdgeLayout();
     void initContent();
-
-protected slots:
 private:
     // ----------------- UI -----------------
     QWidget       * _centralWidget         = nullptr;
@@ -55,11 +63,16 @@ private:
     ElaPivot      * _friendOrGroupPivot    = nullptr;
     ElaTreeView   * _friendTree            = nullptr;
     ElaTreeView   * _groupTree             = nullptr;
+    ContactModel  * _friendModel           = nullptr;
+    ContactModel  * _groupModel            = nullptr;
 
     QVBoxLayout   * _scrollTreeLayout      = nullptr;
     // ----------------- UI -----------------
 
     // --------------- BackEnd --------------
+    QMap<QString,QMap<QString,QList<MsgCardInfo>>>  _groupingInfos;
+    // assist find MsgCardInfo
+    QHash<QString, MsgCardInfo>                     _ssidToCardInfoHash;
     // --------------- BackEnd --------------
 
     static ContactPage* _contactPage;

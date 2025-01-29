@@ -43,6 +43,7 @@ class SS_API ArchPage : public ElaWindow{
 public:
     static ArchPage * getInstance();
     static void destroyInstance();
+    void setInstanceParent(QObject * parent);
 private:
     explicit ArchPage(QWidget * parent = nullptr);
     ~ArchPage() override;

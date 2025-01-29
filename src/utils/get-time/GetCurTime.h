@@ -13,7 +13,7 @@ public:
     static GetCurTime * getTimeObj();
 
     // 返回格式 'xxxx-xx-xx xx:xx:xx' 当前时间
-    std::string getCurTime(std::string format = "%Y-%m-%d %H:%M:%S");
+    std::string getCurTime(const std::string& format = "%Y-%m-%d %H:%M:%S");
 
     // 返回当前时间的时间戳
     std::time_t getCurTimeStamp();
@@ -22,7 +22,10 @@ public:
     std::time_t transformStrToTimeStamp(const std::string& time);
 
     // 根据时间戳转为格式 'xxxx-xx-xx xx:xx:xx'
-    std::string transformTimeStampToStr(std::time_t timestamp);
+    std::string transformTimeStampToStr(std::time_t timestamp,const std::string& format = "%Y-%m-%d %H:%M:%S");
+
+    // 消息时间间隔 昨天、星期、年月日等
+    std::string getMsgTypeTime(std::time_t timestamp);
 
     // 销毁对象
     void destroyTimeObj();

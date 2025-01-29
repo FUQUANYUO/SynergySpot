@@ -61,6 +61,14 @@ LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/out)
 FILE(
         GLOB_RECURSE                 SRC_CPP                    ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
 )
+
+# utils src code
+SET(
+        SRC_CPP                      ${SRC_CPP}
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/log/Log.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/get-time/GetCurTime.cpp
+)
+
 # wheel of view-delegate
 SET(
         SRC_CPP                      ${SRC_CPP}                 ../effect-component/view-delegate/QPersistentStyledItemDelegate.cpp

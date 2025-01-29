@@ -28,7 +28,8 @@ void EmailVerify::destroyInstance(){
     if(_instance != nullptr) {
         m.lock();
         if(_instance != nullptr) {
-            delete _instance;
+            _instance->deleteLater();
+            _instance = nullptr;
         }
         m.unlock();
     }

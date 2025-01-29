@@ -9,6 +9,8 @@
 #include <QImage>
 #include <opencv2/opencv.hpp>
 
+#include "help.h"
+
 class CVProVideoStrategy : public BackgroundStrategyPlugin{
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org.synergy-spot.SS_PluginInterface")

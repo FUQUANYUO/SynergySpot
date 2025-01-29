@@ -13,7 +13,7 @@ GetCurTime *GetCurTime::getTimeObj() {
     return instance;
 }
 
-std::string GetCurTime::getCurTime(std::string format) {
+std::string GetCurTime::getCurTime(const std::string& format) {
     // 获取当前时间
     std::time_t now = std::time(nullptr);
     // tm 结构体
@@ -38,7 +38,7 @@ void GetCurTime::destroyTimeObj() {
     instance = nullptr;
 }
 
-std::string GetCurTime::transformTimeStampToStr(std::time_t timestamp) {
+std::string GetCurTime::transformTimeStampToStr(std::time_t timestamp,const std::string &format) {
     std::tm local_time{};
     // 转换为tm结构体
 #ifdef WIN32
@@ -51,8 +51,27 @@ std::string GetCurTime::transformTimeStampToStr(std::time_t timestamp) {
 
     // 使用sprintf来格式化时间
     // %Y 表示四位数的年份，%m 表示月份，%d 表示日，%H 表示小时（24小时制），%M 表示分钟
-    std::strftime(buffer.data(), buffer.size(), "%Y-%m-%d %H:%M:%S",&local_time);
+    std::strftime(buffer.data(), buffer.size(), format.c_str() ,&local_time);
     return buffer.data();
+}
+
+std::string GetCurTime::getMsgTypeTime(std::time_t timestamp) {
+    std::time_t curTime = getCurTimeStamp();
+    std::time_t deltaDays = (curTime - timestamp) / 86400 * 1000;
+    std::string res = "";
+    if (deltaDays == 0) {
+        // 今天的时间，返回 24 小时制时间（例如 "16:34"）
+        return transformTimeStampToStr(timestamp,"%H:%M");
+    } else if (deltaDays == 1) {
+        // 昨天的时间，返回 "昨天"
+        return "昨天";
+    } else if (deltaDays > 1 && deltaDays <= 7) {
+        // 一周内的时间，返回星期几（例如 "星期一"）
+        return transformTimeStampToStr(timestamp,"%A");
+    } else {
+        // 其他情况，返回年/月/日（例如 "2023/10/05"）
+        return transformTimeStampToStr(timestamp,"%Y/%m/%d");
+    }
 }
 
 std::time_t GetCurTime::transformStrToTimeStamp(const std::string& time) {

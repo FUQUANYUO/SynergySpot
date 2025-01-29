@@ -3,7 +3,8 @@
 //
 #include "MainLogic.h"
 
-#include "core/base/client-request-handler/ClientRequestHandler.h"
+#include "base/client-request-handler/ClientRequestHandler.h"
+#include "common-data/CommonData.h"
 
 #include "land-page/LandPage.h"
 #include "land-page/sign-up-page/SignUpPage.h"
@@ -22,27 +23,17 @@
 //------------   begin core   ------------//
 #include "safety/email-check/EmailVerify.h"
 
-#include <yaml-cpp/node/node.h>
-#include <yaml-cpp/node/parse.h>
+#include "yaml-cpp/yaml.h"
 //------------   end core     ------------//
 
 #include <QProcess>
-
-
-// client info yaml file path
-#ifdef WIN32
-std::string yamlPath = "../../conf/clientInfo.yaml";
-#else
-std::string yamlPath = "../conf/clientInfo.yaml";
-#endif
-
-std::string CurSSID;
-std::string CurSSname;
-std::iostream * logFile;
-
-QWidget * curWindow = nullptr;
+#include <QTimer>
+#include <contact-page/ContactPage.h>
+#include <message-page/MessagePage.h>
 
 MainLogic::MainLogic() {
+    std::string yamlPath = g_pCommonData->getYamlPath();
+
     YAML::Node config = YAML::LoadFile(yamlPath);
     std::string logName = config["log"]["logName"].as<std::string>();
 
@@ -52,7 +43,22 @@ MainLogic::MainLogic() {
 }
 
 MainLogic::~MainLogic() {
+    g_pCommonData->destroyInstance();
+    g_pEmailVerify->destroyInstance();
+    g_pPluginManager->destroyInstance();
+    g_pClientRequestHandler->destroyInstance();
+    g_pSignUpPage->destroyInstance();
     LOG_INFO("--------------------------- SynergySpot.exe Ending ----------------------------")
+    if (_pGRPCProcess && _pGRPCProcess->state() == QProcess::Running) {
+        _pGRPCProcess->terminate();
+        if (!_pGRPCProcess->waitForFinished(5000)) {
+            _pGRPCProcess->kill();
+        }
+        if (!_pGRPCProcess->waitForFinished(1000)) {
+             LOG_ERROR("!!! 无法终止进程，进程仍在运行  !!!");
+        }
+    }
+    delete _pGRPCProcess;
 }
 
 int MainLogic::startMainLogic(QApplication * app) {
@@ -85,19 +91,21 @@ int MainLogic::startMainLogic(QApplication * app) {
                 execPath + "/assets/bk_src.mp4"
         );
         g_pLandPage->show();
-        curWindow = g_pLandPage;
+        _curWindow = g_pLandPage;
 
         connect(g_pClientRequestHandler,&ClientRequestHandler::sigConnServerFailed,this,[=]() {
-            ElaMessageBar::error(ElaMessageBarType::Top,"错误","无法连接到远程服务器!",6000, curWindow);
+            ElaMessageBar::error(ElaMessageBarType::Top,"错误","无法连接到远程服务器!",6000, _curWindow);
         });
         connect(g_pClientRequestHandler,&ClientRequestHandler::sigStartGRPCService,this,[=]() {
             QString processName = "SynergySpot-GRPC-Client.exe";
             _pGRPCProcess = new QProcess(app);
-            _pGRPCProcess->start(processName,{QString::fromStdString(CurSSID.empty()?"-1":CurSSID)});
+            _pGRPCProcess->start(processName,{QString::fromStdString(g_pCommonData->getCurUserInfo().CurSSID),
+                                                          QString::fromStdString(g_pCommonData->getCurUserInfo().CurSSname),
+                                                          QString::fromStdString(g_pCommonData->getCurUserInfo().CurUserAvatarPath)});
             connect(_pGRPCProcess,&QProcess::finished,this,[=](int exitCode, QProcess::ExitStatus exitStatus) {
                 if(exitStatus == QProcess::NormalExit) {
                     if (exitCode != 0) {
-                        ElaMessageBar::error(ElaMessageBarType::Top,"错误","GRPC 服务端连接出现错误！!",12000, curWindow);
+                        ElaMessageBar::error(ElaMessageBarType::Top,"错误","GRPC 服务端连接出现错误！!",12000, _curWindow);
                     }
                 }
             });
@@ -107,14 +115,32 @@ int MainLogic::startMainLogic(QApplication * app) {
         // trigger verify account request
         connect(g_pLandPage,&LandPage::sigSignInRequest,this,[=](const QString& SSID,const QString& password){
             // TODO: ignored request handler
-            g_pLandPage->close();
-            g_pLandPage->destroyLandPage();
 
             // go to arch page
             g_pArchPage->show();
-            curWindow = g_pArchPage;
+            _curWindow = g_pArchPage;
+
+            // init user data dir
+            g_pCommonData->setCurUserInfo({"100001","小柴",":/message-page/rc-page/img/default-avatar-1.jpg"});
+            g_pCommonData->initCurUserInfoDir();
+
+            // TODO: test simulate back end data for contact plugin
+            g_pContactPage->addFriendGrouping("我的好友");
+            g_pContactPage->addContactInfo("我的好友",{"小柴","100002",
+            "小柴","",QString::fromStdString(g_pCommonData->getDataPath(avatar) + "/1.jpg"),0,false});
+            g_pContactPage->addContactInfo("我的好友",{"五花","100003",
+                 "五花","",QString::fromStdString(g_pCommonData->getDataPath(avatar) + "/2.jpg"),0,false});
+            g_pContactPage->addContactInfo("我的好友",{"大黄","100004",
+                        "大黄","",QString::fromStdString(g_pCommonData->getDataPath(avatar) + "/3.jpg"),0,false});
+            g_pContactPage->addContactInfo("我加入的群聊",{"世界首富会议室","G100001",
+                        "世界首富会议室","",QString::fromStdString(g_pCommonData->getDataPath(avatar) + "/4.jpg"),0,true});
+
+            QTimer::singleShot(0, this, [=]() {
+                g_pLandPage->close();
+                g_pLandPage->destroyInstance();
+            });
         });
-        connect(g_pLandPage, &LandPage::sigCurrentWidChanged,this,[=](QWidget* wid){curWindow = wid;});
+        connect(g_pLandPage, &LandPage::sigCurrentWidChanged,this,[=](QWidget* wid){_curWindow = wid;});
 
         // verify email
         connect(g_pSignUpPage,&SignUpPage::sigEmailCodeRequest,this,[=](const QString & emailAddr) {
@@ -131,6 +157,9 @@ int MainLogic::startMainLogic(QApplication * app) {
         connect(g_pClientRequestHandler, &ClientRequestHandler::sigEnrollAccountResponse, this, [=](const std::string &dto) {
 
         });
+
+        // contact trigger msg add tmp card info
+        connect(g_pContactPage,&ContactPage::sigTriggerAddMsgCard,g_pMessagePage,&MessagePage::addMsgCard);
     }
     return QApplication::exec();
 }

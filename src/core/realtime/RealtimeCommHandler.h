@@ -9,6 +9,8 @@
 #include <grpcpp/grpcpp.h>
 #include <QCoreApplication>
 
+#include "CommonData.h"
+
 namespace RealtimeComm {
     class RealtimeCommHandler : public QObject {
         Q_OBJECT
