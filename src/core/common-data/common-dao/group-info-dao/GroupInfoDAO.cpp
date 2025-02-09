@@ -9,11 +9,12 @@ GroupInfoDAO::GroupInfoDAO(LiteConn &db) : _db(db){}
 GroupInfoDAO::~GroupInfoDAO() {}
 
 qint64 GroupInfoDAO::createGroup(const GroupBaseInfoDO &group) {
-    std::string sql = "INSERT INTO group_base_info (ssidGroup, name, createSSID, profile, createTime) "
-                  "VALUES (?, ?, ?, ?, ?);";
+    std::string sql = "INSERT INTO group_base_info (ssid_group, name, avatar, create_ssid, profile, create_time) "
+                  "VALUES (?, ?, ?, ?, ?, ?);";
     std::vector<std::string> params = {
         group.ssidGroup.toStdString(),
         group.name.toStdString(),
+        group.avatar.toStdString(),
         group.createSSID.toStdString(),
         group.profile.toStdString(),
         group.createTime.toString("yyyy-MM-dd HH:mm:ss").toStdString()
@@ -31,7 +32,7 @@ qint64 GroupInfoDAO::createGroup(const GroupBaseInfoDO &group) {
 }
 
 bool GroupInfoDAO::updateProfile(const QString &groupSsid, const QString &newProfile) {
-    std::string sql = "UPDATE group_base_info SET profile = ? WHERE ssidGroup = ?;";
+    std::string sql = "UPDATE group_base_info SET profile = ? WHERE ssid_group = ?;";
     std::vector<std::string> params = {
         newProfile.toStdString(),
         groupSsid.toStdString()
@@ -41,8 +42,8 @@ bool GroupInfoDAO::updateProfile(const QString &groupSsid, const QString &newPro
 }
 
 GroupBaseInfoDO GroupInfoDAO::findBySsid(const QString &groupSsid) {
-    std::string sql = "SELECT id, ssidGroup, name, createSSID, profile, createTime "
-                      "FROM group_base_info WHERE ssidGroup = ?;";
+    std::string sql = "SELECT id, ssid_group, name, avatar, create_ssid, profile, create_time "
+                      "FROM group_base_info WHERE ssid_group = ?;";
     std::vector<std::string> params = { groupSsid.toStdString() };
 
     auto result = _db.query(sql, params);
@@ -51,10 +52,45 @@ GroupBaseInfoDO GroupInfoDAO::findBySsid(const QString &groupSsid) {
         group.id = std::stoll(result[0][0]);
         group.ssidGroup = QString::fromStdString(result[0][1]);
         group.name = QString::fromStdString(result[0][2]);
-        group.createSSID = QString::fromStdString(result[0][3]);
-        group.profile = QString::fromStdString(result[0][4]);
-        group.createTime = QDateTime::fromString(QString::fromStdString(result[0][5]), "yyyy-MM-dd HH:mm:ss");
+        group.avatar = QString::fromStdString(result[0][3]);
+        group.createSSID = QString::fromStdString(result[0][4]);
+        group.profile = QString::fromStdString(result[0][5]);
+        group.createTime = QDateTime::fromString(QString::fromStdString(result[0][6]), "yyyy-MM-dd HH:mm:ss");
         return group;
     }
     return GroupBaseInfoDO();
+}
+
+QList<GroupBaseInfoDO> GroupInfoDAO::getAllGroupInfos(int pageSize, int pageNum) {
+    std::string sql = "SELECT id, ssid_group, name, avatar, create_ssid, profile, create_time "
+                      "FROM group_base_info LIMIT ? OFFSET ?;";
+    std::vector<std::string> params = { std::to_string(pageSize), std::to_string(pageNum)};
+
+    auto result = _db.query(sql, params);
+    QList<GroupBaseInfoDO> infos;
+    for (const auto &row : result) {
+        GroupBaseInfoDO group;
+        group.id = std::stoll(result[0][0]);
+        group.ssidGroup = QString::fromStdString(result[0][1]);
+        group.name = QString::fromStdString(result[0][2]);
+        group.avatar = QString::fromStdString(result[0][3]);
+        group.createSSID = QString::fromStdString(result[0][4]);
+        group.profile = QString::fromStdString(result[0][5]);
+        group.createTime = QDateTime::fromString(QString::fromStdString(result[0][6]), "yyyy-MM-dd HH:mm:ss");
+        infos.append(group);
+    }
+    return infos;
+}
+
+int GroupInfoDAO::getGroupInfoDataCount() {
+    std::string sql = "SELECT COUNT(*) FROM group_base_info";
+    std::vector<std::string> params = { };
+
+    auto result = _db.query(sql, params);
+
+    if (!result.empty() && !result[0].empty()) {
+        return std::stoi(result[0][0]);
+    }else {
+        return 0;
+    }
 }

@@ -9,16 +9,26 @@ using namespace std::chrono;
 class MysqlConn
 {
 public:
+    struct Param {
+        enum Type { INT, DOUBLE, STRING, BLOB };
+        Type type;
+        union {
+            long long int_val;
+            double double_val;
+        };
+        std::string str_val;
+    };
+
     // 初始化数据库连接
     MysqlConn();
     // 释放数据库连接
     ~MysqlConn();
     // 连接数据库
     bool connect(std::string ip, std::string user, std::string passwd, std::string dbName, unsigned short port = 3306);
-    // 更新数据库: insert, update, delete
-    bool update(const std::string sql);
-    // 查询数据库
-    MYSQL_RES * query(const std::string sql);
+    // 更新操作（支持参数化）
+    bool update(const std::string& sql, const std::vector<Param>& params = {});
+    // 查询操作（支持参数化）
+    MYSQL_RES* query(const std::string& sql, const std::vector<Param>& params = {});
     // 事务操作
     bool transaction();
     // 提交事务
@@ -29,6 +39,10 @@ public:
     void refreshAliveTime();
     // 计算连接存活的总时长
     long long getAliveTime();
+    // 返回最后一次插入的 ID
+    uint64_t getLastInsertId() const;
+private:
+    bool _bind_params(MYSQL_STMT* stmt, const std::vector<Param>& params);
 private:
     MYSQL* m_conn = nullptr;
     steady_clock::time_point m_alivetime;

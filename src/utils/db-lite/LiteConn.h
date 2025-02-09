@@ -12,6 +12,11 @@ class LiteConn {
 public:
     LiteConn() = default;
     LiteConn(const char * dbName, std::string accessKey = "");
+
+    bool beginTransaction();
+    bool commit();
+    bool rollback();
+
     bool update(const std::string& sql, const std::vector<std::string>& params);
     std::vector<std::vector<std::string>> query(const std::string& sql, const std::vector<std::string>& params = {});
     ~LiteConn();

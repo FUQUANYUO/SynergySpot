@@ -16,6 +16,7 @@ public:
     bool updateStatus(qint64 id, qint32 newStatus) override;
     FriendshipDO findRelationship(const QString& ssid, const QString& friendSsid) override;
     QList<FriendshipDO> listByUser(const QString& ssid) override;
+    int getFriendshipCount(const QString& ssid);
 private:
     LiteConn& _db;
 };

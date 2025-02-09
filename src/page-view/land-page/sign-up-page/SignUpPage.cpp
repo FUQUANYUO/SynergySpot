@@ -21,9 +21,11 @@
 #include <QLabel>
 #include <QPainter>
 #include <QLineEdit>
+#include <QPainterPath>
 #include <QPushButton>
 #include <QTextBrowser>
 #include <QTimer>
+#include <QRandomGenerator>
 #include <QVBoxLayout>
 
 #include <mutex>
@@ -70,7 +72,7 @@ void SignUpPage::initWindow() {
     _inputEmailCode       =  new QLineEdit(this);
     _sendEmailCodeButton  =  new QPushButton(_inputEmailCode);
     _inputVerifyCode      =  new QLineEdit(this);
-    _verifyCode           =  new QLabel(this);
+    _verifyCode           =  new QPushButton(this);
     _protocolText         =  new QTextBrowser(this);
     _acceptButton         =  new ElaRadioButton(this);
     _signUpButton         =  new QPushButton(this);
@@ -97,8 +99,8 @@ void SignUpPage::initEdgeLayout() {
     _inputLayout->addWidget(_inputEmail);
     _verifyCodeLayout->addWidget(_inputVerifyCode);
     _verifyCodeLayout->addWidget(_verifyCode);
-    _inputLayout->addItem(_verifyCodeLayout);
     _inputLayout->addWidget(_inputEmailCode);
+    _inputLayout->addItem(_verifyCodeLayout);
     _protocolLayout->addWidget(_acceptButton);
     _protocolLayout->addWidget(_protocolText);
     _inputLayout->addItem(_protocolLayout);
@@ -185,6 +187,11 @@ void SignUpPage::initContent() {
     )");
     _protocolText->setFixedSize(235, 27);
     _protocolText->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    _verifyCode->setStyleSheet(R"(
+        QPushButton {
+            border-radius: 10px;
+        }
+    )");
 
     QString inputLineStyle = R"(
         QLineEdit {
@@ -208,9 +215,9 @@ void SignUpPage::initContent() {
     _inputEmail->setStyleSheet(inputLineStyle);
     _inputEmailCode->setFixedSize(width,height);
     _inputEmailCode->setStyleSheet(inputLineStyle);
-    _inputVerifyCode->setFixedSize(width - 60,height);
+    _inputVerifyCode->setFixedSize(width - 100,height);
     _inputVerifyCode->setStyleSheet(inputLineStyle);
-    _verifyCode->setFixedSize(50,height);
+    _verifyCode->setFixedSize(90,height);
 
     _signUpButton->setText("注册账号");
     _signUpButton->setStyleSheet("border: none;background: rgb(0,102,204);color: rgb(255,255,255);border-radius: 10px;");
@@ -236,6 +243,9 @@ void SignUpPage::initContent() {
     _loadBar->setMinimumWidth(this->width());
     _loadBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     _loadBar->hide();
+
+    generateNumberVerifyCode();
+
     setAcrylicForBKMaterial(true);
 }
 
@@ -257,46 +267,63 @@ void SignUpPage::initConnectFunc() {
 
     // get response of sign up request
     connect(this, &SignUpPage::sigSignUpResponse, this, [=](const SignUpDataStruct & data) {
+        _loadBar->hide();
+    });
 
-
+    // refresh code
+    connect(_verifyCode,&QPushButton::clicked,this, [=]() {
+        generateNumberVerifyCode();
     });
 
     // send email verify code
     connect(_sendEmailCodeButton, &QPushButton::clicked, this, [=]() {
         // check format of email
         do {
-            QRegularExpression emailRegex(R"(^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$)");
+            std::regex emailRegex("^[a-z0-9A-Z]+[- | a-z0-9A-Z . _]+@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-z]{2,}$");
 
             if (!_inputEmail->text().isEmpty()) {
                 // check email address format right
-                if (!_inputName->text().contains(emailRegex)) {
-                    ElaMessageBar::error(ElaMessageBarType::BottomLeft,"错误", "邮箱格式不正确，请再次输入！",_displayTime, nullptr);
+                if (!std::regex_match(_inputEmail->text().toStdString(),emailRegex)) {
+                    ElaMessageBar::error(ElaMessageBarType::BottomLeft,"错误", "邮箱格式不正确，请再次输入！",_displayTime, this);
                     break;
                 }
             }
             else {
-                ElaMessageBar::error(ElaMessageBarType::BottomRight,"错误", "请输入邮箱！",_displayTime, nullptr);
+                ElaMessageBar::error(ElaMessageBarType::BottomRight,"错误", "请输入邮箱！",_displayTime, this);
                 break;
             }
-        }while (false);
 
-        // disable 60s
-        _sendEmailCodeButton->setEnabled(false);
-
-        QTimer *t = new QTimer(this);
-        connect(t, &QTimer::timeout, this, [&]() {
-            if (_disableTime <= 0) {
-                _sendEmailCodeButton->setEnabled(true);
-                _sendEmailCodeButton->setText(tr("发送"));
+            // verify code check
+            if (!_inputVerifyCode->text().isEmpty()) {
+                // check verifyCode right
+                if (_inputVerifyCode->text().toLower() != _numberVerifyCode.toLower()) {
+                    ElaMessageBar::error(ElaMessageBarType::BottomRight,"错误", "输入的图片验证码有误!(点击图片可刷新验证码)",_displayTime, this);
+                    generateNumberVerifyCode();
+                    break;
+                }
             }else {
-                _disableTime--;
-                _sendEmailCodeButton->setText(QString::number(_disableTime));
+                ElaMessageBar::error(ElaMessageBarType::BottomRight,"错误", "请输入图片验证码！",_displayTime, this);
+                break;
             }
-        });
-        t->start(1000);
 
-        emit sigEmailCodeRequest(_inputEmail->text());
-        _loadBar->show();
+            // disable 60s
+            _sendEmailCodeButton->setEnabled(false);
+
+            QTimer *t = new QTimer(this);
+            connect(t, &QTimer::timeout, this, [&]() {
+                if (_disableTime <= 0) {
+                    _sendEmailCodeButton->setEnabled(true);
+                    _sendEmailCodeButton->setText(tr("发送"));
+                }else {
+                    _disableTime--;
+                    _sendEmailCodeButton->setText(QString::number(_disableTime));
+                }
+            });
+            t->start(1000);
+
+            emit sigEmailCodeRequest(_inputEmail->text());
+            _loadBar->show();
+        }while (false);
     });
 
     // get response of email code request
@@ -327,6 +354,123 @@ SignUpPage::~SignUpPage() {
 
 void SignUpPage::setAcrylicForBKMaterial(bool enable) {
     _enableAcrylic = enable;
+}
+
+bool SignUpPage::generateNumberVerifyCode() {
+    // 生成5位随机验证码
+    const QString chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    QString result;
+    const int captchaLength = 5;
+    for (int i = 0; i < captchaLength; ++i) {
+        int index = QRandomGenerator::global()->bounded(chars.size());
+        result.append(chars[index]);
+    }
+
+    int width = _verifyCode->width();
+    int height = _verifyCode->height();
+    QImage captchaImage(width, height, QImage::Format_RGB32);
+    captchaImage.fill(Qt::white);
+
+    QPainter painter(&captchaImage);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+
+    // 动态计算字符间距
+    const int charSpacing = width / (result.size() + 1);
+    const int baseFontSize = 12;
+
+    // 绘制验证码文字
+    for (int i = 0; i < result.size(); ++i) {
+        QFont font(
+            "微软雅黑",
+            baseFontSize + QRandomGenerator::global()->bounded(0, 5)
+        );
+        font.setBold(QRandomGenerator::global()->bounded(2));
+        font.setItalic(QRandomGenerator::global()->bounded(2));
+
+        // 字符变形参数
+        int rotationAngle = QRandomGenerator::global()->bounded(-15, 15); // 扩大旋转范围
+        int xRandomShift = QRandomGenerator::global()->bounded(0, 5);  // 扩大水平偏移
+        int yRandomShift = QRandomGenerator::global()->bounded(-5, 5);    // 增加垂直偏移范围
+
+        // 创建临时字符图片
+        QImage charImage(60, 60, QImage::Format_ARGB32_Premultiplied);
+        charImage.fill(Qt::transparent);
+
+        // 绘制原始字符
+        QPainter charPainter(&charImage);
+        charPainter.setPen(Qt::black);
+        charPainter.setFont(font);
+        charPainter.drawText(charImage.rect(), Qt::AlignCenter, QString(1, result[i]));
+        charPainter.end();
+
+        // 添加字符扭曲效果
+        QTransform transform;
+        transform.translate(30, 30);
+        transform.rotate(rotationAngle);
+        transform.shear(
+            QRandomGenerator::global()->generateDouble() * 0.6 - 0.3,
+            QRandomGenerator::global()->generateDouble() * 0.6 - 0.3
+        );
+        transform.translate(-30, -30);
+        QImage transformedChar = charImage.transformed(transform, Qt::SmoothTransformation);
+
+        // 计算绘制位置（动态间距）
+        int x = charSpacing * (i+1) - transformedChar.width()/2 + xRandomShift;
+        int y = (height - transformedChar.height())/2 + yRandomShift;
+
+        // 添加颜色变化
+        QColor textColor(
+            QRandomGenerator::global()->bounded(150),
+            QRandomGenerator::global()->bounded(150),
+            QRandomGenerator::global()->bounded(150)
+        );
+
+        // 绘制处理后的字符
+        painter.drawImage(x, y, transformedChar);
+    }
+
+    // 绘制密集噪声点（带透明度）
+    for (int i = 0; i < 600; ++i) {
+        painter.setPen(QColor(QRandomGenerator::global()->bounded(256),
+                            QRandomGenerator::global()->bounded(256),
+                            QRandomGenerator::global()->bounded(256),
+                            QRandomGenerator::global()->bounded(50, 200))); // 半透明点
+        painter.drawPoint(QRandomGenerator::global()->bounded(width),
+                         QRandomGenerator::global()->bounded(height));
+    }
+
+    // 添加图像扭曲效果
+    QImage warpedImage = captchaImage;
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            int offsetX = 5 * qSin(2 * 3.1415 * y / 60.0); // 波浪形扭曲
+            int offsetY = 3 * qCos(2 * 3.1415 * x / 30.0);
+            if (x + offsetX < width && x + offsetX >= 0 &&
+                y + offsetY < height && y + offsetY >= 0) {
+                captchaImage.setPixelColor(x, y, warpedImage.pixelColor(x + offsetX, y + offsetY));
+            }
+        }
+    }
+
+    QPixmap pixmap = QPixmap::fromImage(captchaImage);
+    QPixmap roundedPixmap(pixmap.size());
+    roundedPixmap.fill(Qt::transparent);
+
+    QPainterPath path;
+    path.addRoundedRect(QRect(0, 0, pixmap.width(), pixmap.height()), 10, 10);
+
+    QPainter painterCircle(&roundedPixmap);
+    painterCircle.setRenderHint(QPainter::Antialiasing, true);
+    painterCircle.setClipPath(path);
+    painterCircle.drawPixmap(0, 0, pixmap);
+
+    _verifyCode->setIcon(roundedPixmap.scaled(width, height, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+    _verifyCode->setIconSize(QSize(width, height));
+    // 保存生成的验证码
+    _numberVerifyCode = result;
+
+    return true;
 }
 
 void SignUpPage::paintEvent(QPaintEvent *event) {
@@ -363,6 +507,7 @@ void SignUpPage::sltCheckInfo(){
     std::regex inputRegex("^[a-zA-Z0-9_]+$");
     std::regex emailRegex("^[a-z0-9A-Z]+[- | a-z0-9A-Z . _]+@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-z]{2,}$");
     do {
+        // name check
         if (!_inputName->text().isEmpty()) {
             // defence sql inject
             if (!std::regex_match(_inputName->text().toStdString(),inputRegex) && _inputName->text().length() > 20) {
@@ -374,6 +519,7 @@ void SignUpPage::sltCheckInfo(){
             break;
         }
 
+        // pd check
         if (!_inputPassword->text().isEmpty()) {
             if (!std::regex_match(_inputPassword->text().toStdString(),inputRegex)&& _inputPassword->text().length() > 30) {
                 ElaMessageBar::error(ElaMessageBarType::BottomLeft,"错误", "密码非法输入，请检查后再次输入！",_displayTime, this);
@@ -384,6 +530,7 @@ void SignUpPage::sltCheckInfo(){
             break;
         }
 
+        // repeat pd check
         if (!_inputRepeatPassword->text().isEmpty()) {
             if (_inputRepeatPassword->text() != _inputPassword->text()) {
                 ElaMessageBar::error(ElaMessageBarType::BottomLeft,"错误", "与前一次输入的密码不同，请再次输入！",_displayTime, this);
@@ -394,6 +541,7 @@ void SignUpPage::sltCheckInfo(){
             break;
         }
 
+        // email format check
         if (!_inputEmail->text().isEmpty()) {
             // check email address format right
             if (!std::regex_match(_inputEmail->text().toStdString(),emailRegex)) {
@@ -403,14 +551,6 @@ void SignUpPage::sltCheckInfo(){
         }else {
             ElaMessageBar::error(ElaMessageBarType::BottomRight,"错误", "请输入邮箱！",_displayTime, this);
             break;
-        }
-
-        if (!_inputVerifyCode->text().isEmpty()) {
-            // check verifyCode right
-
-        }else {
-            ElaMessageBar::error(ElaMessageBarType::BottomRight,"错误", "请输入图片验证码！",_displayTime, this);
-            // break;
         }
 
         // only check empty and the valid check in MainLogic.cpp
@@ -451,5 +591,6 @@ void SignUpPage::sltCheckInfo(){
         std::string password = _inputPassword->text().toStdString();
 
         emit sigSignUpRequest({name,email,password, ""});
+        _loadBar->show();
     }while (false);
 }

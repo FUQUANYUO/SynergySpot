@@ -15,6 +15,9 @@ public:
     qint64 createGroup(const GroupBaseInfoDO& group) override;
     bool updateProfile(const QString& groupSsid, const QString& newProfile) override;
     GroupBaseInfoDO findBySsid(const QString& groupSsid) override;
+    QList<GroupBaseInfoDO> getAllGroupInfos(int pageSize = 20, int pageNum = 1) override;
+
+    int getGroupInfoDataCount();
 private:
     LiteConn& _db;
 };

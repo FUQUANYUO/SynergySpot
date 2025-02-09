@@ -5,8 +5,7 @@
 #include "EmailVerify.h"
 #include "help.h"
 
-// protobuf 登录业务
-#include "email/EmailVerifyCode.pb.h"
+#include "DTO.pb.h"
 
 #include "base/client-request-handler/ClientRequestHandler.h"
 
@@ -44,8 +43,7 @@ void EmailVerify::sendEmailVerifyCode(const std::string& emailAddress,const std:
     startTime = queryTime;
 
     std::string outEdto;
-    SSDTO::EmailVerifyCode_DTO evdto;
-    evdto.set_type(SSDTO::Business_Type::GET_EMAILCODE);
+    SSDTO::EmailVerifyDTO evdto;
     evdto.set_is_request(true);
     evdto.set_email_address(emailAddress);
     evdto.set_start_time(startTime);
@@ -53,12 +51,12 @@ void EmailVerify::sendEmailVerifyCode(const std::string& emailAddress,const std:
     evdto.set_verify_code("");
     evdto.SerializeToString(&outEdto);
 
-    g_pClientRequestHandler->addRequest(SSDTO::Business_Type::GET_EMAILCODE,outEdto);
+    g_pClientRequestHandler->addRequest(SSDTO::BusinessType::EMAIL_VERIFY,outEdto);
 }
 
 std::string EmailVerify::parseEmailVerifyCode(const std::string& rawdto) {
     validTime.clear();
-    SSDTO::EmailVerifyCode_DTO evdto;
+    SSDTO::EmailVerifyDTO evdto;
     evdto.ParseFromString(rawdto);
 
     LOG(evdto.start_time())

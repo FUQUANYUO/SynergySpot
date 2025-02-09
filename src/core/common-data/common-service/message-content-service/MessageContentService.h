@@ -7,17 +7,17 @@
 
 #include "../../common-dto/CommonDatabaseDTO.h"
 #include "../../common-dao/message-content-dao/MessageContentDAO.h"
-#include "../../common-dao/message-recipient-dao/MessageRecipientDAO.h"
 
 class MessageContentService {
+public:
     explicit MessageContentService(LiteConn& db);
 
-    QList<MessageContentDTO> getAllMessages(const QString& ssid);
-    bool storeMessage(QList<MessageContentDTO> &dto);
+    QList<MessageContentDTO> getAllMessages(const QString& ssid, int pageSize = 20, int pageNum = 1);
+    bool storeMessage(const QList<MessageContentDTO> &dto);
 
+    int getMessageCount(const QString& ssid);
 private:
     MessageContentDAO messageContentDAO;
-    MessageRecipientDAO messageRecipientDAO;
 };
 
 

@@ -26,7 +26,7 @@ public:
     static ClientRequestHandler* getInstance();
     static void destroyInstance();
 
-    void addRequest(SSDTO::Business_Type type,std::string rawData);
+    void addRequest(SSDTO::BusinessType type,std::string rawData);
 signals:
     // 请求验证码
     void sigEmailCodeRequest(const std::string& dto);
@@ -73,7 +73,7 @@ namespace BusinessLayer {
         explicit BusinessProcessor(QObject* parent = nullptr);
         ~BusinessProcessor();
 
-        inline QMap<SSDTO::Business_Type , std::function<void(const std::string&)>> * getMappingFunction(const QString& type)
+        inline QMap<SSDTO::BusinessType , std::function<void(const std::string&)>> * getMappingFunction(const QString& type)
         {
             if (type == "request")
                 return &_requestHandlerMap;
@@ -98,12 +98,12 @@ namespace BusinessLayer {
         void sigConnServerFailed();
         void sigStartGRPCService();
     private:
-        void handleResponse(SSDTO::Business_Type type,const std::string& dto);
+        void handleResponse(SSDTO::BusinessType type,const std::string& dto);
 
         ClientConServer* _ccon;
         ThreadPool _pool{10};
-        QMap<SSDTO::Business_Type , std::function<void(const std::string&)>> _requestHandlerMap;
-        QMap<SSDTO::Business_Type , std::function<void(const std::string&)>> _responseHandlerMap;
+        QMap<SSDTO::BusinessType , std::function<void(const std::string&)>> _requestHandlerMap;
+        QMap<SSDTO::BusinessType , std::function<void(const std::string&)>> _responseHandlerMap;
     };
 }
 

@@ -41,6 +41,7 @@ file(GLOB_RECURSE   UtilsCpp        ${CMAKE_CURRENT_SOURCE_DIR}/utils/*.cpp     
 set(CoreCpp
         ${CMAKE_CURRENT_SOURCE_DIR}/core/base/client-request-handler/ClientRequestHandler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/core/safety/email-check/EmailVerify.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/core/safety/encrypt-passwd/EncryptPasswd.cpp
 )
 
 # 遍历前端Ui子项目
@@ -96,13 +97,12 @@ if(SS_CLIENT_WIN)
                         Qt::Network
                         Qt::OpenGLWidgets
                         libprotobufd
-                        libsqlite3
-                        sqlcipher
-                        libmysql
                         yaml-cppd
+                        libmysql
                         libcrypto
+                        libsqlite3
                         libssl
-
+                        sqlcipher
                         CommonDataPlugind
 
                         ElaWidgetToolsd
@@ -120,12 +120,8 @@ if(SS_CLIENT_WIN)
                         Qt::Network
                         Qt::OpenGLWidgets
                         libprotobuf
-                        libsqlite3
-                        sqlcipher
-                        libmysql
                         yaml-cpp
-                        libcrypto
-                        libssl
+                        libmysql
 
                         CommonDataPlugin
 

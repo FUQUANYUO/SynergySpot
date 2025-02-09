@@ -6,16 +6,7 @@
 #define MSGBUBBLEMODEL_H
 
 #include <QStandardItemModel>
-
-struct ChatMessage{
-    QString ssid;           // id
-    QString name;           // name
-    QString content;        // html rich text
-    QString avatarPath;     // pic path
-    bool isOwnMessage;      // distinguish between sender and receiver
-};
-
-Q_DECLARE_METATYPE(ChatMessage)
+#include "define.h"
 
 class MsgBubbleModel : public QStandardItemModel{
 public:

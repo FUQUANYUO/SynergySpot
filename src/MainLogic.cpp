@@ -17,11 +17,12 @@
 #include "ela-widget-tools/ElaMessageBar.h"
 
 //------------ begin protobuf ------------//
-#include "email/EmailVerifyCode.pb.h"
+#include "DTO.pb.h"
 //------------ end protobuf   ------------//
 
 //------------   begin core   ------------//
 #include "safety/email-check/EmailVerify.h"
+#include "safety/encrypt-passwd/EncryptPasswd.h"
 
 #include "yaml-cpp/yaml.h"
 //------------   end core     ------------//
@@ -116,25 +117,15 @@ int MainLogic::startMainLogic(QApplication * app) {
         connect(g_pLandPage,&LandPage::sigSignInRequest,this,[=](const QString& SSID,const QString& password){
             // TODO: ignored request handler
 
+            // TODO: test simulate back end data for contact plugin
+            // init user data dir
+            g_pCommonData->setCurUserInfo({"100001","小柴",":/message-page/rc-page/img/default-avatar-1.jpg"});
+            g_pMessagePage->loadCacheMsg(g_pCommonData->getMessageContentData(99,1));
+            g_pContactPage->loadCacheContact(g_pCommonData->getCurUserFriendship());
+
             // go to arch page
             g_pArchPage->show();
             _curWindow = g_pArchPage;
-
-            // init user data dir
-            g_pCommonData->setCurUserInfo({"100001","小柴",":/message-page/rc-page/img/default-avatar-1.jpg"});
-            g_pCommonData->initCurUserInfoDir();
-
-            // TODO: test simulate back end data for contact plugin
-            g_pContactPage->addFriendGrouping("我的好友");
-            g_pContactPage->addContactInfo("我的好友",{"小柴","100002",
-            "小柴","",QString::fromStdString(g_pCommonData->getDataPath(avatar) + "/1.jpg"),0,false});
-            g_pContactPage->addContactInfo("我的好友",{"五花","100003",
-                 "五花","",QString::fromStdString(g_pCommonData->getDataPath(avatar) + "/2.jpg"),0,false});
-            g_pContactPage->addContactInfo("我的好友",{"大黄","100004",
-                        "大黄","",QString::fromStdString(g_pCommonData->getDataPath(avatar) + "/3.jpg"),0,false});
-            g_pContactPage->addContactInfo("我加入的群聊",{"世界首富会议室","G100001",
-                        "世界首富会议室","",QString::fromStdString(g_pCommonData->getDataPath(avatar) + "/4.jpg"),0,true});
-
             QTimer::singleShot(0, this, [=]() {
                 g_pLandPage->close();
                 g_pLandPage->destroyInstance();
@@ -152,10 +143,22 @@ int MainLogic::startMainLogic(QApplication * app) {
 
         // sign up
         connect(g_pSignUpPage,&SignUpPage::sigSignUpRequest,this,[=](const SignUpDataStruct & data) {
+            std::string pdSalt = EncryptPasswd::generatePasswdSalt();
+            SSDTO::EnrollAccountDTO edto;
+            edto.set_ssid("-1");
+            edto.set_user_name(data.name);
+            edto.set_password(EncryptPasswd::encrypt(data.password,pdSalt));
+            edto.set_email(data.email);
+            edto.set_password_salt(pdSalt);
 
+            std::string resDTO;
+            edto.SerializeToString(&resDTO);
+            g_pClientRequestHandler->sigEnrollAccountRequest(resDTO);
         });
         connect(g_pClientRequestHandler, &ClientRequestHandler::sigEnrollAccountResponse, this, [=](const std::string &dto) {
-
+            SSDTO::EnrollAccountDTO edto;
+            edto.ParseFromString(dto);
+            LOG(edto.ssid());
         });
 
         // contact trigger msg add tmp card info

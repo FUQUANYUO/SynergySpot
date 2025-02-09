@@ -26,7 +26,7 @@ extern std::unordered_map<std::string, SockInfo *> onlineList;
 // 文件描述符 : TcpSocket
 extern std::unordered_map<int,SockInfo*> fd_sockets;
 // 离线业务处理       key: 发送人账号      v:业务包 & 业务类型
-extern std::unordered_map<std::string,std::deque<std::pair<std::string,SSDTO::Business_Type>>> businessSent;
+extern std::unordered_map<std::string,std::deque<std::pair<std::string,SSDTO::BusinessType>>> businessSent;
 
 // 读事件传入参数结构体
 struct ReadArgs{

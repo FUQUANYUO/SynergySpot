@@ -4,11 +4,25 @@
 
 #include "MessageContentService.h"
 
-MessageContentService::MessageContentService(LiteConn &db) : messageContentDAO(db) , messageRecipientDAO(db){}
+MessageContentService::MessageContentService(LiteConn &db) : messageContentDAO(db){}
 
-QList<MessageContentDTO> MessageContentService::getAllMessages(const QString &ssid) {
+QList<MessageContentDTO> MessageContentService::getAllMessages(const QString &ssid, int pageSize, int pageNum) {
     QList<MessageContentDTO> messages;
-    QList<MessageContentDO> result =
+    QList<QVariant> result = messageContentDAO.listMessagesByRecipient(ssid, pageSize,  pageNum);
+    for (auto it : result ) {
+        messages.append(it.value<MessageContentDTO>());
+    }
+    return messages;
 }
 
-bool MessageContentService::storeMessage(QList<MessageContentDTO> &dto) {}
+bool MessageContentService::storeMessage(const QList<MessageContentDTO> &dto) {
+    QList<QVariant> messages;
+    for (auto it : dto) {
+        messages.append(QVariant::fromValue(it));
+    }
+    return messageContentDAO.insertMessageTransaction(messages);
+}
+
+int MessageContentService::getMessageCount(const QString &ssid) {
+    return messageContentDAO.getMessageCount(ssid);
+}

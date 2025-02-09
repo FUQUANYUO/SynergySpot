@@ -7,6 +7,7 @@
 
 #include <QTextDocument>
 #include <QWidget.h>
+#include "common-data/common-dto/CommonDatabaseDTO.h"
 
 class ElaToolButton;
 class ElaDockWidget;
@@ -58,8 +59,9 @@ private:
 class ConversationFriendPage : public QWidget {
     Q_OBJECT
 public:
-    explicit ConversationFriendPage(QWidget * parent = nullptr);
+    explicit ConversationFriendPage(const UserBaseInfoDTO& userInfo,QWidget * parent = nullptr);
     ~ConversationFriendPage() override;
+
 public slots:
     void insertMsgBubble(const ChatMessage& msg) const;
 protected:
@@ -80,6 +82,7 @@ private:
     // ----------------- UI -----------------
 
     // --------------- BackEnd --------------
+    UserBaseInfoDTO    _userInfo;
     MsgBubbleModel   * _msgBubbleModel     =   nullptr;
     // --------------- BackEnd --------------
 };
@@ -88,8 +91,13 @@ private:
 class ConversationGroupPage : public QWidget{
     Q_OBJECT
 public:
-    explicit ConversationGroupPage(QWidget * parent = nullptr);
+    explicit ConversationGroupPage(
+        const GroupBaseInfoDTO& groupBaseInfo,
+        const QList<GroupMemberInfoDTO>& groupMemberInfo,
+        QWidget * parent = nullptr
+    );
     ~ConversationGroupPage() override;
+
 public slots:
     void insertMsgBubble(const ChatMessage& msg) const;
 protected:
@@ -111,7 +119,9 @@ private:
     // ----------------- UI -----------------
 
     // --------------- BackEnd --------------
-    MsgBubbleModel   * _msgBubbleModel     =   nullptr;
+    GroupBaseInfoDTO          _groupBaseInfo;
+    QList<GroupMemberInfoDTO> _groupMemberInfo;
+    MsgBubbleModel   *        _msgBubbleModel     =   nullptr;
     // --------------- BackEnd --------------
 };
 
@@ -124,8 +134,15 @@ enum ConversationType{
 
 class ConversationPage : public QWidget{
 public:
-    explicit ConversationPage(ConversationType type,const MsgCardInfo& info ,QWidget * parent);
+    explicit ConversationPage(ConversationType type,const MsgCombineDTO& dto ,QWidget * parent);
     ~ConversationPage();
+
+    QWidget * getConversationTypePage() {
+        if (_cfP == nullptr)
+            return _cgP;
+        else
+            return _cfP;
+    }
 private:
     ConversationFriendPage * _cfP                =   nullptr;
     ConversationGroupPage  * _cgP                =   nullptr;

@@ -20,21 +20,23 @@
 QMap<UserType,UserPage*> UserPage::_userObjMap;
 static std::mutex m;
 
-UserPage *UserPage::getInstance(UserType type,UserInfo & info,QWidget * parent) {
+UserPage *UserPage::getInstance(UserType type,UserInfo uInfo, GroupInfo gInfo, QWidget * parent) {
     if(_userObjMap.isEmpty()){
         m.lock();
         if(_userObjMap.isEmpty()){
             UserInfo i;
-            _userObjMap[UserType::Myself] = new UserPage(UserType::Myself,i,parent);
-            _userObjMap[UserType::Strangers] = new UserPage(UserType::Strangers,i,parent);
-            _userObjMap[UserType::Friends] = new UserPage(UserType::Friends,i,parent);
-
-            _userObjMap[type]->setInfo(info);
+            _userObjMap[UserType::Myself] = new UserPage(UserType::Myself,parent);
+            _userObjMap[UserType::Strangers] = new UserPage(UserType::Strangers,parent);
+            _userObjMap[UserType::Friends] = new UserPage(UserType::Friends,parent);
+            _userObjMap[UserType::Groups] = new UserPage(UserType::Groups,parent);
         }
         m.unlock();
     }
     UserPage *p = _userObjMap[type];
-    p->setInfo(info);
+    if (type != UserType::Groups)
+        p->setInfo(uInfo);
+    else
+        p->setInfo(gInfo);
     return p;
 }
 
@@ -46,12 +48,15 @@ void UserPage::destroyUserPage() {
         delete _userObjMap[UserType::Myself];
         delete _userObjMap[UserType::Strangers];
         delete _userObjMap[UserType::Friends];
+        delete _userObjMap[UserType::Groups];
         _userObjMap.clear();
         m.unlock();
     }
 }
 
-UserPage::UserPage(UserType type,UserInfo &info,QWidget *parent) : ElaWidget(parent) {
+UserPage::UserPage(UserType type,QWidget *parent) : ElaWidget(parent) {
+
+    _isGroup = (type==UserType::Groups);
 
     initWindow();
 
@@ -64,21 +69,54 @@ UserPage::UserPage(UserType type,UserInfo &info,QWidget *parent) : ElaWidget(par
     switch(type){
         case Myself:
             _editUserButton->show();
+            _likeButton->show();
+            _localInfoText->show();
+            _joinDayText->show();
+            _signContentText->show();
+
             _addFriendButton->hide();
             _callButton->hide();
+            _groupNotice->hide();
+            _groupResume->hide();
             break;
         case Strangers:
             _addFriendButton->show();
+            _likeButton->show();
+            _localInfoText->show();
+            _joinDayText->show();
+            _signContentText->show();
+
             _editUserButton->hide();
             _callButton->hide();
+            _groupNotice->hide();
+            _groupResume->hide();
             break;
         case Friends:
             _callButton->show();
+            _likeButton->show();
+            _localInfoText->show();
+            _joinDayText->show();
+            _signContentText->show();
+
             _addFriendButton->hide();
             _editUserButton->hide();
+            _groupNotice->hide();
+            _groupResume->hide();
+            break;
+        case Groups:
+            _callButton->show();
+            _groupNotice->show();
+            _groupResume->show();
+
+            // hide friends component
+            _addFriendButton->hide();
+            _editUserButton->hide();
+            _likeButton->hide();
+            _localInfoText->hide();
+            _joinDayText->hide();
+            _signContentText->hide();
             break;
     }
-    setInfo(info);
 }
 
 UserPage::~UserPage() {
@@ -107,6 +145,8 @@ void UserPage::initWindow() {
     _signContentText    = new ElaText(this);
     _joinDayText        = new ElaText(this);
     _localInfoText      = new ElaText(this);
+    _groupResume        = new ElaText(this);
+    _groupNotice        = new ElaPushButton(this);
 
     _mainLayout         = new QVBoxLayout;
     _buttonLayout       = new QHBoxLayout;
@@ -116,35 +156,64 @@ void UserPage::initWindow() {
 void UserPage::initEdgeLayout() {
     _textLayout->addWidget(_avatarInfo,0,0,3,2);
     _textLayout->addWidget(_likeButton,1,2,1,1);
-    auto *day = new ElaText("加入天数",this);
-    auto *remark = new ElaText("备注",this);
-    auto *sign = new ElaText("个性签名",this);
-    auto *local = new ElaText("所在地",this);
-    day->setTextPixelSize(12);
-    remark->setTextPixelSize(12);
-    sign->setTextPixelSize(12);
-    local->setTextPixelSize(12);
-    sign->setTextStyle(ElaTextType::BodyStrong);
-    remark->setTextStyle(ElaTextType::BodyStrong);
-    day->setTextStyle(ElaTextType::BodyStrong);
-    local->setTextStyle(ElaTextType::BodyStrong);
-    _remarkText->setTextPixelSize(12);
-    _signContentText->setTextPixelSize(12);
-    _joinDayText->setTextPixelSize(12);
-    _localInfoText->setTextPixelSize(12);
-    _remarkText->setTextStyle(ElaTextType::Body);
-    _signContentText->setTextStyle(ElaTextType::Body);
-    _joinDayText->setTextStyle(ElaTextType::Body);
-    _localInfoText->setTextStyle(ElaTextType::Body);
-    _textLayout->addWidget(day,3,0,1,1);
-    _textLayout->addWidget(remark,4,0,1,1);
-    _textLayout->addWidget(sign,5,0,1,1);
-    _textLayout->addWidget(local,6,0,1,1);
-    _textLayout->addWidget(_joinDayText,3,1,1,1);
-    _textLayout->addWidget(_remarkText,4,1,1,1);
-    _textLayout->addWidget(_signContentText,5,1,1,1);
-    _textLayout->addWidget(_localInfoText,6,1,1,1);
-    _textLayout->setContentsMargins(0,0,0,0);
+    if (!_isGroup) {
+        auto *day = new ElaText("加入天数",this);
+        auto *remark = new ElaText("备注",this);
+        auto *sign = new ElaText("个性签名",this);
+        auto *local = new ElaText("所在地",this);
+        day->setTextPixelSize(12);
+        remark->setTextPixelSize(12);
+        sign->setTextPixelSize(12);
+        local->setTextPixelSize(12);
+        sign->setTextStyle(ElaTextType::BodyStrong);
+        remark->setTextStyle(ElaTextType::BodyStrong);
+        day->setTextStyle(ElaTextType::BodyStrong);
+        local->setTextStyle(ElaTextType::BodyStrong);
+        _remarkText->setTextPixelSize(12);
+        _signContentText->setTextPixelSize(12);
+        _joinDayText->setTextPixelSize(12);
+        _localInfoText->setTextPixelSize(12);
+        _remarkText->setTextStyle(ElaTextType::Body);
+        _signContentText->setTextStyle(ElaTextType::Body);
+        _joinDayText->setTextStyle(ElaTextType::Body);
+        _localInfoText->setTextStyle(ElaTextType::Body);
+        _textLayout->addWidget(day,3,0,1,1);
+        _textLayout->addWidget(remark,4,0,1,1);
+        _textLayout->addWidget(sign,5,0,1,1);
+        _textLayout->addWidget(local,6,0,1,1);
+        _textLayout->addWidget(_joinDayText,3,1,1,1);
+        _textLayout->addWidget(_remarkText,4,1,1,1);
+        _textLayout->addWidget(_signContentText,5,1,1,1);
+        _textLayout->addWidget(_localInfoText,6,1,1,1);
+        _textLayout->setContentsMargins(0,0,0,0);
+    }
+    else{
+        setFixedSize(300,300);
+
+        auto *remark = new ElaText("备注",this);
+        auto *resume = new ElaText("介绍",this);
+        auto *notice = new ElaText("群公告",this);
+        remark->setTextPixelSize(12);
+        resume->setTextPixelSize(12);
+        notice->setTextPixelSize(12);
+        resume->setTextStyle(ElaTextType::BodyStrong);
+        remark->setTextStyle(ElaTextType::BodyStrong);
+        notice->setTextStyle(ElaTextType::BodyStrong);
+        QFont font;
+        font.setPixelSize(12);
+        _remarkText->setTextPixelSize(12);
+        _groupResume->setTextPixelSize(12);
+        _groupNotice->setFont(font);
+        _remarkText->setTextStyle(ElaTextType::Body);
+        _groupResume->setTextStyle(ElaTextType::Body);
+        _textLayout->addWidget(remark,2,0,1,1);
+        _textLayout->addWidget(resume,3,0,1,1);
+        _textLayout->addWidget(notice,4,0,1,1);
+        _textLayout->addWidget(_remarkText,2,1,1,1);
+        _textLayout->addWidget(_groupResume,3,1,1,1);
+        _textLayout->addWidget(_groupNotice,4,1,1,1);
+        _textLayout->setContentsMargins(0,0,0,0);
+    }
 
     // add | call | edit | send
     _buttonLayout->setSpacing(20);
@@ -232,6 +301,19 @@ void UserPage::setInfo(const UserInfo &info) {
         _localInfoText->setText(setLocalInfo);
     }
 }
+
+void UserPage::setInfo(const GroupInfo &info) {
+    if(!info.isEmpty()){
+        _avatarInfo->setTitle(info._name);
+        _avatarInfo->setSubTitle(info._ssid + "  (" + QString::number(info._memberCount) +"人)");
+        _avatarInfo->setCardPixmap(QPixmap(info._picPath));
+
+        _remarkText->setText(info._remark);
+        _groupResume->setText(info._resume);
+        _groupNotice->setText(info._notices.first().content);
+    }
+}
+
 void UserPage::showAt(const QPoint &pos) {
     move(pos);
     show();

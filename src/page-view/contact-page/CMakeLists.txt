@@ -51,6 +51,7 @@ FIND_PACKAGE(Qt6
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/lib-common/include)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/utils)
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/core)
 #--------------------------------   third party include    ----------------------------------   END
 
 # 库文件路径添加       add lib file path
@@ -92,7 +93,7 @@ IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
             ${PLUGINS_NAME}              PUBLIC
             Qt6::Core                    Qt6::Gui                   Qt6::Widgets
             #--------------------------------    your lib file name    ----------------------------------   BEGIN
-            PluginManagerd               ElaWidgetToolsd
+            PluginManagerd               ElaWidgetToolsd            CommonDataPlugind
             #--------------------------------    your lib file name    ----------------------------------   END
     )
 ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -100,7 +101,7 @@ ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Release")
             ${PLUGINS_NAME}              PUBLIC
             Qt6::Core                    Qt6::Gui                   Qt6::Widgets
             #--------------------------------    your lib file name    ----------------------------------   BEGIN
-            PluginManager                ElaWidgetTools
+            PluginManager                ElaWidgetTools             CommonDataPlugin
             #--------------------------------    your lib file name    ----------------------------------   END
     )
 ENDIF ()

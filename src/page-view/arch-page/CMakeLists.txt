@@ -51,6 +51,7 @@ FIND_PACKAGE(Qt6
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/lib-common/include)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/utils)
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/core)
 #--------------------------------   third party include    ----------------------------------   END
 
 # 库文件路径添加       add lib file path

@@ -13,13 +13,50 @@ LiteConn::LiteConn(const char *dbName, std::string accessKey) {
         }
     }else {
         int rc = sqlite3_open(dbName,&qdb);
-        sqlite3_key(qdb, accessKey.c_str(), strlen(accessKey.c_str()));
         if(rc) {
             LOG("can't open sqlite database : " << sqlite3_errmsg(qdb))
             sqlite3_close(qdb);
         }
+        int res = sqlite3_key(qdb, accessKey.c_str(), strlen(accessKey.c_str()));
+        if(res != SQLITE_OK) {
+            LOG_ERROR("cant set key for sqlites3 : " << sqlite3_errmsg(qdb))
+            sqlite3_close(qdb);
+        }
     }
     sqlite3_exec(qdb, "PRAGMA foreign_keys = ON;", 0, 0, 0);
+}
+
+bool LiteConn::beginTransaction() {
+    char* errMsg = nullptr;
+    int rc = sqlite3_exec(qdb, "BEGIN TRANSACTION", nullptr, nullptr, &errMsg);
+    if (rc != SQLITE_OK) {
+        LOG_ERROR("Begin transaction failed: " << errMsg);
+        sqlite3_free(errMsg);
+        return false;
+    }
+    return true;
+}
+
+bool LiteConn::commit() {
+    char* errMsg = nullptr;
+    int rc = sqlite3_exec(qdb, "COMMIT", nullptr, nullptr, &errMsg);
+    if (rc != SQLITE_OK) {
+        LOG_ERROR("Commit failed: " << errMsg);
+        sqlite3_free(errMsg);
+        return false;
+    }
+    return true;
+}
+
+bool LiteConn::rollback() {
+    char* errMsg = nullptr;
+    int rc = sqlite3_exec(qdb, "COMMIT", nullptr, nullptr, &errMsg);
+    if (rc != SQLITE_OK) {
+        LOG_ERROR("Commit failed: " << errMsg);
+        sqlite3_free(errMsg);
+        return false;
+    }
+    return true;
 }
 
 bool LiteConn::update(const std::string& sql, const std::vector<std::string>& params) {

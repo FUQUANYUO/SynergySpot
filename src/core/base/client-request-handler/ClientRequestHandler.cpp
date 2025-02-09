@@ -10,17 +10,9 @@
 #include <QTimer>
 #include <functional>
 
-//-----------    proto-file   -----------//
-#include "forward_msg/ForwardMsgDTO.pb.h"
-#include "disconnect/DisconnectDTO.pb.h"
-#include "login/LoginDTO.pb.h"
-
-
 //-----------      core      -----------//
 #include "net-work/ClientConServer.h"
 #include "common-data/CommonData.h"
-
-
 
 // 发送包装宏
 #define SEND_PACKAGE(__DTO_OBJ__, __DTO_TYPE__, __LOG__)    \
@@ -69,27 +61,31 @@ void ClientRequestHandler::destroyInstance() {
         m.unlock();
     }
 }
-void ClientRequestHandler::addRequest(SSDTO::Business_Type type, std::string dto) {
+void ClientRequestHandler::addRequest(SSDTO::BusinessType type, std::string dto) {
     switch (type) {
-        case SSDTO::LOGIN:
+        case SSDTO::LOGIN_CHECK:
             emit sigVerifyAccountRequest(dto);
             break;
-        case SSDTO::FOWARD_MSG:
+        case SSDTO::C_MESSAGE_CONTENT:
             emit sigForwardMessageRequest(dto);
             break;
-        case SSDTO::GET_CONTACTLIST:
+        case SSDTO::R_FRIENDSHIP_LIST:
             emit sigContactListRequest(dto);
             break;
-        case SSDTO::GET_EMAILCODE:
+        case SSDTO::EMAIL_VERIFY:
             emit sigEmailCodeRequest(dto);
             break;
-        case SSDTO::ENROLL:
+        case SSDTO::ENROLL_ACCOUNT:
             emit sigEnrollAccountRequest(dto);
             break;
-        case SSDTO::ADD_FRIEND:
+        case SSDTO::C_FRIENDSHIP:
             emit sigAddFriendRequest(dto);
             break;
-        case SSDTO::FRIEND_SEARCH:
+        case SSDTO::MAKE_FRIEND_REQUEST:
+            break;
+        case SSDTO::MAKE_FRIEND_RESPONSE:
+            break;
+        case SSDTO::SEARCH_USER:
             emit sigSearchFriendRequest(dto);
             break;
         default:
@@ -104,13 +100,13 @@ ClientRequestHandler::ClientRequestHandler(QObject* parent) : QObject(parent) {
     businessProcessor->moveToThread(_handlerThread);
 
     // 连接业务信号槽
-    connect(this, &ClientRequestHandler::sigEmailCodeRequest,       businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::GET_EMAILCODE));
-    connect(this, &ClientRequestHandler::sigVerifyAccountRequest,   businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::LOGIN));
-    connect(this, &ClientRequestHandler::sigForwardMessageRequest,  businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::FOWARD_MSG));
-    connect(this, &ClientRequestHandler::sigContactListRequest,     businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::GET_CONTACTLIST));
-    connect(this, &ClientRequestHandler::sigEnrollAccountRequest,   businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::ENROLL));
-    connect(this, &ClientRequestHandler::sigAddFriendRequest,       businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::ADD_FRIEND));
-    connect(this, &ClientRequestHandler::sigSearchFriendRequest,    businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::FRIEND_SEARCH));
+    connect(this, &ClientRequestHandler::sigEmailCodeRequest,       businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::EMAIL_VERIFY));
+    connect(this, &ClientRequestHandler::sigVerifyAccountRequest,   businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::LOGIN_CHECK));
+    connect(this, &ClientRequestHandler::sigForwardMessageRequest,  businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::C_MESSAGE_CONTENT));
+    connect(this, &ClientRequestHandler::sigContactListRequest,     businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_FRIENDSHIP_LIST));
+    connect(this, &ClientRequestHandler::sigEnrollAccountRequest,   businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::ENROLL_ACCOUNT));
+    connect(this, &ClientRequestHandler::sigAddFriendRequest,       businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::C_FRIENDSHIP));
+    connect(this, &ClientRequestHandler::sigSearchFriendRequest,    businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::SEARCH_USER));
 
     // 连接响应信号槽
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigEmailCodeResponse,     this, &ClientRequestHandler::sigEmailCodeResponse);
@@ -166,7 +162,7 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
 
             array = _ccon->getQSocket()->read(4);
             QDataStream typeStream(&array, QIODevice::ReadOnly);
-            SSDTO::Business_Type type;
+            SSDTO::BusinessType type;
             typeStream >> type;
 
             if (_ccon->getQSocket()->bytesAvailable() >= msgSize) {
@@ -184,13 +180,13 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
     // request slot manager by dto type mapping
     {
         // login
-        _requestHandlerMap[SSDTO::LOGIN] = [=](const std::string & dto) {
-            SEND_PACKAGE(dto,SSDTO::LOGIN,"login dto has been send to server...")
+        _requestHandlerMap[SSDTO::LOGIN_CHECK] = [=](const std::string & dto) {
+            SEND_PACKAGE(dto,SSDTO::LOGIN_CHECK,"login dto has been send to server...")
         };
 
-        // forward msg
-        _requestHandlerMap[SSDTO::FOWARD_MSG] = [=](const std::string & dto) {
-            SEND_PACKAGE(dto,SSDTO::FOWARD_MSG,"msg_forward dto has been send to server...")
+        // store msg
+        _requestHandlerMap[SSDTO::C_MESSAGE_CONTENT] = [=](const std::string & dto) {
+            SEND_PACKAGE(dto,SSDTO::C_MESSAGE_CONTENT,"msg_forward dto has been send to server...")
         };
 
         // disconnect by user
@@ -199,40 +195,39 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
         };
 
         // query contact list
-        _requestHandlerMap[SSDTO::GET_CONTACTLIST] = [=](const std::string & dto) {
-            SEND_PACKAGE(dto,SSDTO::GET_CONTACTLIST,"query of contact list dto has been send to server...")
+        _requestHandlerMap[SSDTO::R_FRIENDSHIP_LIST] = [=](const std::string & dto) {
+            SEND_PACKAGE(dto,SSDTO::R_FRIENDSHIP_LIST,"query of contact list dto has been send to server...")
         };
 
         // query email code
-        _requestHandlerMap[SSDTO::GET_EMAILCODE] = [=](const std::string & dto) {
-            SEND_PACKAGE(dto,SSDTO::GET_EMAILCODE,"query of email code dto has been send to server...")
+        _requestHandlerMap[SSDTO::EMAIL_VERIFY] = [=](const std::string & dto) {
+            SEND_PACKAGE(dto,SSDTO::EMAIL_VERIFY,"query of email code dto has been send to server...")
         };
 
         // enroll account
-        _requestHandlerMap[SSDTO::ENROLL] = [=](const std::string & dto) {
-            SEND_PACKAGE(dto,SSDTO::ENROLL,"query of enroll dto has been send to server...")
+        _requestHandlerMap[SSDTO::ENROLL_ACCOUNT] = [=](const std::string & dto) {
+            SEND_PACKAGE(dto,SSDTO::ENROLL_ACCOUNT,"query of enroll dto has been send to server...")
         };
 
-        // add friend
-        _requestHandlerMap[SSDTO::ADD_FRIEND] = [=](const std::string & dto) {
-            SEND_PACKAGE(dto,SSDTO::ADD_FRIEND,"query of add friend dto has been send to server...")
+        // add friendship
+        _requestHandlerMap[SSDTO::C_FRIENDSHIP] = [=](const std::string & dto) {
+            SEND_PACKAGE(dto,SSDTO::C_FRIENDSHIP,"query of add friend dto has been send to server...")
         };
 
         // query search request
-        _requestHandlerMap[SSDTO::FRIEND_SEARCH] = [=](const std::string & dto) {
-            SEND_PACKAGE(dto,SSDTO::FRIEND_SEARCH,"query of search friend dto has been send to server...")
+        _requestHandlerMap[SSDTO::SEARCH_USER] = [=](const std::string & dto) {
+            SEND_PACKAGE(dto,SSDTO::SEARCH_USER,"query of search friend dto has been send to server...")
         };
     }
 
     // response slot manager by dto type mapping
     {
         // login
-        _responseHandlerMap[SSDTO::LOGIN] = [=](const std::string & dto) {
-            SSDTO::Login_DTO ldto;
+        _responseHandlerMap[SSDTO::LOGIN_CHECK] = [=](const std::string & dto) {
+            SSDTO::LoginCheckDTO ldto;
             ldto.ParseFromString(dto);
             LOG("recv server verify [" << ldto.ssid() << "] res")
             if(ldto.is_pass()){
-                g_pCommonData->setCurUserInfo({ldto.ssid(),ldto.ssname()});
                 emit sigLoginSuccess();
             }
             else{
@@ -241,32 +236,32 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
         };
 
         // forward msg
-        _responseHandlerMap[SSDTO::FOWARD_MSG] = [=](const std::string & dto) {
+        _responseHandlerMap[SSDTO::C_MESSAGE_CONTENT] = [=](const std::string & dto) {
             emit sigMessageResponse(dto);
         };
 
-        // forward msg
-        _responseHandlerMap[SSDTO::GET_CONTACTLIST] = [=](const std::string & dto) {
+        // friendship
+        _responseHandlerMap[SSDTO::R_FRIENDSHIP_LIST] = [=](const std::string & dto) {
             emit sigContactListResponse(dto);
         };
 
         // email code
-        _responseHandlerMap[SSDTO::GET_EMAILCODE] = [=](const std::string & dto) {
+        _responseHandlerMap[SSDTO::EMAIL_VERIFY] = [=](const std::string & dto) {
             emit sigEmailCodeResponse(dto);
         };
 
         // enroll account
-        _responseHandlerMap[SSDTO::ENROLL] = [=](const std::string & dto) {
+        _responseHandlerMap[SSDTO::ENROLL_ACCOUNT] = [=](const std::string & dto) {
             emit sigEnrollAccountResponse(dto);
         };
 
         // other friend request
-        _responseHandlerMap[SSDTO::ADD_FRIEND] = [=](const std::string & dto) {
+        _responseHandlerMap[SSDTO::MAKE_FRIEND_RESPONSE] = [=](const std::string & dto) {
             emit sigFriendRequestResponse(dto);
         };
 
         // search friend
-        _responseHandlerMap[SSDTO::FRIEND_SEARCH] = [=](const std::string & dto) {
+        _responseHandlerMap[SSDTO::SEARCH_USER] = [=](const std::string & dto) {
             emit sigSearchFriendResponse(dto);
         };
     }
@@ -281,12 +276,12 @@ BusinessLayer::BusinessProcessor::~BusinessProcessor() {
     delete _ccon;
 }
 
-void BusinessLayer::BusinessProcessor::handleResponse(SSDTO::Business_Type type, const std::string &dto) {
+void BusinessLayer::BusinessProcessor::handleResponse(SSDTO::BusinessType type, const std::string &dto) {
     switch (type) {
-        case SSDTO::FILE_TRANSFER_REQUEST:
-            // _pool.enqueue(new FileTransferTask(dto));  // 提交到文件传输线程池
-            break;
-        // 其他任务类型
+        // case SSDTO::FILE_TRANSFER_REQUEST:
+        //     // _pool.enqueue(new FileTransferTask(dto));  // 提交到文件传输线程池
+        //     break;
+        // // 其他任务类型
         default:
             _responseHandlerMap[type](dto);// 默认处理方式
             break;
@@ -296,10 +291,9 @@ void BusinessLayer::BusinessProcessor::handleResponse(SSDTO::Business_Type type,
 void BusinessLayer::BusinessProcessor::disConnectFromSer(){
     // out line notice
     std::string outDisDto;
-    SSDTO::Disconnect_DTO ddto;
+    SSDTO::DisconnectDTO ddto;
     ddto.set_ssid(g_pCommonData->getCurUserInfo().CurSSID);
     ddto.set_ip("");
-    ddto.set_type(SSDTO::DISCONNECT);
     ddto.SerializeToString(&outDisDto);
 
     _responseHandlerMap[SSDTO::DISCONNECT](outDisDto);

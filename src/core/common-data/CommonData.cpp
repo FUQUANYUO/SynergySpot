@@ -11,6 +11,7 @@
 #include <QImage>
 
 #include <mutex>
+#include <db-pool/ConnectionPool.h>
 
 CommonData * CommonData::instance = nullptr;
 static std::mutex m;
@@ -55,9 +56,123 @@ CurUserInfoDataStruct CommonData::getCurUserInfo() const {
 
 void CommonData::setCurUserInfo(const CurUserInfoDataStruct &curUserInfo) {
     _userInfo = curUserInfo;
+    _enable = true;
+    init();
+}
+
+UserBaseInfoDTO CommonData::getUserInfoBySSID(const QString &ssid) {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return {};
+    }
+    if (!userInfoCacheMap.contains(ssid)) {
+        auto res = new UserBaseInfoDTO(userService->getUserBySSID(ssid));
+        userInfoCacheMap.insert(ssid,res);
+    }
+    return *userInfoCacheMap[ssid];
+}
+
+bool CommonData::setUserInfoBySSID(const UserBaseInfoDTO &userInfo) {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return {};
+    }
+    return userService->updateUserBySSID(userInfo);
+}
+
+QList<FriendshipDTO> CommonData::getCurUserFriendship() {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return {};
+    }
+    return friendshipService->getFriendshipsBySSID(QString::fromStdString(_userInfo.CurSSID));
+}
+
+bool CommonData::setFriendshipData(const QList<FriendshipDTO> &dto) {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return {};
+    }
+    return friendshipService->setFriendshipData(dto);
+}
+
+bool CommonData::isCurUserFriend(const QString &ssid) {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return {};
+    }
+    return friendshipService->isCurUserFriend(QString::fromStdString(_userInfo.CurSSID), ssid);
+}
+
+QList<MessageContentDTO> CommonData::getMessageContentData(int pageSize, int pageNum) {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return {};
+    }
+    return messageContentService->getAllMessages(QString::fromStdString(_userInfo.CurSSID),pageSize,pageNum);
+}
+
+bool CommonData::setMessageContentData(const QList<MessageContentDTO> &dto) {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return {};
+    }
+    return messageContentService->storeMessage(dto);
+}
+
+QList<GroupBaseInfoDTO> CommonData::getAllGroupInfo(int pageSize, int pageNum) {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return {};
+    }
+    return groupInfoService->getGroupInfos(pageSize,pageNum);
+}
+
+GroupBaseInfoDTO CommonData::getGroupInfoDataBySSID(const QString &ssidGroup) {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return {};
+    }
+    if (!groupInfoCacheMap.contains(ssidGroup)) {
+        auto res = new GroupBaseInfoDTO(groupInfoService->getGroupInfoById(ssidGroup));
+        groupInfoCacheMap.insert(ssidGroup,res);
+    }
+    return *groupInfoCacheMap[ssidGroup];
+}
+
+bool CommonData::setGroupInfoData(const QList<GroupBaseInfoDTO> &dto) {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return {};
+    }
+    return groupInfoService->setGroupInfoData(dto);
+}
+
+QList<GroupMemberInfoDTO> CommonData::getGroupMemberInfoData(const QString &ssidGroup,int pageSize, int pageNum) {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return {};
+    }
+    if (!groupMemberInfoCacheMap.contains(ssidGroup)) {
+        auto res = new QList<GroupMemberInfoDTO>(groupMemberService->getAllGroupMember(ssidGroup,pageSize,pageNum));
+        groupMemberInfoCacheMap.insert(ssidGroup,res);
+    }
+    return *groupMemberInfoCacheMap[ssidGroup];
+}
+
+bool CommonData::setGroupMemberInfoData(const QList<GroupMemberInfoDTO> &dto) {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return {};
+    }
+    return groupMemberService->addGroupMember(dto);
 }
 
 bool CommonData::initCurUserInfoDir() {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return {};
+    }
     do {
         QString userDir = QString::fromStdString(_userInfo.CurSSID);
         QDir user(userDir);
@@ -128,6 +243,10 @@ bool CommonData::initCurUserInfoDir() {
 }
 
 std::string CommonData::getDataPath(CommonPath type) const {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return {};
+    }
     std::string path = _userInfo.CurSSID;
     switch (type) {
         case avatar:
@@ -215,13 +334,23 @@ QImage CommonData::getMsgPicPathFromTmp(const std::string &picName) {
 }
 
 
-void CommonData::addFileToTmp() {}
+void CommonData::addFileToTmp() {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return ;
+    }
+}
 
 std::string CommonData::getFilePathFromTmp() {
     return "";
 }
 
-void CommonData::addAvatarToData() {}
+void CommonData::addAvatarToData() {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return ;
+    }
+}
 
 std::string CommonData::getAvatarPathFromData(const QString &ssid) const {
     // get data from sqlite
@@ -229,7 +358,29 @@ std::string CommonData::getAvatarPathFromData(const QString &ssid) const {
     return "";
 }
 
-void CommonData::addEmojiToData() {}
+bool CommonData::addCollectionEmoji(const CollectedStickerDTO &dto) {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return false;
+    }
+    return stickerService->addCollectedSticker(dto);
+}
+
+QList<CollectedStickerDTO> CommonData::getCollectionEmoji(int pageSize, int pageNum) {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return {};
+    }
+    return stickerService->getCollectedStickers(QString::fromStdString(_userInfo.CurSSID),pageSize, pageNum);
+}
+
+QList<BaseStickerDTO> CommonData::getBaseEmoji(int pageSize, int pageNum) {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return {};
+    }
+    return stickerService->getBasedStickers(pageSize, pageNum);
+}
 
 bool CommonData::initUserDatabase() {
     const char* tables[] = {
@@ -250,6 +401,7 @@ bool CommonData::initUserDatabase() {
         "CREATE TABLE IF NOT EXISTS friendship ("
         "  id INTEGER PRIMARY KEY AUTOINCREMENT,"
         "  ssid TEXT NOT NULL,"
+        "  grouping TEXT NOT NULL,"
         "  friend_ssid TEXT NOT NULL,"
         "  ship_status INTEGER NOT NULL,"
         "  friend_type INTEGER DEFAULT 1,"
@@ -263,6 +415,7 @@ bool CommonData::initUserDatabase() {
         "  id INTEGER PRIMARY KEY AUTOINCREMENT,"
         "  ssid_group TEXT NOT NULL UNIQUE,"
         "  name TEXT NOT NULL,"
+        "  avatar TEXT,"
         "  create_ssid TEXT NOT NULL,"
         "  profile TEXT DEFAULT '',"
         "  create_time TEXT DEFAULT CURRENT_TIMESTAMP"
@@ -318,9 +471,8 @@ bool CommonData::initUserDatabase() {
         "CREATE INDEX IF NOT EXISTS idx_user_collect ON user_collected_stickers(user_ssid);"
     };
 
-    LiteConn liteDB((getDataPath(db) + "/" + _liteDBName).c_str());
     for (auto table : tables) {
-        if (!liteDB.update(table,{})) {
+        if (!_liteConn->update(table,{})) {
             LOG("occur error in init sqlite table then terminate execute" )
             return false;
         }
@@ -328,12 +480,32 @@ bool CommonData::initUserDatabase() {
     return true;
 }
 
+void CommonData::init() {
+    initCurUserInfoDir();
+    // _liteConn               =   new LiteConn((getDataPath(db) + "/" + _liteDBName).c_str(),_node["sqlite-info"]["accessKey"].as<std::string>());
+    _liteConn               =   new LiteConn((getDataPath(db) + "/" + _liteDBName).c_str());
+    userService             =   new UserService(*_liteConn);
+    stickerService          =   new StickerService(*_liteConn);
+    messageContentService   =   new MessageContentService(*_liteConn);
+    groupMemberService      =   new GroupMemberService(*_liteConn);
+    groupInfoService        =   new GroupInfoService(*_liteConn);
+    friendshipService       =   new FriendshipService(*_liteConn);
+    initUserDatabase();
+}
+
 CommonData::CommonData(){
     _yamlPath = "../../conf/clientInfo.yaml";
     _imageEx  = ".jpg";
 
-     _node = YAML::LoadFile(_yamlPath);
-     _liteDBName = _node["sqlite-info"]["dbName"].as<std::string>();
+    _node = YAML::LoadFile(_yamlPath);
+    _liteDBName = _node["sqlite-info"]["dbName"].as<std::string>();
+    _enable = false;
+
+    _cacheMaxSize = 20;
+
+    userInfoCacheMap.setMaxCost(_cacheMaxSize);
+    groupInfoCacheMap.setMaxCost(_cacheMaxSize);
+    groupMemberInfoCacheMap.setMaxCost(_cacheMaxSize);
 }
 
 CommonData::~CommonData() {}

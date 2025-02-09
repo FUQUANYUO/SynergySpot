@@ -69,6 +69,9 @@ private:
 protected:
     void setAcrylicForBKMaterial(bool enable);
 
+    // generate number verify code
+    bool generateNumberVerifyCode();
+
     void paintEvent(QPaintEvent* event);
 protected slots:
     void sltUpdateFrame();
@@ -83,7 +86,7 @@ private:
     QLineEdit            *    _inputEmailCode       =   nullptr;
     QPushButton          *    _sendEmailCodeButton  =   nullptr;
     QLineEdit            *    _inputVerifyCode      =   nullptr;
-    QLabel               *    _verifyCode           =   nullptr;
+    QPushButton          *    _verifyCode           =   nullptr;
     QTextBrowser         *    _protocolText         =   nullptr;
     ElaRadioButton       *    _acceptButton         =   nullptr;
     QPushButton          *    _signUpButton         =   nullptr;
@@ -96,15 +99,14 @@ private:
     // ----------------- UI -----------------
 
     // --------------- BackEnd --------------
-    bool _verifyEmail   = false;
-    int  _displayTime   = 3000;         // 信息显示时间
-    int  _disableTime   = 60;           // 发送 按钮禁用时间
-
+    bool    _verifyEmail        = false;
+    int     _displayTime        = 3000;         // 信息显示时间
+    int     _disableTime        = 60;           // 发送 按钮禁用时间
+    QString _numberVerifyCode   = "";
     // --------------- BackEnd --------------
 
     static SignUpPage *instance;
     bool _enableAcrylic = false;
-
 };
 
 

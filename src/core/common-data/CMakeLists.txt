@@ -11,6 +11,7 @@ SET(
 # preprocess define
 ADD_DEFINITIONS(
         -DSS_COMMON_DATA_EXPORTS
+        -DSQLITE_HAS_CODEC
 )
 #--------------------------------     need you revise      ----------------------------------   BEGIN
 
@@ -55,6 +56,7 @@ SET(
         SRC_CPP                      ${SRC_CPP}
         ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/log/Log.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/get-time/GetCurTime.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/db-lite/LiteConn.cpp
 )
 
 ADD_LIBRARY(
@@ -73,7 +75,8 @@ IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
             ${PLUGINS_NAME}              PUBLIC
             Qt6::Core                    Qt6::Gui
             #--------------------------------    your lib file name    ----------------------------------   BEGIN
-            yaml-cppd
+            yaml-cppd                    libcrypto                     libssl
+            libsqlite3                   sqlcipher
             #--------------------------------    your lib file name    ----------------------------------   END
     )
 ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -81,7 +84,8 @@ ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Release")
             ${PLUGINS_NAME}              PUBLIC
             Qt6::Core                    Qt6::Gui
             #--------------------------------    your lib file name    ----------------------------------   BEGIN
-            yaml-cpp
+            yaml-cpp                     libcrypto                     libssl
+            libsqlite3                   sqlcipher
             #--------------------------------    your lib file name    ----------------------------------   END
     )
 ENDIF ()

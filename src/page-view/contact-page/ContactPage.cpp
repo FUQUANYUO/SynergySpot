@@ -10,9 +10,12 @@
 #include "ela-widget-tools/ElaToolButton.h"
 #include "ela-widget-tools/ElaPivot.h"
 
+#include "common-data/CommonData.h"
+
 #include <QVBoxLayout>
 #include <QStandardItem>
 #include <mutex>
+
 
 ContactPage * ContactPage::_contactPage = nullptr;
 static std::mutex m;
@@ -40,8 +43,9 @@ void ContactPage::destroyContactPage() {
 }
 
 void ContactPage::addFriendGrouping(const QString &name) {
-    if (_friendModel != nullptr)
+    if (_friendModel != nullptr && !_groupingInfos["friend"].contains(name)) {
         _friendModel->addGrouping(name);
+    }
     _groupingInfos["friend"].insert(name,{});
 }
 
@@ -49,21 +53,43 @@ QList<QString> ContactPage::getFriendGrouping() {
     return _groupingInfos["friend"].keys().toList();
 }
 
-void ContactPage::addContactInfo(const QString& groupingName,const MsgCardInfo &info) {
+bool ContactPage::loadCacheContact(const QList<FriendshipDTO> &caches) {
+    for (auto &it : caches) {
+        bool isGroup = (it.friendType==2);
+        if (!isGroup) {
+            UserBaseInfoDTO uInfo = g_pCommonData->getUserInfoBySSID(it.friendSSID);
+            addFriendGrouping(it.groupingName);
+            addContactInfo(it.groupingName,{
+                uInfo,{},{},
+                "",-1,false
+            });
+        }else {
+            GroupBaseInfoDTO gInfo = g_pCommonData->getGroupInfoDataBySSID(it.friendSSID);
+            QList<GroupMemberInfoDTO> members = g_pCommonData->getGroupMemberInfoData(it.friendSSID,100,1);
+            addContactInfo(it.groupingName,{
+                {},gInfo,members,
+                "",-1,true
+            });
+        }
+    }
+    return true;
+}
+
+void ContactPage::addContactInfo(const QString& groupingName,const MsgCombineDTO &info) {
     if (!info.isGroup) {
         if (_groupingInfos["friend"].contains(groupingName)) {
             _friendModel->addGroupingItem(groupingName,{
-                info.ssid,info.name,info.mark,"","离线",QPixmap(info.avatar)
+                info.userBaseInfo.ssid,info.userBaseInfo.username,"","","离线",QPixmap(info.userBaseInfo.avatarPath)
             });
             _groupingInfos["friend"][groupingName].append(info);
-            _ssidToCardInfoHash[info.ssid] = info;
+            _ssidToCardInfoHash[info.userBaseInfo.ssid] = info;
         }
     }else {
         _groupModel->addGroupingItem(groupingName,{
-                        info.ssid,info.name,info.mark,"","离线",QPixmap(info.avatar)
+                        info.groupBaseInfo.ssidGroup,info.groupBaseInfo.groupName,"","","离线",QPixmap(info.groupBaseInfo.avatarPath)
                     });
         _groupingInfos["group"][groupingName].append(info);
-        _ssidToCardInfoHash[info.ssid] = info;
+        _ssidToCardInfoHash[info.groupBaseInfo.ssidGroup] = info;
     }
 }
 

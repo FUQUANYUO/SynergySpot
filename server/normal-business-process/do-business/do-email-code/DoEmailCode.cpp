@@ -3,12 +3,13 @@
 //
 
 #include <random>
+#include <cstring>
 
+#include "DTO.pb.h"
 #include "DoEmailCode.h"
 
 #include "yaml-cpp/yaml.h"
 #include "curl/curl.h"
-#include "email/EmailVerifyCode.pb.h"
 
 extern std::string yamlPath;
 
@@ -71,7 +72,7 @@ std::string DoEmailCode::sendEmailCode(std::string &rawdto) {
     std::string emailServer = node["email-info"]["emailServer"].as<std::string>();
     std::string accessToken = node["email-info"]["accessToken"].as<std::string>();
 
-    SSDTO::EmailVerifyCode_DTO evdto;
+    SSDTO::EmailVerifyDTO evdto;
     evdto.ParseFromString(rawdto);
 
     if(!evdto.is_request())

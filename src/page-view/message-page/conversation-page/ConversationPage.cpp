@@ -22,6 +22,7 @@
 #include <QMimeData>
 #include <QDragEnterEvent>
 #include <QPainter>
+#include <QDateTime>
 #include <QListView>
 #include <mutex>
 
@@ -223,9 +224,11 @@ void InputWidget::initConnectFunc() {
     });
 }
 
-ConversationFriendPage::ConversationFriendPage(QWidget *parent)
+ConversationFriendPage::ConversationFriendPage(const UserBaseInfoDTO& userInfo,QWidget *parent)
     : QWidget(parent)
 {
+    _userInfo = userInfo;
+
     initWindow();
 
     initEdgeLayout();
@@ -263,7 +266,7 @@ void ConversationFriendPage::initEdgeLayout() {
     _toolLayout->addWidget(_videoButton);
     _toolLayout->addWidget(_createGroupButton);
     _toolLayout->addWidget(_moreOptionButton);
-    _toolLayout->setContentsMargins(0,0,0,0);
+    _toolLayout->setContentsMargins(10,0,0,0);
 
     // toolbar wid to set style
     auto * _toolWid = new QWidget(this);
@@ -291,7 +294,7 @@ void ConversationFriendPage::initEdgeLayout() {
 }
 void ConversationFriendPage::initContent() {
     // tool button settings
-    _userNameButton->setText("{User Name}");
+    _userNameButton->setText(_userInfo.username);
     _userNameButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
     _callButton->setElaIcon(ElaIconType::CirclePhone);
     _callButton->setIconSize(QSize(32,32));
@@ -325,11 +328,31 @@ void ConversationFriendPage::initContent() {
     _msgListView->show();
 }
 void ConversationFriendPage::initConnectFunc() {
+    connect(_userNameButton,&QPushButton::clicked,[=]() {
+        // TODO: remark and region need to get from server
+        UserInfo userInfo{
+            Friends,
+            static_cast<int>(std::difftime(GetCurTime::getTimeObj()->getCurTimeStamp(),
+                static_cast<time_t>(_userInfo.createTime.toMSecsSinceEpoch()))/ (60 * 60 * 24)) + 1,
+            static_cast<int>(_userInfo.thumbUpCount), _userInfo.ssid, _userInfo.username, "", _userInfo.personalSign,
+            _userInfo.avatarPath, {""}
+        };
+        UserPage * wid = g_pUserPage(Friends,userInfo,{});
+        QPoint globalPos = QCursor::pos();
+        wid->showAt(globalPos + QPoint(10,10));
+    });
 }
 
-ConversationGroupPage::ConversationGroupPage(QWidget *parent)
+ConversationGroupPage::ConversationGroupPage(
+    const GroupBaseInfoDTO& groupBaseInfo,
+    const QList<GroupMemberInfoDTO>& groupMemberInfo,
+    QWidget *parent
+)
     : QWidget(parent)
 {
+    _groupBaseInfo = groupBaseInfo;
+    _groupMemberInfo = groupMemberInfo;
+
     initWindow();
 
     initEdgeLayout();
@@ -370,7 +393,7 @@ void ConversationGroupPage::initEdgeLayout() {
     _toolLayout->addWidget(_fileOfGroup);
     _toolLayout->addWidget(_inviteAddButton);
     _toolLayout->addWidget(_moreOptionButton);
-    _toolLayout->setContentsMargins(0,0,0,0);
+    _toolLayout->setContentsMargins(10,0,0,0);
 
     // toolbar wid to set style
     auto * _toolWid = new QWidget(this);
@@ -398,7 +421,7 @@ void ConversationGroupPage::initEdgeLayout() {
 
 void ConversationGroupPage::initContent() {
     // tool button settings
-    _groupNameButton->setText("{Group Name}");
+    _groupNameButton->setText(_groupBaseInfo.groupName);
     _groupNameButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
     _callButton->setElaIcon(ElaIconType::CirclePhone);
     _callButton->setIconSize(QSize(32,32));
@@ -436,9 +459,22 @@ void ConversationGroupPage::initContent() {
 }
 
 void ConversationGroupPage::initConnectFunc() {
+    connect(_groupNameButton,&QPushButton::clicked,[=]() {
+        // TODO: remark and region need to get from server
+        GroupInfo groupInfo{
+            UserType::Groups,_groupBaseInfo.ssidGroup,_groupBaseInfo.groupName,"",
+            _groupBaseInfo.profile,_groupBaseInfo.avatarPath,static_cast<int>(_groupMemberInfo.count()),
+            {
+                {"这是一个公告"}
+            }
+        };
+        UserPage * wid = g_pUserPage(Groups,{},groupInfo);
+        QPoint globalPos = QCursor::pos();
+        wid->showAt(globalPos + QPoint(10,10));
+    });
 }
 
-ConversationPage::ConversationPage(ConversationType type,const MsgCardInfo& info ,QWidget * parent)
+ConversationPage::ConversationPage(ConversationType type,const MsgCombineDTO& dto ,QWidget * parent)
     : QWidget(parent)
 {
     setWindowFlag(Qt::FramelessWindowHint);
@@ -448,8 +484,10 @@ ConversationPage::ConversationPage(ConversationType type,const MsgCardInfo& info
     _layout->setSpacing(0);
     QString _curSSID = QString::fromStdString(g_pCommonData->getCurUserInfo().CurSSID);
     QString _curName = QString::fromStdString(g_pCommonData->getCurUserInfo().CurSSname);
-    if(type == Friend){
-        _cfP = new ConversationFriendPage(this);
+    if(type == ConversationType::Friend){
+        _cfP = new ConversationFriendPage(
+            dto.userBaseInfo,this
+        );
         _layout->addWidget(_cfP);
         _layout->addWidget(_inputWid);
 
@@ -461,7 +499,7 @@ ConversationPage::ConversationPage(ConversationType type,const MsgCardInfo& info
             if (!_inputWid->_inputEditFrame->getImageTmpMap().isEmpty()) {
                 for (auto imageIt = cacheImage.begin(); imageIt != cacheImage.end(); imageIt++) {
                     std::string imageName = imageIt.key().toStdString();
-                    g_pCommonData->addMsgPicToTmp(imageIt.value(),imageName);
+                    g_pCommonData->addMsgPicToTmp(imageIt.value(),imageName);// store in the tmp dir
                     html_cp.replace(imageIt.key(),QString::fromStdString(g_pCommonData->getDataPath(msgPic) + "/" + imageName + g_pCommonData->getImageEx()));
                 }
                 cacheImage.clear();
@@ -470,6 +508,20 @@ ConversationPage::ConversationPage(ConversationType type,const MsgCardInfo& info
 
             _cfP->insertMsgBubble({_curSSID,_curName,
                         html_cp,QString::fromStdString(g_pCommonData->getCurUserInfo().CurUserAvatarPath),true});
+
+            // store msg
+            qint64 curTimeStamp = GetCurTime::getTimeObj()->getCurTimeStamp();
+            MessageContentDTO msgDto{
+                _curSSID,
+                ContentType::Text,
+                html_cp,
+                "",
+                {
+                    1,
+                    dto.userBaseInfo.ssid
+                },
+                QDateTime::fromMSecsSinceEpoch(curTimeStamp)
+            };
 
             // get grandfather to link card and set content display
             MessagePage * msgPage = static_cast<MessagePage*>(parent->parent());
@@ -481,14 +533,21 @@ ConversationPage::ConversationPage(ConversationType type,const MsgCardInfo& info
             QTextDocument docu;
             docu.setHtml(html_cp);
             font.setPointSize(9);
-            msgPage->_ssidLinkCardHash[info.ssid]->setTimeContent(QString::fromStdString(
-                GetCurTime::getTimeObj()->getMsgTypeTime(GetCurTime::getTimeObj()->getCurTimeStamp())),
+
+            msgPage->_ssidLinkCardHash[dto.userBaseInfo.ssid]->setTimeContent(QString::fromStdString(
+                GetCurTime::getTimeObj()->getMsgTypeTime(curTimeStamp)),
                 Qt::gray,font);
-            msgPage->_ssidLinkCardHash[info.ssid]->setSubTitle(docu.toPlainText());
+            msgPage->_ssidLinkCardHash[dto.userBaseInfo.ssid]->setSubTitle(docu.toPlainText());
+
+            g_pCommonData->setMessageContentData({msgDto});
         });
     }
-    else if(type == Group){
-        _cgP = new ConversationGroupPage(this);
+    else if(type == ConversationType::Group){
+        _cgP = new ConversationGroupPage(
+            dto.groupBaseInfo,
+            dto.groupMemberInfo,
+            this
+        );
         auto * listAndInputLayout = new QHBoxLayout;
         listAndInputLayout->setContentsMargins(0,0,0,0);
         listAndInputLayout->setSpacing(0);
@@ -498,9 +557,15 @@ ConversationPage::ConversationPage(ConversationType type,const MsgCardInfo& info
         _memberOfGroupList->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Preferred);
         _memberOfGroupList->setFixedWidth(120);
         _memberOfGroupList->setMaximumHeight(_inputWid->height());
-        _memberOfGroupList->addMember(":/message-page/rc-page/img/default-avatar-1.jpg","10001","小柴");
-        _memberOfGroupList->addMember(":/message-page/rc-page/img/default-avatar-2.jpg","10002","五花");
-        _memberOfGroupList->addMember(":/message-page/rc-page/img/default-avatar-3.jpg","10003","大黄");
+
+        // TODO: mark
+        QHash<QString,UserBaseInfoDTO> tmpUserHash;
+        for (const auto &it : dto.groupMemberInfo ) {
+            UserBaseInfoDTO user = g_pCommonData->getUserInfoBySSID(it.ssidMember);
+            _memberOfGroupList->addMember(user.avatarPath, user.ssid, user.username );
+            tmpUserHash.insert(it.ssidMember,user);
+        }
+
         _memberOfGroupList->setObjectName(QString::fromUtf8("_memberOfGroupList"));
         _memberOfGroupList->setStyleSheet("#_memberOfGroupList {background-color: rgb(242, 242, 242);}");
 
@@ -513,20 +578,22 @@ ConversationPage::ConversationPage(ConversationType type,const MsgCardInfo& info
         // connect group member single clicked
         connect(_memberOfGroupList,&GroupMemberDock::sigClickedMember,this,[=](QString ssid) {
             // TODO : send request to server
-            // get UserInfo DTO
-            QList<UserInfo> _list;
-            UserInfo user_1{Myself,10,10000,"10001","小柴","","我是小柴er~",":/message-page/rc-page/img/default-avatar-1.jpg",{"中国"}};
-            UserInfo user_2{Strangers,99,1000,"10002","五花","","我是五花啊~",":/message-page/rc-page/img/default-avatar-2.jpg",{"中国","湖北","武汉"}};
-            UserInfo user_3{Friends,10213,100,"10003","大黄","","我是大黄，汪汪汪~",":/message-page/rc-page/img/default-avatar-3.jpg",{"美国"}};
-            _list.append(user_1);_list.append(user_2);_list.append(user_3);
-            foreach(auto user,_list) {
-                if (user._ssid == ssid) {
-                    UserPage * wid = g_pUserPage(user._type,user);
-                    QPoint globalPos = QCursor::pos();
-                    QPoint offset(wid->width(),wid->height());
-                    wid->showAt(globalPos-offset);
-                }
-            }
+            UserBaseInfoDTO user = tmpUserHash.value(ssid);
+            bool isFriend = g_pCommonData->isCurUserFriend(ssid);
+
+            UserInfo uInfo{
+                (isFriend?UserType::Friends:UserType::Strangers),
+                static_cast<int>(std::difftime(GetCurTime::getTimeObj()->getCurTimeStamp(),
+                static_cast<time_t>(user.createTime.toMSecsSinceEpoch()))/ (60 * 60 * 24)) + 1,
+                static_cast<int>(user.thumbUpCount) , user.ssid, user.username, "", user.personalSign,
+                user.avatarPath,{""}
+            };
+
+            UserPage * wid = g_pUserPage((isFriend?UserType::Friends:UserType::Strangers),uInfo,{});
+
+            QPoint globalPos = QCursor::pos();
+            QPoint offset(wid->width(),wid->height());
+            wid->showAt(globalPos-offset);
         });
 
         connect(_inputWid, &InputWidget::sigSendBtnClicked, this, [=](const QString& html) {
@@ -545,6 +612,20 @@ ConversationPage::ConversationPage(ConversationType type,const MsgCardInfo& info
             _cgP->insertMsgBubble({_curSSID,_curName,
                         html_cp,QString::fromStdString(g_pCommonData->getCurUserInfo().CurUserAvatarPath),true});
 
+            // store msg
+            qint64 curTimeStamp = GetCurTime::getTimeObj()->getCurTimeStamp();
+            MessageContentDTO msgDto{
+                _curSSID,
+                ContentType::Text,
+                html_cp,
+                "",
+                {
+                    2,
+                    dto.groupBaseInfo.ssidGroup
+                },
+                QDateTime::fromMSecsSinceEpoch(curTimeStamp)
+            };
+
             // get grandfather to link card and set content display
             MessagePage * msgPage = static_cast<MessagePage*>(parent->parent());
 
@@ -555,10 +636,12 @@ ConversationPage::ConversationPage(ConversationType type,const MsgCardInfo& info
             QTextDocument docu;
             docu.setHtml(html_cp);
             font.setPointSize(9);
-            msgPage->_ssidLinkCardHash[info.ssid]->setTimeContent(QString::fromStdString(
-                GetCurTime::getTimeObj()->getMsgTypeTime(GetCurTime::getTimeObj()->getCurTimeStamp())),
+            msgPage->_ssidLinkCardHash[dto.groupBaseInfo.ssidGroup]->setTimeContent(QString::fromStdString(
+                GetCurTime::getTimeObj()->getMsgTypeTime(curTimeStamp)),
                 Qt::gray,font);
-            msgPage->_ssidLinkCardHash[info.ssid]->setSubTitle(docu.toPlainText());
+            msgPage->_ssidLinkCardHash[dto.groupBaseInfo.ssidGroup]->setSubTitle(docu.toPlainText());
+
+            g_pCommonData->setMessageContentData({msgDto});
        });
     }
     this->setLayout(_layout);

@@ -13,7 +13,11 @@ public:
     explicit GroupInfoService(LiteConn& db);
 
     GroupBaseInfoDTO getGroupInfoById(const QString& groupId);
-    bool updateGroupInfo(const GroupBaseInfoDTO& groupInfo);
+    QList<GroupBaseInfoDTO> getGroupInfos(int pageSize, int pageNum);
+    int createGroup(const QString &ssidGroup, const GroupBaseInfoDTO& groupInfo);
+
+    bool setGroupInfoData(QList<GroupBaseInfoDTO> dto);
+    bool updateGroupInfo(const QString& ssidGroup,const QString& profile);
 private:
     GroupInfoDAO groupInfoDAO;
 };

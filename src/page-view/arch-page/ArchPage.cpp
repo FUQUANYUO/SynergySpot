@@ -157,8 +157,7 @@ void ArchPage::initConnectFunc() {
         }
     });
     connect(this, &ElaWindow::userInfoCardClicked, this, [=](){
-        UserInfo info;
-        UserPage * wid = g_pUserPage(UserType::Myself,info);
+        UserPage * wid = g_pUserPage(UserType::Myself,{},{});
 
         QPoint globalPos = QCursor::pos();
         wid->showAt(globalPos + QPoint{10,10});

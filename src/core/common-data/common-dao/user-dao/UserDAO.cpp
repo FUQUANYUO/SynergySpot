@@ -10,7 +10,7 @@ UserDAO::UserDAO(LiteConn &db) : _db(db) {}
 UserDAO::~UserDAO() {}
 
 bool UserDAO::insert(const UserBaseInfoDO &user) {
-    std::string sql = "INSERT INTO user_base_info (ssid, ssname, avatar, sex, personalSign, thumbUpCount, birthday, createTime, region) "
+    std::string sql = "INSERT INTO user_base_info (ssid, ssname, avatar, sex, personal_sign, thumb_up_count, birthday, create_time, region) "
                       "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
     std::vector<std::string> params = {
         user.ssid.toStdString(),
@@ -28,8 +28,8 @@ bool UserDAO::insert(const UserBaseInfoDO &user) {
 }
 
 bool UserDAO::update(const UserBaseInfoDO &user) {
-    std::string sql = "UPDATE user_base_info SET ssname = ?, avatar = ?, sex = ?, personalSign = ?, "
-                      "thumbUpCount = ?, birthday = ?, region = ? WHERE ssid = ?;";
+    std::string sql = "UPDATE user_base_info SET ssname = ?, avatar = ?, sex = ?, personal_sign = ?, "
+                      "thumb_up_count = ?, birthday = ?, region = ? WHERE ssid = ?;";
     std::vector<std::string> params = {
         user.ssname.toStdString(),
         user.avatar.toStdString(),
@@ -52,12 +52,12 @@ bool UserDAO::deleteById(const QString &ssid) {
 }
 
 UserBaseInfoDO UserDAO::findById(const QString &ssid) {
-    std::string sql = "SELECT ssid, ssname, avatar, sex, personalSign, thumbUpCount, birthday, createTime, region "
+    std::string sql = "SELECT ssid, ssname, avatar, sex, personal_sign, thumb_up_count, birthday, create_time, region "
                       "FROM user_base_info WHERE ssid = ?;";
     std::vector<std::string> params = { ssid.toStdString() };
 
     auto result = _db.query(sql, params);
-    if (!result.empty()) {
+    if (result.size() > 0) {
         UserBaseInfoDO user;
         user.ssid = QString::fromStdString(result[0][0]);
         user.ssname = QString::fromStdString(result[0][1]);
@@ -65,7 +65,7 @@ UserBaseInfoDO UserDAO::findById(const QString &ssid) {
         user.sex = (result[0][3] == "M") ? UserSex::Male : UserSex::Female; // "M" 或 "F" 转换为枚举
         user.personalSign = QString::fromStdString(result[0][4]);
         user.thumbUpCount = std::stoul(result[0][5]);
-        user.birthday = QDate::fromString(QString::fromStdString(result[0][6]), "yyyy-MM-dd");
+        user.birthday = QDateTime::fromString(QString::fromStdString(result[0][6]), "yyyy-MM-dd");
         user.createTime = QDateTime::fromString(QString::fromStdString(result[0][7]), "yyyy-MM-dd HH:mm:ss");
         user.region = static_cast<quint8>(std::stoi(result[0][8]));
         return user;
@@ -73,10 +73,10 @@ UserBaseInfoDO UserDAO::findById(const QString &ssid) {
     return UserBaseInfoDO();
 }
 
-QList<UserBaseInfoDO> UserDAO::findByRegion(quint8 region) {
-    std::string sql = "SELECT ssid, ssname, avatar, sex, personalSign, thumbUpCount, birthday, createTime, region "
-                      "FROM user_base_info WHERE region = ?;";
-    std::vector<std::string> params = { std::to_string(region) };
+QList<UserBaseInfoDO> UserDAO::findByRegion(quint8 region, int pageSize, int pageNum) {
+    std::string sql = "SELECT ssid, ssname, avatar, sex, personal_sign, thumb_up_count, birthday, create_time, region "
+                      "FROM user_base_info WHERE region = ? LIMIT ? OFFSET ?;";
+    std::vector<std::string> params = { std::to_string(region) , std::to_string(pageSize), std::to_string(pageNum)};
 
     auto result = _db.query(sql, params);
     QList<UserBaseInfoDO> users;
@@ -88,7 +88,7 @@ QList<UserBaseInfoDO> UserDAO::findByRegion(quint8 region) {
         user.sex = (row[3] == "M") ? UserSex::Male : UserSex::Female; // "M" 或 "F" 转换为枚举
         user.personalSign = QString::fromStdString(row[4]);
         user.thumbUpCount = std::stoul(row[5]);
-        user.birthday = QDate::fromString(QString::fromStdString(row[6]), "yyyy-MM-dd");
+        user.birthday = QDateTime::fromString(QString::fromStdString(row[6]), "yyyy-MM-dd");
         user.createTime = QDateTime::fromString(QString::fromStdString(row[7]), "yyyy-MM-dd HH:mm:ss");
         user.region = static_cast<quint8>(std::stoi(row[8]));
         users.append(user);
@@ -104,6 +104,19 @@ bool UserDAO::updateAvatar(const QString &ssid, const QString &newAvatar) {
     };
 
     return _db.update(sql, params);
+}
+
+int UserDAO::getRegionCount(quint8 region) {
+    std::string sql = "SELECT COUNT(*) FROM user_base_info WHERE region = ?";
+    std::vector<std::string> params = { std::to_string(region) };
+
+    auto result = _db.query(sql, params);
+
+    if (!result.empty() && !result[0].empty()) {
+        return std::stoi(result[0][0]);
+    }else {
+        return 0;
+    }
 }
 
 bool UserDAO::updateThumbUpCount(const QString &ssid, int newCount) {

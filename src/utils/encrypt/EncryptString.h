@@ -10,8 +10,9 @@
 class EncryptString {
 public:
     static EncryptString *getEncryptObj();
-    std::string encryptString(const std::string& str);
-
+    std::string encryptStringByMD5(const std::string& str);
+    std::string encryptStringBySHA256(const std::string& str, const std::string& passwordSalt);
+    std::string generatePasswordSalt(size_t length = 16);
     void destroyObj();
 private:
     static EncryptString * obj;

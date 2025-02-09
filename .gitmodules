@@ -1,7 +1,11 @@
 [submodule "src/3rdparty/ela-widget-tools"]
     path = src/3rdparty/ela-widget-tools
-    url = https://github.com/Liniyous/ElaWidgetTools.git
+    url = https://github.com/FUQUANYUO/SynergySpot-ElaWidgetTools.git
 [submodule "src/3rdparty/grpc"]
     path = src/3rdparty/grpc
     url = https://gitee.com/mirrors/grpc.git
     branch = v1.46.5
+[submodule "src/3rdparty/sqlcipher"]
+    path = src/3rdparty/sqlcipher
+    url = https://github.com/sqlcipher/sqlcipher.git
+    branch = v4.6.1

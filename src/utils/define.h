@@ -29,19 +29,18 @@ Q_DECLARE_INTERFACE(SS_Plugin, "org.synergy-spot.SS_PluginInterface")
 enum UserType{
     Myself,
     Strangers,
-    Friends
+    Friends,
+    Groups,
 };
 
-struct MsgCardInfo {
-    QString name;
-    QString ssid;
-    QString mark;
-    QString content;
-    QString avatar;
-    qint64 timestamp;
-    bool isGroup;
+struct ChatMessage{
+    QString ssid;           // id
+    QString name;           // name
+    QString content;        // html rich text
+    QString avatarPath;     // pic path
+    bool isOwnMessage;      // distinguish between sender and receiver
 };
-Q_DECLARE_METATYPE(MsgCardInfo)
+Q_DECLARE_METATYPE(ChatMessage)
 
 struct LocalInfo{
     QString country;
@@ -68,6 +67,28 @@ struct UserInfo{
     }
 };
 Q_DECLARE_METATYPE(UserInfo)
+
+struct GroupNotice {
+    QString content;
+};
+
+struct GroupInfo{
+    UserType            _type;
+    QString             _ssid;
+    QString             _name;
+    QString             _remark;
+    QString             _resume;
+    QString             _picPath;
+    int                 _memberCount;
+    QList<GroupNotice>  _notices;
+    bool isEmpty() const {
+        if(_ssid.isEmpty() && _name.isEmpty() &&
+           _remark.isEmpty() && _picPath.isEmpty())
+            return true;
+        return false;
+    }
+};
+Q_DECLARE_METATYPE(GroupInfo)
 
 
 #endif//SYNERGYSPOT_DEFINE_H

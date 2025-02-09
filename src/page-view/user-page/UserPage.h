@@ -22,7 +22,7 @@
     #endif
 #endif
 
-#define g_pUserPage(_TYPE_,_INFO_) UserPage::getInstance(_TYPE_,_INFO_)
+#define g_pUserPage(_TYPE_,_INFO1_,_INFO2_) UserPage::getInstance(_TYPE_,_INFO1_,_INFO2_)
 
 class ElaInteractiveCard;
 class ElaToolButton;
@@ -35,15 +35,17 @@ class QGridLayout;
 
 class SS_API UserPage : public ElaWidget{
 public:
-    static UserPage * getInstance(UserType type,UserInfo & info,QWidget*parent = nullptr);
+    static UserPage * getInstance(UserType type, UserInfo uInfo, GroupInfo gInfo, QWidget*parent = nullptr);
     static void destroyUserPage();
 
     void setInfo(const UserInfo & info);
+    void setInfo(const GroupInfo & info);
+
     void showAt(const QPoint &pos);
 signals:
 private:
     UserPage() = default;
-    explicit UserPage(UserType type,UserInfo & info,QWidget *parent = nullptr);
+    explicit UserPage(UserType type,QWidget *parent = nullptr);
     ~UserPage() override;
 
 protected:
@@ -68,6 +70,9 @@ private:
     ElaText            * _joinDayText       = nullptr;
     ElaText            * _localInfoText     = nullptr;
 
+    ElaText            * _groupResume       = nullptr;
+    ElaPushButton      * _groupNotice       = nullptr;
+
     QVBoxLayout        * _mainLayout        = nullptr;
     QGridLayout        * _textLayout        = nullptr;
     QHBoxLayout        * _buttonLayout      = nullptr;
@@ -78,6 +83,7 @@ private:
     QString              _signContent       = "";
     QString              _joinDay           = "";
     QString              _localInfo         = "";
+    bool                 _isGroup           = false;
     // --------------- BackEnd --------------
 
     static QMap<UserType,UserPage*> _userObjMap;

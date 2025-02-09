@@ -13,9 +13,15 @@ public:
     explicit UserService(LiteConn& db);
 
     UserBaseInfoDTO getUserBySSID(const QString& ssid);
-    bool updateUserBySSID(const QString& ssid,const UserBaseInfoDTO& dto);
+
+    bool setUserInfoData(QList<UserBaseInfoDTO> dto);
+    bool addUser(const UserBaseInfoDTO& dto);
+
+    bool updateUserBySSID(const UserBaseInfoDTO& dto);
     bool updateThumbUpCount(const QString& ssid,int newCount);
     bool updateAvatarPath(const QString& ssid, const QString& newUrl);
+
+    int getRegionCount(quint8 code);
 private:
     UserDAO userDAO;
 };

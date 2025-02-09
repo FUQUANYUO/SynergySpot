@@ -8,6 +8,7 @@
 #include "define.h"
 
 #include <QWidget>
+#include "common-data/CommonData.h"
 
 #ifdef SS_PLATFORM_WINDOWS
     #ifdef SS_MESSAGE_PAGE_EXPORTS
@@ -39,11 +40,16 @@ class SS_API MessagePage : public QWidget{
 public:
     static MessagePage * getInstance();
     static void destroyMessagePage();
+
+    bool loadCacheMsg(const QList<MessageContentDTO>& caches);
 public slots:
-    void addMsgCard(const MsgCardInfo& info);
+    // only process card ui logic , don't include interaction with conversation page
+    void addMsgCard(const MsgCombineDTO& info);
 private:
     explicit MessagePage(QWidget *parent = nullptr);
     ~MessagePage() override;
+
+    void addMsgContent(const MessageContentDTO& content);
 protected:
     void initConnectFunc();
     void initWindow();
@@ -58,7 +64,7 @@ private:
     // ----------------- UI -----------------
 
     // --------------- BackEnd --------------
-    QMap<ElaInteractiveCard*,MsgCardInfo>        _tmpUserMsgList;
+    QMap<ElaInteractiveCard*,MsgCombineDTO>      _tmpUserMsgList;
     QHash<QString,int>                           _unreadMsgCount;
     QHash<ElaInteractiveCard*,ConversationPage*> _cardLinkPageHash;
     QHash<QString,ElaInteractiveCard*>           _ssidLinkCardHash;

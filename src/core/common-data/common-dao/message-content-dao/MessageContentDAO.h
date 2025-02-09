@@ -7,13 +7,19 @@
 
 #include "../CommonDataBaseDAO.h"
 
-class MessageContentDAO : public IMessageContentDAO {
+class MessageContentDAO : public IMessageDAO {
 public:
-    explicit MessageContentDAO(LiteConn& db);
+    MessageContentDAO(LiteConn &db);
     ~MessageContentDAO() override;
-    qint64 insertMessage(const MessageContentDO& message) override;
-    MessageContentDO findMessageById(qint64 id) override;
-    QList<MessageContentDO> listMessagesBySender(const QString& senderSsid) override;
+    // 消息内容操作
+    qint64 insertMessageContent(const MessageContentDO& message) override;
+    bool insertMessageRecipient(const MessageRecipientDO& recipient) override;
+    bool insertMessageTransaction(QList<QVariant> messages) override;
+
+    // 消息查询
+    bool markMessageAsRead(qint64 messageId, const QString& recipientSSID) override;
+    QList<QVariant> listMessagesByRecipient(const QString& recipientSSID, int pageSize = 20, int pageNum = 1) override;
+    int getMessageCount(const QString& ssid);
 private:
     LiteConn& _db;
 };

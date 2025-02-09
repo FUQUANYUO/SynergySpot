@@ -28,6 +28,9 @@ class ElaTreeView;
 class QVBoxLayout;
 class ContactModel;
 
+struct MsgCombineDTO;
+struct FriendshipDTO;
+
 #define g_pContactPage ContactPage::getInstance()
 
 class SS_API ContactPage : public ElaScrollPage{
@@ -39,11 +42,11 @@ public:
     void addFriendGrouping(const QString& name);
 
     QList<QString> getFriendGrouping();
-
+    bool loadCacheContact(const QList<FriendshipDTO>& caches);
 public slots:
-    void addContactInfo(const QString& groupingName,const MsgCardInfo &info);
+    void addContactInfo(const QString& groupingName,const MsgCombineDTO &info);
 signals:
-    void sigTriggerAddMsgCard(const MsgCardInfo &info);
+    void sigTriggerAddMsgCard(const MsgCombineDTO &info);
 private:
     explicit ContactPage(QWidget *parent = nullptr);
     ~ContactPage() override;
@@ -70,9 +73,9 @@ private:
     // ----------------- UI -----------------
 
     // --------------- BackEnd --------------
-    QMap<QString,QMap<QString,QList<MsgCardInfo>>>  _groupingInfos;
+    QMap<QString,QMap<QString,QList<MsgCombineDTO>>>  _groupingInfos;
     // assist find MsgCardInfo
-    QHash<QString, MsgCardInfo>                     _ssidToCardInfoHash;
+    QHash<QString, MsgCombineDTO>                     _ssidToCardInfoHash;
     // --------------- BackEnd --------------
 
     static ContactPage* _contactPage;

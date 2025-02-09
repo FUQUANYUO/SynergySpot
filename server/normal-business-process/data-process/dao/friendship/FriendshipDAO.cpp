@@ -1,0 +1,203 @@
+//
+// Created by FUQAQ on 2025/2/6.
+//
+
+#include "FriendshipDAO.h"
+
+int64_t FriendshipDAO::create(const FriendshipDO &friendship) {
+    std::string sql = "INSERT INTO friendship (ssid, grouping, friend_ssid, ship_status, friend_type) "
+                      "VALUES (?, ?, ?, ?, ?)";
+    std::vector<MysqlConn::Param> params;
+
+    MysqlConn::Param paramSsid;
+    paramSsid.type = MysqlConn::Param::STRING;
+    paramSsid.str_val = friendship.ssid;
+    params.push_back(paramSsid);
+
+    MysqlConn::Param paramGrouping;
+    paramGrouping.type = MysqlConn::Param::STRING;
+    paramGrouping.str_val = friendship.grouping;
+    params.push_back(paramGrouping);
+
+    MysqlConn::Param paramFriendSsid;
+    paramFriendSsid.type = MysqlConn::Param::STRING;
+    paramFriendSsid.str_val = friendship.friendSsid;
+    params.push_back(paramFriendSsid);
+
+    MysqlConn::Param paramShipStatus;
+    paramShipStatus.type = MysqlConn::Param::INT;
+    paramShipStatus.int_val = friendship.shipStatus;
+    params.push_back(paramShipStatus);
+
+    MysqlConn::Param paramFriendType;
+    paramFriendType.type = MysqlConn::Param::INT;
+    paramFriendType.int_val = friendship.friendType;
+    params.push_back(paramFriendType);
+
+    if (!m_conn->update(sql, params)) {
+        LOG_ERROR("Failed to create friendship: " << friendship.ssid << " - " << friendship.friendSsid);
+        return -1;
+    }
+
+    return static_cast<int64_t>(m_conn->getLastInsertId());
+}
+
+bool FriendshipDAO::update(const FriendshipDO &friendship) {
+    std::string sql = "UPDATE friendship SET grouping = ? , remark = ? , ship_status = ? WHERE ssid = ? AND friend_ssid = ?";
+    std::vector<MysqlConn::Param> params;
+
+    MysqlConn::Param paramGrouping;
+    paramGrouping.type = MysqlConn::Param::STRING;
+    paramGrouping.str_val = friendship.grouping;
+    params.push_back(paramGrouping);
+
+    MysqlConn::Param remark;
+    remark.type = MysqlConn::Param::STRING;
+    remark.str_val = friendship.remark;
+    params.push_back(remark);
+
+    MysqlConn::Param paramShipStatus;
+    paramShipStatus.type = MysqlConn::Param::INT;
+    paramShipStatus.int_val = friendship.shipStatus;
+    params.push_back(paramShipStatus);
+
+    MysqlConn::Param paramSsid;
+    paramSsid.type = MysqlConn::Param::STRING;
+    paramSsid.str_val = friendship.ssid;
+    params.push_back(paramSsid);
+
+    MysqlConn::Param paramFriendSsid;
+    paramFriendSsid.type = MysqlConn::Param::STRING;
+    paramFriendSsid.str_val = friendship.friendSsid;
+    params.push_back(paramFriendSsid);
+
+    if (!m_conn->update(sql, params)) {
+        LOG_ERROR("Failed to update status for friendship")
+        return false;
+    }
+
+    return true;
+}
+
+bool FriendshipDAO::deleteById(const std::string &ssid, const std::string &friendSsid){
+    std::string sql = "DELETE FROM friendship WHERE ssid = ? AND friend_ssid = ?";
+    std::vector<MysqlConn::Param> params;
+
+    MysqlConn::Param paramSsid;
+    paramSsid.type = MysqlConn::Param::STRING;
+    paramSsid.str_val = ssid;
+    params.push_back(paramSsid);
+
+    MysqlConn::Param paramFriendSsid;
+    paramFriendSsid.type = MysqlConn::Param::STRING;
+    paramFriendSsid.str_val = friendSsid;
+    params.push_back(paramFriendSsid);
+
+    if (!m_conn->update(sql, params)) {
+        LOG_ERROR("Failed to delete friendship: " << ssid << " - " << friendSsid);
+        return false;
+    }
+
+    return true;
+}
+
+FriendshipDO FriendshipDAO::findRelationship(const std::string &ssid, const std::string &friendSsid)  {
+    std::string sql = "SELECT id, ssid, grouping, remark ,friend_ssid, ship_status, friend_type, create_time "
+                      "FROM friendship WHERE ssid = ? AND friend_ssid = ?";
+    std::vector<MysqlConn::Param> params;
+
+    MysqlConn::Param paramSsid;
+    paramSsid.type = MysqlConn::Param::STRING;
+    paramSsid.str_val = ssid;
+    params.push_back(paramSsid);
+
+    MysqlConn::Param paramFriendSsid;
+    paramFriendSsid.type = MysqlConn::Param::STRING;
+    paramFriendSsid.str_val = friendSsid;
+    params.push_back(paramFriendSsid);
+
+    MYSQL_RES* result = m_conn->query(sql, params);
+    if (!result) {
+        LOG_ERROR("Failed to find friendship: " << ssid << " - " << friendSsid);
+        return {-1};
+    }
+
+    MYSQL_ROW row = mysql_fetch_row(result);
+    if (!row) {
+        mysql_free_result(result);
+        return {-1};
+    }
+
+    FriendshipDO friendship;
+    friendship.id = std::stoll(row[0]);
+    friendship.ssid = row[1];
+    friendship.grouping = row[2];
+    friendship.remark = row[3];
+    friendship.friendSsid = row[4];
+    friendship.shipStatus = static_cast<uint8_t>(std::stoul(row[5]));
+    friendship.friendType = static_cast<uint8_t>(std::stoul(row[6]));
+    friendship.createTime = row[6] ? std::stoul(row[6]) : 0;
+
+    mysql_free_result(result);
+    return friendship;
+}
+
+std::vector<FriendshipDO> FriendshipDAO::listByUser(const std::string &ssid)  {
+    std::string sql = "SELECT id, ssid, grouping, remark, friend_ssid, ship_status, friend_type, create_time "
+                      "FROM friendship WHERE ssid = ? ORDER BY create_time DESC LIMIT ? OFFSET ?";
+    std::vector<MysqlConn::Param> params;
+
+    MysqlConn::Param paramSsid;
+    paramSsid.type = MysqlConn::Param::STRING;
+    paramSsid.str_val = ssid;
+    params.push_back(paramSsid);
+
+    MYSQL_RES* result = m_conn->query(sql, params);
+    if (!result) {
+        LOG_ERROR("Failed to list friendships for user: " << ssid);
+        return {};
+    }
+
+    std::vector<FriendshipDO> friendships;
+    MYSQL_ROW row;
+    while ((row = mysql_fetch_row(result))) {
+        FriendshipDO friendship;
+        friendship.id = std::stoll(row[0]);
+        friendship.ssid = row[1];
+        friendship.grouping = row[2];
+        friendship.remark = row[3];
+        friendship.friendSsid = row[4];
+        friendship.shipStatus = static_cast<uint8_t>(std::stoul(row[5]));
+        friendship.friendType = static_cast<uint8_t>(std::stoul(row[6]));
+        friendship.createTime = row[7] ? std::stoul(row[7]) : 0;
+        friendships.push_back(friendship);
+    }
+
+    mysql_free_result(result);
+    return friendships;
+}
+
+int FriendshipDAO::getFriendshipCount(const std::string &ssid)  {
+    std::string sql = "SELECT COUNT(*) FROM friendship WHERE ssid = ?";
+    std::vector<MysqlConn::Param> params;
+
+    MysqlConn::Param paramSsid;
+    paramSsid.type = MysqlConn::Param::STRING;
+    paramSsid.str_val = ssid;
+    params.push_back(paramSsid);
+
+    MYSQL_RES* result = m_conn->query(sql, params);
+    if (!result) {
+        LOG_ERROR("Failed to get friendship count for user: " << ssid);
+        return 0;
+    }
+
+    MYSQL_ROW row = mysql_fetch_row(result);
+    int count = 0;
+    if (row && row[0]) {
+        count = std::stoi(row[0]);
+    }
+
+    mysql_free_result(result);
+    return count;
+}

@@ -22,7 +22,7 @@ public:
     virtual UserBaseInfoDO findById(const QString& ssid) = 0;
 
     // 扩展方法
-    virtual QList<UserBaseInfoDO> findByRegion(quint8 region) = 0;
+    virtual QList<UserBaseInfoDO> findByRegion(quint8 region, int pageSize, int pageNum) = 0;
     virtual bool updateThumbUpCount(const QString& ssid, int newCount) = 0;
 };
 
@@ -43,6 +43,7 @@ public:
     virtual qint64 createGroup(const GroupBaseInfoDO& group) = 0;
     virtual bool updateProfile(const QString& groupSsid, const QString& newProfile) = 0;
     virtual GroupBaseInfoDO findBySsid(const QString& groupSsid) = 0;
+    virtual QList<GroupBaseInfoDO> getAllGroupInfos(int pageSize, int pageNum) = 0;
 };
 
 class IGroupMemberDAO {
@@ -51,25 +52,21 @@ public:
 
     virtual bool addMember(const GroupMemberInfoDO& member) = 0;
     virtual bool removeMember(const QString& groupSsid, const QString& memberSsid) = 0;
-    virtual QList<GroupMemberInfoDO> listMembers(const QString& groupSsid) = 0;
+    virtual QList<GroupMemberInfoDO> listMembers(const QString& groupSsid, int pageSize, int pageNum1) = 0;
 };
 
-class IMessageContentDAO {
+class IMessageDAO {
 public:
-    virtual ~IMessageContentDAO() = default;
+    virtual ~IMessageDAO() = default;
 
-    virtual qint64 insertMessage(const MessageContentDO& message) = 0;
-    virtual MessageContentDO findMessageById(qint64 id) = 0;
-    virtual QList<MessageContentDO> listMessagesBySender(const QString& senderSsid) = 0;
-};
+    // 消息内容操作
+    virtual qint64 insertMessageContent(const MessageContentDO& message) = 0;
+    virtual bool insertMessageRecipient(const MessageRecipientDO& recipient) = 0;
+    virtual bool insertMessageTransaction(QList<QVariant> messages) = 0;
 
-class IMessageRecipientDAO {
-public:
-    virtual ~IMessageRecipientDAO() = default;
-
-    virtual bool addRecipient(const MessageRecipientDO& recipient) = 0;
-    virtual bool markAsRead(qint64 recipientId) = 0;
-    virtual QList<MessageRecipientDO> listUnread(const QString& userSsid) = 0;
+    // 消息查询
+    virtual bool markMessageAsRead(qint64 messageId, const QString& recipientSSID) = 0;
+    virtual QList<QVariant> listMessagesByRecipient(const QString& recipientSSID, int pageSize, int pageNum) = 0;
 };
 
 class IStickerDAO {
@@ -79,12 +76,12 @@ public:
     // 基础表情操作
     virtual qint64 insertBaseSticker(const BaseStickerDO& sticker) = 0;
     virtual bool deleteBaseSticker(qint64 stickerId) = 0;
-    virtual QList<BaseStickerDO> listBaseStickers() = 0;
+    virtual QList<BaseStickerDO> listBaseStickers(int pageSize, int pageNum) = 0;
 
     // 用户收藏操作
     virtual bool insertCollectSticker(const CollectedStickerDO& sticker) = 0;
     virtual bool removeCollectedSticker(const QString& userSsid, const QString& imageUrl) = 0;
-    virtual QList<CollectedStickerDO> listCollectedStickers(const QString& userSsid) = 0;
+    virtual QList<CollectedStickerDO> listCollectedStickers(const QString& userSsid, int pageSize, int pageNum) = 0;
 };
 
 #endif //COMMONDATABASEDAO_H

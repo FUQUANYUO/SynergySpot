@@ -32,7 +32,7 @@ struct UserBaseInfoDO {
     UserSex sex;             // 存储时需要转换为'M'/'F'
     QString personalSign;
     quint32 thumbUpCount = 0;
-    QDate birthday;
+    QDateTime birthday;
     QDateTime createTime;
     quint8 region = 2;       // DEFAULT 2
 };
@@ -41,10 +41,18 @@ struct UserBaseInfoDO {
 struct FriendshipDO {
     qint64 id;               // AUTOINCREMENT
     QString ssid;
+    QString grouping;
     QString friendSSID;
     qint32 shipStatus;       // 状态值（可配合枚举使用）
-    qint32 friendType = 1;   // DEFAULT 1
+    qint32 friendType = 1;   // DEFAULT 1 用户 2 群组
     QDateTime createTime;
+    bool isEmpty() {
+        if ((ssid.isEmpty() && grouping.isEmpty() && friendSSID.isEmpty()) || id == -1) {
+            return true;
+        }else {
+            return false;
+        }
+    }
 };
 
 // 群组基础信息（对应group_base_info表）
@@ -52,6 +60,7 @@ struct GroupBaseInfoDO {
     qint64 id;               // AUTOINCREMENT
     QString ssidGroup;       // UNIQUE
     QString name;
+    QString avatar;
     QString createSSID;
     QString profile;
     QDateTime createTime;

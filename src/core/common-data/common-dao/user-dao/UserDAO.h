@@ -19,9 +19,11 @@ public:
     UserBaseInfoDO findById(const QString& ssid) override;
 
     // 扩展方法
-    QList<UserBaseInfoDO> findByRegion(quint8 region) override;
+    QList<UserBaseInfoDO> findByRegion(quint8 region,int pageSize = 20, int pageNum = 1) override;
     bool updateThumbUpCount(const QString& ssid, int newCount) override;
     bool updateAvatar(const QString& ssid, const QString& newAvatar);
+
+    int getRegionCount(quint8 region);
 
 private:
     LiteConn& _db;

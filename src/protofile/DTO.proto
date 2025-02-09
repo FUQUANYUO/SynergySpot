@@ -2,19 +2,257 @@ syntax = "proto3";
 
 package SSDTO;
 
-enum Business_Type{
-    LOGIN = 0;
-    ENROLL = 1;
-    FOWARD_MSG = 2;
-    DISCONNECT = 3;
-    GET_CONTACTLIST = 4;
-    ADD_FRIEND = 5;
-    GET_EMAILCODE = 6;
-    FRIEND_SEARCH = 7;
+enum BusinessType {
+  R_USER_BASE_INFO = 0;
+  U_USER_BASE_INFO = 1;
+  DISCONNECT = 3;
+  EMAIL_VERIFY = 4;
 
-    FILE_TRANSFER_REQUEST = 8;
-    FILE_CHUNK = 9;
-    MISSING_CHUNK_REQUEST = 10;
+  LOGIN_CHECK = 11;
+  ENROLL_ACCOUNT = 12;
+  RECOVER_PASSWORD = 13;
 
-    REALTIME_SERVICE = 11;
+  R_FRIENDSHIP_LIST = 21;
+  U_FRIENDSHIP = 22;
+  D_FRIENDSHIP = 23;
+  C_FRIENDSHIP = 24;
+
+  C_GROUP_BASE_INFO = 31;
+  R_GROUP_BASE_INFO = 32;
+  D_GROUP_BASE_INFO = 33;
+  U_GROUP_BASE_INF0 = 34;
+
+  C_GROUP_MEMBER_INFO = 41;
+  D_GROUP_MEMBER_INFO = 42;
+  R_GROUP_MEMBER_INFO = 43;
+
+  C_GROUP_NOTICE = 51;
+  D_GROUP_NOTICE = 52;
+  R_GROUP_NOTICE = 53;
+
+  SEARCH_USER = 56;
+  SEARCH_GROUP = 57;
+
+  R_MESSAGE_CONTENT = 61;             // 离线转发
+  C_MESSAGE_CONTENT = 62;             // 转发消息
+  MAKE_FRIEND_REQUEST = 63;
+  MAKE_FRIEND_RESPONSE = 64;
+
+  R_DISTRICT_BY_PID = 71;
+  R_DISTRICT_PROVINCE = 72;
+  R_DISTRICT_CITY = 73;
+  R_DISTRICT_BLOCK = 74;
+  R_DISTRICT_BY_NAME = 75;
+
+  R_BASE_STICKER = 81;
+
+  R_USER_COLLECTED_STICKER = 82;
+  C_USER_COLLECTED_STICKER = 83;
+  D_USER_COLLECTED_STICKER = 84;
+}
+
+message FuzzySearchDTO{
+    bool isGroup = 1;
+    bytes ssid = 2;
+    bytes name = 3;
+    repeated UserBaseInfoDTO userInfos = 4;
+    repeated GroupMemberInfoDTO groupInfos = 5;
+    bytes ip = 6;
+};
+
+message EnrollAccountDTO{
+  bytes ssid = 1;
+  bytes user_name = 2;
+  bytes password = 3;
+  bytes password_salt = 4;
+  bytes email = 5;
+  bytes ip = 6;
+};
+
+message EmailVerifyDTO{
+  bool is_request = 1;
+  bytes email_address = 2;
+  bytes verify_code = 3;
+  bytes start_time = 4;
+  bytes valid_time = 5;
+  bytes ip = 6;
+};
+
+message MakeFriendDTO{
+  bytes sender = 1;
+  bytes recipient = 2;
+  bool  accept = 3;
+  bool  isGroup = 4;
+};
+
+message LoginCheckDTO{
+  bytes ssid = 1;
+  bytes password = 2;
+  bool is_pass = 3;
+  bytes email = 4;
+  bytes ip = 5;
+};
+
+message DisconnectDTO{
+  bytes ssid = 1;
+  bytes ip = 2;
+};
+
+message GetAllUserFriendship{
+  string ssid = 1;
+  repeated UserBaseInfoDTO friends = 2;
+  bytes ip = 3;
+};
+
+// 用户基础信息 DTO
+message UserBaseInfoDTO {
+  string ssid = 1;
+  string ssname = 2;
+  string avatar_path = 3;
+  string sex = 4;         // 'M' 或 'F' 建议后续改为枚举
+  string personal_sign = 5;
+  uint32 thumb_up_count = 6;
+  int64 birthday = 7;     // UNIX 时间戳
+  uint32 region = 8;      // proto3 无 uint8 类型，使用 uint32
+  int64 create_time = 9;
+  bytes ip = 10;
+}
+
+// 用户私有信息 DTO
+message UserPrivateInfoDTO {
+  string ssid = 1;
+  string email = 2;
+  string password = 3;
+  string password_salt = 4;
+  uint32 account_status = 5;
+  bytes ip = 6;
+}
+
+// 好友关系 DTO
+message FriendshipDTO {
+  int64 id = 1;
+  string ssid = 2;
+  string grouping = 3;
+  string remark = 4;
+  string friend_ssid = 5;
+  uint32 ship_status = 6;
+  uint32 friend_type = 7;
+  int64 create_time = 8;
+  bytes ip = 9;
+}
+
+// 群管理员 DTO
+message GroupAdminDTO {
+  int64 id = 1;
+  int64 group_id = 2;
+  string op_ssid = 3;
+  bytes ip = 4;
+}
+
+// 群组基础信息 DTO
+message GroupBaseInfoDTO {
+  int64 id = 1;
+  string ssid_group = 2;
+  string name = 3;
+  string avatar = 4;
+  string create_ssid = 5;
+  string profile = 6;
+  repeated string admins = 7;  // 管理员列表
+  int64 create_time = 8;
+  bytes ip = 9;
+}
+
+// 群公告 DTO
+message GroupNoticeDTO {
+  int64 id = 1;
+  int64 group_id = 2;
+  string notice = 3;
+  int64 create_time = 4;
+  bytes ip = 5;
+}
+
+// 群成员信息 DTO
+message GroupMemberInfoDTO {
+  int64 id = 1;
+  string ssid_group = 2;
+  string ssid_member = 3;
+  int64 create_time = 4;
+  bytes ip = 5;
+}
+
+// 消息接收者 DTO
+message MessageRecipientDTO {
+  int64 id = 1;
+  int64 message_id = 2;
+  uint32 recipient_type = 3;
+  string recipient_ssid = 4;
+  bool read_status = 5;
+  bytes ip = 6;
+}
+
+// 消息内容 DTO
+message MessageContentDTO {
+  int64 id = 1;
+  string sender_ssid = 2;
+  uint32 content_type = 3;
+  string content = 4;
+  string file_id = 5;
+  MessageRecipientDTO recipient = 6;
+  int64 create_time = 7;
+  int32 page_size = 8;    // 分页参数
+  int32 page_num = 9;     // 分页参数
+  bytes ip = 10;
+}
+
+// 地区 DTO
+message DistrictDTO {
+  uint32 district_id = 1;
+  uint32 pid = 2;
+  string district = 3;
+  uint32 level = 4;
+  bytes ip = 5;
+}
+
+// 文件存储 DTO
+message FileStorageDTO {
+  string file_id = 1;
+  string uploader_ssid = 2;
+  string file_name = 3;
+  int64 file_size = 4;
+  string file_type = 5;
+  string storage_path = 6;
+  int64 upload_time = 7;
+  bytes ip = 8;
+}
+
+// 操作日志 DTO
+message OperationLogDTO {
+  int64 id = 1;
+  string ssid = 2;
+  string operation_type = 3;
+  string detail = 4;
+  string ip_address = 5;
+  int64 create_time = 6;
+  bytes ip = 7;
+}
+
+// 基础表情 DTO
+message BaseStickerDTO {
+  int64 sticker_id = 1;
+  string image_url = 2;
+  string tags = 3;
+  int64 created_at = 4;
+  bytes ip = 5;
+}
+
+// 用户收藏表情 DTO
+message UserCollectedStickerDTO {
+  int64 collection_id = 1;
+  string user_ssid = 2;
+  bool is_custom = 3;
+  string image_url = 4;
+  int64 created_at = 5;
+  int32 page_size = 6;    // 分页参数
+  int32 page_num = 7;     // 分页参数
+  bytes ip = 8;
 }
