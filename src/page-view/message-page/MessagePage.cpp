@@ -49,7 +49,7 @@ bool MessagePage::loadCacheMsg(const QList<MessageContentDTO> &caches) {
         if (!isGroup) {
             // get user ssid base info
             UserBaseInfoDTO userBaseInfo;
-            if (it.senderSSID.toStdString() == g_pCommonData->getCurUserInfo().CurSSID) {
+            if (it.senderSSID == g_pCommonData->getCurUserInfo().ssid) {
                 userBaseInfo = g_pCommonData->getUserInfoBySSID(it.recipient.recipientSSID);
             }else {
                 // find recipient base info
@@ -72,7 +72,7 @@ bool MessagePage::loadCacheMsg(const QList<MessageContentDTO> &caches) {
             // get group ssid base info
             GroupBaseInfoDTO   gBaseInfo;
             QList<GroupMemberInfoDTO> gMemberInfos;
-            if (it.senderSSID.toStdString() == g_pCommonData->getCurUserInfo().CurSSID) {
+            if (it.senderSSID == g_pCommonData->getCurUserInfo().ssid) {
                 gBaseInfo    = g_pCommonData->getGroupInfoDataBySSID(it.recipient.recipientSSID);
                 gMemberInfos = g_pCommonData->getGroupMemberInfoData(it.recipient.recipientSSID, 100, 1);
             }else {
@@ -108,11 +108,11 @@ void MessagePage::addMsgContent(const MessageContentDTO &content) {
     QTextDocument docu;
     docu.setHtml(html);
 
-    QString _curSSID = QString::fromStdString(g_pCommonData->getCurUserInfo().CurSSID);
-    QString _curName = QString::fromStdString(g_pCommonData->getCurUserInfo().CurSSname);
-    QString _avatar = QString::fromStdString(g_pCommonData->getCurUserInfo().CurUserAvatarPath);
-    bool isUserSend = (content.senderSSID == _curSSID);
-    bool isGroup    = (content.recipient.recipientType==2);// 2 is group type
+    QString _curSSID = g_pCommonData->getCurUserInfo().ssid;
+    QString _curName = g_pCommonData->getCurUserInfo().username;
+    QString _avatar  = g_pCommonData->getCurUserInfo().avatarPath;
+    bool isUserSend  = (content.senderSSID == _curSSID);
+    bool isGroup     = (content.recipient.recipientType==2);// 2 is group type
     if(isUserSend) {
         _ssidLinkCardHash[content.recipient.recipientSSID]->setTimeContent(QString::fromStdString(
         GetCurTime::getTimeObj()->getMsgTypeTime(content.createTime.toMSecsSinceEpoch())),Qt::gray,font);

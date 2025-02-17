@@ -322,6 +322,10 @@ bool LandPage::saveQrcToFile(const QString &qrcPath, const QString &targetFilePa
     return true;
 }
 
+void LandPage::clearPasswordInput() {
+    _inputPassword->clear();
+}
+
 void LandPage::setAcrylicForBKMaterial(bool enable) {
     _enableAcrylic = enable;
 }

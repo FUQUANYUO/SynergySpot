@@ -2,8 +2,8 @@
 // Created by FU-QAQ on 2024/12/6.
 //
 
-#ifndef SYNERGYSPOT_BACKGROUNDSTRATEGYPLUGIN_H
-#define SYNERGYSPOT_BACKGROUNDSTRATEGYPLUGIN_H
+#ifndef SYNERGYSPOT_EffectComponentPlugin_H
+#define SYNERGYSPOT_EffectComponentPlugin_H
 
 #include "define.h"
 #include "opencv2/opencv.hpp"
@@ -27,7 +27,7 @@
 
 class SS_API BackgroundStrategyPlugin : public SS_Plugin{
 public:
-    virtual ~BackgroundStrategyPlugin() = default;
+    ~BackgroundStrategyPlugin() override = default;
     virtual bool initialize(const QString& videoSource) = 0;
     virtual void updateFrame() = 0;
     virtual QImage getCurrentFrame() const = 0;
@@ -37,4 +37,4 @@ public:
 
 extern "C" SS_API BackgroundStrategyPlugin* createCVProVideoStrategyPlugin();
 
-#endif//SYNERGYSPOT_BACKGROUNDSTRATEGYPLUGIN_H
+#endif

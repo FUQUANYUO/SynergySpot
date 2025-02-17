@@ -95,3 +95,89 @@ FileStorageDO FileStorageDAO::findById(const std::string &fileId) {
     mysql_free_result(result);
     return file;
 }
+
+std::vector<FileStorageDO> FileStorageDAO::findByName(const std::string &fileName,int pageSize, int pageNum) {
+    std::string sql = "SELECT file_id, uploader_ssid, file_name, file_size, file_type, storage_path FROM file_storage "
+                      "WHERE file_name = ? "
+                      "LIMIT ? OFFSET ?";
+    std::vector<MysqlConn::Param> params;
+    MysqlConn::Param paramFileName;
+    paramFileName.type = MysqlConn::Param::STRING;
+    paramFileName.str_val = fileName;
+    params.push_back(paramFileName);
+
+    MysqlConn::Param paramPageSize;
+    paramPageSize.type = MysqlConn::Param::INT;
+    paramPageSize.int_val = pageSize;
+    params.push_back(paramPageSize);
+
+    MysqlConn::Param paramOffset;
+    paramOffset.type = MysqlConn::Param::INT;
+    paramOffset.int_val = (pageNum - 1) * pageSize;
+    params.push_back(paramOffset);
+
+    MYSQL_RES* result = m_conn->query(sql, params);
+    if (!result) {
+        LOG_ERROR("Failed to find file by name: " << fileName);
+        return {};
+    }
+
+    std::vector<FileStorageDO> files;
+    MYSQL_ROW row;
+    while (row = mysql_fetch_row(result)) {
+        FileStorageDO file;
+        file.fileId = row[0];
+        file.uploaderSsid = row[1];
+        file.fileName = row[2];
+        file.fileSize = std::stoll(row[3]);
+        file.fileType = row[4];
+        file.storagePath = row[5];
+        file.uploadTime = std::stoll(row[6]);
+        files.push_back(file);
+    }
+    mysql_free_result(result);
+    return files;
+}
+
+std::vector<FileStorageDO> FileStorageDAO::findBySSID(const std::string &userSSID,int pageSize, int pageNum) {
+    std::string sql = "SELECT file_id, uploader_ssid, file_name, file_size, file_type, storage_path FROM file_storage "
+                      "WHERE file_name = ? "
+                      "LIMIT ? OFFSET ?";
+    std::vector<MysqlConn::Param> params;
+    MysqlConn::Param paramFileName;
+    paramFileName.type = MysqlConn::Param::STRING;
+    paramFileName.str_val = userSSID;
+    params.push_back(paramFileName);
+
+    MysqlConn::Param paramPageSize;
+    paramPageSize.type = MysqlConn::Param::INT;
+    paramPageSize.int_val = pageSize;
+    params.push_back(paramPageSize);
+
+    MysqlConn::Param paramOffset;
+    paramOffset.type = MysqlConn::Param::INT;
+    paramOffset.int_val = (pageNum - 1) * pageSize;
+    params.push_back(paramOffset);
+
+    MYSQL_RES* result = m_conn->query(sql, params);
+    if (!result) {
+        LOG_ERROR("Failed to find file by name: " << userSSID);
+        return {};
+    }
+
+    std::vector<FileStorageDO> files;
+    MYSQL_ROW row;
+    while (row = mysql_fetch_row(result)) {
+        FileStorageDO file;
+        file.fileId = row[0];
+        file.uploaderSsid = row[1];
+        file.fileName = row[2];
+        file.fileSize = std::stoll(row[3]);
+        file.fileType = row[4];
+        file.storagePath = row[5];
+        file.uploadTime = std::stoll(row[6]);
+        files.push_back(file);
+    }
+    mysql_free_result(result);
+    return files;
+}

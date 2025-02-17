@@ -8,7 +8,8 @@
 #include <QTcpSocket>
 #include <QString>
 
-class ClientConServer {
+class ClientConServer : public QObject{
+    Q_OBJECT
 public:
     explicit ClientConServer();
     QTcpSocket *getQSocket();

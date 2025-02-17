@@ -53,44 +53,85 @@ bool UserDAO::insert(const UserBaseInfoDO &user) {
 }
 
 bool UserDAO::update(const UserBaseInfoDO &user) {
-    std::string sql = "UPDATE user_base_info SET ssname = ?, avatar = ?, sex = ?, personal_sign = ?, birthday = ?, region = ? WHERE ssid = ?";
+    std::string sql = "UPDATE user_base_info SET ";
+    std::vector<std::string> setClauses;
     std::vector<MysqlConn::Param> params;
 
-    MysqlConn::Param paramSsname;
-    paramSsname.type = MysqlConn::Param::STRING;
-    paramSsname.str_val = user.ssname;
-    params.push_back(paramSsname);
+    // 检查并添加 ssname
+    if (!user.ssname.empty() && user.ssname != "-1") {
+        setClauses.push_back("ssname = ?");
+        MysqlConn::Param paramSsname;
+        paramSsname.type = MysqlConn::Param::STRING;
+        paramSsname.str_val = user.ssname;
+        params.push_back(paramSsname);
+    }
 
-    MysqlConn::Param paramAvatar;
-    paramAvatar.type = MysqlConn::Param::STRING;
-    paramAvatar.str_val = user.avatar;
-    params.push_back(paramAvatar);
+    // 检查并添加 avatar
+    if (!user.avatar.empty() && user.avatar != "-1") {
+        setClauses.push_back("avatar = ?");
+        MysqlConn::Param paramAvatar;
+        paramAvatar.type = MysqlConn::Param::STRING;
+        paramAvatar.str_val = user.avatar;
+        params.push_back(paramAvatar);
+    }
 
-    MysqlConn::Param paramSex;
-    paramSex.type = MysqlConn::Param::STRING;
-    paramSex.str_val = std::string(1, user.sex);
-    params.push_back(paramSex);
+    // 检查并添加 sex
+    if (user.sex != '\0') {
+        setClauses.push_back("sex = ?");
+        MysqlConn::Param paramSex;
+        paramSex.type = MysqlConn::Param::STRING;
+        paramSex.str_val = std::string(1, user.sex);
+        params.push_back(paramSex);
+    }
 
-    MysqlConn::Param paramPersonalSign;
-    paramPersonalSign.type = MysqlConn::Param::STRING;
-    paramPersonalSign.str_val = user.personalSign;
-    params.push_back(paramPersonalSign);
+    // 检查并添加 personalSign
+    if (!user.personalSign.empty() && user.personalSign != "-1") {
+        setClauses.push_back("personal_sign = ?");
+        MysqlConn::Param paramPersonalSign;
+        paramPersonalSign.type = MysqlConn::Param::STRING;
+        paramPersonalSign.str_val = user.personalSign;
+        params.push_back(paramPersonalSign);
+    }
 
-    MysqlConn::Param paramBirthday;
-    paramBirthday.type = MysqlConn::Param::STRING;
-    paramBirthday.str_val = user.birthday ? std::to_string(user.birthday) : "";
-    params.push_back(paramBirthday);
+    // 检查并添加 birthday
+    if (user.birthday != 0) {
+        setClauses.push_back("birthday = ?");
+        MysqlConn::Param paramBirthday;
+        paramBirthday.type = MysqlConn::Param::STRING;
+        paramBirthday.str_val = std::to_string(user.birthday);
+        params.push_back(paramBirthday);
+    }
 
-    MysqlConn::Param paramRegion;
-    paramRegion.type = MysqlConn::Param::INT;
-    paramRegion.int_val = user.region;
-    params.push_back(paramRegion);
+    // 检查并添加 region
+    if (user.region != 0) {
+        setClauses.push_back("region = ?");
+        MysqlConn::Param paramRegion;
+        paramRegion.type = MysqlConn::Param::INT;
+        paramRegion.int_val = user.region;
+        params.push_back(paramRegion);
+    }
 
+    // 如果没有有效的字段需要更新，直接返回
+    if (setClauses.empty()) {
+        LOG_WARNING("No valid fields to update for user: " << user.ssid);
+        return false;
+    }
+
+    // 拼接完整的SQL语句
+    for (auto it = setClauses.begin(); it != setClauses.end(); ++it) {
+        if (it + 1 != setClauses.end()) {
+            sql += (*it) + ", ";
+        }
+    }
+    sql += " WHERE ssid = ?";
+
+    // 添加 ssid 参数
     MysqlConn::Param paramSsid;
     paramSsid.type = MysqlConn::Param::STRING;
     paramSsid.str_val = user.ssid;
     params.push_back(paramSsid);
 
+    // 执行更新操作
     if (!m_conn->update(sql, params)) {
         LOG_ERROR("Failed to update user: " << user.ssid);
         return false;

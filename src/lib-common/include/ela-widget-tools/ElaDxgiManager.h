@@ -36,7 +36,7 @@ public:
     void setTimeoutMsValue(int timeoutValue);
     int getTimeoutMsValue() const;
 Q_SIGNALS:
-    Q_SIGNAL void grabImageUpdate();
+    Q_SIGNAL void grabImageUpdate(QImage img);
 };
 
 class ElaDxgiScreenPrivate;

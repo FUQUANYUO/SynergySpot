@@ -3,13 +3,14 @@
 //
 
 #include "UserService.h"
+#include "encrypt/EncryptString.h"
 
 bool UserService::loginCheck(const UserPrivateInfoDTO &pInfo) {
     std::string checkSSID = pInfo.ssid;
     std::string checkPassword = pInfo.password;
     UserPrivateInfoDO res = userPrivateDAO.findById(checkSSID);
     if (!res.ssid.empty() && !res.password.empty())
-        return pInfo.password == res.password;
+        return (EncryptString::getEncryptObj()->encryptStringBySHA256(pInfo.password,res.passwordSalt) == res.password);
     else
         return false;
 }
@@ -52,8 +53,8 @@ std::string UserService::enrollAcc(const UserPrivateInfoDTO &userPrivateInfo) {
     if (newSSID != "-1") {
         newSSID = std::to_string(std::stoi(newSSID) + 1);
     }else {
-        LOG("new ssid dont find")
-        return "-1";
+        // first user
+        newSSID = "1000000";
     }
     bool res = userPrivateDAO.insert({
         newSSID,userPrivateInfo.email,userPrivateInfo.password,userPrivateInfo.passwordSalt

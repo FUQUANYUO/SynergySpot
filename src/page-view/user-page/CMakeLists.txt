@@ -89,6 +89,7 @@ IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
                 Qt6::Core                    Qt6::Gui                   Qt6::Widgets
         #--------------------------------    your lib file name    ----------------------------------   BEGIN
                 PluginManagerd               ElaWidgetToolsd            EffectComponentPlugind
+                CommonDataPlugind
         #--------------------------------    your lib file name    ----------------------------------   END
         )
 ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -97,6 +98,7 @@ ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Release")
                 Qt6::Core                    Qt6::Gui                   Qt6::Widgets
         #--------------------------------    your lib file name    ----------------------------------   BEGIN
                 PluginManager                ElaWidgetTools             EffectComponentPlugin
+                CommonDataPlugin
         #--------------------------------    your lib file name    ----------------------------------   END
         )
 ENDIF ()
@@ -132,7 +134,7 @@ foreach(
 endforeach(
 
 )
-file(
+FILE(
         APPEND                       ${PROJECT_NAME}.qrc
         "     </qresource>\n"
         "</RCC>\n"

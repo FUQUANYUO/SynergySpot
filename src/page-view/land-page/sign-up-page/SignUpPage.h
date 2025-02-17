@@ -102,7 +102,8 @@ private:
     bool    _verifyEmail        = false;
     int     _displayTime        = 3000;         // 信息显示时间
     int     _disableTime        = 60;           // 发送 按钮禁用时间
-    QString _numberVerifyCode   = "";
+    QString _numberVerifyCode   = "";           // 图片验证码
+    QString _emailVerifyCode    = "";           // 邮箱验证码
     // --------------- BackEnd --------------
 
     static SignUpPage *instance;

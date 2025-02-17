@@ -18,18 +18,23 @@ message(STATUS "Using gRPC ${gRPC_VERSION}")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../src/lib-common/include/grpc-inc)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../src/lib-common/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../src/protofile)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../src/protofile-grpc)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../src/utils)
 
 # realtime cpp
 file(GLOB_RECURSE RealtimeCpp ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+file(GLOB_RECURSE PRO_CC ${CMAKE_CURRENT_SOURCE_DIR}/../../src/protofile/*.cc)
 file(GLOB_RECURSE GRPC_CC ${CMAKE_CURRENT_SOURCE_DIR}/../../src/protofile-grpc/*.cc)
+file(GLOB_RECURSE TcpCpp ${CMAKE_CURRENT_SOURCE_DIR}/../normal-business-process/tcp-socket/*.cpp)
 
 add_executable(SynergySpot-GRPC-Server
         ${CMAKE_CURRENT_SOURCE_DIR}/../../src/utils/log/Log.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../../src/utils/get-time/GetCurTime.cpp
+        ${PRO_CC}
         ${GRPC_CC}
         ${RealtimeCpp}
+        ${TcpCpp}
 )
 
 target_link_directories(SynergySpot-GRPC-Server PRIVATE

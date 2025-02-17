@@ -119,6 +119,9 @@ struct FileStorageDTO {
     std::string fileType;
     std::string storagePath;
     time_t uploadTime;
+
+    int pageSize;
+    int pageNum;
 };
 
 // 操作日志 DTO

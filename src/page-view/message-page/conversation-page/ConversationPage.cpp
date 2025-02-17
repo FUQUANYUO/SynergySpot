@@ -482,8 +482,8 @@ ConversationPage::ConversationPage(ConversationType type,const MsgCombineDTO& dt
     auto * _inputWid = new InputWidget(this);
     _layout->setContentsMargins(0,0,5,0);
     _layout->setSpacing(0);
-    QString _curSSID = QString::fromStdString(g_pCommonData->getCurUserInfo().CurSSID);
-    QString _curName = QString::fromStdString(g_pCommonData->getCurUserInfo().CurSSname);
+    QString _curSSID = g_pCommonData->getCurUserInfo().ssid;
+    QString _curName = g_pCommonData->getCurUserInfo().username;
     if(type == ConversationType::Friend){
         _cfP = new ConversationFriendPage(
             dto.userBaseInfo,this
@@ -507,7 +507,7 @@ ConversationPage::ConversationPage(ConversationType type,const MsgCombineDTO& dt
             _inputWid->_inputEditFrame->clear();
 
             _cfP->insertMsgBubble({_curSSID,_curName,
-                        html_cp,QString::fromStdString(g_pCommonData->getCurUserInfo().CurUserAvatarPath),true});
+                        html_cp,g_pCommonData->getCurUserInfo().avatarPath,true});
 
             // store msg
             qint64 curTimeStamp = GetCurTime::getTimeObj()->getCurTimeStamp();
@@ -610,7 +610,7 @@ ConversationPage::ConversationPage(ConversationType type,const MsgCombineDTO& dt
             }
             _inputWid->_inputEditFrame->clear();
             _cgP->insertMsgBubble({_curSSID,_curName,
-                        html_cp,QString::fromStdString(g_pCommonData->getCurUserInfo().CurUserAvatarPath),true});
+                        html_cp,g_pCommonData->getCurUserInfo().avatarPath,true});
 
             // store msg
             qint64 curTimeStamp = GetCurTime::getTimeObj()->getCurTimeStamp();

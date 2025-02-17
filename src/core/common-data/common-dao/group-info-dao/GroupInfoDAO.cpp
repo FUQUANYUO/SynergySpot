@@ -58,7 +58,7 @@ GroupBaseInfoDO GroupInfoDAO::findBySsid(const QString &groupSsid) {
         group.createTime = QDateTime::fromString(QString::fromStdString(result[0][6]), "yyyy-MM-dd HH:mm:ss");
         return group;
     }
-    return GroupBaseInfoDO();
+    return {-1};
 }
 
 QList<GroupBaseInfoDO> GroupInfoDAO::getAllGroupInfos(int pageSize, int pageNum) {

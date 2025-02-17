@@ -21,8 +21,7 @@
     stream << static_cast<quint32>(__DTO_OBJ__.size());     \
     stream << static_cast<quint8>(__DTO_TYPE__);            \
     packet.append(__DTO_OBJ__.c_str(), __DTO_OBJ__.size()); \
-    _ccon->getQSocket()->write(packet);                     \
-    _ccon->getQSocket()->waitForBytesWritten();             \
+    emit sigWriteToSocket(packet);                          \
     LOG(__LOG__)
 
 
@@ -88,6 +87,15 @@ void ClientRequestHandler::addRequest(SSDTO::BusinessType type, std::string dto)
         case SSDTO::SEARCH_USER:
             emit sigSearchFriendRequest(dto);
             break;
+        case SSDTO::R_USER_BASE_INFO:
+            emit sigQueryUserBaseInfoRequest(dto);
+            break;
+        case SSDTO::R_GROUP_BASE_INFO:
+            emit sigQueryGroupBaseInfoRequest(dto);
+            break;
+        case SSDTO::R_GROUP_NOTICE:
+            emit sigQueryGroupNoticesRequest(dto);
+            break;
         default:
             LOG("Unsupported business type:" << type)
             break;
@@ -100,25 +108,32 @@ ClientRequestHandler::ClientRequestHandler(QObject* parent) : QObject(parent) {
     businessProcessor->moveToThread(_handlerThread);
 
     // 连接业务信号槽
-    connect(this, &ClientRequestHandler::sigEmailCodeRequest,       businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::EMAIL_VERIFY));
-    connect(this, &ClientRequestHandler::sigVerifyAccountRequest,   businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::LOGIN_CHECK));
-    connect(this, &ClientRequestHandler::sigForwardMessageRequest,  businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::C_MESSAGE_CONTENT));
-    connect(this, &ClientRequestHandler::sigContactListRequest,     businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_FRIENDSHIP_LIST));
-    connect(this, &ClientRequestHandler::sigEnrollAccountRequest,   businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::ENROLL_ACCOUNT));
-    connect(this, &ClientRequestHandler::sigAddFriendRequest,       businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::C_FRIENDSHIP));
-    connect(this, &ClientRequestHandler::sigSearchFriendRequest,    businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::SEARCH_USER));
+    connect(this, &ClientRequestHandler::sigEmailCodeRequest,           businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::EMAIL_VERIFY),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigVerifyAccountRequest,       businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::LOGIN_CHECK),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigForwardMessageRequest,      businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::C_MESSAGE_CONTENT),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigContactListRequest,         businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_FRIENDSHIP_LIST),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigEnrollAccountRequest,       businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::ENROLL_ACCOUNT),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigAddFriendRequest,           businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::C_FRIENDSHIP),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigSearchFriendRequest,        businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::SEARCH_USER),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigQueryUserBaseInfoRequest,   businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_USER_BASE_INFO),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigQueryGroupBaseInfoRequest,  businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_GROUP_BASE_INFO),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigQueryGroupNoticesRequest,   businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_GROUP_NOTICE),Qt::QueuedConnection);
 
     // 连接响应信号槽
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigEmailCodeResponse,     this, &ClientRequestHandler::sigEmailCodeResponse);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigLoginSuccess,          this, &ClientRequestHandler::sigLoginSuccess);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigLoginFailed,           this, &ClientRequestHandler::sigLoginFailed);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigMessageResponse,       this, &ClientRequestHandler::sigMessageResponse);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigContactListResponse,   this, &ClientRequestHandler::sigContactListResponse);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigEnrollAccountResponse, this, &ClientRequestHandler::sigEnrollAccountResponse);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigFriendRequestResponse, this, &ClientRequestHandler::sigFriendRequestResponse);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigSearchFriendResponse,  this, &ClientRequestHandler::sigSearchFriendResponse);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigConnServerFailed,      this, &ClientRequestHandler::sigConnServerFailed);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigStartGRPCService,      this, &ClientRequestHandler::sigStartGRPCService);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigEmailCodeResponse,             this, &ClientRequestHandler::sigEmailCodeResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigLoginSuccess,                  this, &ClientRequestHandler::sigLoginSuccess);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigLoginFailed,                   this, &ClientRequestHandler::sigLoginFailed);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigMessageResponse,               this, &ClientRequestHandler::sigMessageResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigContactListResponse,           this, &ClientRequestHandler::sigContactListResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigEnrollAccountResponse,         this, &ClientRequestHandler::sigEnrollAccountResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigFriendRequestResponse,         this, &ClientRequestHandler::sigFriendRequestResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigSearchFriendResponse,          this, &ClientRequestHandler::sigSearchFriendResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigConnServerFailed,              this, &ClientRequestHandler::sigConnServerFailed);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigStartGRPCService,              this, &ClientRequestHandler::sigStartGRPCService);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryUserBaseInfoResponse,     this, &ClientRequestHandler::sigQueryUserBaseInfoResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryGroupBaseInfoResponse,    this, &ClientRequestHandler::sigQueryGroupBaseInfoResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryGroupNoticesResponse,     this, &ClientRequestHandler::sigQueryGroupNoticesResponse);
+
     // 启动业务线程
     _handlerThread->start();
 }
@@ -133,6 +148,13 @@ ClientRequestHandler::~ClientRequestHandler() {
 
 BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(parent) {
     _ccon = new ClientConServer();
+
+    connect(this, &BusinessProcessor::sigWriteToSocket, _ccon, [=](QByteArray data) {
+        if(_ccon && _ccon->getQSocket()->state() == QAbstractSocket::ConnectedState) {
+            _ccon->getQSocket()->write(data);
+        }
+    },Qt::QueuedConnection);
+
     connect(_ccon->getQSocket(), &QTcpSocket::connected,this, [=]() {
         if (_ccon->getQSocket()->state() == QTcpSocket::ConnectedState) {
             LOG("Connected the server : " << _ccon->getServerIP().toStdString());
@@ -143,7 +165,7 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
     });
 
     // wait 6s check net stable which the net connected the server
-    QTimer::singleShot(6000,this, [=]() {
+    QTimer::singleShot(3000,this, [=]() {
         if (_ccon->getQSocket()->state() != QAbstractSocket::ConnectedState) {
             emit sigConnServerFailed();
         }
@@ -218,6 +240,21 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
         _requestHandlerMap[SSDTO::SEARCH_USER] = [=](const std::string & dto) {
             SEND_PACKAGE(dto,SSDTO::SEARCH_USER,"query of search friend dto has been send to server...")
         };
+
+        // query user base info request
+        _requestHandlerMap[SSDTO::R_USER_BASE_INFO] = [=](const std::string & dto) {
+            SEND_PACKAGE(dto,SSDTO::R_USER_BASE_INFO,"query of user base info dto has been send to server...")
+        };
+
+        // query group base info request
+        _requestHandlerMap[SSDTO::R_GROUP_BASE_INFO] = [=](const std::string & dto) {
+            SEND_PACKAGE(dto,SSDTO::R_GROUP_BASE_INFO,"query of group base info dto has been send to server...")
+        };
+
+        // query group notice info request
+        _requestHandlerMap[SSDTO::R_GROUP_NOTICE] = [=](const std::string & dto) {
+            SEND_PACKAGE(dto,SSDTO::R_GROUP_NOTICE,"query of group notices dto has been send to server...")
+        };
     }
 
     // response slot manager by dto type mapping
@@ -228,10 +265,10 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
             ldto.ParseFromString(dto);
             LOG("recv server verify [" << ldto.ssid() << "] res")
             if(ldto.is_pass()){
-                emit sigLoginSuccess();
+                emit sigLoginSuccess(ldto.ssid());
             }
             else{
-                emit sigLoginFailed();
+                emit sigLoginFailed(ldto.ssid());
             }
         };
 
@@ -264,6 +301,21 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
         _responseHandlerMap[SSDTO::SEARCH_USER] = [=](const std::string & dto) {
             emit sigSearchFriendResponse(dto);
         };
+
+        // query user base info request
+        _responseHandlerMap[SSDTO::R_USER_BASE_INFO] = [=](const std::string & dto) {
+            emit sigQueryUserBaseInfoResponse(dto);
+        };
+
+        // query group base info request
+        _responseHandlerMap[SSDTO::R_GROUP_BASE_INFO] = [=](const std::string & dto) {
+            emit sigQueryGroupBaseInfoResponse(dto);
+        };
+
+        // query group notice info request
+        _responseHandlerMap[SSDTO::R_GROUP_NOTICE] = [=](const std::string & dto) {
+            emit sigQueryGroupNoticesResponse(dto);
+        };
     }
 
     if (_ccon->getQSocket()->state() != QAbstractSocket::ConnectedState) {
@@ -292,7 +344,7 @@ void BusinessLayer::BusinessProcessor::disConnectFromSer(){
     // out line notice
     std::string outDisDto;
     SSDTO::DisconnectDTO ddto;
-    ddto.set_ssid(g_pCommonData->getCurUserInfo().CurSSID);
+    ddto.set_ssid(g_pCommonData->getCurUserInfo().ssid.toStdString());
     ddto.set_ip("");
     ddto.SerializeToString(&outDisDto);
 

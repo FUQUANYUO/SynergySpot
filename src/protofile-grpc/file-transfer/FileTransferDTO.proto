@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+service FileTransferService {
+  rpc InitUpload(FileInitRequest) returns (FileInitResponse);
+  rpc UploadFile(stream FileChunk) returns (FileResponse);
+  rpc DownloadFile(FileRequest) returns (stream FileChunk);
+}
+
+// 文件传输相关消息
+message FileInitRequest {
+  string file_name = 1;
+  int64 file_size = 2;
+  string ssid = 3;
+  string tokens = 4;
+}
+
+message FileInitResponse {
+  bool success = 1;
+  string file_id = 2;
+}
+
+message FileChunk {
+  string file_id = 1;
+  int64 chunk_number = 2;
+  bytes data = 3;
+  string checksum = 4;
+  int64 total_chunks = 5;
+  string tokens = 6;
+}
+
+message FileRequest {
+  string file_id = 1;
+  string file_path = 2;
+  string ssid = 3;
+  string tokens = 4;
+}
+
+message FileResponse {
+  bool success = 1;
+  string message = 2;
+}

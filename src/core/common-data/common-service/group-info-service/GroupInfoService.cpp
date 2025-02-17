@@ -9,7 +9,7 @@ GroupInfoService::GroupInfoService(LiteConn &db) : groupInfoDAO(db){}
 
 GroupBaseInfoDTO GroupInfoService::getGroupInfoById(const QString &groupId) {
     GroupBaseInfoDO result = groupInfoDAO.findBySsid(groupId);
-    return {groupId,result.name,
+    return {result.id==-1?"-1":result.ssidGroup,result.name,
     QString::fromStdString(g_pCommonData->getDataPath(avatar)) + "/" + result.avatar + QString::fromStdString(g_pCommonData->getImageEx()),
         result.createSSID,result.profile,result.createTime};
 }

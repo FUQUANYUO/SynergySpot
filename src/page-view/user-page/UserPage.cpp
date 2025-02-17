@@ -3,19 +3,21 @@
 //
 
 #include "UserPage.h"
+#include "edit-info-page/EditInfoPage.h"
 #include "../effect-component/material-effect/MaterialEffect.h"
 
 #include "ela-widget-tools/ElaInteractiveCard.h"
 #include "ela-widget-tools/ElaToolButton.h"
 #include "ela-widget-tools/ElaPushButton.h"
 #include "ela-widget-tools/ElaText.h"
+#include "ela-widget-tools/ElaApplication.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGridLayout>
+#include <QFontDatabase>
 #include <QPainter>
 #include <mutex>
-
 
 QMap<UserType,UserPage*> UserPage::_userObjMap;
 static std::mutex m;
@@ -123,6 +125,8 @@ UserPage::~UserPage() {
 }
 
 void UserPage::initWindow() {
+    eApp->init();
+    QFontDatabase::addApplicationFont("/user-page/rc-page/ElaAwesome.ttf");
     setWindowButtonFlag(ElaAppBarType::StayTopButtonHint,false);
     setWindowButtonFlag(ElaAppBarType::ThemeChangeButtonHint,false);
     setWindowButtonFlag(ElaAppBarType::MinimizeButtonHint,false);
@@ -147,6 +151,7 @@ void UserPage::initWindow() {
     _localInfoText      = new ElaText(this);
     _groupResume        = new ElaText(this);
     _groupNotice        = new ElaPushButton(this);
+    _editPage           = new EditInfoPage(this);
 
     _mainLayout         = new QVBoxLayout;
     _buttonLayout       = new QHBoxLayout;
@@ -275,9 +280,21 @@ void UserPage::initContent() {
     _signContentText->setText("{Sign Text}");
     _localInfoText->setText("{Country/Province}");
     _joinDayText->setText("316");
+
+    _editPage->hide();
 }
 
 void UserPage::initConnectFunc() {
+    connect(_editUserButton,&ElaPushButton::clicked,[=]() {
+        _editPage->show();
+        this->hide();
+        emit this->sigShowArchPageMaskEffect();
+    });
+
+    connect(_editPage,&EditInfoPage::sigEditPageClosed,this,[=]() {
+        _editPage->hide();
+        emit this->sigHideArchPageMaskEffect();
+    });
 }
 
 void UserPage::setInfo(const UserInfo &info) {
@@ -318,6 +335,11 @@ void UserPage::showAt(const QPoint &pos) {
     move(pos);
     show();
 }
+
+void UserPage::moveUserEditPageToCenter(const QPoint &pos) {
+    _editPage->move(pos);
+}
+
 void UserPage::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);

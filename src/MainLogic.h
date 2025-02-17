@@ -9,6 +9,8 @@
 #include <QApplication>
 
 class QProcess;
+class QLocalServer;
+class QLocalSocket;
 
 class MainLogic : public QObject{
     Q_OBJECT
@@ -20,8 +22,11 @@ public:
 
     bool initUserDataDir();
 private:
-    QProcess * _pGRPCProcess = nullptr;
-    QWidget  * _curWindow    = nullptr;
+    QProcess * _pGRPCProcess   = nullptr;
+    QWidget  * _curWindow      = nullptr;
+    QLocalServer * _pIPCServer = nullptr;
+    QLocalSocket * _pGRCSocket = nullptr;
+    const QString processName = "SynergySpot-GRPC-Client.exe";
 };
 
 

@@ -15,7 +15,7 @@ CREATE TABLE `user_base_info` (
                                   `personal_sign` VARCHAR(160) DEFAULT '' COMMENT '个性签名',
                                   `thumb_up_count` INT DEFAULT '0' COMMENT '点赞数',
                                   `birthday` DATE COMMENT '出生日期',
-                                  `create_time` DATE NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                  `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                                   `region` SMALLINT NOT NULL DEFAULT 2 COMMENT '地区',
                                   PRIMARY KEY (`ssid`),
                                   INDEX `idx_region` (`region`)

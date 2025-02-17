@@ -23,6 +23,10 @@ public:
     bool upload(const FileStorageDO& file) override;
 
     FileStorageDO findById(const std::string& fileId) override;
+
+    std::vector<FileStorageDO> findByName(const std::string& fileName,int pageSize, int pageNum);
+
+    std::vector<FileStorageDO> findBySSID(const std::string& userSSID,int pageSize, int pageNum);
 private:
     std::shared_ptr<MysqlConn> m_conn;
 };

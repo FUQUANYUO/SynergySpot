@@ -20,8 +20,6 @@ find_package(gRPC REQUIRED)
 # Qt module
 find_package(Qt6 REQUIRED COMPONENTS
         Core
-        Gui
-        Widgets
         Network
 )
 
@@ -61,6 +59,7 @@ if(SS_CLIENT_WIN)
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         target_link_libraries(${PROJECT_NAME} PRIVATE
                 Qt::Core
+                Qt::Network
                 yaml-cppd
                 gRPC::grpc++
                 gRPC::grpc
@@ -71,6 +70,7 @@ if(SS_CLIENT_WIN)
     elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
         target_link_libraries(${PROJECT_NAME} PRIVATE
                 Qt::Core
+                Qt::Network
                 yaml-cpp
                 gRPC::grpc++
                 gRPC::grpc

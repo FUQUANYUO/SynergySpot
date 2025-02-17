@@ -43,38 +43,72 @@ int64_t GroupBaseInfoDAO::createGroup(const GroupBaseInfoDO &group)  {
 }
 
 bool GroupBaseInfoDAO::update(const GroupBaseInfoDO &group) {
-    std::string sql = "UPDATE group_base_info SET name = ?, avatar = ?, create_ssid = ?, profile = ? WHERE ssid_group = ?";
+    std::string sql = "UPDATE group_base_info SET ";
+    std::vector<std::string> setClauses;
     std::vector<MysqlConn::Param> params;
 
-    MysqlConn::Param paramName;
-    paramName.type = MysqlConn::Param::STRING;
-    paramName.str_val = group.name;
-    params.push_back(paramName);
+    // 检查并添加 name
+    if (!group.name.empty() && group.name != "-1") {
+        setClauses.push_back("name = ?");
+        MysqlConn::Param paramName;
+        paramName.type = MysqlConn::Param::STRING;
+        paramName.str_val = group.name;
+        params.push_back(paramName);
+    }
 
-    MysqlConn::Param paramAvatar;
-    paramAvatar.type = MysqlConn::Param::STRING;
-    paramAvatar.str_val = group.avatar;
-    params.push_back(paramAvatar);
+    // 检查并添加 avatar
+    if (!group.avatar.empty() && group.avatar != "-1") {
+        setClauses.push_back("avatar = ?");
+        MysqlConn::Param paramAvatar;
+        paramAvatar.type = MysqlConn::Param::STRING;
+        paramAvatar.str_val = group.avatar;
+        params.push_back(paramAvatar);
+    }
 
-    MysqlConn::Param paramCreateSsid;
-    paramCreateSsid.type = MysqlConn::Param::STRING;
-    paramCreateSsid.str_val = group.createSsid;
-    params.push_back(paramCreateSsid);
+    // 检查并添加 createSsid
+    if (!group.createSsid.empty() && group.createSsid != "-1") {
+        setClauses.push_back("create_ssid = ?");
+        MysqlConn::Param paramCreateSsid;
+        paramCreateSsid.type = MysqlConn::Param::STRING;
+        paramCreateSsid.str_val = group.createSsid;
+        params.push_back(paramCreateSsid);
+    }
 
-    MysqlConn::Param paramProfile;
-    paramProfile.type = MysqlConn::Param::STRING;
-    paramProfile.str_val = group.profile;
-    params.push_back(paramProfile);
+    // 检查并添加 profile
+    if (!group.profile.empty() && group.profile != "-1") {
+        setClauses.push_back("profile = ?");
+        MysqlConn::Param paramProfile;
+        paramProfile.type = MysqlConn::Param::STRING;
+        paramProfile.str_val = group.profile;
+        params.push_back(paramProfile);
+    }
 
+    // 如果没有有效的字段需要更新，直接返回
+    if (setClauses.empty()) {
+        LOG_WARNING("No valid fields to update for group: " << group.ssidGroup);
+        return false;
+    }
+
+    // 拼接完整的SQL语句
+    for (auto it = setClauses.begin(); it != setClauses.end(); ++it) {
+        if (it + 1 != setClauses.end()) {
+            sql += (*it) + ", ";
+        }
+    }
+    sql += " WHERE ssid_group = ?";
+
+    // 添加 ssidGroup 参数
     MysqlConn::Param paramSsidGroup;
     paramSsidGroup.type = MysqlConn::Param::STRING;
     paramSsidGroup.str_val = group.ssidGroup;
     params.push_back(paramSsidGroup);
 
+    // 执行更新操作
     if (!m_conn->update(sql, params)) {
-        LOG_ERROR("Failed to update base info for group: " << group.ssidGroup );
+        LOG_ERROR("Failed to update base info for group: " << group.ssidGroup);
         return false;
     }
+
     return true;
 }
 

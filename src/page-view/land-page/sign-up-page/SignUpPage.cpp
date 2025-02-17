@@ -96,11 +96,11 @@ void SignUpPage::initEdgeLayout() {
     _inputLayout->addWidget(_inputName);
     _inputLayout->addWidget(_inputPassword);
     _inputLayout->addWidget(_inputRepeatPassword);
-    _inputLayout->addWidget(_inputEmail);
     _verifyCodeLayout->addWidget(_inputVerifyCode);
     _verifyCodeLayout->addWidget(_verifyCode);
-    _inputLayout->addWidget(_inputEmailCode);
+    _inputLayout->addWidget(_inputEmail);
     _inputLayout->addItem(_verifyCodeLayout);
+    _inputLayout->addWidget(_inputEmailCode);
     _protocolLayout->addWidget(_acceptButton);
     _protocolLayout->addWidget(_protocolText);
     _inputLayout->addItem(_protocolLayout);
@@ -331,6 +331,7 @@ void SignUpPage::initConnectFunc() {
         do {
             _loadBar->hide();
             _verifyEmail = true;
+            _emailVerifyCode = rightEmailCode;
         }while(false);
     });
 

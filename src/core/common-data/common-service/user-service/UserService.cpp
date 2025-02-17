@@ -24,7 +24,7 @@ UserBaseInfoDTO UserService::getUserBySSID(const QString& ssid) {
         };
     }
     else {
-        return {};
+        return {"-1"};
     }
 }
 

@@ -10,6 +10,7 @@
 #include "../settings-page/SettingsPage.h"
 #include "../file-manager-page/FileManagerPage.h"
 #include "../user-page/UserPage.h"
+#include "../effect-component/SS-mask-widget/SSMaskWidget.h"
 
 #include "ela-widget-tools/ElaContentDialog.h"
 #include "ela-widget-tools/ElaStatusBar.h"
@@ -18,9 +19,9 @@
 #include "ela-widget-tools/ElaToolButton.h"
 #include "ela-widget-tools/ElaSuggestBox.h"
 #include "ela-widget-tools/ElaMenu.h"
-#include "ela-widget-tools/ElaDockWidget.h"
 
 #include <QHBoxLayout>
+#include <QResizeEvent>
 #include <mutex>
 
 static std::mutex m;
@@ -45,6 +46,17 @@ void ArchPage::destroyInstance() {
         }
         m.unlock();
     }
+}
+
+void ArchPage::sltShowMaskEffect() {
+    _maskWidget->setVisible(true);
+    _maskWidget->raise();
+    _maskWidget->setFixedSize(this->size());
+    _maskWidget->startMaskAnimation(90);
+}
+
+void ArchPage::sltHideMaskEffect() {
+    _maskWidget->startMaskAnimation(0);
 }
 
 ArchPage::ArchPage(QWidget *parent) : ElaWindow(parent) {
@@ -90,6 +102,7 @@ void ArchPage::initWindow() {
     _toolBar        =   new ElaToolBar("Tool Bar", this);
     _addButton      =   new ElaToolButton(this);
     _searchSuggest  =   new ElaSuggestBox(this);
+    _maskWidget     =   new SSMaskWidget(this);
 }
 
 void ArchPage::initEdgeLayout() {
@@ -145,6 +158,10 @@ void ArchPage::initContent() {
     _searchSuggest->setPlaceholderText("Search...");
 
     setStatusBar(_statusBar);
+
+    _maskWidget->setVisible(false);
+    _maskWidget->move(0,0);
+    _maskWidget->setFixedSize(this->size());
 }
 
 void ArchPage::initConnectFunc() {
@@ -162,5 +179,16 @@ void ArchPage::initConnectFunc() {
         QPoint globalPos = QCursor::pos();
         wid->showAt(globalPos + QPoint{10,10});
     });
+
+    // user edit page require mask effect
+    connect(g_pUserPage(UserType::Myself,{},{}),&UserPage::sigShowArchPageMaskEffect,this,[=]() {
+        sltShowMaskEffect();
+        g_pUserPage(UserType::Myself,{},{})->moveUserEditPageToCenter(pos() + QPoint(width()/2,height()/2) - QPoint(200,300));
+    });
+    connect(g_pUserPage(UserType::Myself,{},{}),&UserPage::sigHideArchPageMaskEffect,this,&ArchPage::sltHideMaskEffect);
 }
 
+void ArchPage::resizeEvent(QResizeEvent *event) {
+    ElaWindow::resizeEvent(event);
+    _maskWidget->setFixedSize(event->size());
+}

@@ -50,11 +50,11 @@ YAML::Node CommonData::getYamlNode() const {
     return _node;
 }
 
-CurUserInfoDataStruct CommonData::getCurUserInfo() const {
+UserBaseInfoDTO CommonData::getCurUserInfo() const {
     return _userInfo;
 }
 
-void CommonData::setCurUserInfo(const CurUserInfoDataStruct &curUserInfo) {
+void CommonData::setCurUserInfo(const UserBaseInfoDTO &curUserInfo) {
     _userInfo = curUserInfo;
     _enable = true;
     init();
@@ -66,8 +66,12 @@ UserBaseInfoDTO CommonData::getUserInfoBySSID(const QString &ssid) {
         return {};
     }
     if (!userInfoCacheMap.contains(ssid)) {
-        auto res = new UserBaseInfoDTO(userService->getUserBySSID(ssid));
-        userInfoCacheMap.insert(ssid,res);
+        UserBaseInfoDTO uRes = userService->getUserBySSID(ssid);
+        if (uRes.ssid == "-1") {
+            LOG_WARNING("local cache cant find ssid < " << ssid.toStdString());
+            return {"-1"};
+        }
+        userInfoCacheMap.insert(ssid,new UserBaseInfoDTO(uRes));
     }
     return *userInfoCacheMap[ssid];
 }
@@ -80,12 +84,20 @@ bool CommonData::setUserInfoBySSID(const UserBaseInfoDTO &userInfo) {
     return userService->updateUserBySSID(userInfo);
 }
 
+bool CommonData::addUserInfoByServer(const UserBaseInfoDTO &userInfo) {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return {};
+    }
+    return userService->addUser(userInfo);
+}
+
 QList<FriendshipDTO> CommonData::getCurUserFriendship() {
     if (!_enable) {
         LOG_ERROR("Please init cur user info!");
         return {};
     }
-    return friendshipService->getFriendshipsBySSID(QString::fromStdString(_userInfo.CurSSID));
+    return friendshipService->getFriendshipsBySSID(_userInfo.ssid);
 }
 
 bool CommonData::setFriendshipData(const QList<FriendshipDTO> &dto) {
@@ -101,7 +113,7 @@ bool CommonData::isCurUserFriend(const QString &ssid) {
         LOG_ERROR("Please init cur user info!");
         return {};
     }
-    return friendshipService->isCurUserFriend(QString::fromStdString(_userInfo.CurSSID), ssid);
+    return friendshipService->isCurUserFriend(_userInfo.ssid, ssid);
 }
 
 QList<MessageContentDTO> CommonData::getMessageContentData(int pageSize, int pageNum) {
@@ -109,7 +121,7 @@ QList<MessageContentDTO> CommonData::getMessageContentData(int pageSize, int pag
         LOG_ERROR("Please init cur user info!");
         return {};
     }
-    return messageContentService->getAllMessages(QString::fromStdString(_userInfo.CurSSID),pageSize,pageNum);
+    return messageContentService->getAllMessages(_userInfo.ssid,pageSize,pageNum);
 }
 
 bool CommonData::setMessageContentData(const QList<MessageContentDTO> &dto) {
@@ -134,8 +146,12 @@ GroupBaseInfoDTO CommonData::getGroupInfoDataBySSID(const QString &ssidGroup) {
         return {};
     }
     if (!groupInfoCacheMap.contains(ssidGroup)) {
-        auto res = new GroupBaseInfoDTO(groupInfoService->getGroupInfoById(ssidGroup));
-        groupInfoCacheMap.insert(ssidGroup,res);
+        GroupBaseInfoDTO gRes = groupInfoService->getGroupInfoById(ssidGroup);
+        if (gRes.ssidGroup == "-1") {
+            LOG_WARNING("local cache cant find ssid < " << ssidGroup.toStdString())
+            return {"-1"};
+        }
+        groupInfoCacheMap.insert(ssidGroup, new GroupBaseInfoDTO(gRes));
     }
     return *groupInfoCacheMap[ssidGroup];
 }
@@ -154,8 +170,12 @@ QList<GroupMemberInfoDTO> CommonData::getGroupMemberInfoData(const QString &ssid
         return {};
     }
     if (!groupMemberInfoCacheMap.contains(ssidGroup)) {
-        auto res = new QList<GroupMemberInfoDTO>(groupMemberService->getAllGroupMember(ssidGroup,pageSize,pageNum));
-        groupMemberInfoCacheMap.insert(ssidGroup,res);
+        auto mRes = groupMemberService->getAllGroupMember(ssidGroup,pageSize,pageNum);
+        if (mRes.count() <= 0) {
+            LOG_WARNING("local cache cant find members < " << ssidGroup.toStdString());
+            return {};
+        }
+        groupMemberInfoCacheMap.insert(ssidGroup,new QList<GroupMemberInfoDTO>(mRes));
     }
     return *groupMemberInfoCacheMap[ssidGroup];
 }
@@ -174,7 +194,7 @@ bool CommonData::initCurUserInfoDir() {
         return {};
     }
     do {
-        QString userDir = QString::fromStdString(_userInfo.CurSSID);
+        QString userDir = _userInfo.ssid;
         QDir user(userDir);
         if (!user.exists() && !user.mkpath(".")) {
             LOG_ERROR("Failed to create user directory")
@@ -247,7 +267,7 @@ std::string CommonData::getDataPath(CommonPath type) const {
         LOG_ERROR("Please init cur user info!");
         return {};
     }
-    std::string path = _userInfo.CurSSID;
+    std::string path = _userInfo.ssid.toStdString();
     switch (type) {
         case avatar:
             path.append("/data/avatar");
@@ -371,7 +391,7 @@ QList<CollectedStickerDTO> CommonData::getCollectionEmoji(int pageSize, int page
         LOG_ERROR("Please init cur user info!");
         return {};
     }
-    return stickerService->getCollectedStickers(QString::fromStdString(_userInfo.CurSSID),pageSize, pageNum);
+    return stickerService->getCollectedStickers(_userInfo.ssid,pageSize, pageNum);
 }
 
 QList<BaseStickerDTO> CommonData::getBaseEmoji(int pageSize, int pageNum) {

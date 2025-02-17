@@ -79,6 +79,7 @@ qt_add_executable(${PROJECT_NAME} main.cpp MainLogic.cpp lib-common/include/ela-
 target_compile_definitions(${PROJECT_NAME} PUBLIC
         PROTOBUF_USE_DLLS
         SQLITE_HAS_CODEC
+        SS_CLIENT
         #LOC_TEST
 )
 

@@ -33,47 +33,48 @@ int TcpSocket::connectToHost(string ip, unsigned short port) {
     return ret;
 }
 
-int TcpSocket::sendMsg(std::string msg,char business_type) {
-    // 申请内存空间: 数据长度 + 包头4字节(存储数据长度)
-    char *data = new char[msg.size() + 8];
+int TcpSocket::sendMsg(std::string msg,int business_type) {
+    // 协议头：4 字节长度 + 4 字节业务类型
+    int total_size = msg.size() + 8;
+    char *data = new char[total_size];
+
+    // 填充协议头
     int bigLen = htonl(msg.size());
-    int bigType = htonl(business_type);
+    int bigType = htonl(business_type);  // 正确：business_type 为 int
     memcpy(data, &bigLen, 4);
-    memcpy(data + 4,&bigType,4);
+    memcpy(data + 4, &bigType, 4);
+
+    // 填充数据
     memcpy(data + 8, msg.data(), msg.size());
+
     // 发送数据
-    int ret = writen(data, msg.size() + 8);
+    int ret = writen(data, total_size);
     delete[] data;
     return ret;
 }
 
-int TcpSocket::recvMsg(string &msg, char &business_type) {
-    // 接收数据
-    int len = 0;
-    business_type = -1;
-    if(readn((char *) &len, 4) <= 0){
+int TcpSocket::recvMsg(std::string &msg, int &business_type) {  // 改为 int 类型
+    // 读取协议头（8 字节）
+    int len = 0, type = 0;
+    if (readn((char*)&len, 4) <= 0 || readn((char*)&type, 4) <= 0) {
         return -1;
     }
-    readn((char *) &business_type, 1);
-    len = ntohl(len);
-    cout << "数据块大小: " << len << endl;
 
-    // 根据读出的长度分配内存
+    // 转换字节序
+    len = ntohl(len);
+    business_type = ntohl(type);
+
+    // 读取数据
     char *buf = new char[len + 1];
     int ret = readn(buf, len);
-    if (ret == -1)
-    {
-        return -1;
-    }
     if (ret != len) {
-        msg = "";
-        business_type = -1;
-        return 0;
+        delete[] buf;
+        return -1;
     }
     buf[len] = '\0';
     msg = buf;
     delete[] buf;
-    return 1;
+    return 0;
 }
 
 int TcpSocket::readn(char *buf, int size) {

@@ -49,14 +49,36 @@ enum BusinessType {
   R_USER_COLLECTED_STICKER = 82;
   C_USER_COLLECTED_STICKER = 83;
   D_USER_COLLECTED_STICKER = 84;
+
+  R_FILE = 91;
+  C_FILE = 92;
+  D_FILE = 93;
 }
 
+message GetUserMessageDTO{
+  bytes ssid = 1;
+  repeated MessageContentDTO msg = 2;
+  int32 page_size = 3;
+  int32 page_num = 4;
+  bytes ip = 5;
+};
+
+message GetFileDTO{
+  bytes ssid = 1;
+  bytes file_id = 2;
+  bytes file_name = 3;
+  int32 page_size = 4;
+  int32 page_num = 5;
+  repeated FileStorageDTO files = 6;
+  bytes ip = 7;
+};
+
 message FuzzySearchDTO{
-    bool isGroup = 1;
+    bool is_group = 1;
     bytes ssid = 2;
     bytes name = 3;
-    repeated UserBaseInfoDTO userInfos = 4;
-    repeated GroupMemberInfoDTO groupInfos = 5;
+    repeated UserBaseInfoDTO user_infos = 4;
+    repeated GroupMemberInfoDTO group_infos = 5;
     bytes ip = 6;
 };
 
@@ -88,8 +110,7 @@ message MakeFriendDTO{
 message LoginCheckDTO{
   bytes ssid = 1;
   bytes password = 2;
-  bool is_pass = 3;
-  bytes email = 4;
+  bool  is_pass = 3;
   bytes ip = 5;
 };
 
@@ -199,9 +220,7 @@ message MessageContentDTO {
   string file_id = 5;
   MessageRecipientDTO recipient = 6;
   int64 create_time = 7;
-  int32 page_size = 8;    // 分页参数
-  int32 page_num = 9;     // 分页参数
-  bytes ip = 10;
+  bytes ip = 8;
 }
 
 // 地区 DTO

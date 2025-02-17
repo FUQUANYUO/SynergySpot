@@ -42,18 +42,28 @@ signals:
     void sigAddFriendRequest(const std::string& dto);
     // 搜索好友
     void sigSearchFriendRequest(const std::string& dto);
+    // 查询用户基础信息
+    void sigQueryUserBaseInfoRequest(const std::string& dto);
+    // 查询群组基础信息
+    void sigQueryGroupBaseInfoRequest(const std::string& dto);
+    // 查询群组公告
+    void sigQueryGroupNoticesRequest(const std::string& dto);
+
 
     // 响应信号
     void sigEmailCodeResponse(const std::string& dto);
 
-    void sigLoginSuccess();
-    void sigLoginFailed();
+    void sigLoginSuccess(const std::string& ssid);
+    void sigLoginFailed(const std::string& ssid);
 
     void sigMessageResponse(const std::string& dto);
     void sigContactListResponse(const std::string& dto);
     void sigEnrollAccountResponse(const std::string& dto);
     void sigFriendRequestResponse(const std::string& dto);
     void sigSearchFriendResponse(const std::string& dto);
+    void sigQueryUserBaseInfoResponse(const std::string& dto);
+    void sigQueryGroupBaseInfoResponse(const std::string& dto);
+    void sigQueryGroupNoticesResponse(const std::string& dto);
 
     void sigConnServerFailed();
     void sigStartGRPCService();
@@ -84,16 +94,22 @@ namespace BusinessLayer {
 
         void disConnectFromSer();
     signals:
+        // avoid socket warning
+        void sigWriteToSocket(QByteArray data);
+
         void sigEmailCodeResponse(const std::string& dto);
 
-        void sigLoginSuccess();
-        void sigLoginFailed();
+        void sigLoginSuccess(const std::string& ssid);
+        void sigLoginFailed(const std::string& ssid);
 
         void sigMessageResponse(const std::string& dto);
         void sigContactListResponse(const std::string& dto);
         void sigEnrollAccountResponse(const std::string& dto);
         void sigFriendRequestResponse(const std::string& dto);
         void sigSearchFriendResponse(const std::string& dto);
+        void sigQueryUserBaseInfoResponse(const std::string& dto);
+        void sigQueryGroupBaseInfoResponse(const std::string& dto);
+        void sigQueryGroupNoticesResponse(const std::string& dto);
 
         void sigConnServerFailed();
         void sigStartGRPCService();

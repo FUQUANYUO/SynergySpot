@@ -28,9 +28,15 @@
 //------------   end core     ------------//
 
 #include <QProcess>
+#include <QLocalServer>
+#include <QLocalSocket>
+#include <QFileDialog>
+#include <QJsonDocument>
+#include <QLocalServer>
 #include <QTimer>
 #include <contact-page/ContactPage.h>
 #include <message-page/MessagePage.h>
+#include <user-page/UserPage.h>
 
 MainLogic::MainLogic() {
     std::string yamlPath = g_pCommonData->getYamlPath();
@@ -91,6 +97,11 @@ int MainLogic::startMainLogic(QApplication * app) {
         dynamic_cast<CVProVideoStrategy*>(g_pPluginManager->getCurrentPlugin(BK_PLUGIN_NAME))->initialize(
                 execPath + "/assets/bk_src.mp4"
         );
+
+        // get data from server and load cache
+        g_pMessagePage->loadCacheMsg(g_pCommonData->getMessageContentData(99,1));
+        g_pContactPage->loadCacheContact(g_pCommonData->getCurUserFriendship());
+
         g_pLandPage->show();
         _curWindow = g_pLandPage;
 
@@ -98,11 +109,9 @@ int MainLogic::startMainLogic(QApplication * app) {
             ElaMessageBar::error(ElaMessageBarType::Top,"错误","无法连接到远程服务器!",6000, _curWindow);
         });
         connect(g_pClientRequestHandler,&ClientRequestHandler::sigStartGRPCService,this,[=]() {
-            QString processName = "SynergySpot-GRPC-Client.exe";
             _pGRPCProcess = new QProcess(app);
-            _pGRPCProcess->start(processName,{QString::fromStdString(g_pCommonData->getCurUserInfo().CurSSID),
-                                                          QString::fromStdString(g_pCommonData->getCurUserInfo().CurSSname),
-                                                          QString::fromStdString(g_pCommonData->getCurUserInfo().CurUserAvatarPath)});
+            _pIPCServer   = new QLocalServer(this);
+
             connect(_pGRPCProcess,&QProcess::finished,this,[=](int exitCode, QProcess::ExitStatus exitStatus) {
                 if(exitStatus == QProcess::NormalExit) {
                     if (exitCode != 0) {
@@ -110,18 +119,96 @@ int MainLogic::startMainLogic(QApplication * app) {
                     }
                 }
             });
+            connect(_pIPCServer,&QLocalServer::newConnection,_pIPCServer,[&]() {
+                _pGRCSocket = _pIPCServer->nextPendingConnection();
+                if (!_pGRCSocket) {
+                     LOG_ERROR("Failed to get client socket.")
+                    return ;
+                }
+
+                connect(_pGRCSocket,&QLocalSocket::readyRead,_pGRCSocket,[=]() {
+                    QByteArray response = _pGRCSocket->readAll();
+                    QJsonDocument doc = QJsonDocument::fromJson(response);
+                    if (!doc.isNull()) {
+                        QJsonObject resp = doc.object();
+                        if (resp["status"] == "success") {
+                            if (resp["type"] == "file-upload" && resp.contains("file-id")) {
+                                LOG("test file uuid : " << resp["file-id"].toString().toStdString())
+                            }
+                            if (resp["type"] == "file-download" && resp.contains("local-path")) {
+                                LOG("test file at : " << resp["local-path"].toString().toStdString())
+                            }
+                        }else {
+                            LOG("test file failed : " << resp["message"].toString().toStdString())
+                        }
+                    }
+                });
+            });
+
+            // start ipc
+            if (!_pIPCServer->listen("SynergySpotIPC")) {
+                LOG_ERROR("IPC start failed!")
+            }
+
+            _pGRPCProcess->start(processName,{"100000","绅士柴",""});
         });
 
-        // TODO : link to core code
         // trigger verify account request
         connect(g_pLandPage,&LandPage::sigSignInRequest,this,[=](const QString& SSID,const QString& password){
-            // TODO: ignored request handler
+            SSDTO::LoginCheckDTO ldto;
+            ldto.set_ssid(SSID.toStdString());
+            ldto.set_password(password.toStdString());
+            ldto.set_is_pass(false);
+            std::string resDTO;
+            ldto.SerializeToString(&resDTO);
+            g_pClientRequestHandler->sigVerifyAccountRequest(resDTO);
+            if (SSID == "121212" || password == "1") {
+                // init user data dir
+                // UserBaseInfoDTO user = g_pCommonData->getUserInfoBySSID(SSID);
+                // if (user.ssid == "-1") {
+                //     // load animation
+                //     emit g_pClientRequestHandler->sigQueryUserBaseInfoRequest(SSID.toStdString());
+                // }
+                // TODO: async from server data
+                g_pCommonData->setCurUserInfo({"100000","绅士柴",""});
 
-            // TODO: test simulate back end data for contact plugin
+                // go to arch page
+                g_pArchPage->show();
+                _curWindow = g_pArchPage;
+
+                QString filePath = QFileDialog::getOpenFileName(
+                    nullptr,
+                    "选择文件",
+                    QDir::homePath(),
+                    "所有文件 (*);;"
+                );
+                QJsonObject cmd;
+                cmd["command"] = "upload";
+                cmd["local-url"] = filePath;
+                if (_pGRCSocket != nullptr) {
+                    _pGRCSocket->write(QJsonDocument(cmd).toJson());
+                    _pGRCSocket->flush();
+                }
+
+                QTimer::singleShot(0, this, [=]() {
+                    g_pLandPage->close();
+                    g_pLandPage->destroyInstance();
+                });
+            }
+        });
+        connect(g_pLandPage, &LandPage::sigCurrentWidChanged,this,[=](QWidget* wid){_curWindow = wid;});
+        connect(g_pClientRequestHandler, &ClientRequestHandler::sigLoginFailed,this,[=]() {
+            g_pLandPage->clearPasswordInput();
+            ElaMessageBar::error(ElaMessageBarType::Top,"错误","账号或密码错误!",6000, g_pLandPage);
+        });
+        connect(g_pClientRequestHandler, &ClientRequestHandler::sigLoginSuccess,this,[=](const std::string& ssid) {
             // init user data dir
-            g_pCommonData->setCurUserInfo({"100001","小柴",":/message-page/rc-page/img/default-avatar-1.jpg"});
-            g_pMessagePage->loadCacheMsg(g_pCommonData->getMessageContentData(99,1));
-            g_pContactPage->loadCacheContact(g_pCommonData->getCurUserFriendship());
+            UserBaseInfoDTO user = g_pCommonData->getUserInfoBySSID(QString::fromStdString(ssid));
+            if (user.ssid == "-1") {
+                // load animation
+                emit g_pClientRequestHandler->sigQueryUserBaseInfoRequest(ssid);
+            }
+            g_pCommonData->setCurUserInfo(user);
 
             // go to arch page
             g_pArchPage->show();
@@ -131,14 +218,29 @@ int MainLogic::startMainLogic(QApplication * app) {
                 g_pLandPage->destroyInstance();
             });
         });
-        connect(g_pLandPage, &LandPage::sigCurrentWidChanged,this,[=](QWidget* wid){_curWindow = wid;});
+        connect(g_pClientRequestHandler, &ClientRequestHandler::sigQueryUserBaseInfoResponse,this,[=](const std::string& dto) {
+            // cancel load animation
+            SSDTO::UserBaseInfoDTO udto;
+            udto.ParseFromString(dto);
+            g_pCommonData->addUserInfoByServer({
+                QString::fromStdString(udto.ssid()),
+                QString::fromStdString(udto.ssname()),
+                QString::fromStdString(udto.avatar_path()),
+                QString::fromStdString(udto.sex()),
+                QString::fromStdString(udto.personal_sign()),
+                QDateTime::fromMSecsSinceEpoch(udto.birthday()),
+                udto.thumb_up_count(),
+                static_cast<uint8_t>(udto.region()),
+                QDateTime::fromMSecsSinceEpoch(udto.create_time()),
+            });
+        });
 
         // verify email
         connect(g_pSignUpPage,&SignUpPage::sigEmailCodeRequest,this,[=](const QString & emailAddr) {
             g_pEmailVerify->sendEmailVerifyCode(emailAddr.toStdString(),GetCurTime::getTimeObj()->getCurTime());
         });
         connect(g_pClientRequestHandler,&ClientRequestHandler::sigEmailCodeResponse,this,[=](const std::string & dto) {
-            g_pEmailVerify->parseEmailVerifyCode(dto);
+            g_pSignUpPage->sigEmailCodeResponse(QString::fromStdString(g_pEmailVerify->parseEmailVerifyCode(dto)));
         });
 
         // sign up

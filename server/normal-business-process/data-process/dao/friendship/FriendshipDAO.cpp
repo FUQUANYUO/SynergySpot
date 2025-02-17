@@ -43,24 +43,53 @@ int64_t FriendshipDAO::create(const FriendshipDO &friendship) {
 }
 
 bool FriendshipDAO::update(const FriendshipDO &friendship) {
-    std::string sql = "UPDATE friendship SET grouping = ? , remark = ? , ship_status = ? WHERE ssid = ? AND friend_ssid = ?";
+    std::string sql = "UPDATE friendship SET ";
+    std::vector<std::string> setClauses;
     std::vector<MysqlConn::Param> params;
 
-    MysqlConn::Param paramGrouping;
-    paramGrouping.type = MysqlConn::Param::STRING;
-    paramGrouping.str_val = friendship.grouping;
-    params.push_back(paramGrouping);
+    // 检查并添加 grouping
+    if (!friendship.grouping.empty() && friendship.grouping != "-1") {
+        setClauses.push_back("grouping = ?");
+        MysqlConn::Param paramGrouping;
+        paramGrouping.type = MysqlConn::Param::STRING;
+        paramGrouping.str_val = friendship.grouping;
+        params.push_back(paramGrouping);
+    }
 
-    MysqlConn::Param remark;
-    remark.type = MysqlConn::Param::STRING;
-    remark.str_val = friendship.remark;
-    params.push_back(remark);
+    // 检查并添加 remark
+    if (!friendship.remark.empty() && friendship.remark != "-1") {
+        setClauses.push_back("remark = ?");
+        MysqlConn::Param paramRemark;
+        paramRemark.type = MysqlConn::Param::STRING;
+        paramRemark.str_val = friendship.remark;
+        params.push_back(paramRemark);
+    }
 
-    MysqlConn::Param paramShipStatus;
-    paramShipStatus.type = MysqlConn::Param::INT;
-    paramShipStatus.int_val = friendship.shipStatus;
-    params.push_back(paramShipStatus);
+    // 检查并添加 shipStatus
+    if (friendship.shipStatus != 0) { // 假设 0 是无效值
+        setClauses.push_back("ship_status = ?");
+        MysqlConn::Param paramShipStatus;
+        paramShipStatus.type = MysqlConn::Param::INT;
+        paramShipStatus.int_val = friendship.shipStatus;
+        params.push_back(paramShipStatus);
+    }
 
+    // 如果没有有效的字段需要更新，直接返回
+    if (setClauses.empty()) {
+        LOG_WARNING("No valid fields to update for friendship between "
+                    << friendship.ssid << " and " << friendship.friendSsid);
+        return false;
+    }
+
+    // 拼接完整的SQL语句
+    for (auto it = setClauses.begin(); it != setClauses.end(); ++it) {
+        if (it + 1 != setClauses.end()) {
+            sql += (*it) + ", ";
+        }
+    }
+    sql += " WHERE ssid = ? AND friend_ssid = ?";
+
+    // 添加 ssid 和 friend_ssid 参数
     MysqlConn::Param paramSsid;
     paramSsid.type = MysqlConn::Param::STRING;
     paramSsid.str_val = friendship.ssid;
@@ -71,11 +100,12 @@ bool FriendshipDAO::update(const FriendshipDO &friendship) {
     paramFriendSsid.str_val = friendship.friendSsid;
     params.push_back(paramFriendSsid);
 
+    // 执行更新操作
     if (!m_conn->update(sql, params)) {
-        LOG_ERROR("Failed to update status for friendship")
+        LOG_ERROR("Failed to update status for friendship between "
+                  << friendship.ssid << " and " << friendship.friendSsid);
         return false;
     }
-
     return true;
 }
 

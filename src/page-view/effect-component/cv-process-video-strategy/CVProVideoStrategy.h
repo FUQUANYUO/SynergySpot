@@ -5,7 +5,7 @@
 #ifndef SYNERGYSPOT_CVPROVIDEOSTRATEGY_H
 #define SYNERGYSPOT_CVPROVIDEOSTRATEGY_H
 
-#include "../BackgroundStrategyPlugin.h"
+#include "../EffectComponentPlugin.h"
 #include <QImage>
 #include <opencv2/opencv.hpp>
 

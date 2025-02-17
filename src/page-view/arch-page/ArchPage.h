@@ -25,6 +25,7 @@
 #endif
 
 
+class SSMaskWidget;
 class ElaContentDialog;
 class ElaStatusBar;
 class ElaText;
@@ -40,10 +41,15 @@ class SettingsPage;
 #define g_pArchPage ArchPage::getInstance()
 
 class SS_API ArchPage : public ElaWindow{
+    Q_OBJECT
 public:
     static ArchPage * getInstance();
     static void destroyInstance();
     void setInstanceParent(QObject * parent);
+
+public slots:
+    void sltShowMaskEffect();
+    void sltHideMaskEffect();
 private:
     explicit ArchPage(QWidget * parent = nullptr);
     ~ArchPage() override;
@@ -52,6 +58,8 @@ protected:
     void initEdgeLayout();
     void initContent();
     void initConnectFunc();
+
+    virtual void resizeEvent(QResizeEvent * event) override;
 private:
     // ----------------- UI -----------------
     ElaContentDialog * _closeDialog      = nullptr;
@@ -63,6 +71,7 @@ private:
 
     QAction          * _createAction     = nullptr;
     QAction          * _addAction        = nullptr;
+    SSMaskWidget     * _maskWidget       = nullptr;
 
     int                _msgNoticeNum     = 0;
     int                _contactNoticeNum = 0;

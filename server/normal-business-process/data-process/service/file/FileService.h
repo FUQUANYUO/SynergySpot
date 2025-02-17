@@ -17,7 +17,12 @@ public:
     bool removeFile(const FileStorageDTO& dto);
 
     // get file
-    std::string getFile(const FileStorageDTO& dto);
+    std::vector<FileStorageDTO> getFileByUserSSID(const std::string& userSSID,int pageSize, int pageNum);
+
+    std::vector<FileStorageDTO> getFileByFileName(const std::string& fileName,int pageSize, int pageNum);
+
+    FileStorageDTO getFileByFileID(const std::string& fileID);
+
 private:
     FileStorageDAO fileDAO;
 };

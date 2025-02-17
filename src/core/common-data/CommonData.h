@@ -35,13 +35,6 @@
 
 #define g_pCommonData CommonData::getInstance()
 
-
-struct CurUserInfoDataStruct {
-    std::string CurSSID;
-    std::string CurSSname;
-    std::string CurUserAvatarPath;
-};
-
 enum CommonPath {
     avatar,
     emoji,
@@ -78,11 +71,12 @@ public:
     YAML::Node                 getYamlNode() const;
 
     // user info //
-    CurUserInfoDataStruct      getCurUserInfo() const;
-    void                       setCurUserInfo(const CurUserInfoDataStruct& curUserInfo);
+    UserBaseInfoDTO            getCurUserInfo() const;
+    void                       setCurUserInfo(const UserBaseInfoDTO& curUserInfo);
 
     UserBaseInfoDTO            getUserInfoBySSID(const QString& ssid);
     bool                       setUserInfoBySSID(const UserBaseInfoDTO& userInfo);
+    bool                       addUserInfoByServer(const UserBaseInfoDTO& userInfo);
 
     // friendship
     QList<FriendshipDTO>       getCurUserFriendship();
@@ -149,7 +143,7 @@ private:
     std::string             _yamlPath;
     std::string             _imageEx;
     std::string             _liteDBName;
-    CurUserInfoDataStruct   _userInfo;
+    UserBaseInfoDTO         _userInfo;
     YAML::Node              _node;
     LiteConn                *_liteConn;
 

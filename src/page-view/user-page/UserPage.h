@@ -32,8 +32,10 @@ class ElaText;
 class QHBoxLayout;
 class QVBoxLayout;
 class QGridLayout;
+class EditInfoPage;
 
 class SS_API UserPage : public ElaWidget{
+    Q_OBJECT
 public:
     static UserPage * getInstance(UserType type, UserInfo uInfo, GroupInfo gInfo, QWidget*parent = nullptr);
     static void destroyUserPage();
@@ -42,7 +44,11 @@ public:
     void setInfo(const GroupInfo & info);
 
     void showAt(const QPoint &pos);
+    void moveUserEditPageToCenter(const QPoint& pos);
 signals:
+    void sigShowArchPageMaskEffect();
+    void sigHideArchPageMaskEffect();
+public slots:
 private:
     UserPage() = default;
     explicit UserPage(UserType type,QWidget *parent = nullptr);
@@ -76,6 +82,7 @@ private:
     QVBoxLayout        * _mainLayout        = nullptr;
     QGridLayout        * _textLayout        = nullptr;
     QHBoxLayout        * _buttonLayout      = nullptr;
+    EditInfoPage       * _editPage          = nullptr;
     // ----------------- UI -----------------
 
     // --------------- BackEnd --------------
@@ -83,6 +90,7 @@ private:
     QString              _signContent       = "";
     QString              _joinDay           = "";
     QString              _localInfo         = "";
+    QWidget            * _archPage          = nullptr;
     bool                 _isGroup           = false;
     // --------------- BackEnd --------------
 

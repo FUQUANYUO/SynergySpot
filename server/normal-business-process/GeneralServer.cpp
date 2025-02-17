@@ -1,5 +1,8 @@
 #include <nlohmann/json.hpp>
 #include <thread>
+#include <csignal>
+#include <sys/wait.h>
+
 #include "GeneralServer.h"
 #include "thread-pool/ThreadPool.h"
 #include "yaml-cpp/yaml.h"
@@ -13,6 +16,8 @@
 #include "data-process/service/sticker/StickerService.h"
 
 #include "do-business/do-email-code/DoEmailCode.h"
+
+
 
 using namespace std;
 
@@ -34,8 +39,6 @@ std::mutex m;
 // 限制子线程添加群聊消息的并发操作
 std::mutex groupM;
 
-void writeRequestToEpoll(EpollEngine& en,int &fd,std::string &dto,char &businessType);
-
 void working(void *arg){
     string ssid;
     auto readArgs = reinterpret_cast<ReadArgs*>(arg);
@@ -43,7 +46,7 @@ void working(void *arg){
     EpollEngine &en = *readArgs->en;
 
     // 读取数据
-    char businessType;
+    int businessType;
     string dto;
     SockInfo *info = fd_sockets[fd];
     int res = (info->tcp->recvMsg(dto,businessType));
@@ -134,6 +137,37 @@ void working(void *arg){
             }
         }
     }
+    // 获取云消息
+    else if (businessType == SSDTO::BusinessType::R_MESSAGE_CONTENT) {
+        MessageService mService;
+        SSDTO::GetUserMessageDTO mdto;
+        mdto.ParseFromString(dto);
+
+        vector<MessageContentDTO> msgRes = mService.getUserAllMessages({
+            .senderSsid = mdto.ssid(),
+            .pageSize = mdto.page_size(),
+            .pageNum = mdto.page_num()
+        });
+
+        for (const auto& it : msgRes ) {
+            SSDTO::MessageContentDTO * msgDto = mdto.add_msg();
+            msgDto->set_id(it.id);
+            msgDto->set_sender_ssid(it.senderSsid);
+            msgDto->set_content(it.content);
+            msgDto->set_file_id(it.fileId);
+            SSDTO::MessageRecipientDTO * recipientDto = msgDto->mutable_recipient();
+            recipientDto->set_id(it.recipient.id);
+            recipientDto->set_message_id(it.recipient.messageId);
+            recipientDto->set_recipient_type(it.recipient.recipientType);
+            recipientDto->set_recipient_ssid(it.recipient.recipientSsid);
+            recipientDto->set_read_status(it.recipient.readStatus);
+            msgDto->set_create_time(it.createTime);
+        }
+
+        std::string resDto;
+        mdto.SerializeToString(&resDto);
+        info->tcp->sendMsg(resDto, SSDTO::BusinessType::R_MESSAGE_CONTENT);
+    }
     // 获取好友列表
     else if (businessType == SSDTO::BusinessType::R_FRIENDSHIP_LIST) {
         FriendshipService fService;
@@ -145,7 +179,7 @@ void working(void *arg){
             udto->set_ssid(it.ssid);
             udto->set_ssname(it.ssname);
             udto->set_avatar_path(it.avatarPath);
-            udto->set_sex(it.sex);
+            udto->set_sex(std::string(1,it.sex));
             udto->set_personal_sign(it.personalSign);
             udto->set_thumb_up_count(it.thumbUpCount);
             udto->set_birthday(it.birthday);
@@ -201,6 +235,7 @@ void working(void *arg){
             }
         }
     }
+    // 好友请求响应
     else if(businessType == SSDTO::BusinessType::MAKE_FRIEND_RESPONSE) {
         SSDTO::MakeFriendDTO mdto;
         mdto.ParseFromString(dto);
@@ -232,11 +267,11 @@ void working(void *arg){
         fdto.ParseFromString(dto);
 
         for (const auto& it : uService.fuzzyMatch(fdto.ssid(),fdto.name())) {
-            SSDTO::UserBaseInfoDTO * udto = fdto.add_userinfos();
+            SSDTO::UserBaseInfoDTO * udto = fdto.add_user_infos();
             udto->set_ssid(it.ssid);
             udto->set_ssname(it.ssname);
             udto->set_avatar_path(it.avatarPath);
-            udto->set_sex(it.sex);
+            udto->set_sex(std::string(1,it.sex));
             udto->set_personal_sign(it.personalSign);
             udto->set_thumb_up_count(it.thumbUpCount);
             udto->set_birthday(it.birthday);
@@ -248,6 +283,101 @@ void working(void *arg){
         fdto.SerializeToString(&resDto);
         info->tcp->sendMsg(resDto, SSDTO::BusinessType::SEARCH_USER);
     }
+    // 获取用户文件信息
+    else if(businessType == SSDTO::BusinessType::R_FILE) {
+        FileService fService;
+        SSDTO::GetFileDTO fdto;
+        fdto.ParseFromString(dto);
+
+        vector<FileStorageDTO> files;
+
+        if (fdto.ssid() != "-1" && !fdto.ssid().empty()) {
+            files = fService.getFileByUserSSID(fdto.ssid(),fdto.page_size(),fdto.page_num());
+        }else if (fdto.file_name() != "-1" && !fdto.file_name().empty()) {
+            files = fService.getFileByFileName(fdto.file_name(),fdto.page_size(),fdto.page_num());
+        }else if (fdto.file_id() != "-1" && !fdto.file_id().empty()) {
+            files.push_back(fService.getFileByFileID(fdto.file_id()));
+        }
+
+        for (const auto& it : files) {
+            SSDTO::FileStorageDTO * fileDto = fdto.add_files();
+            fileDto->set_file_id(it.fileId);
+            fileDto->set_uploader_ssid(it.uploaderSsid);
+            fileDto->set_file_name(it.fileName);
+            fileDto->set_file_size(it.fileSize);
+            fileDto->set_file_type(it.fileType);
+            fileDto->set_storage_path(it.storagePath);
+            fileDto->set_upload_time(it.uploadTime);
+        }
+
+        std::string resDto;
+        fdto.SerializeToString(&resDto);
+        info->tcp->sendMsg(resDto, SSDTO::BusinessType::R_FILE);
+    }
+    // 添加文件信息 by grpc sub process
+    else if(businessType == SSDTO::BusinessType::C_FILE) {
+        FileService fService;
+        SSDTO::FileStorageDTO fdto;
+        fdto.ParseFromString(dto);
+
+        if (!fService.addFile({
+            fdto.file_id(),fdto.uploader_ssid(),fdto.file_name(),
+            fdto.file_size(),fdto.file_type(),fdto.storage_path(),
+            fdto.upload_time()
+        }))
+        {
+            LOG_ERROR("Failed to add file << id : " << fdto.file_id()
+                << "<< ssid : " << fdto.uploader_ssid()
+                << "<< file_name : " << fdto.file_name());
+        }
+    }
+    // 修改用户基础信息
+    else if(businessType == SSDTO::BusinessType::U_USER_BASE_INFO) {
+        UserService uService;
+        SSDTO::UserBaseInfoDTO udto;
+        udto.ParseFromString(dto);
+
+        if (!uService.updateUserBaseInfo({
+            udto.ssid(),udto.ssname(),udto.avatar_path(),(udto.sex()=="男生")?'M':'F',
+            udto.personal_sign(),udto.thumb_up_count(),udto.birthday(),static_cast<uint8_t>(udto.region())
+        }))
+        {
+            LOG_ERROR(
+                "update user info failed << ssid : " << udto.ssid() <<
+                " << ssname : " << udto.ssname() <<
+                " << avatarPath : " << udto.avatar_path() <<
+                " << sex : " << udto.sex() <<
+                " << personal_sign : " << udto.personal_sign() <<
+                " << thumb_up_count : " << udto.thumb_up_count() <<
+                " << birthday : " << udto.birthday() <<
+                " << region : " << udto.region()
+            )
+        }
+    }
+    // 修改群组基础信息
+    else if(businessType == SSDTO::BusinessType::U_GROUP_BASE_INF0) {
+        GroupService gService;
+        SSDTO::GroupBaseInfoDTO gdto;
+        gdto.ParseFromString(dto);
+
+        vector<string> admins;
+        for (const auto &it : gdto.admins()) {
+            admins.push_back(it);
+        }
+        if (!gService.updateGroup({
+            -1,gdto.ssid_group(),gdto.name(),gdto.avatar(),gdto.create_ssid(),gdto.profile(),
+            admins
+        }))
+        {
+            LOG_ERROR(
+                "update group info failed << g_ssid : " << gdto.ssid_group() <<
+                " << g_name : " << gdto.name() <<
+                " << avatarPath : " << gdto.avatar() <<
+                " << create_ssid : " << gdto.create_ssid() <<
+                " << profile : " << gdto.profile()
+            )
+        }
+    }
     else {
         LOG("some error occur in parse business!")
     }
@@ -257,12 +387,35 @@ void working(void *arg){
 TcpServer s;
 ThreadPool * pool = nullptr;
 
+// 信号处理函数和全局变量
+volatile sig_atomic_t stop = 0;
+void handleSignal(int sig) {
+    stop = 1;
+}
+
 int main() {
+    // 注册信号
+    signal(SIGINT, handleSignal);
+    signal(SIGTERM, handleSignal);
+
+    // 启动子进程
+    pid_t grpcPid = fork();
+    if (grpcPid == 0) { // 子进程
+        execl("./SynergySpot-GRPC-Server", "SynergySpot-GRPC-Server", nullptr);
+        LOG_ERROR("execl failed");
+        exit(EXIT_FAILURE);
+    } else if (grpcPid < 0) { // fork失败
+        LOG_ERROR("fork failed");
+        return -1;
+    }
+
     YAML::Node node = YAML::LoadFile(yamlPath);
     if (node.IsNull()) return -1;
     int listenPort = node["host-info"]["listenPort"].as<int>();
     int poolMin = node["thread-pool"]["minSize"].as<int>();
     int poolMax = node["thread-pool"]["maxSize"].as<int>();
+
+    SSLog::initLogFile("SynergySpot-Server");
 
     // 创建线程池
     ThreadPool Pool(poolMin, poolMax);
@@ -273,7 +426,7 @@ int main() {
     // 添加服务端监听事件
     en.addEvent(s.getLisentFD(),EPOLLIN);
 
-    while (1) {
+    while (!stop) {
         // 等待服务端监听响应
         int numsOfReady = en.waitForEvents();
         if (numsOfReady == -1) {
@@ -284,5 +437,9 @@ int main() {
             en.handleEvents(numsOfReady);
         }
     }
+
+    // 终止子进程
+    kill(grpcPid, SIGTERM);
+    waitpid(grpcPid, nullptr, 0);
     return 0;
 }

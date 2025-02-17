@@ -26,6 +26,8 @@ file(GLOB_RECURSE DBCpp ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/db-pool/*.cpp)
 file(GLOB_RECURSE LOGCpp ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/log/*.cpp)
 # get time
 file(GLOB_RECURSE TimeCpp ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/get-time/*.cpp)
+# encrypt
+file(GLOB_RECURSE EncryptCpp ${CMAKE_CURRENT_SOURCE_DIR}/../src/utils/encrypt/*.cpp)
 
 add_executable(Server
         ${NormalCpp}
@@ -34,6 +36,7 @@ add_executable(Server
         ${ProCC}
         ${LOGCpp}
         ${TimeCpp}
+        ${EncryptCpp}
 )
 
 target_link_directories(Server PRIVATE

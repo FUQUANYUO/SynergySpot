@@ -44,6 +44,9 @@ public:
     static void destroyInstance();
     // save qrc to file
     bool saveQrcToFile(const QString& qrcPath, const QString& targetFilePath);
+
+    // clear password
+    void clearPasswordInput();
 signals:
     // sign in request
     void sigSignInRequest(const QString& SSID,const QString& password);

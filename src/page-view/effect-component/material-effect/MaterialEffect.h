@@ -5,7 +5,7 @@
 #ifndef SYNERGYSPOT_MATERIALEFFECT_H
 #define SYNERGYSPOT_MATERIALEFFECT_H
 
-#include "../BackgroundStrategyPlugin.h"
+#include "../EffectComponentPlugin.h"
 #include <QGraphicsBlurEffect>
 #include <QGraphicsWidget>
 
