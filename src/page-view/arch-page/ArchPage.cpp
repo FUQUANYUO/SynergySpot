@@ -3,6 +3,8 @@
 //
 
 #include "ArchPage.h"
+#include "add-page/AddPage.h"
+
 #include "../CommonFunc.hpp"
 #include "../about-page/AboutPage.h"
 #include "../message-page/MessagePage.h"
@@ -10,7 +12,6 @@
 #include "../settings-page/SettingsPage.h"
 #include "../file-manager-page/FileManagerPage.h"
 #include "../user-page/UserPage.h"
-#include "../effect-component/SS-mask-widget/SSMaskWidget.h"
 
 #include "ela-widget-tools/ElaContentDialog.h"
 #include "ela-widget-tools/ElaStatusBar.h"
@@ -23,6 +24,9 @@
 #include <QHBoxLayout>
 #include <QResizeEvent>
 #include <mutex>
+
+#include "../effect-component/SS-mask-widget/SSMaskWidget.h"
+#include "../effect-component/loading-dialog/LoadingDialog.h"
 
 static std::mutex m;
 ArchPage * ArchPage::_obj = nullptr;
@@ -48,6 +52,25 @@ void ArchPage::destroyInstance() {
     }
 }
 
+void ArchPage::sltTriggerUpdate() {
+    UserBaseInfoDTO udto = g_pCommonData->getCurUserInfo();
+    if (udto.username.isEmpty() || udto.username == "-1") {
+        setUserInfoCardTitle("{NULL}");
+    } else {
+        setUserInfoCardTitle(udto.username);
+    }
+    if (udto.avatarPath.isEmpty() || udto.avatarPath == "-1") {
+        setUserInfoCardPixmap(QPixmap(":/arch-page/rc-page/img/SS-default-icon.jpg"));
+    } else {
+        setUserInfoCardPixmap(udto.avatarPath);
+    }
+    if (udto.ssid.isEmpty() || udto.ssid == "-1") {
+        setUserInfoCardSubTitle("{NULL}");
+    } else {
+        setUserInfoCardSubTitle(udto.ssid);
+    }
+}
+
 void ArchPage::sltShowMaskEffect() {
     _maskWidget->setVisible(true);
     _maskWidget->raise();
@@ -58,23 +81,15 @@ void ArchPage::sltShowMaskEffect() {
 void ArchPage::sltHideMaskEffect() {
     _maskWidget->startMaskAnimation(0);
 }
-void ArchPage::sltTriggerUpdate() {
-    UserBaseInfoDTO udto = g_pCommonData->getCurUserInfo();
-    if (udto.username.isEmpty() || udto.username == "-1") {
-        setUserInfoCardTitle("{NULL}");
-    }else {
-        setUserInfoCardTitle(udto.username);
-    }
-    if (udto.avatarPath.isEmpty() || udto.avatarPath == "-1") {
-        setUserInfoCardPixmap(QPixmap(":/arch-page/rc-page/img/SS-default-icon.jpg"));
-    }else {
-        setUserInfoCardPixmap(udto.avatarPath);
-    }
-    if (udto.ssid.isEmpty() || udto.ssid == "-1") {
-        setUserInfoCardSubTitle("{NULL}");
-    }else {
-        setUserInfoCardSubTitle(udto.ssid);
-    }
+
+void ArchPage::sltShowLoading() {
+    sltShowMaskEffect();
+    _loadingDialog->setVisible(true);
+}
+
+void ArchPage::sltHideLoading() {
+    _loadingDialog->setVisible(false);
+    sltHideMaskEffect();
 }
 
 ArchPage::ArchPage(QWidget *parent) : ElaWindow(parent) {
@@ -102,6 +117,7 @@ ArchPage::ArchPage(QWidget *parent) : ElaWindow(parent) {
 }
 
 ArchPage::~ArchPage() {
+    delete _addPage;
 }
 
 void ArchPage::initWindow() {
@@ -117,7 +133,14 @@ void ArchPage::initWindow() {
     _toolBar        =   new ElaToolBar("Tool Bar", this);
     _addButton      =   new ElaToolButton(this);
     _searchSuggest  =   new ElaSuggestBox(this);
+
     _maskWidget     =   new SSMaskWidget(this);
+    _loadingDialog  =   new LoadingDialog(this);
+
+    _maskWidget->setParent(this);
+    _maskWidget->setVisible(false);
+    _loadingDialog->setParent(this);
+    _loadingDialog->setVisible(false);
 
     // init arch user pic and user name
     sltTriggerUpdate();
@@ -220,9 +243,28 @@ void ArchPage::initConnectFunc() {
 
     // refresh data
     connect(g_pCommonData,&CommonData::sigUpdateAvatarData,this,&ArchPage::sltTriggerUpdate);
+
+    // add friend
+    connect(_addAction,&QAction::triggered,this,[=]() {
+        if (_addPage == nullptr) {
+            _addPage = new AddPage();
+            connect(_addPage,&AddPage::sigHideArchPageMaskEffect,this,&ArchPage::sltHideMaskEffect);
+        }
+
+        sltShowMaskEffect();
+        _addPage->show();
+    });
+
+    // create group
+    connect(_createAction,&QAction::triggered,this,[=]() {
+
+    });
+
+
+
 }
 
 void ArchPage::resizeEvent(QResizeEvent *event) {
-    ElaWindow::resizeEvent(event);
     _maskWidget->setFixedSize(event->size());
+    ElaWindow::resizeEvent(event);
 }

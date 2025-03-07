@@ -62,3 +62,17 @@ std::vector<std::string> GroupService::getGroupNoticeInfo(const std::string &gro
     }
     return notices;
 }
+
+std::vector<GroupBaseInfoDTO> GroupService::fuzzyMatch(const std::string &ssid, const std::string &name) {
+    std::vector<GroupBaseInfoDTO> userDto;
+    std::vector<GroupBaseInfoDO> res = groupBaseInfoDAO.fuzzyMatchingByIdOrName(ssid,name);
+    for (const auto &it : res) {
+        std::vector<GroupAdminDO> resAdmin = groupAdminDAO.getAdmins(it.id);
+        std::vector<std::string> admins;
+        for (const auto& ad : resAdmin ) {
+            admins.push_back(ad.opSsid);
+        }
+        userDto.push_back({it.id,it.ssidGroup,it.name,it.avatar,it.createSsid,it.profile,admins,it.createTime});
+    }
+    return userDto;
+}

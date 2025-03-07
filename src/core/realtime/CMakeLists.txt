@@ -11,11 +11,18 @@ set(CMAKE_AUTOUIC ON)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../out)
 
 # grpc cmake
-list(APPEND CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../lib-common/lib/Win/grpc)
+list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../lib-common/lib/Win/grpc/lib")
 
-# protobuf and grpc module
+set(gRPC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../lib-common/lib/Win/grpc/lib/cmake/grpc")
+set(absl_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../lib-common/lib/Win/grpc/lib/cmake/absl")
+set(Protobuf_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../lib-common/lib/Win/grpc/cmake")
+
+
+# 查找依赖
 find_package(Protobuf CONFIG REQUIRED)
-find_package(gRPC REQUIRED)
+find_package(absl CONFIG REQUIRED)
+find_package(gRPC CONFIG REQUIRED)
+
 
 # Qt module
 find_package(Qt6 REQUIRED COMPONENTS

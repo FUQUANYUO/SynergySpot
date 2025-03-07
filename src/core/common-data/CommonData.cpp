@@ -182,6 +182,7 @@ bool CommonData::setMessageContentData(const QList<MessageContentDTO> &dto,bool 
         return res;
     }
 }
+
 time_t CommonData::getLastMessageTime() const {
     if (!_enable) {
         LOG_ERROR("Please init cur user info!");

@@ -9,9 +9,6 @@
 #include <QLabel>
 #include <QLineEdit>
 
-#include "../../effect-component/SS-mask-widget/SSMaskWidget.h"
-
-
 struct UserInfo;
 struct UserBaseInfoDTO;
 class ElaCalendarPicker;

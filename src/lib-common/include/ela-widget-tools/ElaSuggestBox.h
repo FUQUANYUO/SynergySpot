@@ -23,8 +23,15 @@ public:
     QString addSuggestion(ElaIconType::IconName icon, const QString& suggestText, const QVariantMap& suggestData = {});
     void removeSuggestion(const QString& suggestKey);
     void removeSuggestion(int index);
+
+    // fuqaq : enter key event
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) override;
 Q_SIGNALS:
     Q_SIGNAL void suggestionClicked(QString suggestText, QVariantMap suggestData);
+
+    // fuqaq : enter key event signal
+    Q_SIGNAL void sigEnterPressed(const QString& content);
 };
 
 #endif // ELASUGGESTBOX_H

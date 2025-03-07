@@ -46,4 +46,5 @@
         oss << __EXPR__.toStdString(); \
         SSLog::log(SSLog::LogLevel::SS_DEFAULT, __FILE__, __LINE__, oss.str()); \
     } while (0);
+
 #endif//SYNERGYSPOT_HELP_H

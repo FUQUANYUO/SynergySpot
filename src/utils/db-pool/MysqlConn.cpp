@@ -188,7 +188,7 @@ MYSQL_RES* MysqlConn::query(const std::string &sql, const std::vector<Param>& pa
 
     if (mysql_real_query(m_conn, replaceStr.c_str(), replaceStr.size()) != 0)
     {
-        LOG_ERROR("QUERY FAILED: " + sql + "," + mysql_error(m_conn))
+        LOG_ERROR("QUERY FAILED: " + replaceStr + "," + mysql_error(m_conn))
         return nullptr;
     }
     return mysql_store_result(m_conn);

@@ -30,8 +30,7 @@ enum BusinessType {
   D_GROUP_NOTICE = 52;
   R_GROUP_NOTICE = 53;
 
-  SEARCH_USER = 56;
-  SEARCH_GROUP = 57;
+  FUZZY_SEARCH = 56;
 
   R_MESSAGE_CONTENT = 61;             // 离线转发
   C_MESSAGE_CONTENT = 62;             // 转发消息
@@ -87,7 +86,7 @@ message FuzzySearchDTO{
     bytes ssid = 2;
     bytes name = 3;
     repeated UserBaseInfoDTO user_infos = 4;
-    repeated GroupMemberInfoDTO group_infos = 5;
+    repeated GroupBaseInfoDTO group_infos = 5;
     bytes ip = 6;
 };
 
@@ -186,12 +185,13 @@ message GroupBaseInfoDTO {
   int64 id = 1;
   string ssid_group = 2;
   string name = 3;
-  string avatar = 4;
-  string create_ssid = 5;
-  string profile = 6;
-  repeated string admins = 7;  // 管理员列表
-  int64 create_time = 8;
-  bytes ip = 9;
+  string avatar_file_id = 4;
+  string avatar_remote_path = 5;
+  string create_ssid = 6;
+  string profile = 7;
+  repeated string admins = 8;  // 管理员列表
+  int64 create_time = 9;
+  bytes ip = 10;
 }
 
 // 群公告 DTO

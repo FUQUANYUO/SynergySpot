@@ -14,7 +14,6 @@
 #include "land-page/recover-pw-page/RecoverPWPage.h"
 #include "plugin-manager/StrategyManager.h"
 #include "effect-component/cv-process-video-strategy/CVProVideoStrategy.h"
-#include "effect-component/loading-dialog/LoadingDialog.h"
 #include "arch-page/ArchPage.h"
 
 #include "ela-widget-tools/ElaApplication.h"
@@ -227,6 +226,8 @@ int MainLogic::startMainLogic(QApplication *app) {
         ldto.ParseFromString(dto);
         // login success
         if (ldto.is_pass()) {
+            _dataLoadCounter = 0;
+
             // set user info in grpc sub process
             {
                 QJsonObject userInfo;
@@ -275,7 +276,7 @@ int MainLogic::startMainLogic(QApplication *app) {
                         resp["business-type"] = "avatar";
                         _pGRCSocket->write(QJsonDocument(resp).toJson());
                         _pGRCSocket->flush();
-                        _dataLoadCounter++;
+                        // _dataLoadCounter++;
                     } else {
                         baseInfoDto.avatarPath = res.storagePath;
                     }
@@ -292,7 +293,7 @@ int MainLogic::startMainLogic(QApplication *app) {
                     // store user private data
                     g_pCommonData->setLoginRecord({QString::fromStdString(ldto.ssid()),
                                                   QString::fromStdString(ldto.password()),
-                                                  QDateTime::currentDateTime().toMSecsSinceEpoch(),
+                                                  QDateTime::currentMSecsSinceEpoch(),
 #ifdef Q_OS_WIN
                                                   "WINDOWS"
 #else
@@ -308,7 +309,7 @@ int MainLogic::startMainLogic(QApplication *app) {
                     _dataLoadCounter--;
                     checkAllDataLoaded();
                });
-            connect(g_pClientRequestHandler, &ClientRequestHandler::sigQueryNewMessageResponse, this, [=](const std::string dto) {
+            connect(g_pClientRequestHandler, &ClientRequestHandler::sigQueryNewMessageResponse, this, [=](const std::string& dto) {
                 SSDTO::GetUserMessageDTO gudto;
                 gudto.ParseFromString(dto);
 
@@ -359,16 +360,12 @@ int MainLogic::startMainLogic(QApplication *app) {
                     FileStorageDTO res = g_pCommonData->getFileInfoById(QString::fromStdString(info.avatar_file_id()));
                     if (res.fileId == "-1" || res.fileId.isEmpty()) {
                         // send query avatar by grpc
-                        QJsonObject resp;
-                        resp["command"] = "download";
-                        resp["file-id"] = QString::fromStdString(info.avatar_file_id());
-                        resp["uploader-ssid"] = QString::fromStdString(info.ssid());
-                        resp["storage-path"] = QString::fromStdString(info.avatar_remote_path());
-                        resp["local-path"] = QString::fromStdString(g_pCommonData->getDataPath(avatar) + "/" + info.avatar_file_id() + g_pCommonData->getImageEx());
-                        resp["business-type"] = "avatar";
-                        _pGRCSocket->write(QJsonDocument(resp).toJson());
-                        _pGRCSocket->flush();
-                        _dataLoadCounter++;
+                        emit g_pCommonData->sigGetAvatarFileFromRemote(
+                            QString::fromStdString(info.avatar_file_id()),
+                            QString::fromStdString(info.ssid()),
+                            QString::fromStdString(info.avatar_remote_path())
+                        );
+                        // _dataLoadCounter++;
                     } else {
                         baseInfoDto.avatarPath = res.storagePath;
                     }
@@ -494,24 +491,54 @@ int MainLogic::startMainLogic(QApplication *app) {
     connect(g_pUserPage(Myself, {}, {}), &UserPage::sigUserAvatarChanged, this, [=](const QString &localPath) {
         QJsonObject cmd;
         cmd["command"] = "upload";
-        cmd["local-url"] = localPath;
+        cmd["local-path"] = localPath;
         cmd["business-type"] = "avatar";
         cmd["uploader-ssid"] = g_pCommonData->getCurUserInfo().ssid;
         if (_pGRCSocket != nullptr) {
             _pGRCSocket->write(QJsonDocument(cmd).toJson());
             _pGRCSocket->flush();
+            _dataLoadCounter++;
         }
+    });
+
+    // forward msg
+    connect(g_pClientRequestHandler,&ClientRequestHandler::sigForwardMessageResponse,this,[=](const std::string &dto) {
+        _dataLoadCounter--;
+        checkAllDataLoaded();
+
+        SSDTO::MessageContentDTO mdto;
+        mdto.ParseFromString(dto);
+
+        MessageContentDTO lmdto;
+        lmdto.content = QString::fromStdString(mdto.content());
+        lmdto.recipient = {
+            qint32(mdto.recipient().recipient_type()),
+            QString::fromStdString(mdto.recipient().recipient_ssid()),
+            mdto.recipient().read_status()
+        };
+        lmdto.contentType = static_cast<ContentType>(mdto.content_type());
+        lmdto.createTime = mdto.create_time();
+
+        for (const auto& it : mdto.file_id()) {
+            lmdto.fileId.append(QString::fromStdString(it));
+        }
+
+        lmdto.senderSSID = QString::fromStdString(mdto.sender_ssid());
+
+        g_pCommonData->setMessageContentData({lmdto},true);
+        g_pMessagePage->loadCacheMsg({lmdto});
     });
 
     // upload to server for msg dto
     connect(g_pCommonData, &CommonData::sigSyncMsgContentDTO, this, [=](const QList<MessageContentDTO> &dto) {
+        _dataLoadCounter++;
         // send tmp pic to server
         for (const auto &msg: dto) {
             SSDTO::MessageContentDTO mdto;
             for (const auto &file: msg.fileId) {// one msg contains some pic file
                 QJsonObject cmd;
                 cmd["command"] = "upload";
-                cmd["local-url"] = QString::fromStdString(g_pCommonData->getDataPath(msgPic)) + "/" + file +
+                cmd["local-path"] = QString::fromStdString(g_pCommonData->getDataPath(msgPic)) + "/" + file +
                                    QString::fromStdString(g_pCommonData->getImageEx());
                 cmd["business-type"] = "msg_pic";
                 if (_pGRCSocket != nullptr) {
@@ -548,7 +575,7 @@ int MainLogic::startMainLogic(QApplication *app) {
                    QJsonObject cmd;
                    cmd["command"] = "download";
                    cmd["business-type"] = "msg_pic";
-                   cmd["local-url"] = QString::fromStdString(g_pCommonData->getDataPath(msgPic) + "/" +
+                   cmd["local-path"] = QString::fromStdString(g_pCommonData->getDataPath(msgPic) + "/" +
                                                              fileInfo.first + g_pCommonData->getImageEx());
                    cmd["file-id"] = QString::fromStdString(fileInfo.first);
                    cmd["storage-path"] = QString::fromStdString(fileInfo.second);
@@ -556,18 +583,20 @@ int MainLogic::startMainLogic(QApplication *app) {
                    if (_pGRCSocket != nullptr) {
                        _pGRCSocket->write(QJsonDocument(cmd).toJson());
                        _pGRCSocket->flush();
+                       // _dataLoadCounter++;
                    }
                }
-               _dataLoadCounter += gmpdto.pic_name_to_path().size();
+               _dataLoadCounter --;
+               checkAllDataLoaded();
            });
 
         // query file info
         {
             SSDTO::GetMessagePicInfoDTO gmpdto;
             gmpdto.set_ssid(g_pCommonData->getCurUserInfo().ssid.toStdString());
-            auto _map = *gmpdto.mutable_pic_name_to_path();
+            auto _map = gmpdto.mutable_pic_name_to_path();
             for (const auto &file: files) {
-                _map[file.toStdString()] = "";
+                (*_map)[file.toStdString()] = "";
             }
 
             std::string resDto;
@@ -591,7 +620,115 @@ int MainLogic::startMainLogic(QApplication *app) {
 
         g_pLandPage->close();
         g_pLandPage->destroyInstance();
+
+        _dataLoadCounter = INT_MAX;
     });
+
+    // fuzzy search
+    connect(g_pCommonData,&CommonData::sigFuzzySearchRequest,this,[=](const QString& content,bool isGroup) {
+        SSDTO::FuzzySearchDTO fuzzyDto;
+        fuzzyDto.set_is_group(isGroup);
+
+        bool isSSID;
+        content.toInt(&isSSID);
+        if (isSSID) {
+            fuzzyDto.set_ssid(content.toStdString());
+        }else {
+            fuzzyDto.set_name(content.toStdString());
+        }
+        std::string resDto;
+        fuzzyDto.SerializeToString(&resDto);
+
+        g_pClientRequestHandler->sigFuzzySearchRequest(resDto);
+    });
+
+    connect(g_pClientRequestHandler,&ClientRequestHandler::sigFuzzySearchResponse,[=](const std::string& dto) {
+        int waitCount = 0;
+        SSDTO::FuzzySearchDTO fuzzyDto;
+        fuzzyDto.ParseFromString(dto);
+        bool isGroup = fuzzyDto.is_group();
+        if (!isGroup) {
+            QList<UserBaseInfoDTO> resList;
+            for (const auto& info : fuzzyDto.user_infos()) {
+                UserBaseInfoDTO baseInfoDto{
+                    QString::fromStdString(info.ssid()),
+                    QString::fromStdString(info.ssname()),
+                    "",
+                    QString::fromStdString(info.sex()),
+                    QString::fromStdString(info.personal_sign()),
+                    info.birthday(),
+                    info.thumb_up_count(),
+                    static_cast<uint8_t>(info.region()),
+                    info.create_time(),
+                };
+
+                FileStorageDTO res = g_pCommonData->getFileInfoById(QString::fromStdString(info.avatar_file_id()));
+                if (res.fileId == "-1" || res.fileId.isEmpty()) {
+                    // send query avatar by grpc
+                    emit g_pCommonData->sigGetAvatarFileFromRemote(
+                        QString::fromStdString(info.avatar_file_id()),
+                        QString::fromStdString(info.ssid()),
+                        QString::fromStdString(info.avatar_remote_path())
+                    );
+                    waitCount++;
+                } else {
+                    baseInfoDto.avatarPath = res.storagePath;
+                }
+                if (g_pCommonData->getUserInfoBySSID(baseInfoDto.ssid).ssid.isEmpty())
+                    g_pCommonData->addUserInfoByServer(baseInfoDto);
+                resList.append(baseInfoDto);
+            }
+            emit g_pCommonData->sigFuzzySearchFriendResponse(resList,waitCount);
+        }
+        else {
+            QList<GroupBaseInfoDTO> resList;
+            for (const auto& info : fuzzyDto.group_infos()) {
+                GroupBaseInfoDTO baseInfoDto{
+                    QString::fromStdString(info.ssid_group()),
+                    QString::fromStdString(info.name()),
+                    "",
+                    QString::fromStdString(info.create_ssid()),
+                    QString::fromStdString(info.profile()),
+                    info.create_time(),
+                };
+
+                // FileStorageDTO res = g_pCommonData->getFileInfoById(QString::fromStdString(info.avatar_file_id()));
+                // if (res.fileId == "-1" || res.fileId.isEmpty()) {
+                //     // send query avatar by grpc
+                //     emit g_pCommonData->sigGetAvatarFileFromRemote(
+                //         QString::fromStdString(info.avatar_file_id()),
+                //         QString::fromStdString(info.ssid()),
+                //         QString::fromStdString(info.avatar_remote_path())
+                //     );
+                //     waitCount++;
+                // } else {
+                //     baseInfoDto.avatarPath = res.storagePath;
+                // }
+                if (g_pCommonData->getGroupInfoDataBySSID(baseInfoDto.ssidGroup).ssidGroup.isEmpty())
+                    g_pCommonData->setGroupInfoData({baseInfoDto});
+                resList.append(baseInfoDto);
+            }
+            emit g_pCommonData->sigFuzzySearchGroupResponse(resList,waitCount);
+        }
+    });
+
+    // get avatar file
+    connect(g_pCommonData,&CommonData::sigGetAvatarFileFromRemote,this,[=](
+            const QString& fileID,
+            const QString& ssid,
+            const QString& remotePath)
+    {
+        QJsonObject resp;
+        resp["command"] = "download";
+        resp["file-id"] = fileID;
+        resp["uploader-ssid"] = ssid;
+        resp["storage-path"] = remotePath;
+        resp["local-path"] = QString::fromStdString(g_pCommonData->getDataPath(avatar)) + "/" + fileID + QString::fromStdString(g_pCommonData->getImageEx());
+        resp["business-type"] = "avatar";
+        _pGRCSocket->write(QJsonDocument(resp).toJson());
+        _pGRCSocket->flush();
+    });
+
     return QApplication::exec();
 }
 

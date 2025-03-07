@@ -153,6 +153,18 @@ signals:
     void sigSyncMsgContentDTO(const QList<MessageContentDTO>& dto);
     void sigSyncMsgPicFromRemote(const QList<QString>& files);
 
+    // fuzzy search
+    void sigFuzzySearchRequest(const QString& content,bool isGroup);
+    void sigFuzzySearchFriendResponse(QList<UserBaseInfoDTO> dto,int waitCount);
+    void sigFuzzySearchGroupResponse(QList<GroupBaseInfoDTO> dto,int waitCount);
+
+    // get file
+    void sigGetAvatarFileFromRemote(
+        const QString& fileID,
+        const QString& ssid,
+        const QString& remotePath
+    );
+
     void sigAllDataLoadFinished();
 private:
     void init();

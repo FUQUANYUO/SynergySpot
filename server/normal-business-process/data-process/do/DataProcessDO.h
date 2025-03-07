@@ -77,16 +77,6 @@ struct GroupMemberInfoDO {
     time_t createTime;
 };
 
-// 消息内容 DO
-struct MessageContentDO {
-    int64_t id;
-    std::string senderSsid;
-    uint8_t contentType;
-    std::string content;
-    std::vector<std::string> fileIds;
-    uint64_t createTime;
-};
-
 // 消息接收者 DO
 struct MessageRecipientDO {
     int64_t id;
@@ -94,6 +84,17 @@ struct MessageRecipientDO {
     uint8_t recipientType;
     std::string recipientSsid;
     bool readStatus;
+};
+
+// 消息内容 DO
+struct MessageContentDO {
+    int64_t id;
+    std::string senderSsid;
+    uint8_t contentType;
+    std::string content;
+    std::vector<std::string> fileIds;
+    MessageRecipientDO recipient;
+    uint64_t createTime;
 };
 
 // 地区 DO

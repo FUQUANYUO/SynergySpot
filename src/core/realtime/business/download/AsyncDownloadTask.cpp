@@ -116,11 +116,21 @@ void AsyncDownloadTask::processChunk() {
 }
 
 void AsyncDownloadTask::mergeChunks() {
-    QFile finalFile(_savePath);
-    if (!finalFile.open(QIODevice::WriteOnly)) {
-        throw std::runtime_error("Cannot create final file: " + _savePath.toStdString());
+    QFileInfo fileInfo(_savePath);
+    QDir parentDir = fileInfo.absoluteDir();
+    if (!parentDir.exists() && !parentDir.mkpath(".")) {
+        LOG_ERROR("Cannot create parent directory: " + parentDir.path().toStdString());
     }
 
+    QFile finalFile(_savePath);
+    if (!finalFile.open(QIODevice::WriteOnly)) {
+        // 添加详细错误信息
+        LOG_ERROR(
+            "Cannot create final file: " + _savePath.toStdString() +
+            ", Error: " + finalFile.errorString().toStdString()
+        );
+    }
+    
     // 按顺序合并
     for (int i = 0; i < _chunkPaths.size(); ++i) {
         QFile chunkFile(_chunkPaths[i]);

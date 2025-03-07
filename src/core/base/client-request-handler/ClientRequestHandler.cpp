@@ -84,8 +84,8 @@ void ClientRequestHandler::addRequest(SSDTO::BusinessType type, std::string dto)
             break;
         case SSDTO::MAKE_FRIEND_RESPONSE:
             break;
-        case SSDTO::SEARCH_USER:
-            emit sigSearchFriendRequest(dto);
+        case SSDTO::FUZZY_SEARCH:
+            emit sigFuzzySearchRequest(dto);
             break;
         case SSDTO::R_USER_BASE_INFO:
             emit sigQueryUserBaseInfoRequest(dto);
@@ -114,7 +114,7 @@ ClientRequestHandler::ClientRequestHandler(QObject* parent) : QObject(parent) {
     connect(this, &ClientRequestHandler::sigContactListRequest,         businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_FRIENDSHIP_LIST),Qt::QueuedConnection);
     connect(this, &ClientRequestHandler::sigEnrollAccountRequest,       businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::ENROLL_ACCOUNT),Qt::QueuedConnection);
     connect(this, &ClientRequestHandler::sigAddFriendRequest,           businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::C_FRIENDSHIP),Qt::QueuedConnection);
-    connect(this, &ClientRequestHandler::sigSearchFriendRequest,        businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::SEARCH_USER),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigFuzzySearchRequest,         businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::FUZZY_SEARCH),Qt::QueuedConnection);
     connect(this, &ClientRequestHandler::sigQueryUserBaseInfoRequest,   businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_USER_BASE_INFO),Qt::QueuedConnection);
     connect(this, &ClientRequestHandler::sigQueryGroupBaseInfoRequest,  businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_GROUP_BASE_INFO),Qt::QueuedConnection);
     connect(this, &ClientRequestHandler::sigQueryGroupNoticesRequest,   businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_GROUP_NOTICE),Qt::QueuedConnection);
@@ -126,11 +126,11 @@ ClientRequestHandler::ClientRequestHandler(QObject* parent) : QObject(parent) {
     // 连接响应信号槽
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigEmailCodeResponse,             this, &ClientRequestHandler::sigEmailCodeResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigLoginResult,                   this, &ClientRequestHandler::sigLoginResult);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigMessageResponse,               this, &ClientRequestHandler::sigMessageResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigForwardMessageResponse,        this, &ClientRequestHandler::sigForwardMessageResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigContactListResponse,           this, &ClientRequestHandler::sigContactListResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigEnrollAccountResponse,         this, &ClientRequestHandler::sigEnrollAccountResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigFriendRequestResponse,         this, &ClientRequestHandler::sigFriendRequestResponse);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigSearchFriendResponse,          this, &ClientRequestHandler::sigSearchFriendResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigFuzzySearchResponse,           this, &ClientRequestHandler::sigFuzzySearchResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigConnServerFailed,              this, &ClientRequestHandler::sigConnServerFailed);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigStartGRPCService,              this, &ClientRequestHandler::sigStartGRPCService);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryUserBaseInfoResponse,     this, &ClientRequestHandler::sigQueryUserBaseInfoResponse);
@@ -171,7 +171,7 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
     });
 
     // wait 6s check net stable which the net connected the server
-    QTimer::singleShot(5000,this, [=]() {
+    QTimer::singleShot(2000,this, [=]() {
         if (_ccon && !_ccon->isConnected()) {
             emit sigConnServerFailed();
         }
@@ -182,23 +182,32 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
     });
 
     connect(_ccon->getClientSocket(), &QTcpSocket::readyRead, this, [this]() {
-        while (_ccon->getClientSocket()->bytesAvailable() >= 8) {
-            QByteArray array = _ccon->getClientSocket()->read(4);
-            int msgSize = 0;
-            QDataStream sizeStream(&array, QIODevice::ReadOnly);
-            sizeStream >> msgSize;
+        _msgBuffer.append(_ccon->getClientSocket()->readAll());
+    
+        while (true) {
+            // 读取消息头
+            if (_expectedSize == -1 && _msgBuffer.size() >= 8) {
+                QDataStream headerStream(_msgBuffer);
+                headerStream >> _expectedSize;
+                headerStream >> _currentType;
+                _msgBuffer.remove(0, 8);
+                
+                // 添加长度校验
+                if (_expectedSize < 0 || _expectedSize > 10 * 1024 * 1024) {
+                    LOG_ERROR("Invalid message size: " << _expectedSize);
+                    _ccon->getClientSocket()->close();
+                    return;
+                }
+            }
 
-            array = _ccon->getClientSocket()->read(4);
-            QDataStream typeStream(&array, QIODevice::ReadOnly);
-            SSDTO::BusinessType type;
-            typeStream >> type;
-
-            if (_ccon->getClientSocket()->bytesAvailable() >= msgSize) {
-                QByteArray dataArr = _ccon->getClientSocket()->read(msgSize);
-                std::string dto(dataArr.constData(),dataArr.size());
-                handleResponse(type, dto);
-            }else {
-                LOG("current socket cache maybe has trouble , the bytesAvailable less than msgSize")
+            // 读取消息体
+            if (_expectedSize != -1 && _msgBuffer.size() >= _expectedSize) {
+                QByteArray data = _msgBuffer.left(_expectedSize);
+                handleResponse(_currentType, std::string(data.constData(), data.size()));
+                
+                _msgBuffer.remove(0, _expectedSize);  // 移除已处理的数据
+                _expectedSize = -1;  // 重置状态
+            } else {
                 break;
             }
         }
@@ -243,8 +252,8 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
         };
 
         // query search request
-        _requestHandlerMap[SSDTO::SEARCH_USER] = [=](const std::string & dto) {
-            SEND_PACKAGE(dto,SSDTO::SEARCH_USER,"query of search friend dto has been send to server...")
+        _requestHandlerMap[SSDTO::FUZZY_SEARCH] = [=](const std::string & dto) {
+            SEND_PACKAGE(dto,SSDTO::FUZZY_SEARCH,"query of search fuzzy dto has been send to server...")
         };
 
         // query user base info request
@@ -289,7 +298,7 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
         // forward msg
         _responseHandlerMap[SSDTO::C_MESSAGE_CONTENT] = [=](const std::string & dto) {
             LOG("forward response")
-            emit sigMessageResponse(dto);
+            emit sigForwardMessageResponse(dto);
         };
 
         // friendship
@@ -316,10 +325,10 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
             emit sigFriendRequestResponse(dto);
         };
 
-        // search friend
-        _responseHandlerMap[SSDTO::SEARCH_USER] = [=](const std::string & dto) {
-            LOG("search user response")
-            emit sigSearchFriendResponse(dto);
+        // search fuzzy
+        _responseHandlerMap[SSDTO::FUZZY_SEARCH] = [=](const std::string & dto) {
+            LOG("search fuzzy response")
+            emit sigFuzzySearchResponse(dto);
         };
 
         // query user base info request

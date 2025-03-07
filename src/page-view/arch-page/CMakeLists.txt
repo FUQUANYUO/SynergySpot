@@ -68,8 +68,9 @@ SET(
         SRC_CPP                      ${SRC_CPP}
         ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/log/Log.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/get-time/GetCurTime.cpp
-        # mask effect
+        # effect
         ${CMAKE_CURRENT_SOURCE_DIR}/../effect-component/SS-mask-widget/SSMaskWidget.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../effect-component/loading-dialog/LoadingDialog.cpp
 )
 
 QT_ADD_RESOURCES(
@@ -103,7 +104,7 @@ ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Release")
         #--------------------------------    your lib file name    ----------------------------------   BEGIN
                 PluginManager                AboutPagePlugin            SettingsPagePlugin
                 ContactPagePlugin            FileManagerPagePlugin      MessagePagePlugin
-                UserPagePlugin
+                UserPagePlugin               ElaWidgetTools
         #--------------------------------    your lib file name    ----------------------------------   END
         )
 ENDIF ()

@@ -49,6 +49,7 @@ bool ProcessBusiness::parseCompleteRequest(std::vector<char> &buffer, std::strin
 
 
 int ProcessBusiness::processBusiness(std::string dto, int businessType, std::shared_ptr<SockInfo> info) {
+    LOG_INFO("business type : " << businessType);
     if (businessType == SSDTO::BusinessType::LOGIN_CHECK) {
         UserService uService;
         SSDTO::LoginCheckDTO ldto;
@@ -95,7 +96,7 @@ int ProcessBusiness::processBusiness(std::string dto, int businessType, std::sha
                 mdto.recipient().recipient_ssid(),mdto.recipient().read_status()},mdto.create_time()
         };
         std::vector<std::string> files;
-        for (const auto& it : serverMsgDto.fileId) {
+        for (const auto& it : mdto.file_id()) {
             files.push_back(it);
         }
         serverMsgDto.fileId = files;
@@ -278,37 +279,59 @@ int ProcessBusiness::processBusiness(std::string dto, int businessType, std::sha
         }
     }
     // 搜索好友
-    else if (businessType == SSDTO::BusinessType::SEARCH_USER){
+    else if (businessType == SSDTO::BusinessType::FUZZY_SEARCH){
         UserService uService;
+        GroupService gService;
         SSDTO::FuzzySearchDTO fdto;
         fdto.ParseFromString(dto);
 
         FileService fService;
 
-        for (const auto& it : uService.fuzzyMatch(fdto.ssid(),fdto.name())) {
-            SSDTO::UserBaseInfoDTO * udto = fdto.add_user_infos();
-            udto->set_ssid(it.ssid);
-            udto->set_ssname(it.ssname);
-            FileStorageDTO fileInfo = fService.getFileByFilePath(it.avatarPath);
-            if (fileInfo.fileId != "-1" && !fileInfo.fileId.empty()) {
-                udto->set_avatar_file_id(fileInfo.fileId);
-                udto->set_avatar_remote_path(fileInfo.storagePath);
+        if (!fdto.is_group()) {
+            for (const auto& it : uService.fuzzyMatch(fdto.ssid(),fdto.name())) {
+                SSDTO::UserBaseInfoDTO * udto = fdto.add_user_infos();
+                udto->set_ssid(it.ssid);
+                udto->set_ssname(it.ssname);
+                FileStorageDTO fileInfo = fService.getFileByFilePath(it.avatarPath);
+                if (fileInfo.fileId != "-1" && !fileInfo.fileId.empty()) {
+                    udto->set_avatar_file_id(fileInfo.fileId);
+                    udto->set_avatar_remote_path(fileInfo.storagePath);
+                }
+                else {
+                    udto->set_avatar_file_id("-1");
+                    udto->set_avatar_remote_path("");
+                }
+                udto->set_sex(std::string(1,it.sex));
+                udto->set_personal_sign(it.personalSign);
+                udto->set_thumb_up_count(it.thumbUpCount);
+                udto->set_birthday(it.birthday);
+                udto->set_region(it.region);
+                udto->set_create_time(it.createTime);
             }
-            else {
-                udto->set_avatar_file_id("-1");
-                udto->set_avatar_remote_path("");
+        }else {
+            for (const auto& it : gService.fuzzyMatch(fdto.ssid(),fdto.name())) {
+                SSDTO::GroupBaseInfoDTO * gdto = fdto.add_group_infos();
+                gdto->set_ssid_group(it.ssidGroup);
+                gdto->set_name(it.name);
+                FileStorageDTO fileInfo = fService.getFileByFilePath(it.avatar);
+                if (fileInfo.fileId != "-1" && !fileInfo.fileId.empty()) {
+                    gdto->set_avatar_file_id(fileInfo.fileId);
+                    gdto->set_avatar_remote_path(fileInfo.storagePath);
+                }
+                else {
+                    gdto->set_avatar_file_id("-1");
+                    gdto->set_avatar_remote_path("");
+                }
+                gdto->set_create_ssid(it.createSsid);
+                gdto->set_profile(it.profile);
+                for (auto ad : it.admins)
+                    gdto->add_admins(ad);
+                gdto->set_create_time(it.createTime);
             }
-            udto->set_sex(std::string(1,it.sex));
-            udto->set_personal_sign(it.personalSign);
-            udto->set_thumb_up_count(it.thumbUpCount);
-            udto->set_birthday(it.birthday);
-            udto->set_region(it.region);
-            udto->set_create_time(it.createTime);
         }
-
         std::string resDto;
         fdto.SerializeToString(&resDto);
-        info->tcp->sendMsg(resDto, SSDTO::BusinessType::SEARCH_USER);
+        info->tcp->sendMsg(resDto, SSDTO::BusinessType::FUZZY_SEARCH);
     }
     // 获取用户文件信息
     else if (businessType == SSDTO::BusinessType::R_FILE) {
@@ -391,15 +414,17 @@ int ProcessBusiness::processBusiness(std::string dto, int businessType, std::sha
         for (const auto &it : gdto.admins()) {
             admins.push_back(it);
         }
+        FileService fService;
+        FileStorageDTO fileInfo = fService.getFileByFileID(gdto.avatar_file_id());
+
         if (!gService.updateGroup({
-            -1,gdto.ssid_group(),gdto.name(),gdto.avatar(),gdto.create_ssid(),gdto.profile(),
+            -1,gdto.ssid_group(),gdto.name(),fileInfo.storagePath,gdto.create_ssid(),gdto.profile(),
             admins
         }))
         {
             LOG_ERROR(
                 "update group info failed << g_ssid : " << gdto.ssid_group() <<
                 " << g_name : " << gdto.name() <<
-                " << avatarPath : " << gdto.avatar() <<
                 " << create_ssid : " << gdto.create_ssid() <<
                 " << profile : " << gdto.profile()
             )
@@ -443,13 +468,13 @@ int ProcessBusiness::processBusiness(std::string dto, int businessType, std::sha
         gmpdto.ParseFromString(dto);
         FileService fService;
 
-        auto _map = *gmpdto.mutable_pic_name_to_path();
-        for (const auto& fileInfo : gmpdto.pic_name_to_path()) {
+        auto _map = gmpdto.mutable_pic_name_to_path();
+        for (const auto& fileInfo : (*_map)) {
             string path = fService.getFileByFileID(fileInfo.first).storagePath;
             if (path.empty()) {
                 LOG_WARNING("database haven't [" <<fileInfo.first <<"] file path")
             }
-            _map[fileInfo.first] = path;
+            (*_map)[fileInfo.first] = path;
         }
 
         string resDto;

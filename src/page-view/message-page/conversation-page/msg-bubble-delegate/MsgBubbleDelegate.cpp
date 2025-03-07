@@ -16,6 +16,10 @@ MsgBubbleDelegate::MsgBubbleDelegate(QObject *parent) : QStyledItemDelegate(pare
 void MsgBubbleDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
     auto msg = index.data(MsgRole).value<ChatMessage>();
 
+    // 填充默认头像
+    if (msg.avatarPath.isEmpty() || msg.avatarPath == "-1") {
+        msg.avatarPath = ":/message-page/rc-page/img/SS-default-icon.jpg";
+    }
     // 计算可用宽度
     int availableWidth = option.rect.width() - avatarSize * 2 - padding * 6;
 

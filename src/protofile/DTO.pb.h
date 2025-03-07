@@ -185,8 +185,7 @@ enum BusinessType : int {
   C_GROUP_NOTICE = 51,
   D_GROUP_NOTICE = 52,
   R_GROUP_NOTICE = 53,
-  SEARCH_USER = 56,
-  SEARCH_GROUP = 57,
+  FUZZY_SEARCH = 56,
   R_MESSAGE_CONTENT = 61,
   C_MESSAGE_CONTENT = 62,
   R_MESSAGE_PIC_INFO = 63,
@@ -1075,22 +1074,22 @@ class FuzzySearchDTO final :
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::UserBaseInfoDTO >&
       user_infos() const;
 
-  // repeated .SSDTO.GroupMemberInfoDTO group_infos = 5;
+  // repeated .SSDTO.GroupBaseInfoDTO group_infos = 5;
   int group_infos_size() const;
   private:
   int _internal_group_infos_size() const;
   public:
   void clear_group_infos();
-  ::SSDTO::GroupMemberInfoDTO* mutable_group_infos(int index);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::GroupMemberInfoDTO >*
+  ::SSDTO::GroupBaseInfoDTO* mutable_group_infos(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::GroupBaseInfoDTO >*
       mutable_group_infos();
   private:
-  const ::SSDTO::GroupMemberInfoDTO& _internal_group_infos(int index) const;
-  ::SSDTO::GroupMemberInfoDTO* _internal_add_group_infos();
+  const ::SSDTO::GroupBaseInfoDTO& _internal_group_infos(int index) const;
+  ::SSDTO::GroupBaseInfoDTO* _internal_add_group_infos();
   public:
-  const ::SSDTO::GroupMemberInfoDTO& group_infos(int index) const;
-  ::SSDTO::GroupMemberInfoDTO* add_group_infos();
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::GroupMemberInfoDTO >&
+  const ::SSDTO::GroupBaseInfoDTO& group_infos(int index) const;
+  ::SSDTO::GroupBaseInfoDTO* add_group_infos();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::GroupBaseInfoDTO >&
       group_infos() const;
 
   // bytes ssid = 2;
@@ -1152,7 +1151,7 @@ class FuzzySearchDTO final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::UserBaseInfoDTO > user_infos_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::GroupMemberInfoDTO > group_infos_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::GroupBaseInfoDTO > group_infos_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr ssid_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr ip_;
@@ -3463,17 +3462,18 @@ class GroupBaseInfoDTO final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kAdminsFieldNumber = 7,
+    kAdminsFieldNumber = 8,
     kSsidGroupFieldNumber = 2,
     kNameFieldNumber = 3,
-    kAvatarFieldNumber = 4,
-    kCreateSsidFieldNumber = 5,
-    kProfileFieldNumber = 6,
-    kIpFieldNumber = 9,
+    kAvatarFileIdFieldNumber = 4,
+    kAvatarRemotePathFieldNumber = 5,
+    kCreateSsidFieldNumber = 6,
+    kProfileFieldNumber = 7,
+    kIpFieldNumber = 10,
     kIdFieldNumber = 1,
-    kCreateTimeFieldNumber = 8,
+    kCreateTimeFieldNumber = 9,
   };
-  // repeated string admins = 7;
+  // repeated string admins = 8;
   int admins_size() const;
   private:
   int _internal_admins_size() const;
@@ -3525,21 +3525,35 @@ class GroupBaseInfoDTO final :
   std::string* _internal_mutable_name();
   public:
 
-  // string avatar = 4;
-  void clear_avatar();
-  const std::string& avatar() const;
+  // string avatar_file_id = 4;
+  void clear_avatar_file_id();
+  const std::string& avatar_file_id() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
-  void set_avatar(ArgT0&& arg0, ArgT... args);
-  std::string* mutable_avatar();
-  PROTOBUF_NODISCARD std::string* release_avatar();
-  void set_allocated_avatar(std::string* avatar);
+  void set_avatar_file_id(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_avatar_file_id();
+  PROTOBUF_NODISCARD std::string* release_avatar_file_id();
+  void set_allocated_avatar_file_id(std::string* avatar_file_id);
   private:
-  const std::string& _internal_avatar() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_avatar(const std::string& value);
-  std::string* _internal_mutable_avatar();
+  const std::string& _internal_avatar_file_id() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_avatar_file_id(const std::string& value);
+  std::string* _internal_mutable_avatar_file_id();
   public:
 
-  // string create_ssid = 5;
+  // string avatar_remote_path = 5;
+  void clear_avatar_remote_path();
+  const std::string& avatar_remote_path() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_avatar_remote_path(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_avatar_remote_path();
+  PROTOBUF_NODISCARD std::string* release_avatar_remote_path();
+  void set_allocated_avatar_remote_path(std::string* avatar_remote_path);
+  private:
+  const std::string& _internal_avatar_remote_path() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_avatar_remote_path(const std::string& value);
+  std::string* _internal_mutable_avatar_remote_path();
+  public:
+
+  // string create_ssid = 6;
   void clear_create_ssid();
   const std::string& create_ssid() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -3553,7 +3567,7 @@ class GroupBaseInfoDTO final :
   std::string* _internal_mutable_create_ssid();
   public:
 
-  // string profile = 6;
+  // string profile = 7;
   void clear_profile();
   const std::string& profile() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -3567,7 +3581,7 @@ class GroupBaseInfoDTO final :
   std::string* _internal_mutable_profile();
   public:
 
-  // bytes ip = 9;
+  // bytes ip = 10;
   void clear_ip();
   const std::string& ip() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -3590,7 +3604,7 @@ class GroupBaseInfoDTO final :
   void _internal_set_id(int64_t value);
   public:
 
-  // int64 create_time = 8;
+  // int64 create_time = 9;
   void clear_create_time();
   int64_t create_time() const;
   void set_create_time(int64_t value);
@@ -3609,7 +3623,8 @@ class GroupBaseInfoDTO final :
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> admins_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr ssid_group_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr avatar_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr avatar_file_id_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr avatar_remote_path_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr create_ssid_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr profile_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr ip_;
@@ -6515,7 +6530,7 @@ FuzzySearchDTO::user_infos() const {
   return user_infos_;
 }
 
-// repeated .SSDTO.GroupMemberInfoDTO group_infos = 5;
+// repeated .SSDTO.GroupBaseInfoDTO group_infos = 5;
 inline int FuzzySearchDTO::_internal_group_infos_size() const {
   return group_infos_.size();
 }
@@ -6525,31 +6540,31 @@ inline int FuzzySearchDTO::group_infos_size() const {
 inline void FuzzySearchDTO::clear_group_infos() {
   group_infos_.Clear();
 }
-inline ::SSDTO::GroupMemberInfoDTO* FuzzySearchDTO::mutable_group_infos(int index) {
+inline ::SSDTO::GroupBaseInfoDTO* FuzzySearchDTO::mutable_group_infos(int index) {
   // @@protoc_insertion_point(field_mutable:SSDTO.FuzzySearchDTO.group_infos)
   return group_infos_.Mutable(index);
 }
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::GroupMemberInfoDTO >*
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::GroupBaseInfoDTO >*
 FuzzySearchDTO::mutable_group_infos() {
   // @@protoc_insertion_point(field_mutable_list:SSDTO.FuzzySearchDTO.group_infos)
   return &group_infos_;
 }
-inline const ::SSDTO::GroupMemberInfoDTO& FuzzySearchDTO::_internal_group_infos(int index) const {
+inline const ::SSDTO::GroupBaseInfoDTO& FuzzySearchDTO::_internal_group_infos(int index) const {
   return group_infos_.Get(index);
 }
-inline const ::SSDTO::GroupMemberInfoDTO& FuzzySearchDTO::group_infos(int index) const {
+inline const ::SSDTO::GroupBaseInfoDTO& FuzzySearchDTO::group_infos(int index) const {
   // @@protoc_insertion_point(field_get:SSDTO.FuzzySearchDTO.group_infos)
   return _internal_group_infos(index);
 }
-inline ::SSDTO::GroupMemberInfoDTO* FuzzySearchDTO::_internal_add_group_infos() {
+inline ::SSDTO::GroupBaseInfoDTO* FuzzySearchDTO::_internal_add_group_infos() {
   return group_infos_.Add();
 }
-inline ::SSDTO::GroupMemberInfoDTO* FuzzySearchDTO::add_group_infos() {
-  ::SSDTO::GroupMemberInfoDTO* _add = _internal_add_group_infos();
+inline ::SSDTO::GroupBaseInfoDTO* FuzzySearchDTO::add_group_infos() {
+  ::SSDTO::GroupBaseInfoDTO* _add = _internal_add_group_infos();
   // @@protoc_insertion_point(field_add:SSDTO.FuzzySearchDTO.group_infos)
   return _add;
 }
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::GroupMemberInfoDTO >&
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::GroupBaseInfoDTO >&
 FuzzySearchDTO::group_infos() const {
   // @@protoc_insertion_point(field_list:SSDTO.FuzzySearchDTO.group_infos)
   return group_infos_;
@@ -9141,58 +9156,109 @@ inline void GroupBaseInfoDTO::set_allocated_name(std::string* name) {
   // @@protoc_insertion_point(field_set_allocated:SSDTO.GroupBaseInfoDTO.name)
 }
 
-// string avatar = 4;
-inline void GroupBaseInfoDTO::clear_avatar() {
-  avatar_.ClearToEmpty();
+// string avatar_file_id = 4;
+inline void GroupBaseInfoDTO::clear_avatar_file_id() {
+  avatar_file_id_.ClearToEmpty();
 }
-inline const std::string& GroupBaseInfoDTO::avatar() const {
-  // @@protoc_insertion_point(field_get:SSDTO.GroupBaseInfoDTO.avatar)
-  return _internal_avatar();
+inline const std::string& GroupBaseInfoDTO::avatar_file_id() const {
+  // @@protoc_insertion_point(field_get:SSDTO.GroupBaseInfoDTO.avatar_file_id)
+  return _internal_avatar_file_id();
 }
 template <typename ArgT0, typename... ArgT>
 inline PROTOBUF_ALWAYS_INLINE
-void GroupBaseInfoDTO::set_avatar(ArgT0&& arg0, ArgT... args) {
+void GroupBaseInfoDTO::set_avatar_file_id(ArgT0&& arg0, ArgT... args) {
  
- avatar_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:SSDTO.GroupBaseInfoDTO.avatar)
+ avatar_file_id_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:SSDTO.GroupBaseInfoDTO.avatar_file_id)
 }
-inline std::string* GroupBaseInfoDTO::mutable_avatar() {
-  std::string* _s = _internal_mutable_avatar();
-  // @@protoc_insertion_point(field_mutable:SSDTO.GroupBaseInfoDTO.avatar)
+inline std::string* GroupBaseInfoDTO::mutable_avatar_file_id() {
+  std::string* _s = _internal_mutable_avatar_file_id();
+  // @@protoc_insertion_point(field_mutable:SSDTO.GroupBaseInfoDTO.avatar_file_id)
   return _s;
 }
-inline const std::string& GroupBaseInfoDTO::_internal_avatar() const {
-  return avatar_.Get();
+inline const std::string& GroupBaseInfoDTO::_internal_avatar_file_id() const {
+  return avatar_file_id_.Get();
 }
-inline void GroupBaseInfoDTO::_internal_set_avatar(const std::string& value) {
+inline void GroupBaseInfoDTO::_internal_set_avatar_file_id(const std::string& value) {
   
-  avatar_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+  avatar_file_id_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
 }
-inline std::string* GroupBaseInfoDTO::_internal_mutable_avatar() {
+inline std::string* GroupBaseInfoDTO::_internal_mutable_avatar_file_id() {
   
-  return avatar_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+  return avatar_file_id_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
 }
-inline std::string* GroupBaseInfoDTO::release_avatar() {
-  // @@protoc_insertion_point(field_release:SSDTO.GroupBaseInfoDTO.avatar)
-  return avatar_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+inline std::string* GroupBaseInfoDTO::release_avatar_file_id() {
+  // @@protoc_insertion_point(field_release:SSDTO.GroupBaseInfoDTO.avatar_file_id)
+  return avatar_file_id_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
 }
-inline void GroupBaseInfoDTO::set_allocated_avatar(std::string* avatar) {
-  if (avatar != nullptr) {
+inline void GroupBaseInfoDTO::set_allocated_avatar_file_id(std::string* avatar_file_id) {
+  if (avatar_file_id != nullptr) {
     
   } else {
     
   }
-  avatar_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), avatar,
+  avatar_file_id_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), avatar_file_id,
       GetArenaForAllocation());
 #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (avatar_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
-    avatar_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  if (avatar_file_id_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
+    avatar_file_id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:SSDTO.GroupBaseInfoDTO.avatar)
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.GroupBaseInfoDTO.avatar_file_id)
 }
 
-// string create_ssid = 5;
+// string avatar_remote_path = 5;
+inline void GroupBaseInfoDTO::clear_avatar_remote_path() {
+  avatar_remote_path_.ClearToEmpty();
+}
+inline const std::string& GroupBaseInfoDTO::avatar_remote_path() const {
+  // @@protoc_insertion_point(field_get:SSDTO.GroupBaseInfoDTO.avatar_remote_path)
+  return _internal_avatar_remote_path();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void GroupBaseInfoDTO::set_avatar_remote_path(ArgT0&& arg0, ArgT... args) {
+ 
+ avatar_remote_path_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:SSDTO.GroupBaseInfoDTO.avatar_remote_path)
+}
+inline std::string* GroupBaseInfoDTO::mutable_avatar_remote_path() {
+  std::string* _s = _internal_mutable_avatar_remote_path();
+  // @@protoc_insertion_point(field_mutable:SSDTO.GroupBaseInfoDTO.avatar_remote_path)
+  return _s;
+}
+inline const std::string& GroupBaseInfoDTO::_internal_avatar_remote_path() const {
+  return avatar_remote_path_.Get();
+}
+inline void GroupBaseInfoDTO::_internal_set_avatar_remote_path(const std::string& value) {
+  
+  avatar_remote_path_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* GroupBaseInfoDTO::_internal_mutable_avatar_remote_path() {
+  
+  return avatar_remote_path_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* GroupBaseInfoDTO::release_avatar_remote_path() {
+  // @@protoc_insertion_point(field_release:SSDTO.GroupBaseInfoDTO.avatar_remote_path)
+  return avatar_remote_path_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+}
+inline void GroupBaseInfoDTO::set_allocated_avatar_remote_path(std::string* avatar_remote_path) {
+  if (avatar_remote_path != nullptr) {
+    
+  } else {
+    
+  }
+  avatar_remote_path_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), avatar_remote_path,
+      GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (avatar_remote_path_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
+    avatar_remote_path_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.GroupBaseInfoDTO.avatar_remote_path)
+}
+
+// string create_ssid = 6;
 inline void GroupBaseInfoDTO::clear_create_ssid() {
   create_ssid_.ClearToEmpty();
 }
@@ -9243,7 +9309,7 @@ inline void GroupBaseInfoDTO::set_allocated_create_ssid(std::string* create_ssid
   // @@protoc_insertion_point(field_set_allocated:SSDTO.GroupBaseInfoDTO.create_ssid)
 }
 
-// string profile = 6;
+// string profile = 7;
 inline void GroupBaseInfoDTO::clear_profile() {
   profile_.ClearToEmpty();
 }
@@ -9294,7 +9360,7 @@ inline void GroupBaseInfoDTO::set_allocated_profile(std::string* profile) {
   // @@protoc_insertion_point(field_set_allocated:SSDTO.GroupBaseInfoDTO.profile)
 }
 
-// repeated string admins = 7;
+// repeated string admins = 8;
 inline int GroupBaseInfoDTO::_internal_admins_size() const {
   return admins_.size();
 }
@@ -9369,7 +9435,7 @@ GroupBaseInfoDTO::mutable_admins() {
   return &admins_;
 }
 
-// int64 create_time = 8;
+// int64 create_time = 9;
 inline void GroupBaseInfoDTO::clear_create_time() {
   create_time_ = int64_t{0};
 }
@@ -9389,7 +9455,7 @@ inline void GroupBaseInfoDTO::set_create_time(int64_t value) {
   // @@protoc_insertion_point(field_set:SSDTO.GroupBaseInfoDTO.create_time)
 }
 
-// bytes ip = 9;
+// bytes ip = 10;
 inline void GroupBaseInfoDTO::clear_ip() {
   ip_.ClearToEmpty();
 }

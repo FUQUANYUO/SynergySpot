@@ -8,7 +8,6 @@
 #include <QObject>
 #include <QApplication>
 
-class LoadingDialog;
 class QProcess;
 class QLocalServer;
 class QLocalSocket;

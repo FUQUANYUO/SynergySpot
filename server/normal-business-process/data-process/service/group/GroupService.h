@@ -30,6 +30,10 @@ public:
 
     // get group notice
     std::vector<std::string> getGroupNoticeInfo(const std::string& groupSsid,int pageSize,int pageNum);
+
+    // fuzzy search
+    std::vector<GroupBaseInfoDTO> fuzzyMatch(const std::string& ssid,const std::string& name);
+
 private:
     GroupAdminDAO    groupAdminDAO;
     GroupMemberDAO   groupMemberDAO;

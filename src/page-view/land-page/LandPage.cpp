@@ -2,12 +2,11 @@
 // Created by FU-QAQ on 2024/9/12.
 //
 #include "LandPage.h"
-#include "help.h"
 #include "../CommonFunc.hpp"
 #include "../../core/common-data/CommonData.h"
 #include "../effect-component/cv-process-video-strategy/CVProVideoStrategy.h"
-#include "../effect-component/SS-mask-widget/SSMaskWidget.h"
 #include "../effect-component/loading-dialog/LoadingDialog.h"
+#include "../effect-component/SS-mask-widget/SSMaskWidget.h"
 #include "../plugin-manager/StrategyManager.h"
 #include "sign-up-page/SignUpPage.h"
 
@@ -54,6 +53,26 @@ void LandPage::destroyInstance() {
     }
 }
 
+void LandPage::sltShowLoading() {
+    sltShowMaskEffect();
+    _loadingDialog->setVisible(true);
+}
+
+void LandPage::sltHideMaskEffect()  {
+    _maskWidget->startMaskAnimation(0);
+}
+
+void LandPage::sltShowMaskEffect() {
+    _maskWidget->setVisible(true);
+    _maskWidget->raise();
+    _maskWidget->setFixedSize(this->size());
+    _maskWidget->startMaskAnimation(90);
+}
+
+void LandPage::sltHideLoading(){
+    _loadingDialog->setVisible(false);
+    sltHideMaskEffect();
+}
 
 LandPage::LandPage(QWidget *parent)
     : QOpenGLWidget(parent)
@@ -93,12 +112,17 @@ void LandPage::initWindow() {
     _recoverPWButton = new QPushButton(this);
     _hideOrShowBtn   = new QCheckBox(_inputPassword);
 
+    _maskWidget      = new SSMaskWidget(this);
+    _loadingDialog   = new LoadingDialog(this);
+
     _GLayoutMain              = new QGridLayout;
     _HLayoutForJumpURL        = new QHBoxLayout;
     _HLayoutForAcceptProtocol = new QHBoxLayout;
 
-    _maskWidget               = new SSMaskWidget(this);
-    _loadingDialog            = new LoadingDialog(this);
+    _maskWidget->setParent(this);
+    _maskWidget->setVisible(false);
+    _loadingDialog->setParent(this);
+    _loadingDialog->setVisible(false);
 }
 
 void LandPage::initEdgeLayout() {
@@ -342,27 +366,6 @@ void LandPage::clearPasswordInput() {
 }
 void LandPage::isFreezeSignInBtn(bool enable) {
     _signInButton->setEnabled(!enable);
-}
-
-void LandPage::sltShowMaskEffect() {
-    _maskWidget->setVisible(true);
-    _maskWidget->raise();
-    _maskWidget->setFixedSize(this->size());
-    _maskWidget->startMaskAnimation(90);
-}
-
-void LandPage::sltHideMaskEffect() {
-    _maskWidget->startMaskAnimation(0);
-}
-
-void LandPage::sltShowLoading() {
-    sltShowMaskEffect();
-    _loadingDialog->setVisible(true);
-}
-
-void LandPage::sltHideLoading() {
-    _loadingDialog->setVisible(false);
-    sltHideMaskEffect();
 }
 
 void LandPage::setAcrylicForBKMaterial(bool enable) {

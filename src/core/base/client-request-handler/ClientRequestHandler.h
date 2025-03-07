@@ -43,7 +43,7 @@ signals:
     // 添加好友
     void sigAddFriendRequest(const std::string& dto);
     // 搜索好友
-    void sigSearchFriendRequest(const std::string& dto);
+    void sigFuzzySearchRequest(const std::string& dto);
     // 查询用户基础信息
     void sigQueryUserBaseInfoRequest(const std::string& dto);
     // 查询群组基础信息
@@ -63,11 +63,11 @@ signals:
 
     void sigLoginResult(const std::string& dto);
 
-    void sigMessageResponse(const std::string& dto);
+    void sigForwardMessageResponse(const std::string& dto);
     void sigContactListResponse(const std::string& dto);
     void sigEnrollAccountResponse(const std::string& dto);
     void sigFriendRequestResponse(const std::string& dto);
-    void sigSearchFriendResponse(const std::string& dto);
+    void sigFuzzySearchResponse(const std::string& dto);
     void sigQueryUserBaseInfoResponse(const std::string& dto);
     void sigQueryGroupBaseInfoResponse(const std::string& dto);
     void sigQueryGroupNoticesResponse(const std::string& dto);
@@ -111,11 +111,11 @@ namespace BusinessLayer {
 
         void sigLoginResult(const std::string& dto);
 
-        void sigMessageResponse(const std::string& dto);
+        void sigForwardMessageResponse(const std::string& dto);
         void sigContactListResponse(const std::string& dto);
         void sigEnrollAccountResponse(const std::string& dto);
         void sigFriendRequestResponse(const std::string& dto);
-        void sigSearchFriendResponse(const std::string& dto);
+        void sigFuzzySearchResponse(const std::string& dto);
         void sigQueryUserBaseInfoResponse(const std::string& dto);
         void sigQueryGroupBaseInfoResponse(const std::string& dto);
         void sigQueryGroupNoticesResponse(const std::string& dto);
@@ -128,8 +128,11 @@ namespace BusinessLayer {
     private:
         void handleResponse(SSDTO::BusinessType type,const std::string& dto);
 
-        ClientConServer* _ccon;
-        ThreadPool _pool{10};
+        ClientConServer*    _ccon;
+        ThreadPool          _pool{10};
+        QByteArray          _msgBuffer;
+        qint32              _expectedSize = -1;
+        SSDTO::BusinessType _currentType;
         QMap<SSDTO::BusinessType , std::function<void(const std::string&)>> _requestHandlerMap;
         QMap<SSDTO::BusinessType , std::function<void(const std::string&)>> _responseHandlerMap;
     };

@@ -24,8 +24,8 @@
 
 #define g_pLandPage LandPage::getLandPage()
 
-class LoadingDialog;
-class SSMaskWidget;
+#include "help.h"
+
 class ElaRadioButton;
 class ElaText;
 class ElaPushButton;
@@ -38,34 +38,35 @@ class QComboBox;
 class QLineEdit;
 class QCheckBox;
 class QTimer;
+class SSMaskWidget;
+class LoadingDialog;
 
-class SS_API LandPage : public QOpenGLWidget  {
+class SS_API LandPage : public QOpenGLWidget {
     Q_OBJECT
 public:
-    static LandPage * getLandPage();
+    static LandPage *getLandPage();
     static void destroyInstance();
     // save qrc to file
-    bool saveQrcToFile(const QString& qrcPath, const QString& targetFilePath);
+    bool saveQrcToFile(const QString &qrcPath, const QString &targetFilePath);
 
     // clear password
     void clearPasswordInput();
 
     // freeze sign in btn
     void isFreezeSignInBtn(bool enable);
-signals:
-    // sign in request
-    void sigSignInRequest(const QString& SSID,const QString& password);
 
-    // change cur widget in top
-    void sigCurrentWidChanged(QWidget * curWid);
 public slots:
-    // mask effect
     void sltShowMaskEffect();
     void sltHideMaskEffect();
-
-    // loading dialog
     void sltShowLoading();
     void sltHideLoading();
+signals:
+    // sign in request
+    void sigSignInRequest(const QString &SSID, const QString &password);
+
+    // change cur widget in top
+    void sigCurrentWidChanged(QWidget *curWid);
+
 private:
     explicit LandPage(QWidget *parent = nullptr);
     ~LandPage() override;
@@ -78,36 +79,37 @@ protected:
 
     void setAcrylicForBKMaterial(bool enable = true);
 
-    void paintEvent(QPaintEvent* event);
+    void paintEvent(QPaintEvent *event);
 protected slots:
     void sltUpdateFrame();
+
 private:
     // ----------------- UI -----------------
-    QGridLayout   *  _GLayoutMain               =   nullptr;
-    QHBoxLayout   *  _HLayoutForJumpURL         =   nullptr;
-    QHBoxLayout   *  _HLayoutForAcceptProtocol  =   nullptr;
+    QGridLayout *_GLayoutMain = nullptr;
+    QHBoxLayout *_HLayoutForJumpURL = nullptr;
+    QHBoxLayout *_HLayoutForAcceptProtocol = nullptr;
 
-    ElaImageCard  *  _avatar                    =   nullptr;
-    QComboBox     *  _accountComboBox           =   nullptr;
-    QLineEdit     *  _inputPassword             =   nullptr;
-    QCheckBox     *  _hideOrShowBtn             =   nullptr;
-    ElaRadioButton*  _acceptButton              =   nullptr;
-    QTextBrowser  *  _protocolText              =   nullptr;
-    QPushButton   *  _signInButton              =   nullptr;
-    QPushButton   *  _signUpButton              =   nullptr;
-    QPushButton   *  _recoverPWButton           =   nullptr;
-
-    SSMaskWidget  * _maskWidget                 =   nullptr;
-    LoadingDialog * _loadingDialog              =   nullptr;
+    ElaImageCard *_avatar = nullptr;
+    QComboBox *_accountComboBox = nullptr;
+    QLineEdit *_inputPassword = nullptr;
+    QCheckBox *_hideOrShowBtn = nullptr;
+    ElaRadioButton *_acceptButton = nullptr;
+    QTextBrowser *_protocolText = nullptr;
+    QPushButton *_signInButton = nullptr;
+    QPushButton *_signUpButton = nullptr;
+    QPushButton *_recoverPWButton = nullptr;
     // ----------------- UI -----------------
 
     // --------------- BackEnd --------------
-    QHash<QString,QString>                     _accToPasswordHash;
+    QHash<QString, QString> _accToPasswordHash;
     // --------------- BackEnd --------------
 
-    static LandPage* _landPage;
+    static LandPage *_landPage;
     bool _enableAcrylic;
     QTimer *timer;
+
+    SSMaskWidget *_maskWidget;
+    LoadingDialog *_loadingDialog;
 };
 
 

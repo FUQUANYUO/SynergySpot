@@ -190,7 +190,7 @@ void RealtimeCommHandler::processCommand(const QString &line)  {
         QJsonObject cmd = doc.object();
         QString command = cmd["command"].toString();
         if (command == "upload") {
-            handleUploadCommand(cmd["local-url"].toString(),cmd["business-type"].toString(),{
+            handleUploadCommand(cmd["local-path"].toString(),cmd["business-type"].toString(),{
                 cmd["file-id"].toString(),cmd["uploader-ssid"].toString(),
                 "",-1,"",""
                 }

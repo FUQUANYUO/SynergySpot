@@ -8,7 +8,7 @@ std::vector<MessageContentDTO> MessageService::getUserAllMessages(const MessageC
     std::vector<MessageContentDTO> msgDTOs;
     std::vector<MessageContentDO>  msg = messageContentDAO.listBySender(dto.senderSsid,dto.pageSize,dto.pageNum,dto.createTime);
     for (const auto& it : msg) {
-        MessageRecipientDO reDO= messageRecipientDAO.getRecipientData(it.id);
+        MessageRecipientDO reDO= it.recipient;
 
         std::vector<std::string> files;
         files.reserve(it.fileIds.size());
@@ -30,5 +30,5 @@ std::vector<MessageContentDTO> MessageService::getUserAllMessages(const MessageC
 
 bool MessageService::insertUserMessage(const MessageContentDTO &content) {
     int messageID = messageContentDAO.insert({-1,content.senderSsid,content.contentType,content.content,content.fileId});
-    return messageRecipientDAO.insert({-1,messageID,content.recipient.recipientType,content.recipient.recipientSsid,content.recipient.readStatus});;
+    return messageRecipientDAO.insert({-1,messageID,content.recipient.recipientType,content.recipient.recipientSsid,content.recipient.readStatus});
 }

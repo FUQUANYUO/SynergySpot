@@ -6,7 +6,6 @@
 #define SYNERGYSPOT_ARCHPAGE_H
 
 #include "define.h"
-#include "help.h"
 #include "ela-widget-tools/ElaWindow.h"
 #include "ela-widget-tools/ElaWidget.h"
 
@@ -25,7 +24,6 @@
 #endif
 
 
-class SSMaskWidget;
 class ElaContentDialog;
 class ElaStatusBar;
 class ElaText;
@@ -37,8 +35,13 @@ class AboutPage;
 class ContactPage;
 class FileManagerPage;
 class SettingsPage;
+class AddPage;
+class SSMaskWidget;
+class LoadingDialog;
 
 #define g_pArchPage ArchPage::getInstance()
+
+#include "help.h"
 
 class SS_API ArchPage : public ElaWindow{
     Q_OBJECT
@@ -48,10 +51,13 @@ public:
     void setInstanceParent(QObject * parent);
 
 public slots:
+    void sltTriggerUpdate();
+
     void sltShowMaskEffect();
     void sltHideMaskEffect();
+    void sltShowLoading();
+    void sltHideLoading();
 
-    void sltTriggerUpdate();
 private:
     explicit ArchPage(QWidget * parent = nullptr);
     ~ArchPage() override;
@@ -73,7 +79,8 @@ private:
 
     QAction          * _createAction     = nullptr;
     QAction          * _addAction        = nullptr;
-    SSMaskWidget     * _maskWidget       = nullptr;
+
+    AddPage          * _addPage          = nullptr;
 
     int                _msgNoticeNum     = 0;
     int                _contactNoticeNum = 0;
@@ -86,6 +93,8 @@ private:
     // --------------- BackEnd --------------
 
     static ArchPage * _obj;
+    SSMaskWidget  *_maskWidget;
+    LoadingDialog *_loadingDialog;
 };
 
 #endif //SYNERGYSPOT_ARCHPAGE_H

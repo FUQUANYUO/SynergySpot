@@ -27,6 +27,9 @@ public:
     GroupBaseInfoDO findBySsid(const std::string& groupSsid) override;
 
     std::string getLastGroupSSID();
+
+    std::vector<GroupBaseInfoDO> fuzzyMatchingByIdOrName(const std::string& ssid, const std::string& name);
+
 private:
     std::shared_ptr<MysqlConn> m_conn;
 };

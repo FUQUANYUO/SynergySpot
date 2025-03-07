@@ -182,6 +182,66 @@ std::string GroupBaseInfoDAO::getLastGroupSSID() {
     return row[0];
 }
 
+std::vector<GroupBaseInfoDO> GroupBaseInfoDAO::fuzzyMatchingByIdOrName(const std::string &ssid, const std::string &name) {
+    std::vector<GroupBaseInfoDO> users;
+    std::vector<std::string> conditions;
+    std::vector<MysqlConn::Param> params;
+
+    // 动态构建SQL条件
+    if (!ssid.empty()) {
+        conditions.emplace_back("ssid_group LIKE ?");
+        MysqlConn::Param param;
+        param.type = MysqlConn::Param::STRING;
+        param.str_val = "%" + ssid + "%";
+        params.push_back(param);
+    }
+    if (!name.empty()) {
+        conditions.emplace_back("name LIKE ?");
+        MysqlConn::Param param;
+        param.type = MysqlConn::Param::STRING;
+        param.str_val = "%" + name + "%";
+        params.push_back(param);
+    }
+
+    // 无有效条件时直接返回空结果
+    if (conditions.empty()) {
+        LOG_ERROR("Both ssid and name are empty");
+        return users;
+    }
+
+    // 拼接SQL语句
+    std::string sql = "SELECT id, ssid_group, name, avatar, create_ssid, profile, UNIX_TIMESTAMP(create_time) "
+                      "FROM group_base_info WHERE ";
+    for (size_t i = 0; i < conditions.size(); ++i) {
+        if (i > 0) sql += " OR ";
+        sql += conditions[i];
+    }
+
+    // 执行查询
+    MYSQL_RES* result = m_conn->query(sql, params);
+    if (!result) {
+        LOG_ERROR("Fuzzy search failed. SQL: " << sql);
+        return users;
+    }
+
+    // 遍历结果集
+    MYSQL_ROW row;
+    while ((row = mysql_fetch_row(result))) {
+        GroupBaseInfoDO groupDo;
+        groupDo.id = std::stoll(row[0]);
+        groupDo.ssidGroup = row[1] ? row[1] : "";
+        groupDo.name = row[2] ? row[2] : "";
+        groupDo.avatar = row[3] ? row[3][0] : '\0';
+        groupDo.createSsid = row[4] ? row[4] : "";
+        groupDo.profile= row[5] ? row[5] : "";
+        groupDo.createTime = row[6] ? std::stoll(row[6]) : 0;
+        users.push_back(groupDo);
+    }
+
+    mysql_free_result(result);
+    return users;
+}
+
 bool GroupAdminDAO::addAdmin(int64_t groupId, const std::string &opSsid)  {
     std::string sql = "INSERT INTO group_admin (group_id, op_ssid) VALUES (?, ?)";
     std::vector<MysqlConn::Param> params;

@@ -7,8 +7,6 @@
 
 #include <QWidget>
 
-#include "help.h"
-
 class SSMaskWidget : public QWidget{
     Q_OBJECT
     Q_PROPERTY(int pMaskAlpha READ getMaskAlpha WRITE setMaskAlpha NOTIFY maskAlphaChanged)

@@ -24,6 +24,8 @@
 
 #define g_pAboutPage AboutPage::getInstance()
 
+#include "help.h"
+
 class SS_API AboutPage : public ElaWidget{
 public:
     static AboutPage * getInstance();

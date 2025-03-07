@@ -130,7 +130,7 @@ void MessagePage::addMsgContent(const MessageContentDTO &content) {
         _ssidLinkCardHash[content.recipient.recipientSSID]->changeStatus(true);
 
     }else { // other user send to cur user
-        int unreadCount = 0;
+        int unreadCount = 1;
         if (!content.recipient.readStatus)
            unreadCount = ++_unreadMsgCount[content.senderSSID];
         _ssidLinkCardHash[content.senderSSID]->setStatusContent((unreadCount>99?"99+":QString::number(unreadCount)),font,40);
@@ -144,12 +144,12 @@ void MessagePage::addMsgContent(const MessageContentDTO &content) {
             auto typeWid = dynamic_cast<ConversationGroupPage*>(_cardLinkPageHash[_ssidLinkCardHash[content.senderSSID]]->getConversationTypePage());
             auto userInfo = g_pCommonData->getUserInfoBySSID(content.senderSSID);
             _ssidLinkCardHash[content.senderSSID]->setSubTitle(userInfo.username + "：" + docu.toPlainText());
-            typeWid->insertMsgBubble({content.senderSSID,userInfo.username,content.content,userInfo.avatarPath,true});
+            typeWid->insertMsgBubble({content.senderSSID,userInfo.username,content.content,userInfo.avatarPath,false});
         }else {
             auto typeWid = dynamic_cast<ConversationFriendPage*>(_cardLinkPageHash[_ssidLinkCardHash[content.senderSSID]]->getConversationTypePage());
             auto userInfo = g_pCommonData->getUserInfoBySSID(content.senderSSID);
             _ssidLinkCardHash[content.senderSSID]->setSubTitle(docu.toPlainText());
-            typeWid->insertMsgBubble({content.senderSSID,userInfo.username,content.content,userInfo.avatarPath,true});
+            typeWid->insertMsgBubble({content.senderSSID,userInfo.username,content.content,userInfo.avatarPath,false});
         }
     }
 }
@@ -261,7 +261,7 @@ void MessagePage::initEdgeLayout() {
     _conversionWid->setContentsMargins(0,0,0,0);
     _conversionWid->setMaximumHeight(1000);
     _tempMsgList->setFixedWidth(250);
-    _tempMsgList->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Expanding);
+    _tempMsgList->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Preferred);
     _tempMsgList->setContentsMargins(0,0,0,0);
 
     QHBoxLayout * layout = new QHBoxLayout;
@@ -271,10 +271,9 @@ void MessagePage::initEdgeLayout() {
 
     _tempMsgWidLayout->setContentsMargins(0,0,0,0);
     _tempMsgWid->setLayout(_tempMsgWidLayout);
-    _tempMsgWid->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Expanding);
+    _tempMsgWid->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Preferred);
     _tempMsgWid->setFixedWidth(250);
     _tempMsgWid->setMinimumHeight(700);
-    _tempMsgWid->setMaximumHeight(2000);
     _tempMsgWid->setContentsMargins(0,20,5,0);
 
     setLayout(layout);

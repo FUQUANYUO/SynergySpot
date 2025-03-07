@@ -9,7 +9,6 @@
 #include "ela-widget-tools/ElaTheme.h"
 
 #include "../../../core/common-data/CommonData.h"
-#include "../arch-page/ArchPage.h"
 
 #include <QAbstractItemView>
 #include <QApplication>
