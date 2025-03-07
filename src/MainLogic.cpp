@@ -503,6 +503,31 @@ int MainLogic::startMainLogic(QApplication *app) {
         }
     });
 
+    // forward msg
+    connect(g_pClientRequestHandler,&ClientRequestHandler::sigForwardMessageResponse,this,[=](const std::string &dto) {
+        SSDTO::MessageContentDTO mdto;
+        mdto.ParseFromString(dto);
+
+        MessageContentDTO lmdto;
+        lmdto.content = QString::fromStdString(mdto.content());
+        lmdto.recipient = {
+            qint32(mdto.recipient().recipient_type()),
+            QString::fromStdString(mdto.recipient().recipient_ssid()),
+            mdto.recipient().read_status()
+        };
+        lmdto.contentType = static_cast<ContentType>(mdto.content_type());
+        lmdto.createTime = mdto.create_time();
+
+        for (const auto& it : mdto.file_id()) {
+            lmdto.fileId.append(QString::fromStdString(it));
+        }
+
+        lmdto.senderSSID = QString::fromStdString(mdto.sender_ssid());
+
+        g_pCommonData->setMessageContentData({lmdto},true);
+        g_pMessagePage->loadCacheMsg({lmdto});
+    });
+
     // upload to server for msg dto
     connect(g_pCommonData, &CommonData::sigSyncMsgContentDTO, this, [=](const QList<MessageContentDTO> &dto) {
         // send tmp pic to server
@@ -579,6 +604,8 @@ int MainLogic::startMainLogic(QApplication *app) {
 
     // all data load from server database or local database
     connect(g_pCommonData, &CommonData::sigAllDataLoadFinished, this, [=]() {
+        _dataLoadCounter = INT_MAX;
+
         // close loading
         g_pLandPage->sltHideLoading();
 

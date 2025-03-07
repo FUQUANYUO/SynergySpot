@@ -63,7 +63,7 @@ signals:
 
     void sigLoginResult(const std::string& dto);
 
-    void sigMessageResponse(const std::string& dto);
+    void sigForwardMessageResponse(const std::string& dto);
     void sigContactListResponse(const std::string& dto);
     void sigEnrollAccountResponse(const std::string& dto);
     void sigFriendRequestResponse(const std::string& dto);
@@ -111,7 +111,7 @@ namespace BusinessLayer {
 
         void sigLoginResult(const std::string& dto);
 
-        void sigMessageResponse(const std::string& dto);
+        void sigForwardMessageResponse(const std::string& dto);
         void sigContactListResponse(const std::string& dto);
         void sigEnrollAccountResponse(const std::string& dto);
         void sigFriendRequestResponse(const std::string& dto);

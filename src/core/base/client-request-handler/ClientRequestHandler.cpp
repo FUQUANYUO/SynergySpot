@@ -126,7 +126,7 @@ ClientRequestHandler::ClientRequestHandler(QObject* parent) : QObject(parent) {
     // 连接响应信号槽
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigEmailCodeResponse,             this, &ClientRequestHandler::sigEmailCodeResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigLoginResult,                   this, &ClientRequestHandler::sigLoginResult);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigMessageResponse,               this, &ClientRequestHandler::sigMessageResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigForwardMessageResponse,               this, &ClientRequestHandler::sigForwardMessageResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigContactListResponse,           this, &ClientRequestHandler::sigContactListResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigEnrollAccountResponse,         this, &ClientRequestHandler::sigEnrollAccountResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigFriendRequestResponse,         this, &ClientRequestHandler::sigFriendRequestResponse);
@@ -289,7 +289,7 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
         // forward msg
         _responseHandlerMap[SSDTO::C_MESSAGE_CONTENT] = [=](const std::string & dto) {
             LOG("forward response")
-            emit sigMessageResponse(dto);
+            emit sigForwardMessageResponse(dto);
         };
 
         // friendship
