@@ -112,6 +112,7 @@ if(SS_CLIENT_WIN)
                         ContactPagePlugind
                         MessagePagePlugind
                         LandPagePlugind
+                        UserPagePlugind
                 )
         elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
                 target_link_libraries(${PROJECT_NAME} PRIVATE

@@ -20,6 +20,8 @@ public:
     bool markMessageAsRead(qint64 messageId, const QString& recipientSSID) override;
     QList<QVariant> listMessagesByRecipient(const QString& recipientSSID, int pageSize = 20, int pageNum = 1) override;
     int getMessageCount(const QString& ssid);
+
+    time_t getLastMsgTime();
 private:
     LiteConn& _db;
 };

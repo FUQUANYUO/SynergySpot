@@ -60,55 +60,37 @@ bool UserDAO::update(const UserBaseInfoDO &user) {
     // 检查并添加 ssname
     if (!user.ssname.empty() && user.ssname != "-1") {
         setClauses.push_back("ssname = ?");
-        MysqlConn::Param paramSsname;
-        paramSsname.type = MysqlConn::Param::STRING;
-        paramSsname.str_val = user.ssname;
-        params.push_back(paramSsname);
+        params.push_back({MysqlConn::Param::STRING, 0, user.ssname});
     }
 
     // 检查并添加 avatar
     if (!user.avatar.empty() && user.avatar != "-1") {
         setClauses.push_back("avatar = ?");
-        MysqlConn::Param paramAvatar;
-        paramAvatar.type = MysqlConn::Param::STRING;
-        paramAvatar.str_val = user.avatar;
-        params.push_back(paramAvatar);
+        params.push_back({MysqlConn::Param::STRING, 0, user.avatar});
     }
 
     // 检查并添加 sex
     if (user.sex != '\0') {
         setClauses.push_back("sex = ?");
-        MysqlConn::Param paramSex;
-        paramSex.type = MysqlConn::Param::STRING;
-        paramSex.str_val = std::string(1, user.sex);
-        params.push_back(paramSex);
+        params.push_back({MysqlConn::Param::STRING, 0, std::string(1, user.sex)});
     }
 
     // 检查并添加 personalSign
     if (!user.personalSign.empty() && user.personalSign != "-1") {
         setClauses.push_back("personal_sign = ?");
-        MysqlConn::Param paramPersonalSign;
-        paramPersonalSign.type = MysqlConn::Param::STRING;
-        paramPersonalSign.str_val = user.personalSign;
-        params.push_back(paramPersonalSign);
+        params.push_back({MysqlConn::Param::STRING, 0, user.personalSign});
     }
 
     // 检查并添加 birthday
     if (user.birthday != 0) {
         setClauses.push_back("birthday = ?");
-        MysqlConn::Param paramBirthday;
-        paramBirthday.type = MysqlConn::Param::STRING;
-        paramBirthday.str_val = std::to_string(user.birthday);
-        params.push_back(paramBirthday);
+        params.push_back({MysqlConn::Param::STRING, 0, std::to_string(user.birthday)});
     }
 
     // 检查并添加 region
     if (user.region != 0) {
         setClauses.push_back("region = ?");
-        MysqlConn::Param paramRegion;
-        paramRegion.type = MysqlConn::Param::INT;
-        paramRegion.int_val = user.region;
-        params.push_back(paramRegion);
+        params.push_back({MysqlConn::Param::INT, user.region, ""});
     }
 
     // 如果没有有效的字段需要更新，直接返回
@@ -117,19 +99,17 @@ bool UserDAO::update(const UserBaseInfoDO &user) {
         return false;
     }
 
-    // 拼接完整的SQL语句
-    for (auto it = setClauses.begin(); it != setClauses.end(); ++it) {
-        if (it + 1 != setClauses.end()) {
-            sql += (*it) + ", ";
+    for (size_t i = 0; i < setClauses.size(); ++i) {
+        sql += setClauses[i];
+        if (i != setClauses.size() - 1) {
+            sql += ", ";
         }
     }
+
     sql += " WHERE ssid = ?";
 
     // 添加 ssid 参数
-    MysqlConn::Param paramSsid;
-    paramSsid.type = MysqlConn::Param::STRING;
-    paramSsid.str_val = user.ssid;
-    params.push_back(paramSsid);
+    params.push_back({MysqlConn::Param::STRING, 0, user.ssid});
 
     // 执行更新操作
     if (!m_conn->update(sql, params)) {
@@ -158,7 +138,7 @@ bool UserDAO::deleteById(const std::string &ssid) {
 }
 
 UserBaseInfoDO UserDAO::findById(const std::string &ssid) {
-    std::string sql = "SELECT ssid, ssname, avatar, sex, personal_sign, birthday, region, create_time "
+    std::string sql = "SELECT ssid, ssname, avatar, sex, personal_sign, UNIX_TIMESTAMP(birthday), region, UNIX_TIMESTAMP(create_time) "
                       "FROM user_base_info WHERE ssid = ?";
     std::vector<MysqlConn::Param> params;
 
@@ -182,12 +162,12 @@ UserBaseInfoDO UserDAO::findById(const std::string &ssid) {
     UserBaseInfoDO user;
     user.ssid = row[0];
     user.ssname = row[1];
-    user.avatar = row[2];
+    user.avatar = (row[2] != nullptr) ? row[2] : "";
     user.sex = row[3][0];
     user.personalSign = row[4];
-    user.birthday = row[5] ? std::stoul(row[5]) : 0;
+    user.birthday = row[5] ? std::stoll(row[5]) : 0;
     user.region = static_cast<uint8_t>(std::stoul(row[6]));
-    user.createTime = row[7] ? std::stoul(row[7]) : 0;
+    user.createTime = row[7] ? std::stoll(row[7]) : 0;
 
     mysql_free_result(result);
     return user;
@@ -221,7 +201,7 @@ std::vector<UserBaseInfoDO> UserDAO::fuzzyMatchingByIdOrName(const std::string &
     }
 
     // 拼接SQL语句
-    std::string sql = "SELECT ssid, ssname, avatar, sex, personal_sign, birthday, region, create_time "
+    std::string sql = "SELECT ssid, ssname, avatar, sex, personal_sign, UNIX_TIMESTAMP(birthday), region, UNIX_TIMESTAMP(create_time) "
                       "FROM user_base_info WHERE ";
     for (size_t i = 0; i < conditions.size(); ++i) {
         if (i > 0) sql += " OR ";
@@ -244,9 +224,9 @@ std::vector<UserBaseInfoDO> UserDAO::fuzzyMatchingByIdOrName(const std::string &
         user.avatar = row[2] ? row[2] : "";
         user.sex = row[3] ? row[3][0] : '\0';
         user.personalSign = row[4] ? row[4] : "";
-        user.birthday = row[5] ? std::stoul(row[5]) : 0;
+        user.birthday = row[5] ? std::stoll(row[5]) : 0;
         user.region = row[6] ? static_cast<uint8_t>(std::stoul(row[6])) : 0;
-        user.createTime = row[7] ? std::stoul(row[7]) : 0;
+        user.createTime = row[7] ? std::stoll(row[7]) : 0;
         users.push_back(user);
     }
 
@@ -277,7 +257,7 @@ bool UserDAO::updateThumbUpCount(const std::string &ssid, int newCount) {
 }
 
 std::vector<UserBaseInfoDO> UserDAO::findByRegion(uint8_t region, int pageSize, int pageNum) {
-    std::string sql = "SELECT ssid, ssname, avatar, sex, personal_sign, birthday, region, create_time "
+    std::string sql = "SELECT ssid, ssname, avatar, sex, personal_sign, UNIX_TIMESTAMP(birthday), region, UNIX_TIMESTAMP(create_time) "
                       "FROM user_base_info WHERE region = ? "
                       "LIMIT ? OFFSET ?";
     std::vector<MysqlConn::Param> params;

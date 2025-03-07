@@ -39,9 +39,9 @@ ArchPage *ArchPage::getInstance() {
 }
 
 void ArchPage::destroyInstance() {
-    if(_obj){
+    if (_obj) {
         m.lock();
-        if(_obj){
+        if (_obj) {
             _obj->deleteLater();
         }
         m.unlock();
@@ -57,6 +57,24 @@ void ArchPage::sltShowMaskEffect() {
 
 void ArchPage::sltHideMaskEffect() {
     _maskWidget->startMaskAnimation(0);
+}
+void ArchPage::sltTriggerUpdate() {
+    UserBaseInfoDTO udto = g_pCommonData->getCurUserInfo();
+    if (udto.username.isEmpty() || udto.username == "-1") {
+        setUserInfoCardTitle("{NULL}");
+    }else {
+        setUserInfoCardTitle(udto.username);
+    }
+    if (udto.avatarPath.isEmpty() || udto.avatarPath == "-1") {
+        setUserInfoCardPixmap(QPixmap(":/arch-page/rc-page/img/SS-default-icon.jpg"));
+    }else {
+        setUserInfoCardPixmap(udto.avatarPath);
+    }
+    if (udto.ssid.isEmpty() || udto.ssid == "-1") {
+        setUserInfoCardSubTitle("{NULL}");
+    }else {
+        setUserInfoCardSubTitle(udto.ssid);
+    }
 }
 
 ArchPage::ArchPage(QWidget *parent) : ElaWindow(parent) {
@@ -92,9 +110,6 @@ void ArchPage::initWindow() {
     setMinimumSize(400,500);
     resize(800, 650);
 
-    setUserInfoCardPixmap(QPixmap(":/arch-page/rc-page/img/SS-default-icon-flat.jpg"));
-    setUserInfoCardTitle("{test name}");
-    setUserInfoCardSubTitle("{ssid}");
     setWindowTitle("Synergy-Spot \t\t version:  " + QString(SS_VERSION));
 
     _statusBar      =   new ElaStatusBar(this);
@@ -103,6 +118,9 @@ void ArchPage::initWindow() {
     _addButton      =   new ElaToolButton(this);
     _searchSuggest  =   new ElaSuggestBox(this);
     _maskWidget     =   new SSMaskWidget(this);
+
+    // init arch user pic and user name
+    sltTriggerUpdate();
 }
 
 void ArchPage::initEdgeLayout() {
@@ -174,7 +192,20 @@ void ArchPage::initConnectFunc() {
         }
     });
     connect(this, &ElaWindow::userInfoCardClicked, this, [=](){
-        UserPage * wid = g_pUserPage(UserType::Myself,{},{});
+        UserBaseInfoDTO udto = g_pCommonData->getCurUserInfo();
+        UserInfo ifo{
+            Myself,
+            static_cast<int>((udto.createTime / (24 * 60 * 60 * 1000)) + 1),
+            static_cast<int>(udto.thumbUpCount),
+            udto.ssid,
+            udto.username,
+            "",
+            udto.personalSign,
+            udto.avatarPath,
+            {
+            }
+        };
+        UserPage * wid = g_pUserPage(UserType::Myself,ifo,{});
 
         QPoint globalPos = QCursor::pos();
         wid->showAt(globalPos + QPoint{10,10});
@@ -186,6 +217,9 @@ void ArchPage::initConnectFunc() {
         g_pUserPage(UserType::Myself,{},{})->moveUserEditPageToCenter(pos() + QPoint(width()/2,height()/2) - QPoint(200,300));
     });
     connect(g_pUserPage(UserType::Myself,{},{}),&UserPage::sigHideArchPageMaskEffect,this,&ArchPage::sltHideMaskEffect);
+
+    // refresh data
+    connect(g_pCommonData,&CommonData::sigUpdateAvatarData,this,&ArchPage::sltTriggerUpdate);
 }
 
 void ArchPage::resizeEvent(QResizeEvent *event) {

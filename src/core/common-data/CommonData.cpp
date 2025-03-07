@@ -56,8 +56,10 @@ UserBaseInfoDTO CommonData::getCurUserInfo() const {
 
 void CommonData::setCurUserInfo(const UserBaseInfoDTO &curUserInfo) {
     _userInfo = curUserInfo;
-    _enable = true;
     init();
+    if (!curUserInfo.sex.isEmpty() || !curUserInfo.avatarPath.isEmpty() || !curUserInfo.personalSign.isEmpty()) {
+        updateUserInfoBySSID(curUserInfo);
+    }
 }
 
 UserBaseInfoDTO CommonData::getUserInfoBySSID(const QString &ssid) {
@@ -69,19 +71,24 @@ UserBaseInfoDTO CommonData::getUserInfoBySSID(const QString &ssid) {
         UserBaseInfoDTO uRes = userService->getUserBySSID(ssid);
         if (uRes.ssid == "-1") {
             LOG_WARNING("local cache cant find ssid < " << ssid.toStdString());
-            return {"-1"};
+            return {};
         }
         userInfoCacheMap.insert(ssid,new UserBaseInfoDTO(uRes));
     }
     return *userInfoCacheMap[ssid];
 }
 
-bool CommonData::setUserInfoBySSID(const UserBaseInfoDTO &userInfo) {
+bool CommonData::updateUserInfoBySSID(const UserBaseInfoDTO &userInfo) {
     if (!_enable) {
         LOG_ERROR("Please init cur user info!");
         return {};
     }
-    return userService->updateUserBySSID(userInfo);
+    bool res = userService->updateUserBySSID(userInfo);
+    if (res) {
+        userInfoCacheMap.insert(userInfo.ssid ,new UserBaseInfoDTO(userInfo));
+        return true;
+    }
+    return false;
 }
 
 bool CommonData::addUserInfoByServer(const UserBaseInfoDTO &userInfo) {
@@ -89,7 +96,38 @@ bool CommonData::addUserInfoByServer(const UserBaseInfoDTO &userInfo) {
         LOG_ERROR("Please init cur user info!");
         return {};
     }
+    if (!userService->getUserBySSID(userInfo.ssid).ssid.isEmpty() && userService->getUserBySSID(userInfo.ssid).ssid != "-1" ) {
+        updateUserInfoBySSID(userInfo);
+    }
     return userService->addUser(userInfo);
+}
+
+bool CommonData::setLoginRecord(const LoginRecordDTO &loginInfo) {
+    auto res = loginRecordService->getLoginRecordsBySSID(loginInfo.account);
+    if (res.account == "-1") {
+        loginRecordService->addLoginRecord(loginInfo);
+    }else {
+        if (res.plainPassword == loginInfo.plainPassword) {
+            // update login time
+            loginRecordService->updateLoginTime(loginInfo.account,loginInfo.loginTime);
+        }else {
+            // remove login data and insert new
+            loginRecordService->deleteLoginRecord(loginInfo.account);
+        }
+    }
+    return true;
+}
+
+bool CommonData::removeLoginRecordBySSID(const QString &ssid) {
+    return loginRecordService->deleteLoginRecord(ssid);
+}
+
+bool CommonData::removeLoginRecordBefore(time_t date) {
+    return loginRecordService->deleteLoginRecordsBefore(date);
+}
+
+QList<LoginRecordDTO> CommonData::getLoginRecord(int limit) {
+    return loginRecordService->getLoginRecords(limit);
 }
 
 QList<FriendshipDTO> CommonData::getCurUserFriendship() {
@@ -124,12 +162,32 @@ QList<MessageContentDTO> CommonData::getMessageContentData(int pageSize, int pag
     return messageContentService->getAllMessages(_userInfo.ssid,pageSize,pageNum);
 }
 
-bool CommonData::setMessageContentData(const QList<MessageContentDTO> &dto) {
+bool CommonData::setMessageContentData(const QList<MessageContentDTO> &dto,bool isFromRemote) {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return false;
+    }
+    if (!isFromRemote) { // cur user send msg doesn't immediately store in the local db
+        emit sigSyncMsgContentDTO(dto);
+        return true;
+    }else {
+        bool res = messageContentService->storeMessage(dto);
+
+        // download from server
+        QList<QString> needFiles;
+        for (const auto& it : dto) {
+            needFiles.append(it.fileId);
+        }
+        emit sigSyncMsgPicFromRemote(needFiles);
+        return res;
+    }
+}
+time_t CommonData::getLastMessageTime() const {
     if (!_enable) {
         LOG_ERROR("Please init cur user info!");
         return {};
     }
-    return messageContentService->storeMessage(dto);
+    return messageContentService->getLastMsgTime();
 }
 
 QList<GroupBaseInfoDTO> CommonData::getAllGroupInfo(int pageSize, int pageNum) {
@@ -353,17 +411,38 @@ QImage CommonData::getMsgPicPathFromTmp(const std::string &picName) {
     return image;
 }
 
-
-void CommonData::addFileToTmp() {
+FileStorageDTO CommonData::getFileInfoById(const QString &fileId) {
     if (!_enable) {
         LOG_ERROR("Please init cur user info!");
-        return ;
+        return {"-1"};
     }
+    return fileService->getFileByFileID(fileId);
 }
 
-std::string CommonData::getFilePathFromTmp() {
-    return "";
+FileStorageDTO CommonData::getFileInfoByPath(const QString &filePath) {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return {"-1"};
+    }
+    return fileService->getFileByFilePath(filePath);
 }
+
+QList<FileStorageDTO> CommonData::getFileInfosBySSID(const QString &ssid, int pageSize, int pageNum) {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return {};
+    }
+    return fileService->getFileByUserSSID(ssid, pageSize, pageNum);
+}
+
+bool CommonData::setFileInfo(const FileStorageDTO &fileInfo) {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return false;
+    }
+    return fileService->addFile(fileInfo);
+}
+
 
 void CommonData::addAvatarToData() {
     if (!_enable) {
@@ -425,7 +504,7 @@ bool CommonData::initUserDatabase() {
         "  friend_ssid TEXT NOT NULL,"
         "  ship_status INTEGER NOT NULL,"
         "  friend_type INTEGER DEFAULT 1,"
-        "  create_time TEXT DEFAULT CURRENT_TIMESTAMP,"
+        "  create_time TEXT NOT NULL,"
         "  UNIQUE(ssid, friend_ssid)"
         ");"
         "CREATE INDEX IF NOT EXISTS idx_friend_ssid ON friendship(friend_ssid);",
@@ -438,7 +517,7 @@ bool CommonData::initUserDatabase() {
         "  avatar TEXT,"
         "  create_ssid TEXT NOT NULL,"
         "  profile TEXT DEFAULT '',"
-        "  create_time TEXT DEFAULT CURRENT_TIMESTAMP"
+        "  create_time TEXT NOT NULL"
         ");"
         "CREATE INDEX IF NOT EXISTS idx_create_ssid ON group_base_info(create_ssid);",
 
@@ -447,7 +526,7 @@ bool CommonData::initUserDatabase() {
         "  id INTEGER PRIMARY KEY AUTOINCREMENT,"
         "  ssid_group TEXT NOT NULL,"
         "  ssid_member TEXT NOT NULL,"
-        "  create_time TEXT DEFAULT CURRENT_TIMESTAMP,"
+        "  create_time TEXT NOT NULL,"
         "  UNIQUE(ssid_group, ssid_member)"
         ");"
         "CREATE INDEX IF NOT EXISTS idx_member ON group_member_info(ssid_member);",
@@ -458,10 +537,19 @@ bool CommonData::initUserDatabase() {
         "  sender_ssid TEXT NOT NULL,"
         "  content_type INTEGER NOT NULL,"
         "  content TEXT NOT NULL,"
-        "  file_id TEXT,"
-        "  create_time TEXT DEFAULT CURRENT_TIMESTAMP"
+        "  create_time TEXT NOT NULL"
         ");"
         "CREATE INDEX IF NOT EXISTS idx_sender ON message_content(sender_ssid);",
+
+        // 消息文件内容表
+        "CREATE TABLE IF NOT EXISTS message_file ("
+        "  id INTEGER PRIMARY KEY AUTOINCREMENT,"
+        "  message_id INTEGER NOT NULL,"
+        "  file_id TEXT NOT NULL,"
+        "  sequence INTEGER NOT NULL,"
+        "  FOREIGN KEY (message_id) REFERENCES message_content(id) ON DELETE CASCADE"
+        ");"
+        "CREATE INDEX IF NOT EXISTS idx_message_id ON message_file(message_id);",
 
         // 消息接收表
         "CREATE TABLE IF NOT EXISTS message_recipient ("
@@ -469,14 +557,15 @@ bool CommonData::initUserDatabase() {
         "  message_id INTEGER NOT NULL,"
         "  recipient_type INTEGER NOT NULL,"
         "  recipient_ssid TEXT NOT NULL,"
-        "  read_status INTEGER DEFAULT 0"
+        "  read_status INTEGER DEFAULT 0,"
+        "  FOREIGN KEY(message_id) REFERENCES message_content(id) ON DELETE CASCADE"
         ");"
         "CREATE INDEX IF NOT EXISTS idx_recipient ON message_recipient(recipient_ssid, recipient_type);"
 
         "CREATE TABLE IF NOT EXISTS base_stickers ("
         "  sticker_id INTEGER PRIMARY KEY AUTOINCREMENT,"
         "  image_url TEXT NOT NULL UNIQUE,"
-        "  created_at TEXT DEFAULT CURRENT_TIMESTAMP"
+        "  created_at TEXT NOT NULL"
         ");",
 
         // 用户收藏表情表（合并基础表情和自定义表情）
@@ -484,11 +573,22 @@ bool CommonData::initUserDatabase() {
         "  user_ssid TEXT NOT NULL,"
         "  image_url TEXT NOT NULL,"
         "  is_custom INTEGER DEFAULT 0 CHECK(is_custom IN (0, 1))," // 0-基础表情，1-自定义
-        "  created_at TEXT DEFAULT CURRENT_TIMESTAMP,"
+        "  created_at TEXT NOT NULL,"
         "  PRIMARY KEY (user_ssid, image_url),"
         "  FOREIGN KEY (user_ssid) REFERENCES user_base_info(ssid) ON DELETE CASCADE"
         ");"
-        "CREATE INDEX IF NOT EXISTS idx_user_collect ON user_collected_stickers(user_ssid);"
+        "CREATE INDEX IF NOT EXISTS idx_user_collect ON user_collected_stickers(user_ssid);",
+
+        "CREATE TABLE IF NOT EXISTS file_storage ("
+        "   file_id TEXT PRIMARY KEY NOT NULL,"
+        "   uploader_ssid TEXT NOT NULL,"
+        "   file_name TEXT NOT NULL,"
+        "   file_size INTEGER NOT NULL,"
+        "   file_type TEXT NOT NULL,"
+        "   storage_path TEXT NOT NULL,"
+        "   upload_time TEXT NOT NULL"
+        ");"
+        "CREATE INDEX IF NOT EXISTS idx_file_id ON file_storage(file_id);",
     };
 
     for (auto table : tables) {
@@ -501,16 +601,21 @@ bool CommonData::initUserDatabase() {
 }
 
 void CommonData::init() {
-    initCurUserInfoDir();
-    // _liteConn               =   new LiteConn((getDataPath(db) + "/" + _liteDBName).c_str(),_node["sqlite-info"]["accessKey"].as<std::string>());
-    _liteConn               =   new LiteConn((getDataPath(db) + "/" + _liteDBName).c_str());
-    userService             =   new UserService(*_liteConn);
-    stickerService          =   new StickerService(*_liteConn);
-    messageContentService   =   new MessageContentService(*_liteConn);
-    groupMemberService      =   new GroupMemberService(*_liteConn);
-    groupInfoService        =   new GroupInfoService(*_liteConn);
-    friendshipService       =   new FriendshipService(*_liteConn);
-    initUserDatabase();
+    if (!_enable) {
+        _enable = true;
+
+        initCurUserInfoDir();
+        // _liteConn               =   new LiteConn((getDataPath(db) + "/" + _liteDBName).c_str(),_node["sqlite-info"]["accessKey"].as<std::string>());
+        _liteConn               =   new LiteConn((getDataPath(db) + "/" + _liteDBName).c_str());
+        userService             =   new UserService(*_liteConn);
+        stickerService          =   new StickerService(*_liteConn);
+        messageContentService   =   new MessageContentService(*_liteConn);
+        groupMemberService      =   new GroupMemberService(*_liteConn);
+        groupInfoService        =   new GroupInfoService(*_liteConn);
+        friendshipService       =   new FriendshipService(*_liteConn);
+        fileService             =   new FileService(*_liteConn);
+        initUserDatabase();
+    }
 }
 
 CommonData::CommonData(){
@@ -526,6 +631,21 @@ CommonData::CommonData(){
     userInfoCacheMap.setMaxCost(_cacheMaxSize);
     groupInfoCacheMap.setMaxCost(_cacheMaxSize);
     groupMemberInfoCacheMap.setMaxCost(_cacheMaxSize);
+
+    // login record
+    _loginDB                =   new LiteConn("loginCache.db");
+    loginRecordService      =   new LoginRecordService(*_loginDB);
+
+    std::string loginRecordsSql =
+        "CREATE TABLE IF NOT EXISTS login_record ("
+        "  id INTEGER PRIMARY KEY AUTOINCREMENT,"
+        "  account VARCHAR(64) NOT NULL,"
+        "  encrypted_password VARCHAR(256) NOT NULL,"
+        "  login_time TEXT NOT NULL,"
+        "  device_info TEXT"
+        ");"
+        "CREATE INDEX IF NOT EXISTS idx_user_collect ON login_record(account);";
+    _loginDB->update(loginRecordsSql,{});
 }
 
 CommonData::~CommonData() {}

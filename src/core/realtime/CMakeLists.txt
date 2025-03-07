@@ -24,7 +24,9 @@ find_package(Qt6 REQUIRED COMPONENTS
 )
 
 file(GLOB_RECURSE   ProtoCC         ${CMAKE_CURRENT_SOURCE_DIR}/../../protofile-grpc/*.cc     )
-file(GLOB_RECURSE   RealtimeCpp     ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+file(GLOB_RECURSE   RealtimeCpp     ${CMAKE_CURRENT_SOURCE_DIR}/business/*.cpp)
+
+set(RealtimeCpp ${RealtimeCpp} main.cpp RealtimeCommHandler.cpp)
 
 # common data
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../common-data)
@@ -67,7 +69,7 @@ if(SS_CLIENT_WIN)
 
                 CommonDataPlugind
         )
-    elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
+    elseif (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
         target_link_libraries(${PROJECT_NAME} PRIVATE
                 Qt::Core
                 Qt::Network

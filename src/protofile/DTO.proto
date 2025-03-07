@@ -35,8 +35,9 @@ enum BusinessType {
 
   R_MESSAGE_CONTENT = 61;             // 离线转发
   C_MESSAGE_CONTENT = 62;             // 转发消息
-  MAKE_FRIEND_REQUEST = 63;
-  MAKE_FRIEND_RESPONSE = 64;
+  R_MESSAGE_PIC_INFO = 63;            // 消息中的图片
+  MAKE_FRIEND_REQUEST = 64;
+  MAKE_FRIEND_RESPONSE = 65;
 
   R_DISTRICT_BY_PID = 71;
   R_DISTRICT_PROVINCE = 72;
@@ -55,22 +56,30 @@ enum BusinessType {
   D_FILE = 93;
 }
 
+message GetMessagePicInfoDTO{
+  bytes ssid = 1;
+  map<string,string> pic_name_to_path = 2;    // file id equal file name
+  bytes ip = 3;
+};
+
 message GetUserMessageDTO{
   bytes ssid = 1;
   repeated MessageContentDTO msg = 2;
-  int32 page_size = 3;
-  int32 page_num = 4;
-  bytes ip = 5;
+  bytes last_time = 3;
+  int32 page_size = 4;
+  int32 page_num = 5;
+  bytes ip = 6;
 };
 
 message GetFileDTO{
   bytes ssid = 1;
   bytes file_id = 2;
   bytes file_name = 3;
-  int32 page_size = 4;
-  int32 page_num = 5;
-  repeated FileStorageDTO files = 6;
-  bytes ip = 7;
+  bytes file_storage = 4;
+  int32 page_size = 5;
+  int32 page_num = 6;
+  repeated FileStorageDTO files = 7;
+  bytes ip = 8;
 };
 
 message FuzzySearchDTO{
@@ -121,22 +130,24 @@ message DisconnectDTO{
 
 message GetAllUserFriendship{
   string ssid = 1;
-  repeated UserBaseInfoDTO friends = 2;
-  bytes ip = 3;
+  repeated UserBaseInfoDTO friends_base_info = 2;
+  repeated FriendshipDTO friendship_info = 3;
+  bytes ip = 4;
 };
 
 // 用户基础信息 DTO
 message UserBaseInfoDTO {
   string ssid = 1;
   string ssname = 2;
-  string avatar_path = 3;
-  string sex = 4;         // 'M' 或 'F' 建议后续改为枚举
-  string personal_sign = 5;
-  uint32 thumb_up_count = 6;
-  int64 birthday = 7;     // UNIX 时间戳
-  uint32 region = 8;      // proto3 无 uint8 类型，使用 uint32
-  int64 create_time = 9;
-  bytes ip = 10;
+  string avatar_file_id = 3;
+  string avatar_remote_path = 4;
+  string sex = 5;         // 'M' 或 'F'
+  string personal_sign = 6;
+  uint32 thumb_up_count = 7;
+  int64 birthday = 8;     // UNIX 时间戳
+  uint32 region = 9;      // proto3 无 uint8 类型，使用 uint32
+  int64 create_time = 10;
+  bytes ip = 11;
 }
 
 // 用户私有信息 DTO
@@ -217,7 +228,7 @@ message MessageContentDTO {
   string sender_ssid = 2;
   uint32 content_type = 3;
   string content = 4;
-  string file_id = 5;
+  repeated string file_id = 5;
   MessageRecipientDTO recipient = 6;
   int64 create_time = 7;
   bytes ip = 8;

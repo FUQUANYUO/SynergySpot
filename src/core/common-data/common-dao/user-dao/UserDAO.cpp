@@ -19,8 +19,8 @@ bool UserDAO::insert(const UserBaseInfoDO &user) {
         (user.sex == UserSex::Male) ? "M" : "F", // 枚举转换为 "M" 或 "F"
         user.personalSign.toStdString(),
         std::to_string(user.thumbUpCount),
-        user.birthday.toString("yyyy-MM-dd").toStdString(),
-        user.createTime.toString("yyyy-MM-dd HH:mm:ss").toStdString(),
+        std::to_string(user.birthday),
+        std::to_string(user.createTime),
         std::to_string(user.region)
     };
 
@@ -36,7 +36,7 @@ bool UserDAO::update(const UserBaseInfoDO &user) {
         (user.sex == UserSex::Male) ? "M" : "F", // 枚举转换为 "M" 或 "F"
         user.personalSign.toStdString(),
         std::to_string(user.thumbUpCount),
-        user.birthday.toString("yyyy-MM-dd").toStdString(),
+        std::to_string(user.birthday),
         std::to_string(user.region),
         user.ssid.toStdString()
     };
@@ -52,7 +52,7 @@ bool UserDAO::deleteById(const QString &ssid) {
 }
 
 UserBaseInfoDO UserDAO::findById(const QString &ssid) {
-    std::string sql = "SELECT ssid, ssname, avatar, sex, personal_sign, thumb_up_count, birthday, create_time, region "
+    std::string sql = "SELECT ssid, ssname, avatar, sex, personal_sign, thumb_up_count, birthday, create_time , region "
                       "FROM user_base_info WHERE ssid = ?;";
     std::vector<std::string> params = { ssid.toStdString() };
 
@@ -65,8 +65,8 @@ UserBaseInfoDO UserDAO::findById(const QString &ssid) {
         user.sex = (result[0][3] == "M") ? UserSex::Male : UserSex::Female; // "M" 或 "F" 转换为枚举
         user.personalSign = QString::fromStdString(result[0][4]);
         user.thumbUpCount = std::stoul(result[0][5]);
-        user.birthday = QDateTime::fromString(QString::fromStdString(result[0][6]), "yyyy-MM-dd");
-        user.createTime = QDateTime::fromString(QString::fromStdString(result[0][7]), "yyyy-MM-dd HH:mm:ss");
+        user.birthday = std::stoll(result[0][6]);
+        user.createTime = std::stoll(result[0][7]);
         user.region = static_cast<quint8>(std::stoi(result[0][8]));
         return user;
     }
@@ -88,8 +88,8 @@ QList<UserBaseInfoDO> UserDAO::findByRegion(quint8 region, int pageSize, int pag
         user.sex = (row[3] == "M") ? UserSex::Male : UserSex::Female; // "M" 或 "F" 转换为枚举
         user.personalSign = QString::fromStdString(row[4]);
         user.thumbUpCount = std::stoul(row[5]);
-        user.birthday = QDateTime::fromString(QString::fromStdString(row[6]), "yyyy-MM-dd");
-        user.createTime = QDateTime::fromString(QString::fromStdString(row[7]), "yyyy-MM-dd HH:mm:ss");
+        user.birthday =  std::stoll(row[6]);
+        user.createTime =  std::stoll(row[7]);
         user.region = static_cast<quint8>(std::stoi(row[8]));
         users.append(user);
     }

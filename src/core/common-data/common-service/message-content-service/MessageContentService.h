@@ -16,6 +16,8 @@ public:
     bool storeMessage(const QList<MessageContentDTO> &dto);
 
     int getMessageCount(const QString& ssid);
+
+    time_t getLastMsgTime();
 private:
     MessageContentDAO messageContentDAO;
 };

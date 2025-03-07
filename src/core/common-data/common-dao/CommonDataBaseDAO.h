@@ -84,4 +84,25 @@ public:
     virtual QList<CollectedStickerDO> listCollectedStickers(const QString& userSsid, int pageSize, int pageNum) = 0;
 };
 
+class ILoginRecordDAO {
+public:
+    virtual ~ILoginRecordDAO() = default;
+
+    virtual qint64 insert(const LoginRecordDO& record) = 0;
+
+    virtual LoginRecordDO findByAccount(const QString& ssid) = 0;
+
+    virtual bool deleteBefore(time_t threshold) = 0;
+};
+
+class IFileStorageDAO {
+public:
+    virtual ~IFileStorageDAO() = default;
+
+    virtual bool deleteFile(const QString& fileId) = 0;
+    virtual bool upload(const FileStorageDO& file) = 0;
+    virtual FileStorageDO findById(const QString& fileId) = 0;
+};
+
+
 #endif //COMMONDATABASEDAO_H

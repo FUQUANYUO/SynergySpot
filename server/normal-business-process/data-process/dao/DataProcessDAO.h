@@ -99,7 +99,7 @@ public:
     virtual ~IMessageContentDAO() = default;
 
     virtual int64_t insert(const MessageContentDO& message) = 0;
-    virtual std::vector<MessageContentDO> listBySender(const std::string& senderSsid, int pageSize, int pageNum) = 0;
+    virtual std::vector<MessageContentDO> listBySender(const std::string& senderSsid, int pageSize, int pageNum, time_t lastTime) = 0;
     virtual int getMessageContentCount(const std::string& senderSsid) = 0;
 };
 

@@ -15,24 +15,38 @@ qint64 MessageContentDAO::insertMessageContent(const MessageContentDO &message) 
         message.senderSSID.toStdString(),
         std::to_string(static_cast<int>(message.contentType)),
         message.content.toStdString(),
-        message.fileId.toStdString(),
-        message.createTime.toString(Qt::ISODate).toStdString()
+        std::to_string(message.createTime)
     };
 
     // 执行插入
     bool success = _db.update(
         "INSERT INTO message_content "
-        "(sender_ssid, content_type, content, file_id, create_time) "
-        "VALUES (?, ?, ?, ?, ?)",
+        "(sender_ssid, content_type, content, create_time) "
+        "VALUES (?, ?, ?, ?)",
         params
     );
 
     if (!success) return -1;
 
-    // 获取最后插入ID
     auto result = _db.query("SELECT last_insert_rowid()", {});
     if (result.empty() || result[0].empty()) return -1;
-    return std::stoll(result[0][0]);
+
+    int msgID = std::stoll(result[0][0]);
+
+    if(!message.fileId.empty()) {
+        const char* fileSql = "INSERT INTO message_file (message_id, file_id, sequence) VALUES (?, ?, ?)";
+        for(size_t i = 0; i < message.fileId.size(); ++i) {
+            params.clear();
+
+            params.emplace_back(result[0][0]);
+            params.emplace_back(message.fileId[i].toStdString());
+            params.emplace_back(std::to_string(i));
+        }
+
+        success = _db.update(fileSql,params);
+        if (!success) return -1;
+    }
+    return msgID;
 }
 
 bool MessageContentDAO::insertMessageRecipient(const MessageRecipientDO &recipient) {
@@ -88,7 +102,6 @@ bool MessageContentDAO::markMessageAsRead(qint64 messageId, const QString &recip
 
 QList<QVariant> MessageContentDAO::listMessagesByRecipient(const QString& recipientSSID, int pageSize, int pageNum) {
     QList<QVariant> result;
-
     // 参数校验
     if (pageSize <= 0) pageSize = 20;
     if (pageNum <= 0) pageNum = 1;
@@ -97,59 +110,86 @@ QList<QVariant> MessageContentDAO::listMessagesByRecipient(const QString& recipi
     // 构建参数
     std::vector<std::string> params{
         recipientSSID.toStdString(),
+        recipientSSID.toStdString(),    // sender is cur user
         std::to_string(pageSize),
         std::to_string(offset)
     };
 
+    // Messages are ordered by create_time in ascending order to ensure that the earliest messages are displayed at the top of the message page.
+    const char* sql = R"(
+        SELECT mc.id, mc.sender_ssid, mc.content_type, mc.content, mc.create_time,
+               mf.file_id, mf.sequence,
+               mr.recipient_type, mr.recipient_ssid, mr.read_status
+        FROM message_content mc
+        JOIN message_recipient mr ON mc.id = mr.message_id
+        LEFT JOIN message_file mf ON mc.id = mf.message_id
+        WHERE mr.recipient_ssid = ? OR mc.sender_ssid = ?
+        ORDER BY mc.create_time ASC, mf.sequence ASC
+        LIMIT ? OFFSET ?
+    )";
+
     // 分页查询SQL
-    auto queryResult = _db.query(
-        "SELECT mc.sender_ssid, mc.content_type, mc.content, mc.file_id, mc.create_time, "
-        "mr.recipient_type, mr.recipient_ssid, mr.read_status "
-        "FROM message_content mc "
-        "JOIN message_recipient mr ON mc.id = mr.message_id "
-        "WHERE mc.sender_ssid = ? "
-        "ORDER BY mc.create_time ASC "
-        "LIMIT ? OFFSET ?",  // 分页控制
-        params
-    );
+    auto queryResult = _db.query(sql,params);
 
     // 转换结果集
+    std::unordered_map<int64_t, MessageContentDTO> msgMap;
     for (const auto& row : queryResult) {
-        if (row.size() < 8) continue;
+        int64_t msgId = std::stoll(row[0]);
 
-        MessageContentDTO dto;
-        // 消息内容部分
-        dto.senderSSID = QString::fromStdString(row[0]);
-        dto.content = QString::fromStdString(row[2]);
-        dto.fileId = QString::fromStdString(row[3]);
-        dto.createTime = QDateTime::fromString(
-            QString::fromStdString(row[4]), Qt::ISODate);
+        if (msgMap.find(msgId) == msgMap.end()) {
+            MessageContentDTO msg;
+            msg.senderSSID  = QString::fromStdString(row[1]);
+            msg.contentType = static_cast<ContentType>(std::stoi(row[2]));
+            msg.content     = QString::fromStdString(row[3]);
+            msg.createTime  = std::stoll(row[4]);
 
-        // 内容类型转换
-        dto.contentType = static_cast<ContentType>(QString::fromStdString(row[1]).toInt());
+            MessageRecipientDTO recip;
+            recip.recipientType = std::stoi(row[7]);
+            recip.recipientSSID = QString::fromStdString(row[8]);
+            recip.readStatus = std::stoi(row[9]) == 1;
+            msg.recipient = recip;
 
-        // 接收方信息
-        MessageRecipientDTO recip;
-        recip.recipientType = QString::fromStdString(row[5]).toInt();
-        recip.recipientSSID = QString::fromStdString(row[6]);
-        recip.readStatus = QString::fromStdString(row[7]) == "1";
-        dto.recipient = recip;
-
-        result.append(QVariant::fromValue(dto));
+            msgMap[msgId] = msg;
+        }
+        if (!row[5].empty()) {
+            msgMap[msgId].fileId.push_back(QString::fromStdString(row[5]));
+        }
+    }
+    for(auto& pair : msgMap) {
+        result.push_back(QVariant::fromValue(pair.second));
     }
     return result;
-
 }
 
 int MessageContentDAO::getMessageCount(const QString &ssid) {
     std::string sql = "SELECT COUNT(*) FROM message_content WHERE sender_ssid = ?";
-    std::vector<std::string> params = { ssid.toStdString() };
+    std::vector<std::string> params = {ssid.toStdString()};
 
     auto result = _db.query(sql, params);
 
     if (!result.empty() && !result[0].empty()) {
         return std::stoi(result[0][0]);
-    }else {
+    } else {
         return 0;
     }
+}
+time_t MessageContentDAO::getLastMsgTime() {
+    // 执行 SQL 查询获取最新消息时间
+    auto result = _db.query(
+        "SELECT MAX(create_time) FROM message_content",
+        {}
+    );
+
+    // 处理查询结果
+    if (!result.empty() && !result[0].empty()) {
+        const std::string& timeStr = result[0][0];
+
+        if (timeStr.empty()) {
+            return 0;
+        }
+
+        return std::stol(timeStr);
+    }
+
+    return 0;
 }

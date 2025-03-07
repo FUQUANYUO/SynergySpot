@@ -24,6 +24,8 @@ public:
 
     FileStorageDO findById(const std::string& fileId) override;
 
+    FileStorageDO findByPath(const std::string& path);
+
     std::vector<FileStorageDO> findByName(const std::string& fileName,int pageSize, int pageNum);
 
     std::vector<FileStorageDO> findBySSID(const std::string& userSSID,int pageSize, int pageNum);

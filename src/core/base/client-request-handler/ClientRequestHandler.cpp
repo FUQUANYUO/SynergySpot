@@ -19,7 +19,7 @@
     QByteArray packet;                                      \
     QDataStream stream(&packet, QIODevice::WriteOnly);      \
     stream << static_cast<quint32>(__DTO_OBJ__.size());     \
-    stream << static_cast<quint8>(__DTO_TYPE__);            \
+    stream << static_cast<quint32>(__DTO_TYPE__);           \
     packet.append(__DTO_OBJ__.c_str(), __DTO_OBJ__.size()); \
     emit sigWriteToSocket(packet);                          \
     LOG(__LOG__)
@@ -118,11 +118,14 @@ ClientRequestHandler::ClientRequestHandler(QObject* parent) : QObject(parent) {
     connect(this, &ClientRequestHandler::sigQueryUserBaseInfoRequest,   businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_USER_BASE_INFO),Qt::QueuedConnection);
     connect(this, &ClientRequestHandler::sigQueryGroupBaseInfoRequest,  businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_GROUP_BASE_INFO),Qt::QueuedConnection);
     connect(this, &ClientRequestHandler::sigQueryGroupNoticesRequest,   businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_GROUP_NOTICE),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigQueryNewMessageRequest,     businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_MESSAGE_CONTENT),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigQueryFileInfoRequest,       businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_FILE),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigQueryMsgPicInfoRequest,     businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_MESSAGE_PIC_INFO),Qt::QueuedConnection);
+
 
     // 连接响应信号槽
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigEmailCodeResponse,             this, &ClientRequestHandler::sigEmailCodeResponse);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigLoginSuccess,                  this, &ClientRequestHandler::sigLoginSuccess);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigLoginFailed,                   this, &ClientRequestHandler::sigLoginFailed);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigLoginResult,                   this, &ClientRequestHandler::sigLoginResult);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigMessageResponse,               this, &ClientRequestHandler::sigMessageResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigContactListResponse,           this, &ClientRequestHandler::sigContactListResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigEnrollAccountResponse,         this, &ClientRequestHandler::sigEnrollAccountResponse);
@@ -133,6 +136,9 @@ ClientRequestHandler::ClientRequestHandler(QObject* parent) : QObject(parent) {
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryUserBaseInfoResponse,     this, &ClientRequestHandler::sigQueryUserBaseInfoResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryGroupBaseInfoResponse,    this, &ClientRequestHandler::sigQueryGroupBaseInfoResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryGroupNoticesResponse,     this, &ClientRequestHandler::sigQueryGroupNoticesResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryNewMessageResponse,       this, &ClientRequestHandler::sigQueryNewMessageResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryFileInfoResponse,         this, &ClientRequestHandler::sigQueryFileInfoResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryMsgPicInfoResponse,       this, &ClientRequestHandler::sigQueryMsgPicInfoResponse);
 
     // 启动业务线程
     _handlerThread->start();
@@ -149,14 +155,14 @@ ClientRequestHandler::~ClientRequestHandler() {
 BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(parent) {
     _ccon = new ClientConServer();
 
-    connect(this, &BusinessProcessor::sigWriteToSocket, _ccon, [=](QByteArray data) {
-        if(_ccon && _ccon->getQSocket()->state() == QAbstractSocket::ConnectedState) {
-            _ccon->getQSocket()->write(data);
+    connect(this, &BusinessProcessor::sigWriteToSocket, _ccon, [=](const QByteArray& data) {
+        if(_ccon && _ccon->isConnected()) {
+            _ccon->enqueueData(data);
         }
     },Qt::QueuedConnection);
 
-    connect(_ccon->getQSocket(), &QTcpSocket::connected,this, [=]() {
-        if (_ccon->getQSocket()->state() == QTcpSocket::ConnectedState) {
+    connect(_ccon->getClientSocket(), &QTcpSocket::connected,this, [=]() {
+        if (_ccon && _ccon->isConnected()) {
             LOG("Connected the server : " << _ccon->getServerIP().toStdString());
         }
         else {
@@ -165,8 +171,8 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
     });
 
     // wait 6s check net stable which the net connected the server
-    QTimer::singleShot(3000,this, [=]() {
-        if (_ccon->getQSocket()->state() != QAbstractSocket::ConnectedState) {
+    QTimer::singleShot(5000,this, [=]() {
+        if (_ccon && !_ccon->isConnected()) {
             emit sigConnServerFailed();
         }
         else {
@@ -175,20 +181,20 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
         }
     });
 
-    connect(_ccon->getQSocket(), &QTcpSocket::readyRead, this, [this]() {
-        while (_ccon->getQSocket()->bytesAvailable() >= 8) {
-            QByteArray array = _ccon->getQSocket()->read(4);
+    connect(_ccon->getClientSocket(), &QTcpSocket::readyRead, this, [this]() {
+        while (_ccon->getClientSocket()->bytesAvailable() >= 8) {
+            QByteArray array = _ccon->getClientSocket()->read(4);
             int msgSize = 0;
             QDataStream sizeStream(&array, QIODevice::ReadOnly);
             sizeStream >> msgSize;
 
-            array = _ccon->getQSocket()->read(4);
+            array = _ccon->getClientSocket()->read(4);
             QDataStream typeStream(&array, QIODevice::ReadOnly);
             SSDTO::BusinessType type;
             typeStream >> type;
 
-            if (_ccon->getQSocket()->bytesAvailable() >= msgSize) {
-                QByteArray dataArr = _ccon->getQSocket()->read(msgSize);
+            if (_ccon->getClientSocket()->bytesAvailable() >= msgSize) {
+                QByteArray dataArr = _ccon->getClientSocket()->read(msgSize);
                 std::string dto(dataArr.constData(),dataArr.size());
                 handleResponse(type, dto);
             }else {
@@ -255,76 +261,111 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
         _requestHandlerMap[SSDTO::R_GROUP_NOTICE] = [=](const std::string & dto) {
             SEND_PACKAGE(dto,SSDTO::R_GROUP_NOTICE,"query of group notices dto has been send to server...")
         };
+
+        // query message content
+        _requestHandlerMap[SSDTO::R_MESSAGE_CONTENT] = [=](const std::string & dto) {
+            SEND_PACKAGE(dto,SSDTO::R_MESSAGE_CONTENT,"query of msg content dto has been send to server...")
+        };
+
+        // query file info
+        _requestHandlerMap[SSDTO::R_FILE] = [=](const std::string & dto) {
+            SEND_PACKAGE(dto,SSDTO::R_FILE,"query of file info dto has been send to server...")
+        };
+
+        // query msg pic info
+        _requestHandlerMap[SSDTO::R_MESSAGE_PIC_INFO] = [=](const std::string & dto) {
+            SEND_PACKAGE(dto,SSDTO::R_MESSAGE_PIC_INFO,"query of pic embedding msg dto has been send to server...")
+        };
     }
 
     // response slot manager by dto type mapping
     {
         // login
         _responseHandlerMap[SSDTO::LOGIN_CHECK] = [=](const std::string & dto) {
-            SSDTO::LoginCheckDTO ldto;
-            ldto.ParseFromString(dto);
-            LOG("recv server verify [" << ldto.ssid() << "] res")
-            if(ldto.is_pass()){
-                emit sigLoginSuccess(ldto.ssid());
-            }
-            else{
-                emit sigLoginFailed(ldto.ssid());
-            }
+            LOG("login response")
+            emit sigLoginResult(dto);
         };
 
         // forward msg
         _responseHandlerMap[SSDTO::C_MESSAGE_CONTENT] = [=](const std::string & dto) {
+            LOG("forward response")
             emit sigMessageResponse(dto);
         };
 
         // friendship
         _responseHandlerMap[SSDTO::R_FRIENDSHIP_LIST] = [=](const std::string & dto) {
+            LOG("friendship response")
             emit sigContactListResponse(dto);
         };
 
         // email code
         _responseHandlerMap[SSDTO::EMAIL_VERIFY] = [=](const std::string & dto) {
+            LOG("email response")
             emit sigEmailCodeResponse(dto);
         };
 
         // enroll account
         _responseHandlerMap[SSDTO::ENROLL_ACCOUNT] = [=](const std::string & dto) {
+            LOG("enroll response")
             emit sigEnrollAccountResponse(dto);
         };
 
         // other friend request
         _responseHandlerMap[SSDTO::MAKE_FRIEND_RESPONSE] = [=](const std::string & dto) {
+            LOG("make friend response")
             emit sigFriendRequestResponse(dto);
         };
 
         // search friend
         _responseHandlerMap[SSDTO::SEARCH_USER] = [=](const std::string & dto) {
+            LOG("search user response")
             emit sigSearchFriendResponse(dto);
         };
 
         // query user base info request
         _responseHandlerMap[SSDTO::R_USER_BASE_INFO] = [=](const std::string & dto) {
+            LOG("get user base info response")
             emit sigQueryUserBaseInfoResponse(dto);
         };
 
         // query group base info request
         _responseHandlerMap[SSDTO::R_GROUP_BASE_INFO] = [=](const std::string & dto) {
+            LOG("get group base info response")
             emit sigQueryGroupBaseInfoResponse(dto);
         };
 
         // query group notice info request
         _responseHandlerMap[SSDTO::R_GROUP_NOTICE] = [=](const std::string & dto) {
+            LOG("get group notice info response")
             emit sigQueryGroupNoticesResponse(dto);
+        };
+
+        // query message content
+        _responseHandlerMap[SSDTO::R_MESSAGE_CONTENT] = [=](const std::string & dto) {
+            LOG("get message content response")
+            emit sigQueryNewMessageResponse(dto);
+        };
+
+        // file info
+        _responseHandlerMap[SSDTO::R_FILE] = [=](const std::string & dto) {
+            LOG("get file response")
+            emit sigQueryFileInfoResponse(dto);
+        };
+
+        // query msg pic info
+        _responseHandlerMap[SSDTO::R_MESSAGE_PIC_INFO] = [=](const std::string & dto) {
+            LOG("get msg pic response")
+            emit sigQueryMsgPicInfoResponse(dto);
         };
     }
 
-    if (_ccon->getQSocket()->state() != QAbstractSocket::ConnectedState) {
+    if (_ccon && !_ccon->isConnected()) {
         _ccon->connToSer();
     }
 }
 
 BusinessLayer::BusinessProcessor::~BusinessProcessor() {
-    _ccon->getQSocket()->disconnectFromHost();
+    _ccon->getClientSocket()->disconnectFromHost();
     delete _ccon;
 }
 

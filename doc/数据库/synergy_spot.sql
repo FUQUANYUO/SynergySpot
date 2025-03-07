@@ -121,15 +121,27 @@ DROP TABLE IF EXISTS `message_content`;
 CREATE TABLE `message_content` (
                                    `id` BIGINT AUTO_INCREMENT,
                                    `sender_ssid` VARCHAR(20) NOT NULL COMMENT '发送者ss号',
-                                   `content_type` TINYINT NOT NULL COMMENT '消息类型（1文本/2文件）',
-                                   `content` TEXT NOT NULL COMMENT '消息内容',
-                                   `file_id` VARCHAR(50) COMMENT '关联文件ID',
+                                   `content_type` TINYINT NOT NULL COMMENT '消息类型（1文本/2文件/3混合）',
+                                   `content` TEXT COMMENT '文本内容（可为空）',
                                    `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                                    PRIMARY KEY (`id`),
                                    FOREIGN KEY (`sender_ssid`) REFERENCES `user_base_info`(`ssid`) ON DELETE CASCADE,
-                                   INDEX `idx_sender` (`sender_ssid`),
-                                   INDEX `idx_file` (`file_id`)
+                                   INDEX `idx_sender` (`sender_ssid`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COMMENT = '消息内容表';
+
+-- ----------------------------
+-- Table structure for message_file
+-- ----------------------------
+DROP TABLE IF EXISTS `message_file`;
+CREATE TABLE `message_file` (
+                                `id` BIGINT AUTO_INCREMENT,
+                                `message_id` BIGINT NOT NULL COMMENT '消息ID',
+                                `file_id` VARCHAR(255) NOT NULL COMMENT '文件ID',
+                                `sequence` INT DEFAULT 0 COMMENT '文件顺序',
+                                PRIMARY KEY (`id`),
+                                FOREIGN KEY (`message_id`) REFERENCES `message_content`(`id`) ON DELETE CASCADE,
+                                INDEX `idx_message` (`message_id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COMMENT = '消息关联文件表';
 
 -- ----------------------------
 -- 消息内容表 + 接收者映射表

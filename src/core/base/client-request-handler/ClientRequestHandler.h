@@ -28,6 +28,8 @@ public:
 
     void addRequest(SSDTO::BusinessType type,std::string rawData);
 signals:
+    // --------------- 请求信号 --------------- //
+
     // 请求验证码
     void sigEmailCodeRequest(const std::string& dto);
     // 验证账号
@@ -48,13 +50,18 @@ signals:
     void sigQueryGroupBaseInfoRequest(const std::string& dto);
     // 查询群组公告
     void sigQueryGroupNoticesRequest(const std::string& dto);
+    // 获取最新消息
+    void sigQueryNewMessageRequest(const std::string& dto);
+    // 查询文件相关信息
+    void sigQueryFileInfoRequest(const std::string& dto);
+    // 获取消息中的图片相关的信息
+    void sigQueryMsgPicInfoRequest(const std::string& dto);
 
 
-    // 响应信号
+    // --------------- 响应信号 --------------- //
     void sigEmailCodeResponse(const std::string& dto);
 
-    void sigLoginSuccess(const std::string& ssid);
-    void sigLoginFailed(const std::string& ssid);
+    void sigLoginResult(const std::string& dto);
 
     void sigMessageResponse(const std::string& dto);
     void sigContactListResponse(const std::string& dto);
@@ -64,6 +71,9 @@ signals:
     void sigQueryUserBaseInfoResponse(const std::string& dto);
     void sigQueryGroupBaseInfoResponse(const std::string& dto);
     void sigQueryGroupNoticesResponse(const std::string& dto);
+    void sigQueryNewMessageResponse(const std::string& dto);
+    void sigQueryFileInfoResponse(const std::string& dto);
+    void sigQueryMsgPicInfoResponse(const std::string& dto);
 
     void sigConnServerFailed();
     void sigStartGRPCService();
@@ -99,8 +109,7 @@ namespace BusinessLayer {
 
         void sigEmailCodeResponse(const std::string& dto);
 
-        void sigLoginSuccess(const std::string& ssid);
-        void sigLoginFailed(const std::string& ssid);
+        void sigLoginResult(const std::string& dto);
 
         void sigMessageResponse(const std::string& dto);
         void sigContactListResponse(const std::string& dto);
@@ -110,6 +119,9 @@ namespace BusinessLayer {
         void sigQueryUserBaseInfoResponse(const std::string& dto);
         void sigQueryGroupBaseInfoResponse(const std::string& dto);
         void sigQueryGroupNoticesResponse(const std::string& dto);
+        void sigQueryNewMessageResponse(const std::string& dto);
+        void sigQueryFileInfoResponse(const std::string& dto);
+        void sigQueryMsgPicInfoResponse(const std::string& dto);
 
         void sigConnServerFailed();
         void sigStartGRPCService();

@@ -22,7 +22,7 @@ grpc::Status MediaServiceImpl::HeartbeatHandler(grpc::ServerContext *context, co
     std::string client_id = request->client_id();
     int64_t timestamp = request->timestamp();
 
-    LOG_INFO("Received heartbeat from client: " << client_id << ", timestamp: " << timestamp);
+    // LOG_INFO("Received heartbeat from client: " << client_id << ", timestamp: " << timestamp);
     // 设置响应
     response->set_alive(true);
     return grpc::Status::OK;
@@ -37,8 +37,22 @@ grpc::Status FileTransferServiceImpl::InitUpload(
     std::lock_guard<std::mutex> lock(session_mutex_);
     fileSavePath = config["realtime-info"]["fileSavePath"].as<std::string>();
     // 生成唯一ID并创建临时目录
-    std::string file_id = GenerateFileID();
+    std::string file_id;
+
+    // msg-pic business's file-id is its file name
+    if (request->type() != MSG_PIC) {
+        file_id = GenerateFileID();
+    }else {
+        size_t pos = request->file_name().find_last_of('.');
+        if (pos != std::string::npos)
+            file_id = request->file_name().substr(0,pos);
+        else
+            file_id = request->file_name();
+    }
     std::string temp_dir = fileSavePath + "/tmp/" + file_id + "/";
+
+    LOG_INFO("file upload request id : " << file_id <<  " , name : " << request->file_name())
+
 
     if (!std::filesystem::create_directories(temp_dir)) {
         response->set_success(false);
@@ -50,6 +64,7 @@ grpc::Status FileTransferServiceImpl::InitUpload(
     UploadSession newSession(
         request->ssid(),
         request->file_name(),
+        request->type(),
         (request->file_size() + CHUNK_SIZE - 1) / CHUNK_SIZE,
         temp_dir,
         0
@@ -128,6 +143,18 @@ grpc::Status FileTransferServiceImpl::UploadFile(
             std::string resDTO;
             fdto.SerializeToString(&resDTO);
             toNormalSocket.sendMsg(resDTO, SSDTO::C_FILE);
+
+            // update user base info
+            if (session->file_business_type == AVATAR) {
+                SSDTO::UserBaseInfoDTO udto;
+                udto.set_ssid(session->ssid);
+                udto.set_avatar_file_id(current_file_id);
+                udto.set_avatar_remote_path(final_path);
+
+                resDTO.clear();
+                udto.SerializeToString(&resDTO);
+                toNormalSocket.sendMsg(resDTO, SSDTO::U_USER_BASE_INFO);
+            }
         } else {
             response->set_success(false);
             response->set_message("file merge failed !");

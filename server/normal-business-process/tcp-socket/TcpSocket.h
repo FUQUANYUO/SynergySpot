@@ -7,6 +7,7 @@ public:
     TcpSocket(int socket);
     ~TcpSocket();
     int connectToHost(std::string ip, unsigned short port);
+    ssize_t recvPartial(char* buffer, size_t bufferSize);
     int sendMsg(std::string msg,int business_type);
     int recvMsg(std::string &msg, int &business_type);
     int getFD() {

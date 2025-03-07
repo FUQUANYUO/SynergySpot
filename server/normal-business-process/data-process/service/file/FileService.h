@@ -23,6 +23,8 @@ public:
 
     FileStorageDTO getFileByFileID(const std::string& fileID);
 
+    FileStorageDTO getFileByFilePath(const std::string& filePath);
+
 private:
     FileStorageDAO fileDAO;
 };

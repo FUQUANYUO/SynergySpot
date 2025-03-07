@@ -16,6 +16,9 @@
 #include "common-service/group-member-service/GroupMemberService.h"
 #include "common-service/group-info-service/GroupInfoService.h"
 #include "common-service/friendship-service/FriendshipService.h"
+#include "common-service/login-record-service/LoginRecordService.h"
+#include "common-service/file-service/FileService.h"
+
 
 #include <QCache>
 
@@ -59,7 +62,8 @@ enum CommonPath {
 //       -- file          //
 // ---------------------- //
 
-class SS_API CommonData {
+class SS_API CommonData : public QObject {
+    Q_OBJECT
 public:
     static CommonData * getInstance();
     static void destroyInstance();
@@ -75,8 +79,15 @@ public:
     void                       setCurUserInfo(const UserBaseInfoDTO& curUserInfo);
 
     UserBaseInfoDTO            getUserInfoBySSID(const QString& ssid);
-    bool                       setUserInfoBySSID(const UserBaseInfoDTO& userInfo);
+    bool                       updateUserInfoBySSID(const UserBaseInfoDTO& userInfo);
     bool                       addUserInfoByServer(const UserBaseInfoDTO& userInfo);
+
+    // user login record
+    bool                       setLoginRecord(const LoginRecordDTO& loginInfo);
+    bool                       removeLoginRecordBySSID(const QString& ssid);
+    bool                       removeLoginRecordBefore(time_t date);
+    QList<LoginRecordDTO>      getLoginRecord(int limit);
+
 
     // friendship
     QList<FriendshipDTO>       getCurUserFriendship();
@@ -85,7 +96,8 @@ public:
 
     // msg content
     QList<MessageContentDTO>   getMessageContentData(int pageSize, int pageNum);
-    bool                       setMessageContentData(const QList<MessageContentDTO>& dto);
+    bool                       setMessageContentData(const QList<MessageContentDTO>& dto,bool isFromRemote = false);
+    time_t                     getLastMessageTime() const;
 
     // group info
     QList<GroupBaseInfoDTO>    getAllGroupInfo(int pageSize, int pageNum);
@@ -109,9 +121,11 @@ public:
     void                       addMsgPicToTmp(const QImage& image, const std::string& picName);
     QImage                     getMsgPicPathFromTmp(const std::string& picName);
 
-    // tmp data for the file
-    void                       addFileToTmp();
-    std::string                getFilePathFromTmp();
+    // file data
+    FileStorageDTO             getFileInfoById(const QString& fileId);
+    FileStorageDTO             getFileInfoByPath(const QString& filePath);
+    QList<FileStorageDTO>      getFileInfosBySSID(const QString& ssid,int pageSize,int pageNum);
+    bool                       setFileInfo(const FileStorageDTO& fileInfo);
 
     // avatar data
     void                       addAvatarToData();
@@ -133,7 +147,13 @@ public:
     void setCacheMaxSize(int maxSize) {
         _cacheMaxSize = maxSize;
     }
+signals:
+    void sigUpdateAvatarData();
+    void sigUpdateMsgView();
+    void sigSyncMsgContentDTO(const QList<MessageContentDTO>& dto);
+    void sigSyncMsgPicFromRemote(const QList<QString>& files);
 
+    void sigAllDataLoadFinished();
 private:
     void init();
     explicit CommonData();
@@ -146,6 +166,7 @@ private:
     UserBaseInfoDTO         _userInfo;
     YAML::Node              _node;
     LiteConn                *_liteConn;
+    LiteConn                *_loginDB;
 
     int                     _cacheMaxSize;
 // ------------------ service -------------------- //
@@ -155,6 +176,8 @@ private:
     GroupMemberService      *groupMemberService;
     GroupInfoService        *groupInfoService;
     FriendshipService       *friendshipService;
+    FileService             *fileService;
+    LoginRecordService      *loginRecordService;
 // ------------------ service -------------------- //
 
 // ------------------ cache map ------------------ //
@@ -165,7 +188,6 @@ private:
 
     static CommonData * instance;
 };
-
 
 
 #endif //COMMONDATA_H

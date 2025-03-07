@@ -83,8 +83,8 @@ struct MessageContentDO {
     std::string senderSsid;
     uint8_t contentType;
     std::string content;
-    std::string fileId;
-    time_t createTime;
+    std::vector<std::string> fileIds;
+    uint64_t createTime;
 };
 
 // 消息接收者 DO

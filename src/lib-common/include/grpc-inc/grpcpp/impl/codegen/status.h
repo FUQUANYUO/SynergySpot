@@ -104,7 +104,7 @@ class Status {
 
   // Pre-defined special status objects.
   /// An OK pre-defined instance.
-  static const Status& OK;
+  static grpc::Status OK;
   /// A CANCELLED pre-defined instance.
   static const Status& CANCELLED;
 

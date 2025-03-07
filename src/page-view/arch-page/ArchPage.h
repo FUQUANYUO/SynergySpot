@@ -50,6 +50,8 @@ public:
 public slots:
     void sltShowMaskEffect();
     void sltHideMaskEffect();
+
+    void sltTriggerUpdate();
 private:
     explicit ArchPage(QWidget * parent = nullptr);
     ~ArchPage() override;

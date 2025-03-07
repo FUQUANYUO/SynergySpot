@@ -68,6 +68,7 @@ SET(
         SRC_CPP                      ${SRC_CPP}
         ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/log/Log.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/get-time/GetCurTime.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/uuid/GenUUID.cpp
 )
 
 QT_ADD_RESOURCES(

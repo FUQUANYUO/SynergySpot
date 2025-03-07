@@ -30,6 +30,7 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
@@ -76,6 +77,32 @@ template<> ::FileRequest* Arena::CreateMaybeMessage<::FileRequest>(Arena*);
 template<> ::FileResponse* Arena::CreateMaybeMessage<::FileResponse>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 
+enum FileBusinessType : int {
+  AVATAR = 0,
+  FILE_STORAGE = 1,
+  MSG_PIC = 2,
+  FileBusinessType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  FileBusinessType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
+};
+bool FileBusinessType_IsValid(int value);
+constexpr FileBusinessType FileBusinessType_MIN = AVATAR;
+constexpr FileBusinessType FileBusinessType_MAX = MSG_PIC;
+constexpr int FileBusinessType_ARRAYSIZE = FileBusinessType_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* FileBusinessType_descriptor();
+template<typename T>
+inline const std::string& FileBusinessType_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, FileBusinessType>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function FileBusinessType_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    FileBusinessType_descriptor(), enum_t_value);
+}
+inline bool FileBusinessType_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, FileBusinessType* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<FileBusinessType>(
+    FileBusinessType_descriptor(), name, value);
+}
 // ===================================================================
 
 class FileInitRequest final :
@@ -201,9 +228,10 @@ class FileInitRequest final :
 
   enum : int {
     kFileNameFieldNumber = 1,
-    kSsidFieldNumber = 3,
-    kTokensFieldNumber = 4,
+    kSsidFieldNumber = 4,
+    kTokensFieldNumber = 5,
     kFileSizeFieldNumber = 2,
+    kTypeFieldNumber = 3,
   };
   // string file_name = 1;
   void clear_file_name();
@@ -219,7 +247,7 @@ class FileInitRequest final :
   std::string* _internal_mutable_file_name();
   public:
 
-  // string ssid = 3;
+  // string ssid = 4;
   void clear_ssid();
   const std::string& ssid() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -233,7 +261,7 @@ class FileInitRequest final :
   std::string* _internal_mutable_ssid();
   public:
 
-  // string tokens = 4;
+  // string tokens = 5;
   void clear_tokens();
   const std::string& tokens() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -256,6 +284,15 @@ class FileInitRequest final :
   void _internal_set_file_size(int64_t value);
   public:
 
+  // .FileBusinessType type = 3;
+  void clear_type();
+  ::FileBusinessType type() const;
+  void set_type(::FileBusinessType value);
+  private:
+  ::FileBusinessType _internal_type() const;
+  void _internal_set_type(::FileBusinessType value);
+  public:
+
   // @@protoc_insertion_point(class_scope:FileInitRequest)
  private:
   class _Internal;
@@ -267,6 +304,7 @@ class FileInitRequest final :
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr ssid_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr tokens_;
   int64_t file_size_;
+  int type_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_FileTransferDTO_2eproto;
 };
@@ -1096,7 +1134,27 @@ inline void FileInitRequest::set_file_size(int64_t value) {
   // @@protoc_insertion_point(field_set:FileInitRequest.file_size)
 }
 
-// string ssid = 3;
+// .FileBusinessType type = 3;
+inline void FileInitRequest::clear_type() {
+  type_ = 0;
+}
+inline ::FileBusinessType FileInitRequest::_internal_type() const {
+  return static_cast< ::FileBusinessType >(type_);
+}
+inline ::FileBusinessType FileInitRequest::type() const {
+  // @@protoc_insertion_point(field_get:FileInitRequest.type)
+  return _internal_type();
+}
+inline void FileInitRequest::_internal_set_type(::FileBusinessType value) {
+  
+  type_ = value;
+}
+inline void FileInitRequest::set_type(::FileBusinessType value) {
+  _internal_set_type(value);
+  // @@protoc_insertion_point(field_set:FileInitRequest.type)
+}
+
+// string ssid = 4;
 inline void FileInitRequest::clear_ssid() {
   ssid_.ClearToEmpty();
 }
@@ -1147,7 +1205,7 @@ inline void FileInitRequest::set_allocated_ssid(std::string* ssid) {
   // @@protoc_insertion_point(field_set_allocated:FileInitRequest.ssid)
 }
 
-// string tokens = 4;
+// string tokens = 5;
 inline void FileInitRequest::clear_tokens() {
   tokens_.ClearToEmpty();
 }
@@ -1818,6 +1876,16 @@ inline void FileResponse::set_allocated_message(std::string* message) {
 
 // @@protoc_insertion_point(namespace_scope)
 
+
+PROTOBUF_NAMESPACE_OPEN
+
+template <> struct is_proto_enum< ::FileBusinessType> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::FileBusinessType>() {
+  return ::FileBusinessType_descriptor();
+}
+
+PROTOBUF_NAMESPACE_CLOSE
 
 // @@protoc_insertion_point(global_scope)
 

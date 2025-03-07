@@ -1,6 +1,8 @@
 #include "TcpSocket.h"
-#include <iostream>
 #include <cstring>
+#include <fcntl.h>
+#include <help.h>
+#include <iostream>
 #include <unistd.h>
 
 using namespace std;
@@ -10,6 +12,8 @@ TcpSocket::TcpSocket() {
 
 TcpSocket::TcpSocket(int socket) {
     m_fd = socket;
+    int flags = fcntl(m_fd, F_GETFL, 0);
+    fcntl(m_fd, F_SETFL, flags | O_NONBLOCK);
 }
 
 TcpSocket::~TcpSocket() {
@@ -24,6 +28,7 @@ int TcpSocket::connectToHost(string ip, unsigned short port) {
     saddr.sin_family = AF_INET;
     saddr.sin_port = htons(port);
     inet_pton(AF_INET, ip.data(), &saddr.sin_addr.s_addr);
+
     int ret = connect(m_fd, (struct sockaddr *) &saddr, sizeof(saddr));
     if (ret == -1) {
         perror("connect");
@@ -31,6 +36,26 @@ int TcpSocket::connectToHost(string ip, unsigned short port) {
     }
     cout << "成功和服务器建立连接..." << endl;
     return ret;
+}
+ssize_t TcpSocket::recvPartial(char *buffer, size_t bufferSize) {
+    ssize_t bytesRead = recv(m_fd, buffer, bufferSize, 0);
+
+    if (bytesRead == -1) {
+        if (errno == EAGAIN || errno == EWOULDBLOCK) {
+            // 没有数据可读，非阻塞模式下正常情况
+            return 0;
+        } else {
+            // 发生错误
+            LOG_ERROR("recv error: " << strerror(errno));
+            return -1;
+        }
+    } else if (bytesRead == 0) {
+        // 对端关闭连接
+        return -1;
+    }
+
+    // 返回实际读取的字节数
+    return bytesRead;
 }
 
 int TcpSocket::sendMsg(std::string msg,int business_type) {
@@ -53,10 +78,14 @@ int TcpSocket::sendMsg(std::string msg,int business_type) {
     return ret;
 }
 
-int TcpSocket::recvMsg(std::string &msg, int &business_type) {  // 改为 int 类型
-    // 读取协议头（8 字节）
+int TcpSocket::recvMsg(std::string &msg, int &business_type) {
     int len = 0, type = 0;
+
+    // 读取协议头（8字节）
     if (readn((char*)&len, 4) <= 0 || readn((char*)&type, 4) <= 0) {
+        if (errno == EAGAIN || errno == EWOULDBLOCK) {
+            return 1;
+        }
         return -1;
     }
 
@@ -64,18 +93,37 @@ int TcpSocket::recvMsg(std::string &msg, int &business_type) {  // 改为 int �
     len = ntohl(len);
     business_type = ntohl(type);
 
-    // 读取数据
+    // 读取消息体
     char *buf = new char[len + 1];
-    int ret = readn(buf, len);
-    if (ret != len) {
-        delete[] buf;
-        return -1;
+    int totalRead = 0, ret = 0;
+
+    while (totalRead < len) {
+        ret = readn(buf + totalRead, len - totalRead);
+        if (ret > 0) {
+            totalRead += ret;
+        } else if (ret == 0) {
+            delete[] buf;
+            return -1;  // 连接关闭
+        } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
+            // 数据未完全到达，等待下一次 epoll
+            break;
+        } else {
+            delete[] buf;
+            return -1;  // 发生错误
+        }
     }
-    buf[len] = '\0';
-    msg = buf;
+
+    buf[totalRead] = '\0';
+    msg.assign(buf, totalRead);
     delete[] buf;
+
+    if (totalRead < len) {
+        return 1;  // 数据未完全到达，等待下次触发
+    }
     return 0;
 }
+
+
 
 int TcpSocket::readn(char *buf, int size) {
     int nread = 0;

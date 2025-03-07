@@ -20,9 +20,11 @@ public:
 
     int64_t insert(const MessageContentDO& message) override;
 
-    std::vector<MessageContentDO> listBySender(const std::string& senderSsid, int pageSize, int pageNum) override;
+    std::vector<MessageContentDO> listBySender(const std::string& senderSsid, int pageSize, int pageNum, time_t lastTime) override;
 
     int getMessageContentCount(const std::string& senderSsid) override;
+
+    bool insertFiles(int64_t messageId, const std::vector<std::string>& fileIds);
 private:
     std::shared_ptr<MysqlConn> m_conn;
 };

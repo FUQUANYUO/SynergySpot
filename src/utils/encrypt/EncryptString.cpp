@@ -4,6 +4,9 @@
 #include <openssl/md5.h>
 #include <openssl/sha.h>
 #include <openssl/err.h>
+#include <openssl/aes.h>
+#include <openssl/evp.h>
+#include <openssl/rand.h>
 #include <sstream>
 #include <iomanip>
 #include <random>
@@ -69,6 +72,82 @@ std::string EncryptString::generatePasswordSalt(size_t length) {
     }
 
     return salt;
+}
+
+std::string EncryptString::encryptStringByAES(const std::string &str,const std::string encryptKey) {
+    EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
+    if (!ctx) {
+        LOG_ERROR("Failed to create AES encryption context.");
+        return "";
+    }
+
+    // 初始化加密操作
+    if (EVP_EncryptInit_ex(ctx, EVP_aes_256_ecb(), nullptr,
+                           reinterpret_cast<const unsigned char*>(encryptKey.c_str()), nullptr) != 1) {
+        LOG_ERROR("Failed to initialize AES encryption.");
+        EVP_CIPHER_CTX_free(ctx);
+        return "";
+                           }
+
+    // 加密数据
+    std::vector<unsigned char> cipherText(str.size() + EVP_CIPHER_CTX_block_size(ctx));
+    int len;
+    if (EVP_EncryptUpdate(ctx, cipherText.data(), &len,
+                          reinterpret_cast<const unsigned char*>(str.c_str()), str.size()) != 1) {
+        LOG_ERROR("Failed to encrypt data.");
+        EVP_CIPHER_CTX_free(ctx);
+        return "";
+                          }
+
+    // 结束加密
+    int cipherTextLen = len;
+    if (EVP_EncryptFinal_ex(ctx, cipherText.data() + len, &len) != 1) {
+        LOG_ERROR("Failed to finalize AES encryption.");
+        EVP_CIPHER_CTX_free(ctx);
+        return "";
+    }
+    cipherTextLen += len;
+
+    EVP_CIPHER_CTX_free(ctx);
+    return std::string(cipherText.begin(), cipherText.begin() + cipherTextLen);
+}
+
+std::string EncryptString::decryptStringByAES(const std::string &str,const std::string encryptKey) {
+    EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
+    if (!ctx) {
+        LOG_ERROR("Failed to create AES decryption context.");
+        return "";
+    }
+
+    // 初始化解密操作
+    if (EVP_DecryptInit_ex(ctx, EVP_aes_256_ecb(), nullptr,
+                           reinterpret_cast<const unsigned char*>(encryptKey.c_str()), nullptr) != 1) {
+        LOG_ERROR("Failed to initialize AES decryption.");
+        EVP_CIPHER_CTX_free(ctx);
+        return "";
+                           }
+
+    // 解密数据
+    std::vector<unsigned char> plainText(str.size());
+    int len;
+    if (EVP_DecryptUpdate(ctx, plainText.data(), &len,
+                          reinterpret_cast<const unsigned char*>(str.c_str()), str.size()) != 1) {
+        LOG_ERROR("Failed to decrypt data.");
+        EVP_CIPHER_CTX_free(ctx);
+        return "";
+                          }
+
+    // 结束解密
+    int plainTextLen = len;
+    if (EVP_DecryptFinal_ex(ctx, plainText.data() + len, &len) != 1) {
+        LOG_ERROR("Failed to finalize AES decryption.");
+        EVP_CIPHER_CTX_free(ctx);
+        return "";
+    }
+    plainTextLen += len;
+
+    EVP_CIPHER_CTX_free(ctx);
+    return std::string(plainText.begin(), plainText.begin() + plainTextLen);
 }
 
 

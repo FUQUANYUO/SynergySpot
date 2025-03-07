@@ -24,6 +24,8 @@
 
 #define g_pUserPage(_TYPE_,_INFO1_,_INFO2_) UserPage::getInstance(_TYPE_,_INFO1_,_INFO2_)
 
+struct UserBaseInfoDTO;
+
 class ElaInteractiveCard;
 class ElaToolButton;
 class ElaPushButton;
@@ -48,6 +50,9 @@ public:
 signals:
     void sigShowArchPageMaskEffect();
     void sigHideArchPageMaskEffect();
+
+    void sigUserAvatarChanged(const QString& localPath);
+    void sigUserInfoChanged(const UserBaseInfoDTO& userInfo);
 public slots:
 private:
     UserPage() = default;

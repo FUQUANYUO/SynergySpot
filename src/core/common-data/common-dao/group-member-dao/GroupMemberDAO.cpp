@@ -14,7 +14,7 @@ bool GroupMemberDAO::addMember(const GroupMemberInfoDO &member) {
     std::vector<std::string> params = {
         member.ssidGroup.toStdString(),
         member.ssidMember.toStdString(),
-        member.createTime.toString("yyyy-MM-dd HH:mm:ss").toStdString()
+        std::to_string(member.createTime)
     };
 
     return _db.update(sql, params);
@@ -42,7 +42,7 @@ QList<GroupMemberInfoDO> GroupMemberDAO::listMembers(const QString &groupSsid, i
         member.id = std::stoll(row[0]);
         member.ssidGroup = QString::fromStdString(row[1]);
         member.ssidMember = QString::fromStdString(row[2]);
-        member.createTime = QDateTime::fromString(QString::fromStdString(row[3]), "yyyy-MM-dd HH:mm:ss");
+        member.createTime = std::stoll(row[3]);
         members.append(member);
     }
     return members;

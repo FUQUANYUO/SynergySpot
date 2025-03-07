@@ -5,7 +5,7 @@
 #ifndef COMMONDATABASEDO_H
 #define COMMONDATABASEDO_H
 
-#include <QDateTime>
+#include <QList>
 
 // 性别枚举（与数据库CHECK约束对应）
 enum class UserSex {
@@ -32,8 +32,8 @@ struct UserBaseInfoDO {
     UserSex sex;             // 存储时需要转换为'M'/'F'
     QString personalSign;
     quint32 thumbUpCount = 0;
-    QDateTime birthday;
-    QDateTime createTime;
+    time_t birthday;
+    time_t createTime;
     quint8 region = 2;       // DEFAULT 2
 };
 
@@ -45,7 +45,7 @@ struct FriendshipDO {
     QString friendSSID;
     qint32 shipStatus;       // 状态值（可配合枚举使用）
     qint32 friendType = 1;   // DEFAULT 1 用户 2 群组
-    QDateTime createTime;
+    time_t createTime;
     bool isEmpty() {
         if ((ssid.isEmpty() && grouping.isEmpty() && friendSSID.isEmpty()) || id == -1) {
             return true;
@@ -63,7 +63,7 @@ struct GroupBaseInfoDO {
     QString avatar;
     QString createSSID;
     QString profile;
-    QDateTime createTime;
+    time_t createTime;
 };
 
 // 群成员信息（对应group_member_info表）
@@ -71,7 +71,7 @@ struct GroupMemberInfoDO {
     qint64 id;               // AUTOINCREMENT
     QString ssidGroup;
     QString ssidMember;
-    QDateTime createTime;
+    time_t createTime;
 };
 
 // 消息内容（对应message_content表）
@@ -80,8 +80,8 @@ struct MessageContentDO {
     QString senderSSID;
     ContentType contentType;
     QString content;
-    QString fileId;
-    QDateTime createTime;
+    QList<QString> fileId;
+    time_t createTime;
 };
 
 // 消息接收方（对应message_recipient表）
@@ -97,7 +97,7 @@ struct MessageRecipientDO {
 struct BaseStickerDO {
     qint64 stickerId;        // AUTOINCREMENT
     QString imageUrl;        // UNIQUE
-    QDateTime createdAt;
+    time_t createdAt;
 };
 
 // 用户收藏表情（对应user_collected_stickers表）
@@ -105,8 +105,25 @@ struct CollectedStickerDO {
     QString userSSID;        // PRIMARY KEY (与imageUrl组合)
     QString imageUrl;
     bool isCustom = false;   // DEFAULT 0
-    QDateTime createdAt;
+    time_t createdAt;
 };
 
+struct LoginRecordDO {
+    qint64 id;                 // AUTOINCREMENT
+    QString account;           // 登录账号
+    QString encryptedPassword; // 加密后的密码
+    time_t loginTime;       // 登录时间
+    QString deviceInfo;        // 设备信息（可选）
+};
+
+struct FileStorageDO {
+    QString fileId;
+    QString uploaderSsid;
+    QString fileName;
+    int64_t fileSize;
+    QString fileType;
+    QString storagePath;
+    time_t uploadTime;
+};
 
 #endif //COMMONDATABASEDO_H

@@ -11,8 +11,10 @@
 
 #include "../../effect-component/SS-mask-widget/SSMaskWidget.h"
 
+
+struct UserInfo;
+struct UserBaseInfoDTO;
 class ElaCalendarPicker;
-class ElaPushButton;
 class ElaLineEdit;
 
 class EditInfoPage : public QDialog {
@@ -22,6 +24,10 @@ public:
     ~EditInfoPage();
 signals:
     void sigEditPageClosed();
+    void sigUserAvatarChanged(const QString& localPath);
+    void sigUserInfoChanged(const UserBaseInfoDTO& userInfo);
+public slots:
+    void sltSetEditPageInfo(const UserInfo& info);
 protected:
     void initWindow();
     void initEdgeLayout();
@@ -31,7 +37,7 @@ protected:
     virtual void paintEvent(QPaintEvent *event);
 private:
     // ----------------- UI -----------------
-    ElaPushButton        *          _avatar              = nullptr;
+    QPushButton          *          _avatar              = nullptr;
     QLabel               *          _name                = nullptr;
     ElaLineEdit          *          _nameLineEdit        = nullptr;
     QLabel               *          _nameSize            = nullptr;

@@ -29,19 +29,19 @@ EpollEngine::~EpollEngine() {
 }
 
 void EpollEngine::handleEvents(int numEvents) {
-    for(int i = 0; i < numEvents; ++i){
+    for (int i = 0; i < numEvents; ++i) {
         int fd = events[i].data.fd;
-        if(events[i].events & EPOLLIN){
+        if (events[i].events & EPOLLIN) {
             // 是否为服务端监听
-            if(s.getLisentFD() == fd){
-                TcpSocket * tp = s.acceptConn();
-                auto * info = new SockInfo;
+            if (s.getListenFD() == fd) {
+                auto tp = s.acceptConn();
+                auto info = std::make_shared<SockInfo>();
                 info->tcp = tp;
                 info->ssid = "";
                 fd_sockets[tp->getFD()] = info;
-                this->addEvent(tp->getFD(),EPOLLIN);
-            }else{
-                auto * readArgs = new ReadArgs;
+                this->addEvent(tp->getFD(), EPOLLIN);
+            } else {
+                auto *readArgs = new ReadArgs;
                 readArgs->fd = fd;
                 readArgs->en = this;
                 Task task(working, readArgs);
@@ -49,6 +49,12 @@ void EpollEngine::handleEvents(int numEvents) {
             }
         }
     }
+}
+bool EpollEngine::modifyEvent(int fd, uint32_t eventCode)  {
+    epoll_event ev{};
+    ev.data.fd = fd;
+    ev.events = eventCode | EPOLLET;
+    return epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev) == 0;
 }
 
 int EpollEngine::waitForEvents() {
@@ -71,6 +77,6 @@ int EpollEngine::getFd() const {
     return epfd;
 }
 
-void EpollEngine::deleteEvent(int fd,epoll_event *ev) {
-    epoll_ctl(epfd,EPOLL_CTL_DEL,fd,ev);
+void EpollEngine::deleteEvent(int fd) {
+    epoll_ctl(epfd,EPOLL_CTL_DEL,fd,nullptr);
 }

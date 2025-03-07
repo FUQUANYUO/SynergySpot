@@ -18,7 +18,7 @@ qint64 FriendshipDAO::create(const FriendshipDO &friendship) {
         friendship.friendSSID.toStdString(),
         std::to_string(friendship.shipStatus),
         std::to_string(friendship.friendType),
-        friendship.createTime.toString("yyyy-MM-dd HH:mm:ss").toStdString()
+        std::to_string(friendship.createTime)
     };
 
     if (_db.update(sql, params)) {
@@ -59,7 +59,7 @@ FriendshipDO FriendshipDAO::findRelationship(const QString &ssid, const QString 
         friendship.friendSSID = QString::fromStdString(result[0][3]);
         friendship.shipStatus = std::stoi(result[0][4]);
         friendship.friendType = std::stoi(result[0][5]);
-        friendship.createTime = QDateTime::fromString(QString::fromStdString(result[0][6]), "yyyy-MM-dd HH:mm:ss");
+        friendship.createTime = std::stoll(result[0][6]);
         return friendship;
     }
     return {-1};
@@ -80,7 +80,7 @@ QList<FriendshipDO> FriendshipDAO::listByUser(const QString &ssid) {
         friendship.friendSSID = QString::fromStdString(result[i][3]);
         friendship.shipStatus = std::stoi(result[i][4]);
         friendship.friendType = std::stoi(result[i][5]);
-        friendship.createTime = QDateTime::fromString(QString::fromStdString(result[i][6]), "yyyy-MM-dd HH:mm:ss");
+        friendship.createTime = std::stoll(result[0][6]);
         friendships.append(friendship);
     }
     return friendships;

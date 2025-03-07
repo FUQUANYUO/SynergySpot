@@ -6,11 +6,15 @@
 #include "base/client-request-handler/ClientRequestHandler.h"
 #include "common-data/CommonData.h"
 
+#include "contact-page/ContactPage.h"
+#include "message-page/MessagePage.h"
+#include "user-page/UserPage.h"
 #include "land-page/LandPage.h"
 #include "land-page/sign-up-page/SignUpPage.h"
 #include "land-page/recover-pw-page/RecoverPWPage.h"
 #include "plugin-manager/StrategyManager.h"
 #include "effect-component/cv-process-video-strategy/CVProVideoStrategy.h"
+#include "effect-component/loading-dialog/LoadingDialog.h"
 #include "arch-page/ArchPage.h"
 
 #include "ela-widget-tools/ElaApplication.h"
@@ -27,16 +31,12 @@
 #include "yaml-cpp/yaml.h"
 //------------   end core     ------------//
 
-#include <QProcess>
-#include <QLocalServer>
-#include <QLocalSocket>
-#include <QFileDialog>
 #include <QJsonDocument>
 #include <QLocalServer>
+#include <QLocalSocket>
+#include <QProcess>
 #include <QTimer>
-#include <contact-page/ContactPage.h>
-#include <message-page/MessagePage.h>
-#include <user-page/UserPage.h>
+
 
 MainLogic::MainLogic() {
     std::string yamlPath = g_pCommonData->getYamlPath();
@@ -46,6 +46,7 @@ MainLogic::MainLogic() {
 
     // init log orient
     SSLog::initLogFile(logName);
+
     LOG_INFO("--------------------------- SynergySpot.exe Beginning ----------------------------")
 }
 
@@ -68,7 +69,7 @@ MainLogic::~MainLogic() {
     delete _pGRPCProcess;
 }
 
-int MainLogic::startMainLogic(QApplication * app) {
+int MainLogic::startMainLogic(QApplication *app) {
     g_pClientRequestHandler;
     eApp->init();
 
@@ -84,187 +85,518 @@ int MainLogic::startMainLogic(QApplication * app) {
     BKStrategyPluginName = "/EffectComponentPlugin.dll";
 #endif
     // init Background strategy plugin
-    if(g_pPluginManager->loadPlugin(BK_PLUGIN_NAME,execPath + BKStrategyPluginName)){
-        // copy bk source from landpage rc to bin
-        QDir tmpDir;
-        if(!tmpDir.exists(execPath + "/assets")){
-            tmpDir.mkpath(execPath + "/assets");
-            //            g_pLandPage->saveQrcToFile(":/land-page/rc-page/video/bk_src.mp4",
-            //                                       execPath + "/assets/bk_src.mp4");
-        }
+    if (!g_pPluginManager->loadPlugin(BK_PLUGIN_NAME, execPath + BKStrategyPluginName)) {
+        LOG_ERROR(BK_PLUGIN_NAME << "dont find!!!")
+        return -1;
+    }
+    // copy bk source from landpage rc to bin
+    QDir tmpDir;
+    if (!tmpDir.exists(execPath + "/assets")) {
+        tmpDir.mkpath(execPath + "/assets");
+        //            g_pLandPage->saveQrcToFile(":/land-page/rc-page/video/bk_src.mp4",
+        //                                       execPath + "/assets/bk_src.mp4");
+    }
 
-        // init effect bk source
-        dynamic_cast<CVProVideoStrategy*>(g_pPluginManager->getCurrentPlugin(BK_PLUGIN_NAME))->initialize(
-                execPath + "/assets/bk_src.mp4"
-        );
+    // init effect bk source
+    dynamic_cast<CVProVideoStrategy *>(g_pPluginManager->getCurrentPlugin(BK_PLUGIN_NAME))->initialize(execPath + "/assets/bk_src.mp4");
 
-        // get data from server and load cache
-        g_pMessagePage->loadCacheMsg(g_pCommonData->getMessageContentData(99,1));
-        g_pContactPage->loadCacheContact(g_pCommonData->getCurUserFriendship());
+    g_pLandPage->show();
+    _curWindow = g_pLandPage;
 
-        g_pLandPage->show();
-        _curWindow = g_pLandPage;
+    connect(g_pClientRequestHandler, &ClientRequestHandler::sigConnServerFailed, this, [=]() {
+        ElaMessageBar::error(ElaMessageBarType::Top, "错误", "无法连接到远程服务器!", 600000, _curWindow);
+        _enable = false;
+        g_pLandPage->sltHideLoading();
+    });
+    connect(g_pClientRequestHandler, &ClientRequestHandler::sigStartGRPCService, this, [=]() {
+        _pGRPCProcess = new QProcess(app);
+        _pIPCServer = new QLocalServer(this);
 
-        connect(g_pClientRequestHandler,&ClientRequestHandler::sigConnServerFailed,this,[=]() {
-            ElaMessageBar::error(ElaMessageBarType::Top,"错误","无法连接到远程服务器!",6000, _curWindow);
+        connect(_pGRPCProcess, &QProcess::finished, this, [=](int exitCode, QProcess::ExitStatus exitStatus) {
+            if (exitStatus == QProcess::NormalExit) {
+                if (exitCode != 0) {
+                    ElaMessageBar::error(ElaMessageBarType::Top, "错误", "GRPC服务端连接出现错误，\n子进程连接已关闭！!", 60000, _curWindow);
+                    g_pLandPage->sltHideLoading();
+                }
+            }
         });
-        connect(g_pClientRequestHandler,&ClientRequestHandler::sigStartGRPCService,this,[=]() {
-            _pGRPCProcess = new QProcess(app);
-            _pIPCServer   = new QLocalServer(this);
-
-            connect(_pGRPCProcess,&QProcess::finished,this,[=](int exitCode, QProcess::ExitStatus exitStatus) {
-                if(exitStatus == QProcess::NormalExit) {
-                    if (exitCode != 0) {
-                        ElaMessageBar::error(ElaMessageBarType::Top,"错误","GRPC 服务端连接出现错误！!",12000, _curWindow);
-                    }
-                }
-            });
-            connect(_pIPCServer,&QLocalServer::newConnection,_pIPCServer,[&]() {
-                _pGRCSocket = _pIPCServer->nextPendingConnection();
-                if (!_pGRCSocket) {
-                     LOG_ERROR("Failed to get client socket.")
-                    return ;
-                }
-
-                connect(_pGRCSocket,&QLocalSocket::readyRead,_pGRCSocket,[=]() {
-                    QByteArray response = _pGRCSocket->readAll();
-                    QJsonDocument doc = QJsonDocument::fromJson(response);
-                    if (!doc.isNull()) {
-                        QJsonObject resp = doc.object();
-                        if (resp["status"] == "success") {
-                            if (resp["type"] == "file-upload" && resp.contains("file-id")) {
-                                LOG("test file uuid : " << resp["file-id"].toString().toStdString())
-                            }
-                            if (resp["type"] == "file-download" && resp.contains("local-path")) {
-                                LOG("test file at : " << resp["local-path"].toString().toStdString())
-                            }
-                        }else {
-                            LOG("test file failed : " << resp["message"].toString().toStdString())
-                        }
-                    }
-                });
-            });
-
-            // start ipc
-            if (!_pIPCServer->listen("SynergySpotIPC")) {
-                LOG_ERROR("IPC start failed!")
+        connect(_pIPCServer, &QLocalServer::newConnection, _pIPCServer, [&]() {
+            _pGRCSocket = _pIPCServer->nextPendingConnection();
+            if (!_pGRCSocket) {
+                LOG_ERROR("Failed to get client socket.")
+                return;
             }
 
-            _pGRPCProcess->start(processName,{"100000","绅士柴",""});
+            connect(_pGRCSocket, &QLocalSocket::readyRead, _pGRCSocket, [=]() {
+                QByteArray response = _pGRCSocket->readAll();
+                QJsonDocument doc = QJsonDocument::fromJson(response);
+                if (!doc.isNull()) {
+                    QJsonObject resp = doc.object();
+                    if (resp["status"] == "success") {
+                        FileStorageDTO responseFileDto;
+                        responseFileDto.fileId = resp["file-id"].toString();
+                        responseFileDto.uploaderSsid = resp["uploader-ssid"].toString();
+                        responseFileDto.fileName = resp["file-name"].toString();
+                        responseFileDto.fileSize = resp["file-size"].toInt();
+                        responseFileDto.fileType = resp["file-type"].toString();
+                        responseFileDto.storagePath = resp["local-path"].toString();
+                        responseFileDto.uploadTime = resp["upload-time"].toInt();
+
+                        // avatar
+                        if (resp["business-type"].toString() == "avatar") {
+                            UserBaseInfoDTO curInfo;
+                            curInfo.ssid = responseFileDto.uploaderSsid;
+                            curInfo.avatarPath = resp["local-path"].toString();
+                            g_pCommonData->updateUserInfoBySSID(curInfo);
+                            curInfo = g_pCommonData->getCurUserInfo();
+                            if (curInfo.ssid == responseFileDto.uploaderSsid) {
+                                curInfo.avatarPath = resp["local-path"].toString();
+                                g_pCommonData->setCurUserInfo(curInfo);
+                            }
+                            emit g_pCommonData->sigUpdateAvatarData();
+
+                            _dataLoadCounter--;
+                            checkAllDataLoaded();
+                        }
+                        // msg pic
+                        else if (resp["business-type"].toString() == "msg_pic") {
+                            // if (resp["type"] == "file-upload") {
+                            //
+                            // }
+                            if (resp["type"] == "file-download") {
+                                emit g_pCommonData->sigUpdateMsgView();
+
+                                _dataLoadCounter--;
+                                checkAllDataLoaded();
+                            }
+                        }
+
+                        // storage in local file info
+                        if (g_pCommonData->getFileInfoById(resp["file-id"].toString()).fileId.isEmpty()) {
+                            g_pCommonData->setFileInfo(responseFileDto);
+
+                            _dataLoadCounter--;
+                            checkAllDataLoaded();
+                        }
+                    } else if (resp["status"] == "error" && resp["message"].toString().contains("grpc")) {
+                        LOG(resp["message"].toString().toStdString())
+                        ElaMessageBar::error(ElaMessageBarType::Top, "错误", "GRPC 服务端连接出现错误！!", 3000, _curWindow);
+                    } else {
+                        LOG("file failed : " << resp["message"].toString().toStdString())
+                        _dataLoadCounter--;
+                        checkAllDataLoaded();
+                    }
+                }
+            });
         });
 
-        // trigger verify account request
-        connect(g_pLandPage,&LandPage::sigSignInRequest,this,[=](const QString& SSID,const QString& password){
+        // start ipc
+        if (!_pIPCServer->listen("SynergySpotIPC")) {
+            LOG_ERROR("IPC start failed!")
+        }
+
+        // start grpc sub process
+        _pGRPCProcess->start(processName);
+    });
+
+    // trigger verify account request
+    connect(g_pLandPage, &LandPage::sigSignInRequest, this, [=](const QString &SSID, const QString &password) {
+        do {
+            if (!_enable) {
+                LOG_ERROR("sign in request reject")
+                ElaMessageBar::error(ElaMessageBarType::TopLeft, "错误", "无法连接到服务器!", 600000, _curWindow);
+                break;
+            }
             SSDTO::LoginCheckDTO ldto;
             ldto.set_ssid(SSID.toStdString());
             ldto.set_password(password.toStdString());
             ldto.set_is_pass(false);
             std::string resDTO;
             ldto.SerializeToString(&resDTO);
-            g_pClientRequestHandler->sigVerifyAccountRequest(resDTO);
-            if (SSID == "121212" || password == "1") {
-                // init user data dir
-                // UserBaseInfoDTO user = g_pCommonData->getUserInfoBySSID(SSID);
-                // if (user.ssid == "-1") {
-                //     // load animation
-                //     emit g_pClientRequestHandler->sigQueryUserBaseInfoRequest(SSID.toStdString());
-                // }
-                // TODO: async from server data
-                g_pCommonData->setCurUserInfo({"100000","绅士柴",""});
+            emit g_pClientRequestHandler->sigVerifyAccountRequest(resDTO);
 
-                // go to arch page
-                g_pArchPage->show();
-                _curWindow = g_pArchPage;
+            // wait login result
+            g_pLandPage->sltShowLoading();
+        } while (false);
+    });
+    connect(g_pLandPage, &LandPage::sigCurrentWidChanged, this, [=](QWidget *wid) { _curWindow = wid; });
+    connect(g_pClientRequestHandler, &ClientRequestHandler::sigLoginResult, this, [=](const std::string &dto) {
+        g_pLandPage->isFreezeSignInBtn(false);
 
-                QString filePath = QFileDialog::getOpenFileName(
-                    nullptr,
-                    "选择文件",
-                    QDir::homePath(),
-                    "所有文件 (*);;"
-                );
-                QJsonObject cmd;
-                cmd["command"] = "upload";
-                cmd["local-url"] = filePath;
-                if (_pGRCSocket != nullptr) {
-                    _pGRCSocket->write(QJsonDocument(cmd).toJson());
-                    _pGRCSocket->flush();
+        SSDTO::LoginCheckDTO ldto;
+        ldto.ParseFromString(dto);
+        // login success
+        if (ldto.is_pass()) {
+            // set user info in grpc sub process
+            {
+                QJsonObject userInfo;
+                userInfo["command"] = "set";
+                userInfo["ssid"] = QString::fromStdString(ldto.ssid());
+
+                _pGRCSocket->write(QJsonDocument(userInfo).toJson());
+                _pGRCSocket->flush();
+            }
+
+            // init user data dir
+            g_pCommonData->setCurUserInfo({QString::fromStdString(ldto.ssid())});
+            auto *pConnection = new QMetaObject::Connection;
+            *pConnection = connect(g_pClientRequestHandler, &ClientRequestHandler::sigQueryUserBaseInfoResponse,
+                this, [=](const std::string &dto) {
+                    isInit = false;
+
+                    // disconnect from event listen
+                    QObject::disconnect(*pConnection);
+                    delete pConnection;
+
+                    // update user info
+                    SSDTO::UserBaseInfoDTO udto;
+                    udto.ParseFromString(dto);
+
+                    UserBaseInfoDTO baseInfoDto{
+                            QString::fromStdString(udto.ssid()),
+                            QString::fromStdString(udto.ssname()),
+                            "",
+                            QString::fromStdString(udto.sex()),
+                            QString::fromStdString(udto.personal_sign()),
+                            udto.birthday(),
+                            udto.thumb_up_count(),
+                            static_cast<uint8_t>(udto.region()),
+                            udto.create_time(),
+                    };
+                    FileStorageDTO res = g_pCommonData->getFileInfoById(QString::fromStdString(udto.avatar_file_id()));
+                    if (res.fileId == "-1" || res.fileId.isEmpty()) {
+                        // send query avatar by grpc
+                        QJsonObject resp;
+                        resp["command"] = "download";
+                        resp["file-id"] = QString::fromStdString(udto.avatar_file_id());
+                        resp["uploader-ssid"] = QString::fromStdString(udto.ssid());
+                        resp["storage-path"] = QString::fromStdString(udto.avatar_remote_path());
+                        resp["local-path"] = QString::fromStdString(g_pCommonData->getDataPath(avatar) + "/" + udto.avatar_file_id() + g_pCommonData->getImageEx());
+                        resp["business-type"] = "avatar";
+                        _pGRCSocket->write(QJsonDocument(resp).toJson());
+                        _pGRCSocket->flush();
+                        _dataLoadCounter++;
+                    } else {
+                        baseInfoDto.avatarPath = res.storagePath;
+                    }
+
+                    // refresh local cache
+                    g_pCommonData->setCurUserInfo(baseInfoDto);
+                    auto curUserInfo = g_pCommonData->getUserInfoBySSID(QString::fromStdString(ldto.ssid()));
+                    if (curUserInfo.ssid == "-1" || curUserInfo.ssid.isEmpty()) {
+                        g_pCommonData->addUserInfoByServer(baseInfoDto);
+                    } else {
+                        g_pCommonData->updateUserInfoBySSID(baseInfoDto);
+                    }
+
+                    // store user private data
+                    g_pCommonData->setLoginRecord({QString::fromStdString(ldto.ssid()),
+                                                  QString::fromStdString(ldto.password()),
+                                                  QDateTime::currentDateTime().toMSecsSinceEpoch(),
+#ifdef Q_OS_WIN
+                                                  "WINDOWS"
+#else
+    "LINUX"
+#endif
+                    });
+
+                    g_pArchPage->hide();
+
+                    // refresh data
+                    emit g_pCommonData->sigUpdateAvatarData();
+
+                    _dataLoadCounter--;
+                    checkAllDataLoaded();
+               });
+            connect(g_pClientRequestHandler, &ClientRequestHandler::sigQueryNewMessageResponse, this, [=](const std::string dto) {
+                SSDTO::GetUserMessageDTO gudto;
+                gudto.ParseFromString(dto);
+
+                QList<MessageContentDTO> newsMsg;
+                for (const auto &msg: gudto.msg()) {
+                    MessageContentDTO tmpDto;
+                    tmpDto.senderSSID = QString::fromStdString(msg.sender_ssid());
+                    tmpDto.contentType = static_cast<ContentType>(msg.content_type());
+                    tmpDto.content = QString::fromStdString(msg.content());
+                    tmpDto.recipient = {
+                            qint32(msg.recipient().recipient_type()),
+                            QString::fromStdString(msg.recipient().recipient_ssid()),
+                            msg.recipient().read_status()};
+                    tmpDto.createTime = msg.create_time();
+
+                    for (const auto &fid: msg.file_id()) {
+                        tmpDto.fileId.append(QString::fromStdString(fid));
+                    }
+
+                    newsMsg.append(tmpDto);
+                }
+                if (!newsMsg.empty())
+                    g_pCommonData->setMessageContentData(newsMsg, true);
+
+                _dataLoadCounter--;
+                checkAllDataLoaded();
+            });
+
+            connect(g_pClientRequestHandler, &ClientRequestHandler::sigContactListResponse, this, [=](const std::string dto) {
+                SSDTO::GetAllUserFriendship gfdto;
+                gfdto.ParseFromString(dto);
+
+                QList<FriendshipDTO> contacts;
+                QList<UserBaseInfoDTO> friendBaseInfos;
+                for (const auto &info: gfdto.friends_base_info()) {
+                    UserBaseInfoDTO baseInfoDto{
+                            QString::fromStdString(info.ssid()),
+                            QString::fromStdString(info.ssname()),
+                            "",
+                            QString::fromStdString(info.sex()),
+                            QString::fromStdString(info.personal_sign()),
+                            info.birthday(),
+                            info.thumb_up_count(),
+                            static_cast<uint8_t>(info.region()),
+                            info.create_time(),
+                    };
+
+                    FileStorageDTO res = g_pCommonData->getFileInfoById(QString::fromStdString(info.avatar_file_id()));
+                    if (res.fileId == "-1" || res.fileId.isEmpty()) {
+                        // send query avatar by grpc
+                        QJsonObject resp;
+                        resp["command"] = "download";
+                        resp["file-id"] = QString::fromStdString(info.avatar_file_id());
+                        resp["uploader-ssid"] = QString::fromStdString(info.ssid());
+                        resp["storage-path"] = QString::fromStdString(info.avatar_remote_path());
+                        resp["local-path"] = QString::fromStdString(g_pCommonData->getDataPath(avatar) + "/" + info.avatar_file_id() + g_pCommonData->getImageEx());
+                        resp["business-type"] = "avatar";
+                        _pGRCSocket->write(QJsonDocument(resp).toJson());
+                        _pGRCSocket->flush();
+                        _dataLoadCounter++;
+                    } else {
+                        baseInfoDto.avatarPath = res.storagePath;
+                    }
+                    if (g_pCommonData->getUserInfoBySSID(baseInfoDto.ssid).ssid.isEmpty())
+                        g_pCommonData->addUserInfoByServer(baseInfoDto);
+                }
+                for (const auto &info: gfdto.friendship_info()) {
+                    contacts.append({QString::fromStdString(info.ssid()),
+                                     QString::fromStdString(info.grouping()),
+                                     QString::fromStdString(info.friend_ssid()),
+                                     qint32(info.ship_status()),
+                                     qint32(info.friend_type()),
+                                     info.create_time()});
                 }
 
-                QTimer::singleShot(0, this, [=]() {
-                    g_pLandPage->close();
-                    g_pLandPage->destroyInstance();
-                });
+                if (!contacts.empty())
+                    g_pCommonData->setFriendshipData(contacts);
+
+                _dataLoadCounter--;
+                checkAllDataLoaded();
+            });
+
+            // get user base info
+            {
+                SSDTO::UserBaseInfoDTO udto;
+                udto.set_ssid(ldto.ssid());
+                std::string resDto;
+                udto.SerializeToString(&resDto);
+                emit g_pClientRequestHandler->sigQueryUserBaseInfoRequest(resDto);
+                _dataLoadCounter++;
             }
-        });
-        connect(g_pLandPage, &LandPage::sigCurrentWidChanged,this,[=](QWidget* wid){_curWindow = wid;});
-        connect(g_pClientRequestHandler, &ClientRequestHandler::sigLoginFailed,this,[=]() {
+
+            // get new msg from server
+            {
+                SSDTO::GetUserMessageDTO gudto;
+                gudto.set_ssid(ldto.ssid());
+                gudto.set_last_time(std::to_string(g_pCommonData->getLastMessageTime()));
+                gudto.set_page_size(99);
+                gudto.set_page_num(1);
+                std::string resUdto;
+                gudto.SerializeToString(&resUdto);
+                emit g_pClientRequestHandler->sigQueryNewMessageRequest(resUdto);
+                _dataLoadCounter++;
+            }
+
+            // get user contact
+            {
+                SSDTO::GetAllUserFriendship gfdto;
+                gfdto.set_ssid(ldto.ssid());
+                std::string resgfDto;
+                gfdto.SerializeToString(&resgfDto);
+                emit g_pClientRequestHandler->sigContactListRequest(resgfDto);
+                _dataLoadCounter++;
+            }
+        }
+        // login failed
+        else {
             g_pLandPage->clearPasswordInput();
-            ElaMessageBar::error(ElaMessageBarType::Top,"错误","账号或密码错误!",6000, g_pLandPage);
-        });
-        connect(g_pClientRequestHandler, &ClientRequestHandler::sigLoginSuccess,this,[=](const std::string& ssid) {
-            // init user data dir
-            UserBaseInfoDTO user = g_pCommonData->getUserInfoBySSID(QString::fromStdString(ssid));
-            if (user.ssid == "-1") {
-                // load animation
-                emit g_pClientRequestHandler->sigQueryUserBaseInfoRequest(ssid);
-            }
-            g_pCommonData->setCurUserInfo(user);
-
-            // go to arch page
-            g_pArchPage->show();
-            _curWindow = g_pArchPage;
-            QTimer::singleShot(0, this, [=]() {
-                g_pLandPage->close();
-                g_pLandPage->destroyInstance();
-            });
-        });
-        connect(g_pClientRequestHandler, &ClientRequestHandler::sigQueryUserBaseInfoResponse,this,[=](const std::string& dto) {
-            // cancel load animation
-            SSDTO::UserBaseInfoDTO udto;
-            udto.ParseFromString(dto);
+            ElaMessageBar::error(ElaMessageBarType::Top, "错误", "账号或密码错误!", 6000, g_pLandPage);
+            // close loading
+            g_pLandPage->sltHideLoading();
+        }
+    });
+    connect(g_pClientRequestHandler, &ClientRequestHandler::sigQueryUserBaseInfoResponse, this, [=](const std::string &dto) {
+        if (isInit)// init get user base info dont trigger this func
+            return;
+        SSDTO::UserBaseInfoDTO udto;
+        udto.ParseFromString(dto);
+        if (g_pCommonData->getUserInfoBySSID(QString::fromStdString(udto.ssid())).ssid.isEmpty()) {
             g_pCommonData->addUserInfoByServer({
-                QString::fromStdString(udto.ssid()),
-                QString::fromStdString(udto.ssname()),
-                QString::fromStdString(udto.avatar_path()),
-                QString::fromStdString(udto.sex()),
-                QString::fromStdString(udto.personal_sign()),
-                QDateTime::fromMSecsSinceEpoch(udto.birthday()),
-                udto.thumb_up_count(),
-                static_cast<uint8_t>(udto.region()),
-                QDateTime::fromMSecsSinceEpoch(udto.create_time()),
+                    QString::fromStdString(udto.ssid()),
+                    QString::fromStdString(udto.ssname()),
+                    "",
+                    QString::fromStdString(udto.sex()),
+                    QString::fromStdString(udto.personal_sign()),
+                    udto.birthday(),
+                    udto.thumb_up_count(),
+                    static_cast<uint8_t>(udto.region()),
+                    udto.create_time(),
             });
-        });
+        }
+    });
 
-        // verify email
-        connect(g_pSignUpPage,&SignUpPage::sigEmailCodeRequest,this,[=](const QString & emailAddr) {
-            g_pEmailVerify->sendEmailVerifyCode(emailAddr.toStdString(),GetCurTime::getTimeObj()->getCurTime());
-        });
-        connect(g_pClientRequestHandler,&ClientRequestHandler::sigEmailCodeResponse,this,[=](const std::string & dto) {
-            g_pSignUpPage->sigEmailCodeResponse(QString::fromStdString(g_pEmailVerify->parseEmailVerifyCode(dto)));
-        });
+    // verify email
+    connect(g_pSignUpPage, &SignUpPage::sigEmailCodeRequest, this, [=](const QString &emailAddr) {
+        g_pEmailVerify->sendEmailVerifyCode(emailAddr.toStdString(), GetCurTime::getTimeObj()->getCurTime());
+    });
+    connect(g_pClientRequestHandler, &ClientRequestHandler::sigEmailCodeResponse, this, [=](const std::string &dto) {
+        g_pSignUpPage->sigEmailCodeResponse(QString::fromStdString(g_pEmailVerify->parseEmailVerifyCode(dto)));
+    });
 
-        // sign up
-        connect(g_pSignUpPage,&SignUpPage::sigSignUpRequest,this,[=](const SignUpDataStruct & data) {
+    // sign up
+    connect(g_pSignUpPage, &SignUpPage::sigSignUpRequest, this, [=](const SignUpDataStruct &data) {
+        do {
+            if (!_enable) {
+                LOG_ERROR("sign up page reject")
+                ElaMessageBar::error(ElaMessageBarType::TopLeft, "错误", "无法连接到服务器，请检查网络!", 600000, _curWindow);
+                break;
+            }
             std::string pdSalt = EncryptPasswd::generatePasswdSalt();
             SSDTO::EnrollAccountDTO edto;
             edto.set_ssid("-1");
             edto.set_user_name(data.name);
-            edto.set_password(EncryptPasswd::encrypt(data.password,pdSalt));
+            edto.set_password(EncryptPasswd::encrypt(data.password, pdSalt));
             edto.set_email(data.email);
             edto.set_password_salt(pdSalt);
 
             std::string resDTO;
             edto.SerializeToString(&resDTO);
             g_pClientRequestHandler->sigEnrollAccountRequest(resDTO);
-        });
-        connect(g_pClientRequestHandler, &ClientRequestHandler::sigEnrollAccountResponse, this, [=](const std::string &dto) {
-            SSDTO::EnrollAccountDTO edto;
-            edto.ParseFromString(dto);
-            LOG(edto.ssid());
-        });
+        } while (false);
+    });
+    connect(g_pClientRequestHandler, &ClientRequestHandler::sigEnrollAccountResponse, this, [=](const std::string &dto) {
+        SSDTO::EnrollAccountDTO edto;
+        edto.ParseFromString(dto);
+        LOG(edto.ssid());
+    });
 
-        // contact trigger msg add tmp card info
-        connect(g_pContactPage,&ContactPage::sigTriggerAddMsgCard,g_pMessagePage,&MessagePage::addMsgCard);
-    }
+    // contact trigger msg add tmp card info
+    connect(g_pContactPage, &ContactPage::sigTriggerAddMsgCard, g_pMessagePage, &MessagePage::addMsgCard);
+
+    // cur user info changed
+    connect(g_pUserPage(Myself, {}, {}), &UserPage::sigUserAvatarChanged, this, [=](const QString &localPath) {
+        QJsonObject cmd;
+        cmd["command"] = "upload";
+        cmd["local-url"] = localPath;
+        cmd["business-type"] = "avatar";
+        cmd["uploader-ssid"] = g_pCommonData->getCurUserInfo().ssid;
+        if (_pGRCSocket != nullptr) {
+            _pGRCSocket->write(QJsonDocument(cmd).toJson());
+            _pGRCSocket->flush();
+        }
+    });
+
+    // upload to server for msg dto
+    connect(g_pCommonData, &CommonData::sigSyncMsgContentDTO, this, [=](const QList<MessageContentDTO> &dto) {
+        // send tmp pic to server
+        for (const auto &msg: dto) {
+            SSDTO::MessageContentDTO mdto;
+            for (const auto &file: msg.fileId) {// one msg contains some pic file
+                QJsonObject cmd;
+                cmd["command"] = "upload";
+                cmd["local-url"] = QString::fromStdString(g_pCommonData->getDataPath(msgPic)) + "/" + file +
+                                   QString::fromStdString(g_pCommonData->getImageEx());
+                cmd["business-type"] = "msg_pic";
+                if (_pGRCSocket != nullptr) {
+                    _pGRCSocket->write(QJsonDocument(cmd).toJson());
+                    _pGRCSocket->flush();
+                }
+                mdto.add_file_id(file.toStdString());
+            }
+            mdto.set_sender_ssid(msg.senderSSID.toStdString());
+            mdto.set_content_type(static_cast<int>(msg.contentType));
+            mdto.set_content(msg.content.toStdString());
+            mdto.mutable_recipient()->set_recipient_type(static_cast<int>(msg.recipient.recipientType));
+            mdto.mutable_recipient()->set_recipient_ssid(msg.recipient.recipientSSID.toStdString());
+            mdto.mutable_recipient()->set_read_status(msg.recipient.readStatus);
+
+            std::string resDto;
+            mdto.SerializeToString(&resDto);
+            emit g_pClientRequestHandler->sigForwardMessageRequest(resDto);
+        }
+    });
+    // download msg pic from remote
+    connect(g_pCommonData, &CommonData::sigSyncMsgPicFromRemote, this, [=](const QList<QString> &files) {
+        auto *pConnection = new QMetaObject::Connection;
+        *pConnection = connect(g_pClientRequestHandler, &ClientRequestHandler::sigQueryMsgPicInfoResponse,
+           this, [=](const std::string &dto) {
+               // disconnect from event listen
+               QObject::disconnect(*pConnection);
+               delete pConnection;
+
+               SSDTO::GetMessagePicInfoDTO gmpdto;
+               gmpdto.ParseFromString(dto);
+
+               for (const auto &fileInfo: gmpdto.pic_name_to_path()) {
+                   QJsonObject cmd;
+                   cmd["command"] = "download";
+                   cmd["business-type"] = "msg_pic";
+                   cmd["local-url"] = QString::fromStdString(g_pCommonData->getDataPath(msgPic) + "/" +
+                                                             fileInfo.first + g_pCommonData->getImageEx());
+                   cmd["file-id"] = QString::fromStdString(fileInfo.first);
+                   cmd["storage-path"] = QString::fromStdString(fileInfo.second);
+
+                   if (_pGRCSocket != nullptr) {
+                       _pGRCSocket->write(QJsonDocument(cmd).toJson());
+                       _pGRCSocket->flush();
+                   }
+               }
+               _dataLoadCounter += gmpdto.pic_name_to_path().size();
+           });
+
+        // query file info
+        {
+            SSDTO::GetMessagePicInfoDTO gmpdto;
+            gmpdto.set_ssid(g_pCommonData->getCurUserInfo().ssid.toStdString());
+            auto _map = *gmpdto.mutable_pic_name_to_path();
+            for (const auto &file: files) {
+                _map[file.toStdString()] = "";
+            }
+
+            std::string resDto;
+            gmpdto.SerializeToString(&resDto);
+            emit g_pClientRequestHandler->sigQueryMsgPicInfoRequest(resDto);
+            _dataLoadCounter++;
+        }
+    });
+
+    // all data load from server database or local database
+    connect(g_pCommonData, &CommonData::sigAllDataLoadFinished, this, [=]() {
+        // close loading
+        g_pLandPage->sltHideLoading();
+
+        g_pMessagePage->loadCacheMsg(g_pCommonData->getMessageContentData(99, 1));
+        g_pContactPage->loadCacheContact(g_pCommonData->getCurUserFriendship());
+
+        // goto arch page
+        g_pArchPage->show();
+        _curWindow = g_pArchPage;
+
+        g_pLandPage->close();
+        g_pLandPage->destroyInstance();
+    });
     return QApplication::exec();
+}
+
+void MainLogic::checkAllDataLoaded() {
+    if (_dataLoadCounter <= 0) {
+        emit g_pCommonData->sigAllDataLoadFinished();
+    }
 }

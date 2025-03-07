@@ -9,15 +9,15 @@
 #include "../common-do/CommonDatabaseDO.h"
 
 struct UserBaseInfoDTO{
-    QString     ssid;
-    QString     username;
-    QString     avatarPath;
-    QString     sex;
-    QString     personalSign;
-    QDateTime   birthDate;
-    quint32     thumbUpCount;
-    quint8      region{};
-    QDateTime   createTime;
+    QString     ssid = "";
+    QString     username = "";
+    QString     avatarPath = "";
+    QString     sex = "";
+    QString     personalSign = "";
+    time_t      birthDate = 0;
+    quint32     thumbUpCount = static_cast<quint32>(-1);
+    quint8      region =  static_cast<quint8>(-1);
+    time_t      createTime = 0;
     UserBaseInfoDTO() = default;
     UserBaseInfoDTO(const UserBaseInfoDTO& other) = default;
 };
@@ -28,7 +28,7 @@ struct FriendshipDTO{
     QString friendSSID;
     qint32 shipStatus;
     qint32 friendType; // 1 用户 2 群组
-    QDateTime createTime;
+    time_t createTime;
 };
 
 struct GroupBaseInfoDTO{
@@ -37,13 +37,13 @@ struct GroupBaseInfoDTO{
     QString   avatarPath;
     QString   createSSID;
     QString   profile;
-    QDateTime createTime;
+    time_t createTime;
 };
 
 struct GroupMemberInfoDTO{
     QString ssidGroup;
     QString ssidMember;
-    QDateTime createTime;
+    time_t createTime;
 };
 
 struct MessageRecipientDTO{
@@ -56,9 +56,9 @@ struct MessageContentDTO{
     QString senderSSID;
     ContentType contentType;
     QString content;
-    QString fileId;
+    QList<QString> fileId;
     MessageRecipientDTO recipient;
-    QDateTime createTime;
+    time_t createTime;
 };
 Q_DECLARE_METATYPE(MessageContentDO)
 
@@ -71,7 +71,7 @@ struct CollectedStickerDTO {
     QString userSSID;
     QString imageUrl;
     bool isCustom = false;
-    QDateTime createdAt;
+    time_t createdAt;
 };
 
 struct MsgCombineDTO {
@@ -83,5 +83,27 @@ struct MsgCombineDTO {
     bool isGroup = false;
 };
 Q_DECLARE_METATYPE(MsgCombineDTO)
+
+struct LoginRecordDTO {
+    QString account;         // 登录账号
+    QString plainPassword;   // 明文密码
+    time_t loginTime;     // 登录时间
+    QString deviceInfo;      // 设备信息
+};
+
+struct FileStorageDTO {
+    QString fileId;
+    QString uploaderSsid;
+    QString fileName;
+    int64_t fileSize;
+    QString fileType;
+    QString storagePath;
+    time_t uploadTime;
+
+    int pageSize;
+    int pageNum;
+};
+
+
 
 #endif //COMMONDATABASEDTO_H

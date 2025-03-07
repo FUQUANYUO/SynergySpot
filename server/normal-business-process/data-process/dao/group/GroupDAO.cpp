@@ -90,11 +90,13 @@ bool GroupBaseInfoDAO::update(const GroupBaseInfoDO &group) {
     }
 
     // 拼接完整的SQL语句
-    for (auto it = setClauses.begin(); it != setClauses.end(); ++it) {
-        if (it + 1 != setClauses.end()) {
-            sql += (*it) + ", ";
+    for (size_t i = 0; i < setClauses.size(); ++i) {
+        sql += setClauses[i];
+        if (i != setClauses.size() - 1) {
+            sql += ", ";
         }
     }
+
     sql += " WHERE ssid_group = ?";
 
     // 添加 ssidGroup 参数
@@ -130,7 +132,7 @@ bool GroupBaseInfoDAO::deleteById(const std::string &groupSsid)  {
 }
 
 GroupBaseInfoDO GroupBaseInfoDAO::findBySsid(const std::string &groupSsid) {
-    std::string sql = "SELECT id, ssid_group, name, avatar, create_ssid, profile, create_time "
+    std::string sql = "SELECT id, ssid_group, name, avatar, create_ssid, profile, UNIX_TIMESTAMP(create_time) "
                       "FROM group_base_info WHERE ssid_group = ?";
     std::vector<MysqlConn::Param> params;
 
@@ -158,14 +160,14 @@ GroupBaseInfoDO GroupBaseInfoDAO::findBySsid(const std::string &groupSsid) {
     group.avatar = row[3];
     group.createSsid = row[4];
     group.profile = row[5];
-    group.createTime = row[6] ? std::stoul(row[6]) : 0;
+    group.createTime = row[6] ? std::stoll(row[6]) : 0;
 
     mysql_free_result(result);
     return group;
 }
 
 std::string GroupBaseInfoDAO::getLastGroupSSID() {
-    std::string sql = "SELECT ssid_group FROM group_base_info ORDER BY create_time DESC LIMIT 1";
+    std::string sql = "SELECT ssid_group FROM group_base_info ORDER BY UNIX_TIMESTAMP(create_time) DESC LIMIT 1";
     MYSQL_RES* result = m_conn->query(sql, {});
     if (!result) {
         LOG_ERROR("Failed find last group ssid ");
@@ -299,9 +301,9 @@ int64_t GroupNoticeDAO::addNotice(int64_t groupId, const std::string &notice)  {
 }
 
 std::vector<GroupNoticeDO> GroupNoticeDAO::listNotices(int64_t groupId, int pageSize, int pageNum)  {
-    std::string sql = "SELECT id, group_id, notice, create_time "
+    std::string sql = "SELECT id, group_id, notice, UNIX_TIMESTAMP(create_time) "
                       "FROM group_notice WHERE group_id = ? "
-                      "ORDER BY create_time DESC LIMIT ? OFFSET ?";
+                      "ORDER BY UNIX_TIMESTAMP(create_time) DESC LIMIT ? OFFSET ?";
     std::vector<MysqlConn::Param> params;
 
     MysqlConn::Param paramGroupId;
@@ -332,7 +334,7 @@ std::vector<GroupNoticeDO> GroupNoticeDAO::listNotices(int64_t groupId, int page
         notice.id = std::stoll(row[0]);
         notice.groupId = std::stoll(row[1]);
         notice.notice = row[2];
-        notice.createTime = row[3] ? std::stoul(row[3]) : 0;
+        notice.createTime = row[3] ? std::stoll(row[3]) : 0;
         notices.push_back(notice);
     }
 
@@ -387,9 +389,9 @@ bool GroupMemberDAO::removeMember(const std::string &groupSsid, const std::strin
 }
 
 std::vector<GroupMemberInfoDO> GroupMemberDAO::listMembers(const std::string &groupSsid)  {
-    std::string sql = "SELECT id, ssid_group, ssid_member, create_time "
+    std::string sql = "SELECT id, ssid_group, ssid_member, UNIX_TIMESTAMP(create_time) "
                       "FROM group_member_info WHERE ssid_group = ? "
-                      "ORDER BY create_time DESC";
+                      "ORDER BY UNIX_TIMESTAMP(create_time) DESC";
     std::vector<MysqlConn::Param> params;
 
     MysqlConn::Param paramGroupSsid;
@@ -410,7 +412,7 @@ std::vector<GroupMemberInfoDO> GroupMemberDAO::listMembers(const std::string &gr
         member.id = std::stoll(row[0]);
         member.ssidGroup = row[1];
         member.ssidMember = row[2];
-        member.createTime = row[3] ? std::stoul(row[3]) : 0;
+        member.createTime = row[3] ? std::stoll(row[3]) : 0;
         members.push_back(member);
     }
 

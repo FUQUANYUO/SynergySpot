@@ -94,7 +94,7 @@ struct MessageContentDTO {
     std::string senderSsid;
     uint8_t contentType;
     std::string content;
-    std::string fileId;
+    std::vector<std::string> fileId;
     MessageRecipientDTO recipient;
     time_t createTime;
 

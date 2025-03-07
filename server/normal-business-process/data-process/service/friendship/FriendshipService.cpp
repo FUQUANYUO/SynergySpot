@@ -17,11 +17,12 @@ bool FriendshipService::updateFriendship(const FriendshipDTO &dto) {
     return friendshipDAO.update({-1,dto.ssid,dto.grouping,dto.remark,dto.friendSsid,dto.shipStatus,dto.friendType});
 }
 
-std::vector<UserBaseInfoDTO> FriendshipService::getAllFriendshipBySSID(const std::string &ssid) {
+std::vector<UserBaseInfoDTO> FriendshipService::getAllFriendshipBySSID(const std::string &ssid,std::vector<FriendshipDTO>& res) {
     std::vector<UserBaseInfoDTO> friends;
     std::vector<FriendshipDO> resFriendship = friendshipDAO.listByUser(ssid);
     UserDAO infoDAO;
     for (const auto &it : resFriendship) {
+        res.push_back({it.id,it.ssid,it.grouping,it.remark,it.friendSsid,it.shipStatus,it.friendType,it.createTime});
         UserBaseInfoDO resInfo = infoDAO.findById(it.friendSsid);
         friends.push_back({resInfo.ssid,resInfo.ssname,resInfo.avatar,resInfo.sex,resInfo.personalSign,resInfo.thumbUpCount,resInfo.birthday,resInfo.region,resInfo.createTime});
     }

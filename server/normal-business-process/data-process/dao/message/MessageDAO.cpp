@@ -5,8 +5,8 @@
 #include "MessageDAO.h"
 
 int64_t MessageContentDAO::insert(const MessageContentDO &message)  {
-    std::string sql = "INSERT INTO message_content (sender_ssid, content_type, content, file_id) "
-                      "VALUES (?, ?, ?, ?)";
+    std::string sql = "INSERT INTO message_content (sender_ssid, content_type, content) "
+                      "VALUES (?, ?, ?)";
     std::vector<MysqlConn::Param> params;
 
     MysqlConn::Param paramSender;
@@ -24,29 +24,44 @@ int64_t MessageContentDAO::insert(const MessageContentDO &message)  {
     paramContent.str_val = message.content;
     params.push_back(paramContent);
 
-    MysqlConn::Param paramFileId;
-    paramFileId.type = MysqlConn::Param::STRING;
-    paramFileId.str_val = message.fileId;
-    params.push_back(paramFileId);
-
     if (!m_conn->update(sql, params)) {
         LOG_ERROR("Failed to insert message content for sender: " << message.senderSsid);
+        LOG_ERROR(sql + " , " + message.senderSsid + " , " + std::to_string(message.contentType) + " , " + message.content )
         return -1;
+    }
+
+    int64_t messageId = static_cast<int64_t>(m_conn->getLastInsertId());
+
+    if (!message.fileIds.empty()) {
+        if (!insertFiles(messageId, message.fileIds)) {
+            LOG_ERROR("Insert message_file failed");
+            return -1;
+        }
     }
 
     return static_cast<int64_t>(m_conn->getLastInsertId());
 }
 
-std::vector<MessageContentDO> MessageContentDAO::listBySender(const std::string &senderSsid, int pageSize, int pageNum) {
-    std::string sql = "SELECT id, sender_ssid, content_type, content, file_id, create_time FROM message_content "
-                      "WHERE sender_ssid = ? "
-                      "LIMIT ? OFFSET ?";
+std::vector<MessageContentDO> MessageContentDAO::listBySender(const std::string& senderSsid, int pageSize, int pageNum, time_t lastTime) {
+    std::string sql =
+        "SELECT mc.id, mc.sender_ssid, mc.content_type, mc.content, UNIX_TIMESTAMP(mc.create_time), "
+               "mf.file_id, mf.sequence "
+        "FROM message_content mc "
+        "LEFT JOIN message_file mf ON mc.id = mf.message_id "
+        "WHERE mc.sender_ssid = ? AND UNIX_TIMESTAMP(mc.create_time) > ? "
+        "ORDER BY UNIX_TIMESTAMP(mc.create_time) DESC, mf.sequence ASC "
+        "LIMIT ? OFFSET ?";
     std::vector<MysqlConn::Param> params;
 
     MysqlConn::Param paramSender;
     paramSender.type = MysqlConn::Param::STRING;
     paramSender.str_val = senderSsid;
     params.push_back(paramSender);
+
+    MysqlConn::Param paramLastTime;
+    paramLastTime.type = MysqlConn::Param::INT;
+    paramLastTime.int_val = lastTime;
+    params.push_back(paramLastTime);
 
     MysqlConn::Param paramPageSize;
     paramPageSize.type = MysqlConn::Param::INT;
@@ -65,16 +80,30 @@ std::vector<MessageContentDO> MessageContentDAO::listBySender(const std::string 
     }
 
     std::vector<MessageContentDO> messages;
+    std::unordered_map<int64_t, MessageContentDO> messageMap;
+
     MYSQL_ROW row;
     while ((row = mysql_fetch_row(result))) {
-        MessageContentDO message;
-        message.id = std::stoll(row[0]);
-        message.senderSsid = row[1];
-        message.contentType = static_cast<uint8_t>(std::stoul(row[2]));
-        message.content = row[3];
-        message.fileId = row[4];
-        message.createTime = row[5] ? std::stoul(row[5]) : 0;
-        messages.push_back(message);
+        int64_t messageId = std::stoll(row[0]);
+
+        if (messageMap.find(messageId) == messageMap.end()) {
+            MessageContentDO msg;
+            msg.id = messageId;
+            msg.senderSsid = row[1];
+            msg.contentType = static_cast<uint8_t>(std::stoul(row[2]));
+            msg.content = row[3];
+            msg.createTime = row[4] ? std::stoll(row[4]) : 0;
+            messageMap[messageId] = msg;
+        }
+
+        if (row[5] != nullptr) {
+            messageMap[messageId].fileIds.emplace_back(row[5]);
+        }
+    }
+
+    messages.reserve(messageMap.size());
+    for (auto& pair : messageMap) {
+        messages.push_back(pair.second);
     }
 
     mysql_free_result(result);
@@ -104,6 +133,40 @@ int MessageContentDAO::getMessageContentCount(const std::string &senderSsid)  {
 
     mysql_free_result(result);
     return count;
+}
+
+bool MessageContentDAO::insertFiles(int64_t messageId, const std::vector<std::string> &fileIds) {
+    std::string sql = "INSERT INTO message_file (message_id, file_id, sequence) VALUES ";
+    std::vector<MysqlConn::Param> params;
+
+    // 构建 VALUES 占位符 (?, ?, ?), (?, ?, ?)...
+    for (size_t i = 0; i < fileIds.size(); ++i) {
+        sql += "(?, ?, ?)";
+        if (i != fileIds.size() - 1) sql += ", ";
+    }
+
+    // 绑定参数
+    for (size_t i = 0; i < fileIds.size(); ++i) {
+        // message_id
+        MysqlConn::Param paramMessageId;
+        paramMessageId.type = MysqlConn::Param::INT;
+        paramMessageId.int_val = messageId;
+        params.push_back(paramMessageId);
+
+        // file_id
+        MysqlConn::Param paramFileId;
+        paramFileId.type = MysqlConn::Param::STRING;
+        paramFileId.str_val = fileIds[i];
+        params.push_back(paramFileId);
+
+        // sequence（按列表顺序从0开始）
+        MysqlConn::Param paramSequence;
+        paramSequence.type = MysqlConn::Param::INT;
+        paramSequence.int_val = static_cast<int>(i);
+        params.push_back(paramSequence);
+    }
+
+    return m_conn->update(sql, params);
 }
 
 bool MessageRecipientDAO::insert(const MessageRecipientDO &recipient) {

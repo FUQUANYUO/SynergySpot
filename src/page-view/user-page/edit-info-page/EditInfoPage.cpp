@@ -6,7 +6,6 @@
 
 #include "ela-widget-tools/ElaLineEdit.h"
 #include "ela-widget-tools/ElaCalendarPicker.h"
-#include "ela-widget-tools/ElaPushButton.h"
 #include "ela-widget-tools/ElaTheme.h"
 
 #include "../../../core/common-data/CommonData.h"
@@ -19,13 +18,14 @@
 #include <QPainterPath>
 #include <QLabel>
 #include <QComboBox>
+#include <QFileDialog>
 
-#define SET_FRAME_STYLE(__FRAME_NAME__,__FRAME_LAYOUT__)                                                                   \
-    QFrame *__FRAME_NAME__ = new QFrame(this);                                                                             \
-    (__FRAME_NAME__)->setContentsMargins(0,0,0,0);                                                                         \
-    (__FRAME_NAME__)->setFrameShape(QFrame::Panel);                                                                        \
-    (__FRAME_NAME__)->setFrameShadow(QFrame::Sunken);                                                                      \
-    (__FRAME_NAME__)->setStyleSheet("background-color: rgb(242, 242, 242); border-radius: 15px;");     \
+#define SET_FRAME_STYLE(__FRAME_NAME__,__FRAME_LAYOUT__)                                                        \
+    QFrame *__FRAME_NAME__ = new QFrame(this);                                                                  \
+    (__FRAME_NAME__)->setContentsMargins(0,0,0,0);                                                              \
+    (__FRAME_NAME__)->setFrameShape(QFrame::Panel);                                                             \
+    (__FRAME_NAME__)->setFrameShadow(QFrame::Sunken);                                                           \
+    (__FRAME_NAME__)->setStyleSheet("background-color: rgb(242, 242, 242); border-radius: 15px;");              \
     (__FRAME_NAME__)->setLayout(__FRAME_LAYOUT__);
 
 EditInfoPage::EditInfoPage(QWidget *parent) : QDialog(parent) {
@@ -41,6 +41,17 @@ EditInfoPage::EditInfoPage(QWidget *parent) : QDialog(parent) {
 EditInfoPage::~EditInfoPage() {
 }
 
+void EditInfoPage::sltSetEditPageInfo(const UserInfo &info) {
+    _avatar->setIcon(QIcon(info._picPath.isEmpty()?(":/user-page/rc-page/img/SS-default-icon.jpg"):info._picPath));
+    _nameLineEdit->setText(info._name);
+    _personalSignEdit->setText(info._signContent);
+    _sexSelected->setCurrentIndex(info._sex=="男生"?1:0);
+    _birthdaySelected->setText(QDateTime::fromMSecsSinceEpoch(g_pCommonData->getCurUserInfo().birthDate).toString("yyyy-MM-dd"));
+    _provinceSelected->setCurrentText(info._localInfo.province);
+    _citySelected->setCurrentText(info._localInfo.city);
+    _districtSelected->setCurrentText(info._localInfo.district);
+}
+
 void EditInfoPage::initWindow() {
     QFont font;
     font.setFamily("微软雅黑");
@@ -51,7 +62,7 @@ void EditInfoPage::initWindow() {
     setWindowModality(Qt::ApplicationModal);
     setWindowFlags((window()->windowFlags()) | Qt::WindowMinimizeButtonHint | Qt::FramelessWindowHint);
 
-    _avatar = new ElaPushButton(this);
+    _avatar = new QPushButton(this);
 
     _name = new QLabel("昵称",this);
     _name->setFont(font);
@@ -193,9 +204,8 @@ void EditInfoPage::initContent() {
 
     setFixedSize(400,600);
     _avatar->setFixedSize(80,80);
-    _avatar->setBorderRadius(80);
-    _avatar->setIcon(QIcon(g_pCommonData->getCurUserInfo().avatarPath));
     _avatar->setIconSize(QSize(60,60));
+    _avatar->setStyleSheet("border-radius: 60px;");
 
     _name->setFixedSize(30,40);
     _nameSize->setFixedSize(40,40);
@@ -238,8 +248,27 @@ void EditInfoPage::initContent() {
 }
 
 void EditInfoPage::initConnectFunc() {
+    connect(_avatar,&QPushButton::clicked,[=]() {
+        QString filePath = QFileDialog::getOpenFileName(
+            nullptr,
+            "选择文件",
+            QDir::homePath(),
+            "所有文件 (*);;"
+        );
+        if (filePath != nullptr) {
+            _avatar->setIcon(QIcon(filePath));
+        }
+        emit sigUserAvatarChanged(filePath);
+    });
     connect(_cancelBtn,&QPushButton::clicked,this,&EditInfoPage::sigEditPageClosed);
     connect(_saveBtn,&QPushButton::clicked,this,[=]() {
+        UserBaseInfoDTO userInfo;
+        userInfo.username = _nameLineEdit->text();
+        userInfo.avatarPath = g_pCommonData->getCurUserInfo().avatarPath;
+        userInfo.personalSign = _personalSignEdit->text();
+        userInfo.sex = _sexSelected->currentText();
+        userInfo.birthDate = QDateTime(_birthdaySelected->getSelectedDate(),QTime(0,0)).toMSecsSinceEpoch();
+        emit sigUserInfoChanged(userInfo);
         emit sigEditPageClosed();
     });
 }

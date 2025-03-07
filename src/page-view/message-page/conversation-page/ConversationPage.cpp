@@ -10,6 +10,7 @@
 #include "../MessagePage.h"
 
 #include "help.h"
+#include "uuid/GenUUID.h"
 #include "common-data/CommonData.h"
 #include "ela-widget-tools/ElaToolButton.h"
 #include "ela-widget-tools/ElaDockWidget.h"
@@ -46,7 +47,7 @@ protected:
     // insert logic default scale is 0.3
     void insertImage(const QImage &image, double scale = 0.3);
 private:
-    QMap<QString, QImage> _imagesTmpMap;
+    QMap<QString, QImage> _imagesTmpMap;    // pic name without suffix : pic pixmap
 };
 
 SSTextEdit::SSTextEdit(QWidget *parent): QTextEdit(parent) {
@@ -110,7 +111,7 @@ void SSTextEdit::insertImage(const QImage &image, double scale) {
     int width = static_cast<int>(image.width() * scale);
     int height = static_cast<int>(image.height() * scale);
 
-    QString imageName = QString::number(GetCurTime::getTimeObj()->getCurTimeStamp());
+    QString imageName = QString::fromStdString(g_pGenUUID->generateUUID("msg_pic"));
     document->addResource(QTextDocument::ImageResource, QUrl(imageName), QVariant(image));
 
     QTextImageFormat imageFormat;
@@ -332,8 +333,7 @@ void ConversationFriendPage::initConnectFunc() {
         // TODO: remark and region need to get from server
         UserInfo userInfo{
             Friends,
-            static_cast<int>(std::difftime(GetCurTime::getTimeObj()->getCurTimeStamp(),
-                static_cast<time_t>(_userInfo.createTime.toMSecsSinceEpoch()))/ (60 * 60 * 24)) + 1,
+            static_cast<int>(std::difftime(GetCurTime::getTimeObj()->getCurTimeStamp(),_userInfo.createTime)/ (60 * 60 * 24)) + 1,
             static_cast<int>(_userInfo.thumbUpCount), _userInfo.ssid, _userInfo.username, "", _userInfo.personalSign,
             _userInfo.avatarPath, {""}
         };
@@ -496,11 +496,13 @@ ConversationPage::ConversationPage(ConversationType type,const MsgCombineDTO& dt
             QString html_cp = html;
             // add msg pic to the tmp
             QMap<QString,QImage>& cacheImage = _inputWid->_inputEditFrame->getImageTmpMap();
+            QList<QString> fileIDs;
             if (!_inputWid->_inputEditFrame->getImageTmpMap().isEmpty()) {
                 for (auto imageIt = cacheImage.begin(); imageIt != cacheImage.end(); imageIt++) {
                     std::string imageName = imageIt.key().toStdString();
                     g_pCommonData->addMsgPicToTmp(imageIt.value(),imageName);// store in the tmp dir
                     html_cp.replace(imageIt.key(),QString::fromStdString(g_pCommonData->getDataPath(msgPic) + "/" + imageName + g_pCommonData->getImageEx()));
+                    fileIDs.append(imageIt.key());
                 }
                 cacheImage.clear();
             }
@@ -515,16 +517,16 @@ ConversationPage::ConversationPage(ConversationType type,const MsgCombineDTO& dt
                 _curSSID,
                 ContentType::Text,
                 html_cp,
-                "",
+                fileIDs,
                 {
                     1,
                     dto.userBaseInfo.ssid
                 },
-                QDateTime::fromMSecsSinceEpoch(curTimeStamp)
+                curTimeStamp
             };
 
             // get grandfather to link card and set content display
-            MessagePage * msgPage = static_cast<MessagePage*>(parent->parent());
+            MessagePage * msgPage = dynamic_cast<MessagePage*>(parent->parent());
 
             // replace image url to [图片] placeholders
             QRegularExpression imgRegex("<img[^>]*>", QRegularExpression::CaseInsensitiveOption);
@@ -539,6 +541,7 @@ ConversationPage::ConversationPage(ConversationType type,const MsgCombineDTO& dt
                 Qt::gray,font);
             msgPage->_ssidLinkCardHash[dto.userBaseInfo.ssid]->setSubTitle(docu.toPlainText());
 
+            // sync with server
             g_pCommonData->setMessageContentData({msgDto});
         });
     }
@@ -583,8 +586,7 @@ ConversationPage::ConversationPage(ConversationType type,const MsgCombineDTO& dt
 
             UserInfo uInfo{
                 (isFriend?UserType::Friends:UserType::Strangers),
-                static_cast<int>(std::difftime(GetCurTime::getTimeObj()->getCurTimeStamp(),
-                static_cast<time_t>(user.createTime.toMSecsSinceEpoch()))/ (60 * 60 * 24)) + 1,
+                static_cast<int>(std::difftime(GetCurTime::getTimeObj()->getCurTimeStamp(),user.createTime) / (60 * 60 * 24) + 1),
                 static_cast<int>(user.thumbUpCount) , user.ssid, user.username, "", user.personalSign,
                 user.avatarPath,{""}
             };
@@ -599,12 +601,14 @@ ConversationPage::ConversationPage(ConversationType type,const MsgCombineDTO& dt
         connect(_inputWid, &InputWidget::sigSendBtnClicked, this, [=](const QString& html) {
             QString html_cp = html;
             // add msg pic to the tmp
+            QList<QString> fileIds;
             QMap<QString,QImage>& cacheImage = _inputWid->_inputEditFrame->getImageTmpMap();
             if (!_inputWid->_inputEditFrame->getImageTmpMap().isEmpty()) {
                 for (auto imageIt = cacheImage.begin(); imageIt != cacheImage.end(); imageIt++) {
                     std::string imageName = imageIt.key().toStdString();
                     g_pCommonData->addMsgPicToTmp(imageIt.value(),imageName);
                     html_cp.replace(imageIt.key(),QString::fromStdString(g_pCommonData->getDataPath(msgPic) + "/" + imageName + g_pCommonData->getImageEx()));
+                    fileIds.append(imageIt.key());
                 }
                 cacheImage.clear();
             }
@@ -618,16 +622,16 @@ ConversationPage::ConversationPage(ConversationType type,const MsgCombineDTO& dt
                 _curSSID,
                 ContentType::Text,
                 html_cp,
-                "",
+                fileIds,
                 {
                     2,
                     dto.groupBaseInfo.ssidGroup
                 },
-                QDateTime::fromMSecsSinceEpoch(curTimeStamp)
+                curTimeStamp
             };
 
             // get grandfather to link card and set content display
-            MessagePage * msgPage = static_cast<MessagePage*>(parent->parent());
+            MessagePage * msgPage = dynamic_cast<MessagePage*>(parent->parent());
 
             // replace image url to [图片] placeholders
             QRegularExpression imgRegex("<img[^>]*>", QRegularExpression::CaseInsensitiveOption);
@@ -641,6 +645,7 @@ ConversationPage::ConversationPage(ConversationType type,const MsgCombineDTO& dt
                 Qt::gray,font);
             msgPage->_ssidLinkCardHash[dto.groupBaseInfo.ssidGroup]->setSubTitle(docu.toPlainText());
 
+            // sync with server
             g_pCommonData->setMessageContentData({msgDto});
        });
     }

@@ -18,13 +18,15 @@
 struct UploadSession {
     std::string ssid;
     std::string file_name;
+    FileBusinessType file_business_type;
     int64_t total_chunks{};
     std::string temp_dir;
     std::atomic<int> received_chunks{0};
     UploadSession() = default;
-    UploadSession(std::string ssid,std::string file_name, int64_t total_chunks, std::string temp_dir, int received_chunks) {
+    UploadSession(std::string ssid,std::string file_name,FileBusinessType type,int64_t total_chunks, std::string temp_dir, int received_chunks) {
         this->ssid = ssid;
         this->file_name = file_name;
+        this->file_business_type = type;
         this->total_chunks = total_chunks;
         this->temp_dir = temp_dir;
         this->received_chunks.store(received_chunks);
@@ -33,6 +35,7 @@ struct UploadSession {
         if (this != &other) {
             ssid = other.ssid;
             file_name = std::move(other.file_name);
+            file_business_type = other.file_business_type;
             total_chunks = other.total_chunks;
             temp_dir = std::move(other.temp_dir);
             received_chunks.store(other.received_chunks.load());
@@ -71,7 +74,7 @@ private:
     std::unordered_map<std::string, UploadSession> active_sessions_;
     std::string fileSavePath = "";
 
-    static constexpr int CHUNK_SIZE = 4 * 1024 * 1024;
+    static constexpr int CHUNK_SIZE = 3 * 1024 * 1024;
 };
 // --------------------------------- GRPC Func Implement --------------------------------- //
 

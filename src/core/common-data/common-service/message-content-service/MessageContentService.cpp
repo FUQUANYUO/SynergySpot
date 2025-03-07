@@ -26,3 +26,6 @@ bool MessageContentService::storeMessage(const QList<MessageContentDTO> &dto) {
 int MessageContentService::getMessageCount(const QString &ssid) {
     return messageContentDAO.getMessageCount(ssid);
 }
+time_t MessageContentService::getLastMsgTime() {
+    return messageContentDAO.getLastMsgTime();
+}

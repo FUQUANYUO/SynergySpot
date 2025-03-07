@@ -26,11 +26,13 @@ public:
     // 处理事件
     void handleEvents(int numEvents);
 
+    bool modifyEvent(int fd, uint32_t eventCode);
+
     // 获取 epoll 引擎文件描述符
     inline int getFd() const;
 
     // 删除事件
-    void deleteEvent(int fd,epoll_event *ev = nullptr);
+    void deleteEvent(int fd);
 private:
     int epfd;
     epoll_event events[MAXEVENTS];// 存放 epoll 事件动态数组

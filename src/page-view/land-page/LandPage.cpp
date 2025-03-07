@@ -4,7 +4,10 @@
 #include "LandPage.h"
 #include "help.h"
 #include "../CommonFunc.hpp"
+#include "../../core/common-data/CommonData.h"
 #include "../effect-component/cv-process-video-strategy/CVProVideoStrategy.h"
+#include "../effect-component/SS-mask-widget/SSMaskWidget.h"
+#include "../effect-component/loading-dialog/LoadingDialog.h"
 #include "../plugin-manager/StrategyManager.h"
 #include "sign-up-page/SignUpPage.h"
 
@@ -93,6 +96,9 @@ void LandPage::initWindow() {
     _GLayoutMain              = new QGridLayout;
     _HLayoutForJumpURL        = new QHBoxLayout;
     _HLayoutForAcceptProtocol = new QHBoxLayout;
+
+    _maskWidget               = new SSMaskWidget(this);
+    _loadingDialog            = new LoadingDialog(this);
 }
 
 void LandPage::initEdgeLayout() {
@@ -152,25 +158,25 @@ void LandPage::initContent() {
         }
     )");
 
-    // TODO: read local cache to fill _accountComboBox
-    auto * testList = new QListWidget(this);
-    testList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    testList->setContentsMargins(0,0,0,0);
-    testList->setFixedWidth(240);
-    testList->setMaximumHeight(120);
-    testList->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Maximum);
-    auto * data_1 = new QListWidgetItem("12121212");
-    auto * data_2 = new QListWidgetItem("44455402");
-    auto * data_3 = new QListWidgetItem("55484816");
-    data_1->setTextAlignment(Qt::AlignCenter);
-    data_1->setSizeHint(QSize(240,50));
-    data_2->setTextAlignment(Qt::AlignCenter);
-    data_2->setSizeHint(QSize(240,50));
-    data_3->setTextAlignment(Qt::AlignCenter);
-    data_3->setSizeHint(QSize(240,50));
-    testList->addItem(data_1);testList->addItem(data_2);testList->addItem(data_3);
-    _accountComboBox->setModel(testList->model());
-    _accountComboBox->setView(testList);
+    auto * accountList = new QListWidget(this);
+    accountList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    accountList->setContentsMargins(0,0,0,0);
+    accountList->setFixedWidth(240);
+    accountList->setMaximumHeight(120);
+    accountList->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Maximum);
+
+    for (const auto& it : g_pCommonData->getLoginRecord(8)) {
+        // init local cache for account
+        auto * data = new QListWidgetItem(it.account);
+        data->setTextAlignment(Qt::AlignCenter);
+        data->setSizeHint(QSize(240,50));
+        accountList->addItem(data);
+
+        // init local cache for password
+        _accToPasswordHash.insert(it.account, it.plainPassword);
+    }
+    _accountComboBox->setModel(accountList->model());
+    _accountComboBox->setView(accountList);
 
     _inputPassword->setEnabled(true);
     _inputPassword->setPlaceholderText("请输入SS密码");
@@ -234,11 +240,13 @@ void LandPage::initContent() {
     _recoverPWButton->setStyleSheet("border:none;background:transparent;color: rgb(45,107,205);font-weight: bold;");
     _recoverPWButton->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
     setAcrylicForBKMaterial(true);
+
+    _maskWidget->setVisible(false);
+    _loadingDialog->setVisible(false);
 }
 
 void LandPage::initConnectFunc() {
     // TODO: receiver Backend data change avatar
-
     connect(timer, &QTimer::timeout, this, &LandPage::sltUpdateFrame);
     connect(_signUpButton,&QPushButton::clicked,this,[=]() {
         g_pSignUpPage->show();
@@ -248,6 +256,8 @@ void LandPage::initConnectFunc() {
         // emit sigCurrentWidChanged();
     });
     connect(_signInButton,&QPushButton::clicked,this,[=](){
+        isFreezeSignInBtn(true);
+
         QString acc =  _accountComboBox->currentText();
         QString pw  =  _inputPassword->text();
         if(!acc.isEmpty() && !pw.isEmpty())
@@ -267,6 +277,11 @@ void LandPage::initConnectFunc() {
             LOG("service test success")
         }else if (url.toString() == "privacy_policy") {
             LOG("privacy test success")
+        }
+    });
+    connect(_accountComboBox,&QComboBox::currentIndexChanged,this,[=](int index) {
+        if (_accToPasswordHash.contains(_accountComboBox->itemData(index).toString())){
+            _inputPassword->setText(_accToPasswordHash[_accountComboBox->itemData(index).toString()]);
         }
     });
 
@@ -324,6 +339,30 @@ bool LandPage::saveQrcToFile(const QString &qrcPath, const QString &targetFilePa
 
 void LandPage::clearPasswordInput() {
     _inputPassword->clear();
+}
+void LandPage::isFreezeSignInBtn(bool enable) {
+    _signInButton->setEnabled(!enable);
+}
+
+void LandPage::sltShowMaskEffect() {
+    _maskWidget->setVisible(true);
+    _maskWidget->raise();
+    _maskWidget->setFixedSize(this->size());
+    _maskWidget->startMaskAnimation(90);
+}
+
+void LandPage::sltHideMaskEffect() {
+    _maskWidget->startMaskAnimation(0);
+}
+
+void LandPage::sltShowLoading() {
+    sltShowMaskEffect();
+    _loadingDialog->setVisible(true);
+}
+
+void LandPage::sltHideLoading() {
+    _loadingDialog->setVisible(false);
+    sltHideMaskEffect();
 }
 
 void LandPage::setAcrylicForBKMaterial(bool enable) {

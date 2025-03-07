@@ -27,6 +27,7 @@ int main(){
 
     SSLog::initLogFile("SynergySpot-GRPC-Server");
 
+    sleep(2);
     toNormalSocket.connectToHost("127.0.0.1", node["host-info"]["listenPort"].as<int>());
 
     businessProcess = std::make_unique<RealtimeBusinessProcess>(address);

@@ -43,22 +43,23 @@ struct ChatMessage{
 Q_DECLARE_METATYPE(ChatMessage)
 
 struct LocalInfo{
-    QString country;
     QString province;
     QString city;
+    QString district;
 };
 Q_DECLARE_METATYPE(LocalInfo)
 
 struct UserInfo{
     UserType    _type;
-    int         _joinDay;
-    int         _likeCount;
+    int         _joinDay = 0;
+    int         _likeCount = 0;
     QString     _ssid;
     QString     _name;
     QString     _remark;
     QString     _signContent;
     QString     _picPath;
     LocalInfo   _localInfo;
+    QString     _sex;
     bool isEmpty() const {
         if(_ssid.isEmpty() && _name.isEmpty() &&
            _remark.isEmpty() && _signContent.isEmpty())

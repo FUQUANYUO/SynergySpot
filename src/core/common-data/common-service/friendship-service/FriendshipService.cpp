@@ -26,9 +26,12 @@ bool FriendshipService::isCurUserFriend(const QString &curSSID, const QString &o
 bool FriendshipService::setFriendshipData(QList<FriendshipDTO> dto) {
     bool res = true;
     for (auto it : dto) {
-        res = friendshipDAO.create({-1,it.ssid,it.groupingName,it.friendSSID,it.shipStatus,it.friendType,it.createTime});
-        if (!res)
-            return res;
+        auto isStorageInLocal = friendshipDAO.findRelationship(it.ssid,it.friendSSID);
+        if (isStorageInLocal.isEmpty()) {
+            res = friendshipDAO.create({-1,it.ssid,it.groupingName,it.friendSSID,it.shipStatus,it.friendType,it.createTime});
+            if (!res)
+                return res;
+        }
     }
     return res;
 }

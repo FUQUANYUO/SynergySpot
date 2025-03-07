@@ -42,6 +42,7 @@ public:
     static void destroyMessagePage();
 
     bool loadCacheMsg(const QList<MessageContentDTO>& caches);
+signals:
 public slots:
     // only process card ui logic , don't include interaction with conversation page
     void addMsgCard(const MsgCombineDTO& info);

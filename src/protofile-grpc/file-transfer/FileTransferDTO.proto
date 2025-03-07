@@ -6,12 +6,19 @@ service FileTransferService {
   rpc DownloadFile(FileRequest) returns (stream FileChunk);
 }
 
-// 文件传输相关消息
+enum FileBusinessType {
+  AVATAR = 0;
+  FILE_STORAGE = 1;
+  MSG_PIC = 2;
+}
+
+// 文件传输相关消息1
 message FileInitRequest {
   string file_name = 1;
   int64 file_size = 2;
-  string ssid = 3;
-  string tokens = 4;
+  FileBusinessType type = 3;
+  string ssid = 4;
+  string tokens = 5;
 }
 
 message FileInitResponse {

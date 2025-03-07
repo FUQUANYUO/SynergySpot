@@ -17,7 +17,7 @@ qint64 GroupInfoDAO::createGroup(const GroupBaseInfoDO &group) {
         group.avatar.toStdString(),
         group.createSSID.toStdString(),
         group.profile.toStdString(),
-        group.createTime.toString("yyyy-MM-dd HH:mm:ss").toStdString()
+        std::to_string(group.createTime)
     };
 
     if (_db.update(sql, params)) {
@@ -55,7 +55,7 @@ GroupBaseInfoDO GroupInfoDAO::findBySsid(const QString &groupSsid) {
         group.avatar = QString::fromStdString(result[0][3]);
         group.createSSID = QString::fromStdString(result[0][4]);
         group.profile = QString::fromStdString(result[0][5]);
-        group.createTime = QDateTime::fromString(QString::fromStdString(result[0][6]), "yyyy-MM-dd HH:mm:ss");
+        group.createTime = std::stoll(result[0][6]);
         return group;
     }
     return {-1};
@@ -76,7 +76,7 @@ QList<GroupBaseInfoDO> GroupInfoDAO::getAllGroupInfos(int pageSize, int pageNum)
         group.avatar = QString::fromStdString(result[0][3]);
         group.createSSID = QString::fromStdString(result[0][4]);
         group.profile = QString::fromStdString(result[0][5]);
-        group.createTime = QDateTime::fromString(QString::fromStdString(result[0][6]), "yyyy-MM-dd HH:mm:ss");
+        group.createTime = std::stoll(result[0][6]);
         infos.append(group);
     }
     return infos;

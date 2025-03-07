@@ -5,7 +5,7 @@
 #include "FriendshipDAO.h"
 
 int64_t FriendshipDAO::create(const FriendshipDO &friendship) {
-    std::string sql = "INSERT INTO friendship (ssid, grouping, friend_ssid, ship_status, friend_type) "
+    std::string sql = "INSERT INTO friendship (ssid, `grouping`, friend_ssid, ship_status, friend_type) "
                       "VALUES (?, ?, ?, ?, ?)";
     std::vector<MysqlConn::Param> params;
 
@@ -49,7 +49,7 @@ bool FriendshipDAO::update(const FriendshipDO &friendship) {
 
     // 检查并添加 grouping
     if (!friendship.grouping.empty() && friendship.grouping != "-1") {
-        setClauses.push_back("grouping = ?");
+        setClauses.push_back("`grouping` = ?");
         MysqlConn::Param paramGrouping;
         paramGrouping.type = MysqlConn::Param::STRING;
         paramGrouping.str_val = friendship.grouping;
@@ -81,12 +81,13 @@ bool FriendshipDAO::update(const FriendshipDO &friendship) {
         return false;
     }
 
-    // 拼接完整的SQL语句
-    for (auto it = setClauses.begin(); it != setClauses.end(); ++it) {
-        if (it + 1 != setClauses.end()) {
-            sql += (*it) + ", ";
+    for (size_t i = 0; i < setClauses.size(); ++i) {
+        sql += setClauses[i];
+        if (i != setClauses.size() - 1) {
+            sql += ", ";
         }
     }
+
     sql += " WHERE ssid = ? AND friend_ssid = ?";
 
     // 添加 ssid 和 friend_ssid 参数
@@ -132,7 +133,7 @@ bool FriendshipDAO::deleteById(const std::string &ssid, const std::string &frien
 }
 
 FriendshipDO FriendshipDAO::findRelationship(const std::string &ssid, const std::string &friendSsid)  {
-    std::string sql = "SELECT id, ssid, grouping, remark ,friend_ssid, ship_status, friend_type, create_time "
+    std::string sql = "SELECT id, ssid, `grouping`, remark ,friend_ssid, ship_status, friend_type, UNIX_TIMESTAMP(create_time) "
                       "FROM friendship WHERE ssid = ? AND friend_ssid = ?";
     std::vector<MysqlConn::Param> params;
 
@@ -166,15 +167,15 @@ FriendshipDO FriendshipDAO::findRelationship(const std::string &ssid, const std:
     friendship.friendSsid = row[4];
     friendship.shipStatus = static_cast<uint8_t>(std::stoul(row[5]));
     friendship.friendType = static_cast<uint8_t>(std::stoul(row[6]));
-    friendship.createTime = row[6] ? std::stoul(row[6]) : 0;
+    friendship.createTime = row[6] ? std::stoll(row[6]) : 0;
 
     mysql_free_result(result);
     return friendship;
 }
 
 std::vector<FriendshipDO> FriendshipDAO::listByUser(const std::string &ssid)  {
-    std::string sql = "SELECT id, ssid, grouping, remark, friend_ssid, ship_status, friend_type, create_time "
-                      "FROM friendship WHERE ssid = ? ORDER BY create_time DESC LIMIT ? OFFSET ?";
+    std::string sql = "SELECT id, ssid, `grouping`, remark, friend_ssid, ship_status, friend_type, UNIX_TIMESTAMP(create_time) "
+                      "FROM friendship WHERE ssid = ? ORDER BY UNIX_TIMESTAMP(create_time) DESC";
     std::vector<MysqlConn::Param> params;
 
     MysqlConn::Param paramSsid;

@@ -4,6 +4,7 @@
 
 #include "UserPage.h"
 #include "edit-info-page/EditInfoPage.h"
+#include "../core/common-data/CommonData.h"
 #include "../effect-component/material-effect/MaterialEffect.h"
 
 #include "ela-widget-tools/ElaInteractiveCard.h"
@@ -35,9 +36,9 @@ UserPage *UserPage::getInstance(UserType type,UserInfo uInfo, GroupInfo gInfo, Q
         m.unlock();
     }
     UserPage *p = _userObjMap[type];
-    if (type != UserType::Groups)
+    if (type != UserType::Groups && !uInfo._ssid.isEmpty())
         p->setInfo(uInfo);
-    else
+    else if (type == UserType::Groups && !uInfo._ssid.isEmpty())
         p->setInfo(gInfo);
     return p;
 }
@@ -286,6 +287,20 @@ void UserPage::initContent() {
 
 void UserPage::initConnectFunc() {
     connect(_editUserButton,&ElaPushButton::clicked,[=]() {
+        UserBaseInfoDTO udto = g_pCommonData->getCurUserInfo();
+        UserInfo ifo{
+            Myself,
+            static_cast<int>((udto.createTime / (24 * 60 * 60 * 1000)) + 1),
+            static_cast<int>(udto.thumbUpCount),
+            udto.ssid,
+            udto.username,
+            "",
+            udto.personalSign,
+            udto.avatarPath,
+            {
+            }
+        };
+        _editPage->sltSetEditPageInfo(ifo);
         _editPage->show();
         this->hide();
         emit this->sigShowArchPageMaskEffect();
@@ -295,13 +310,16 @@ void UserPage::initConnectFunc() {
         _editPage->hide();
         emit this->sigHideArchPageMaskEffect();
     });
+
+    connect(_editPage,&EditInfoPage::sigUserAvatarChanged,this,&UserPage::sigUserAvatarChanged);
+    connect(_editPage,&EditInfoPage::sigUserInfoChanged,this,&UserPage::sigUserInfoChanged);
 }
 
 void UserPage::setInfo(const UserInfo &info) {
     if(!info.isEmpty()){
         _avatarInfo->setTitle(info._name);
         _avatarInfo->setSubTitle(info._ssid);
-        _avatarInfo->setCardPixmap(QPixmap(info._picPath));
+        _avatarInfo->setCardPixmap(QPixmap(info._picPath.isEmpty()?":/user-page/rc-page/img/SS-default-icon.jpg":info._picPath));
 
         _likeButton->setText(info._likeCount > 9999 ? QString("9999+"):QString::number(info._likeCount));
         _joinDayText->setText(QString::number(info._joinDay));
@@ -310,10 +328,10 @@ void UserPage::setInfo(const UserInfo &info) {
 
         QString setLocalInfo;
         if(!info._localInfo.province.isEmpty() && !info._localInfo.city.isEmpty()){
-            setLocalInfo = info._localInfo.province + "·" + info._localInfo.city;
+            setLocalInfo = info._localInfo.city + "·" + info._localInfo.district;
         }
         else{
-            setLocalInfo = info._localInfo.country;
+            setLocalInfo = info._localInfo.province;
         }
         _localInfoText->setText(setLocalInfo);
     }
@@ -323,7 +341,7 @@ void UserPage::setInfo(const GroupInfo &info) {
     if(!info.isEmpty()){
         _avatarInfo->setTitle(info._name);
         _avatarInfo->setSubTitle(info._ssid + "  (" + QString::number(info._memberCount) +"人)");
-        _avatarInfo->setCardPixmap(QPixmap(info._picPath));
+        _avatarInfo->setCardPixmap(QPixmap(info._picPath.isEmpty()?":/user-page/rc-page/img/SS-default-icon.jpg":info._picPath));
 
         _remarkText->setText(info._remark);
         _groupResume->setText(info._resume);

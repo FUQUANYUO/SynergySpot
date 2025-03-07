@@ -21,7 +21,9 @@ constexpr FileInitRequest::FileInitRequest(
   : file_name_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
   , ssid_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
   , tokens_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
-  , file_size_(int64_t{0}){}
+  , file_size_(int64_t{0})
+  , type_(0)
+{}
 struct FileInitRequestDefaultTypeInternal {
   constexpr FileInitRequestDefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
@@ -90,7 +92,7 @@ struct FileResponseDefaultTypeInternal {
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT FileResponseDefaultTypeInternal _FileResponse_default_instance_;
 static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_FileTransferDTO_2eproto[5];
-static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_FileTransferDTO_2eproto = nullptr;
+static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_FileTransferDTO_2eproto[1];
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_FileTransferDTO_2eproto = nullptr;
 
 const uint32_t TableStruct_FileTransferDTO_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -102,6 +104,7 @@ const uint32_t TableStruct_FileTransferDTO_2eproto::offsets[] PROTOBUF_SECTION_V
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::FileInitRequest, file_name_),
   PROTOBUF_FIELD_OFFSET(::FileInitRequest, file_size_),
+  PROTOBUF_FIELD_OFFSET(::FileInitRequest, type_),
   PROTOBUF_FIELD_OFFSET(::FileInitRequest, ssid_),
   PROTOBUF_FIELD_OFFSET(::FileInitRequest, tokens_),
   ~0u,  // no _has_bits_
@@ -145,10 +148,10 @@ const uint32_t TableStruct_FileTransferDTO_2eproto::offsets[] PROTOBUF_SECTION_V
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::FileInitRequest)},
-  { 10, -1, -1, sizeof(::FileInitResponse)},
-  { 18, -1, -1, sizeof(::FileChunk)},
-  { 30, -1, -1, sizeof(::FileRequest)},
-  { 40, -1, -1, sizeof(::FileResponse)},
+  { 11, -1, -1, sizeof(::FileInitResponse)},
+  { 19, -1, -1, sizeof(::FileChunk)},
+  { 31, -1, -1, sizeof(::FileRequest)},
+  { 41, -1, -1, sizeof(::FileResponse)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -160,25 +163,28 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_FileTransferDTO_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\025FileTransferDTO.proto\"U\n\017FileInitReque"
+  "\n\025FileTransferDTO.proto\"v\n\017FileInitReque"
   "st\022\021\n\tfile_name\030\001 \001(\t\022\021\n\tfile_size\030\002 \001(\003"
-  "\022\014\n\004ssid\030\003 \001(\t\022\016\n\006tokens\030\004 \001(\t\"4\n\020FileIn"
-  "itResponse\022\017\n\007success\030\001 \001(\010\022\017\n\007file_id\030\002"
-  " \001(\t\"x\n\tFileChunk\022\017\n\007file_id\030\001 \001(\t\022\024\n\014ch"
-  "unk_number\030\002 \001(\003\022\014\n\004data\030\003 \001(\014\022\020\n\010checks"
-  "um\030\004 \001(\t\022\024\n\014total_chunks\030\005 \001(\003\022\016\n\006tokens"
-  "\030\006 \001(\t\"O\n\013FileRequest\022\017\n\007file_id\030\001 \001(\t\022\021"
-  "\n\tfile_path\030\002 \001(\t\022\014\n\004ssid\030\003 \001(\t\022\016\n\006token"
-  "s\030\004 \001(\t\"0\n\014FileResponse\022\017\n\007success\030\001 \001(\010"
-  "\022\017\n\007message\030\002 \001(\t2\237\001\n\023FileTransferServic"
-  "e\0221\n\nInitUpload\022\020.FileInitRequest\032\021.File"
-  "InitResponse\022)\n\nUploadFile\022\n.FileChunk\032\r"
-  ".FileResponse(\001\022*\n\014DownloadFile\022\014.FileRe"
-  "quest\032\n.FileChunk0\001b\006proto3"
+  "\022\037\n\004type\030\003 \001(\0162\021.FileBusinessType\022\014\n\004ssi"
+  "d\030\004 \001(\t\022\016\n\006tokens\030\005 \001(\t\"4\n\020FileInitRespo"
+  "nse\022\017\n\007success\030\001 \001(\010\022\017\n\007file_id\030\002 \001(\t\"x\n"
+  "\tFileChunk\022\017\n\007file_id\030\001 \001(\t\022\024\n\014chunk_num"
+  "ber\030\002 \001(\003\022\014\n\004data\030\003 \001(\014\022\020\n\010checksum\030\004 \001("
+  "\t\022\024\n\014total_chunks\030\005 \001(\003\022\016\n\006tokens\030\006 \001(\t\""
+  "O\n\013FileRequest\022\017\n\007file_id\030\001 \001(\t\022\021\n\tfile_"
+  "path\030\002 \001(\t\022\014\n\004ssid\030\003 \001(\t\022\016\n\006tokens\030\004 \001(\t"
+  "\"0\n\014FileResponse\022\017\n\007success\030\001 \001(\010\022\017\n\007mes"
+  "sage\030\002 \001(\t*=\n\020FileBusinessType\022\n\n\006AVATAR"
+  "\020\000\022\020\n\014FILE_STORAGE\020\001\022\013\n\007MSG_PIC\020\0022\237\001\n\023Fi"
+  "leTransferService\0221\n\nInitUpload\022\020.FileIn"
+  "itRequest\032\021.FileInitResponse\022)\n\nUploadFi"
+  "le\022\n.FileChunk\032\r.FileResponse(\001\022*\n\014Downl"
+  "oadFile\022\014.FileRequest\032\n.FileChunk0\001b\006pro"
+  "to3"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_FileTransferDTO_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_FileTransferDTO_2eproto = {
-  false, false, 587, descriptor_table_protodef_FileTransferDTO_2eproto, "FileTransferDTO.proto", 
+  false, false, 683, descriptor_table_protodef_FileTransferDTO_2eproto, "FileTransferDTO.proto", 
   &descriptor_table_FileTransferDTO_2eproto_once, nullptr, 0, 5,
   schemas, file_default_instances, TableStruct_FileTransferDTO_2eproto::offsets,
   file_level_metadata_FileTransferDTO_2eproto, file_level_enum_descriptors_FileTransferDTO_2eproto, file_level_service_descriptors_FileTransferDTO_2eproto,
@@ -189,6 +195,21 @@ PROTOBUF_ATTRIBUTE_WEAK const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable
 
 // Force running AddDescriptors() at dynamic initialization time.
 PROTOBUF_ATTRIBUTE_INIT_PRIORITY static ::PROTOBUF_NAMESPACE_ID::internal::AddDescriptorsRunner dynamic_init_dummy_FileTransferDTO_2eproto(&descriptor_table_FileTransferDTO_2eproto);
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* FileBusinessType_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_FileTransferDTO_2eproto);
+  return file_level_enum_descriptors_FileTransferDTO_2eproto[0];
+}
+bool FileBusinessType_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+      return true;
+    default:
+      return false;
+  }
+}
+
 
 // ===================================================================
 
@@ -232,7 +253,9 @@ FileInitRequest::FileInitRequest(const FileInitRequest& from)
     tokens_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_tokens(), 
       GetArenaForAllocation());
   }
-  file_size_ = from.file_size_;
+  ::memcpy(&file_size_, &from.file_size_,
+    static_cast<size_t>(reinterpret_cast<char*>(&type_) -
+    reinterpret_cast<char*>(&file_size_)) + sizeof(type_));
   // @@protoc_insertion_point(copy_constructor:FileInitRequest)
 }
 
@@ -249,7 +272,10 @@ tokens_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlrea
 #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
   tokens_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-file_size_ = int64_t{0};
+::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
+    reinterpret_cast<char*>(&file_size_) - reinterpret_cast<char*>(this)),
+    0, static_cast<size_t>(reinterpret_cast<char*>(&type_) -
+    reinterpret_cast<char*>(&file_size_)) + sizeof(type_));
 }
 
 FileInitRequest::~FileInitRequest() {
@@ -285,7 +311,9 @@ void FileInitRequest::Clear() {
   file_name_.ClearToEmpty();
   ssid_.ClearToEmpty();
   tokens_.ClearToEmpty();
-  file_size_ = int64_t{0};
+  ::memset(&file_size_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&type_) -
+      reinterpret_cast<char*>(&file_size_)) + sizeof(type_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -313,9 +341,18 @@ const char* FileInitRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         } else
           goto handle_unusual;
         continue;
-      // string ssid = 3;
+      // .FileBusinessType type = 3;
       case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
+          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+          _internal_set_type(static_cast<::FileBusinessType>(val));
+        } else
+          goto handle_unusual;
+        continue;
+      // string ssid = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
           auto str = _internal_mutable_ssid();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "FileInitRequest.ssid"));
@@ -323,9 +360,9 @@ const char* FileInitRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         } else
           goto handle_unusual;
         continue;
-      // string tokens = 4;
-      case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
+      // string tokens = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 42)) {
           auto str = _internal_mutable_tokens();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "FileInitRequest.tokens"));
@@ -378,24 +415,31 @@ uint8_t* FileInitRequest::_InternalSerialize(
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt64ToArray(2, this->_internal_file_size(), target);
   }
 
-  // string ssid = 3;
+  // .FileBusinessType type = 3;
+  if (this->_internal_type() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
+      3, this->_internal_type(), target);
+  }
+
+  // string ssid = 4;
   if (!this->_internal_ssid().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_ssid().data(), static_cast<int>(this->_internal_ssid().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
       "FileInitRequest.ssid");
     target = stream->WriteStringMaybeAliased(
-        3, this->_internal_ssid(), target);
+        4, this->_internal_ssid(), target);
   }
 
-  // string tokens = 4;
+  // string tokens = 5;
   if (!this->_internal_tokens().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_tokens().data(), static_cast<int>(this->_internal_tokens().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
       "FileInitRequest.tokens");
     target = stream->WriteStringMaybeAliased(
-        4, this->_internal_tokens(), target);
+        5, this->_internal_tokens(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -421,14 +465,14 @@ size_t FileInitRequest::ByteSizeLong() const {
         this->_internal_file_name());
   }
 
-  // string ssid = 3;
+  // string ssid = 4;
   if (!this->_internal_ssid().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_ssid());
   }
 
-  // string tokens = 4;
+  // string tokens = 5;
   if (!this->_internal_tokens().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
@@ -438,6 +482,12 @@ size_t FileInitRequest::ByteSizeLong() const {
   // int64 file_size = 2;
   if (this->_internal_file_size() != 0) {
     total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int64SizePlusOne(this->_internal_file_size());
+  }
+
+  // .FileBusinessType type = 3;
+  if (this->_internal_type() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_type());
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_cached_size_);
@@ -474,6 +524,9 @@ void FileInitRequest::MergeFrom(const FileInitRequest& from) {
   if (from._internal_file_size() != 0) {
     _internal_set_file_size(from._internal_file_size());
   }
+  if (from._internal_type() != 0) {
+    _internal_set_type(from._internal_type());
+  }
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -508,7 +561,12 @@ void FileInitRequest::InternalSwap(FileInitRequest* other) {
       &tokens_, lhs_arena,
       &other->tokens_, rhs_arena
   );
-  swap(file_size_, other->file_size_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(FileInitRequest, type_)
+      + sizeof(FileInitRequest::type_)
+      - PROTOBUF_FIELD_OFFSET(FileInitRequest, file_size_)>(
+          reinterpret_cast<char*>(&file_size_),
+          reinterpret_cast<char*>(&other->file_size_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata FileInitRequest::GetMetadata() const {

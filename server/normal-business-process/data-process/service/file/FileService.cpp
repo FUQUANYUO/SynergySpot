@@ -27,7 +27,7 @@ std::vector<FileStorageDTO> FileService::getFileByUserSSID(const std::string& us
 
 std::vector<FileStorageDTO> FileService::getFileByFileName(const std::string& fileName, int pageSize, int pageNum) {
     std::vector<FileStorageDTO> files;
-    std::vector<FileStorageDO> res = fileDAO.findBySSID(fileName,pageSize,pageNum);
+    std::vector<FileStorageDO> res = fileDAO.findByName(fileName,pageSize,pageNum);
     files.reserve(res.size());
     for (const FileStorageDO& it : res) {
         files.push_back({
@@ -39,5 +39,16 @@ std::vector<FileStorageDTO> FileService::getFileByFileName(const std::string& fi
 
 FileStorageDTO FileService::getFileByFileID(const std::string& fileID) {
     auto res = fileDAO.findById(fileID);
+    if (res.fileId.empty()) {
+        return {};
+    }
+    return {res.fileId,res.uploaderSsid,res.fileName,res.fileSize,res.fileType,res.storagePath,res.uploadTime};
+}
+
+FileStorageDTO FileService::getFileByFilePath(const std::string &filePath) {
+    auto res = fileDAO.findByPath(filePath);
+    if (res.fileId.empty()) {
+        return {};
+    }
     return {res.fileId,res.uploaderSsid,res.fileName,res.fileSize,res.fileType,res.storagePath,res.uploadTime};
 }

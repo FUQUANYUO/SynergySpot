@@ -2,6 +2,7 @@
 #include <arpa/inet.h>
 #include <iostream>
 #include <unistd.h>
+
 using namespace std;
 TcpServer::TcpServer() {
     m_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -41,7 +42,7 @@ int TcpServer::setListen(unsigned short port) {
     return ret;
 }
 
-TcpSocket *TcpServer::acceptConn() {
+std::shared_ptr<TcpSocket> TcpServer::acceptConn() {
     sockaddr_in *addr = new sockaddr_in;
     if (addr == NULL) {
         return nullptr;
@@ -54,8 +55,8 @@ TcpSocket *TcpServer::acceptConn() {
         return nullptr;
     }
     printf("成功和客户端建立连接...\n");
-    return new TcpSocket(cfd);
+    return std::make_shared<TcpSocket>(cfd);
 }
-int TcpServer::getLisentFD() {
+int TcpServer::getListenFD() {
     return m_fd;
 }

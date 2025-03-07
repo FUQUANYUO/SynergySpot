@@ -64,7 +64,7 @@ bool FileStorageDAO::upload(const FileStorageDO &file) {
 }
 
 FileStorageDO FileStorageDAO::findById(const std::string &fileId) {
-    std::string sql = "SELECT file_id, uploader_ssid, file_name, file_size, file_type, storage_path FROM file_storage WHERE file_id = ?";
+    std::string sql = "SELECT file_id, uploader_ssid, file_name, file_size, file_type, storage_path, UNIX_TIMESTAMP(upload_time) FROM file_storage WHERE file_id = ?";
     std::vector<MysqlConn::Param> params;
     MysqlConn::Param param;
     param.type = MysqlConn::Param::STRING;
@@ -80,7 +80,7 @@ FileStorageDO FileStorageDAO::findById(const std::string &fileId) {
     MYSQL_ROW row = mysql_fetch_row(result);
     if (!row) {
         mysql_free_result(result);
-        LOG_ERROR("File not found: " << fileId);
+        LOG_WARNING("File not found: " << fileId);
         return {};
     }
 
@@ -91,13 +91,48 @@ FileStorageDO FileStorageDAO::findById(const std::string &fileId) {
     file.fileSize = std::stoll(row[3]);
     file.fileType = row[4];
     file.storagePath = row[5];
+    file.uploadTime = std::stoll(row[6]);
+
+    mysql_free_result(result);
+    return file;
+}
+
+FileStorageDO FileStorageDAO::findByPath(const std::string &path) {
+    std::string sql = "SELECT file_id, uploader_ssid, file_name, file_size, file_type, storage_path, UNIX_TIMESTAMP(upload_time) FROM file_storage WHERE storage_path = ?";
+    std::vector<MysqlConn::Param> params;
+    MysqlConn::Param param;
+    param.type = MysqlConn::Param::STRING;
+    param.str_val = path;
+    params.push_back(param);
+
+    MYSQL_RES* result = m_conn->query(sql, params);
+    if (!result) {
+        LOG_ERROR("Failed to find file by path: " << path);
+        return {};
+    }
+
+    MYSQL_ROW row = mysql_fetch_row(result);
+    if (!row) {
+        mysql_free_result(result);
+        LOG_WARNING("File not found: " << path);
+        return {};
+    }
+
+    FileStorageDO file;
+    file.fileId = row[0];
+    file.uploaderSsid = row[1];
+    file.fileName = row[2];
+    file.fileSize = std::stoll(row[3]);
+    file.fileType = row[4];
+    file.storagePath = row[5];
+    file.uploadTime = std::stoll(row[6]);
 
     mysql_free_result(result);
     return file;
 }
 
 std::vector<FileStorageDO> FileStorageDAO::findByName(const std::string &fileName,int pageSize, int pageNum) {
-    std::string sql = "SELECT file_id, uploader_ssid, file_name, file_size, file_type, storage_path FROM file_storage "
+    std::string sql = "SELECT file_id, uploader_ssid, file_name, file_size, file_type, storage_path, UNIX_TIMESTAMP(upload_time) FROM file_storage "
                       "WHERE file_name = ? "
                       "LIMIT ? OFFSET ?";
     std::vector<MysqlConn::Param> params;
@@ -140,7 +175,7 @@ std::vector<FileStorageDO> FileStorageDAO::findByName(const std::string &fileNam
 }
 
 std::vector<FileStorageDO> FileStorageDAO::findBySSID(const std::string &userSSID,int pageSize, int pageNum) {
-    std::string sql = "SELECT file_id, uploader_ssid, file_name, file_size, file_type, storage_path FROM file_storage "
+    std::string sql = "SELECT file_id, uploader_ssid, file_name, file_size, file_type, storage_path, UNIX_TIMESTAMP(upload_time) FROM file_storage "
                       "WHERE file_name = ? "
                       "LIMIT ? OFFSET ?";
     std::vector<MysqlConn::Param> params;

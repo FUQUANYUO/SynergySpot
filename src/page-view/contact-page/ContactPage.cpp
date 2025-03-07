@@ -78,15 +78,27 @@ bool ContactPage::loadCacheContact(const QList<FriendshipDTO> &caches) {
 void ContactPage::addContactInfo(const QString& groupingName,const MsgCombineDTO &info) {
     if (!info.isGroup) {
         if (_groupingInfos["friend"].contains(groupingName)) {
+            QString avatarPath;
+            if (info.userBaseInfo.avatarPath.isEmpty() || info.userBaseInfo.avatarPath == "-1") {
+                avatarPath = ":/contact-page/rc-page/img/SS-default-icon.jpg";
+            }else {
+                avatarPath = info.userBaseInfo.avatarPath;
+            }
             _friendModel->addGroupingItem(groupingName,{
-                info.userBaseInfo.ssid,info.userBaseInfo.username,"","","离线",QPixmap(info.userBaseInfo.avatarPath)
+                info.userBaseInfo.ssid,info.userBaseInfo.username,"","","离线",QPixmap(avatarPath)
             });
             _groupingInfos["friend"][groupingName].append(info);
             _ssidToCardInfoHash[info.userBaseInfo.ssid] = info;
         }
     }else {
+        QString avatarPath;
+        if (info.userBaseInfo.avatarPath.isEmpty() || info.userBaseInfo.avatarPath == "-1") {
+            avatarPath = ":/contact-page/rc-page/SS-default-icon.jpg";
+        }else {
+            avatarPath = info.userBaseInfo.avatarPath;
+        }
         _groupModel->addGroupingItem(groupingName,{
-                        info.groupBaseInfo.ssidGroup,info.groupBaseInfo.groupName,"","","离线",QPixmap(info.groupBaseInfo.avatarPath)
+                        info.groupBaseInfo.ssidGroup,info.groupBaseInfo.groupName,"","","离线",QPixmap(avatarPath)
                     });
         _groupingInfos["group"][groupingName].append(info);
         _ssidToCardInfoHash[info.groupBaseInfo.ssidGroup] = info;

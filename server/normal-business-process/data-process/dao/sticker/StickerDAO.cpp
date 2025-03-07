@@ -44,8 +44,8 @@ bool BaseStickerDAO::deleteById(int64_t stickerId) {
 }
 
 std::vector<BaseStickerDO> BaseStickerDAO::listBaseStickers() {
-    std::string sql = "SELECT sticker_id, image_url, tags, created_at FROM base_stickers "
-                      "ORDER BY created_at DESC";
+    std::string sql = "SELECT sticker_id, image_url, tags, UNIX_TIMESTAMP(created_at) FROM base_stickers "
+                      "ORDER BY UNIX_TIMESTAMP(created_at) DESC";
 
     MYSQL_RES* result = m_conn->query(sql, {});
     if (!result) {
@@ -60,7 +60,7 @@ std::vector<BaseStickerDO> BaseStickerDAO::listBaseStickers() {
         sticker.stickerId = std::stoll(row[0]);
         sticker.imageUrl = row[1];
         sticker.tags = row[2];
-        sticker.createdAt = row[3] ? std::stoul(row[3]) : 0;
+        sticker.createdAt = row[3] ? std::stoll(row[3]) : 0;
         stickers.push_back(sticker);
     }
 
@@ -118,9 +118,9 @@ bool UserCollectedStickerDAO::unCollect(const std::string &userSsid, const std::
 }
 
 std::vector<UserCollectedStickerDO> UserCollectedStickerDAO::listByUser(const std::string &userSsid, int pageSize, int pageNum) {
-    std::string sql = "SELECT collection_id, user_ssid, is_custom, image_url, created_at "
+    std::string sql = "SELECT collection_id, user_ssid, is_custom, image_url, UNIX_TIMESTAMP(created_at) "
                       "FROM user_collected_stickers WHERE user_ssid = ? "
-                      "ORDER BY created_at DESC LIMIT ? OFFSET ?";
+                      "ORDER BY UNIX_TIMESTAMP(created_at) DESC LIMIT ? OFFSET ?";
     std::vector<MysqlConn::Param> params;
 
     MysqlConn::Param paramUserSsid;
@@ -152,7 +152,7 @@ std::vector<UserCollectedStickerDO> UserCollectedStickerDAO::listByUser(const st
         sticker.userSsid = row[1];
         sticker.isCustom = static_cast<bool>(std::stoul(row[2]));
         sticker.imageUrl = row[3];
-        sticker.createdAt = row[4] ? std::stoul(row[4]) : 0;
+        sticker.createdAt = row[4] ? std::stoll(row[4]) : 0;
         stickers.push_back(sticker);
     }
 

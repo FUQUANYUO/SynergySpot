@@ -57,6 +57,7 @@ SET(
         ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/log/Log.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/get-time/GetCurTime.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/db-lite/LiteConn.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/encrypt/EncryptString.cpp
 )
 
 ADD_LIBRARY(

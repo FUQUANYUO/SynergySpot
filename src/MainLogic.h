@@ -8,6 +8,7 @@
 #include <QObject>
 #include <QApplication>
 
+class LoadingDialog;
 class QProcess;
 class QLocalServer;
 class QLocalSocket;
@@ -21,7 +22,13 @@ public:
     int startMainLogic(QApplication * app);
 
     bool initUserDataDir();
+
+    void checkAllDataLoaded();
 private:
+    bool _enable = true;
+    bool isInit  = true;
+    int  _dataLoadCounter = 0;
+
     QProcess * _pGRPCProcess   = nullptr;
     QWidget  * _curWindow      = nullptr;
     QLocalServer * _pIPCServer = nullptr;

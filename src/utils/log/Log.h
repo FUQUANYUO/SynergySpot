@@ -37,7 +37,15 @@ namespace SSLog {
 
     // 初始化日志文件
     inline void initLogFile(const std::string& logName) {
-        logFile = std::make_unique<LogFile>(logName);
+        static std::once_flag flag;
+        try {
+            std::call_once(flag, [&] {
+                logFile = std::make_unique<LogFile>(logName);
+            });
+        } catch (const std::exception& e) {
+            std::cerr << "FATAL: " << e.what() << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
     }
 
     // 日志函数

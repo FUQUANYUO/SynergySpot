@@ -6,17 +6,16 @@
 #include "Log.h"
 namespace SSLog {
     LogFile::LogFile(const std::string &logName) {
-        try {
-            if (!std::filesystem::exists("log")) {
-                std::filesystem::create_directories("log");  // 使用create_directories创建多级目录
+        std::filesystem::path dir = "log";
+        if (!std::filesystem::exists(dir)) {
+            if (!std::filesystem::create_directories(dir)) {
+                throw std::runtime_error("Failed to create log directory");
             }
-            std::filesystem::path logFilePath = ("log/" + logName + "_" + GetCurTime::getTimeObj()->getCurTime("%Y-%m-%d") + ".log");
-            file.open(logFilePath, std::ios::out | std::ios::app);
-            if (!file.is_open()) {
-                throw std::runtime_error("Failed to open log file: " + logFilePath.string());
-            }
-        } catch (std::exception &e) {
-            std::cerr << "init Log file occur error : " << e.what() << std::endl;
+        }
+        std::string filename = "log/" + logName + "_" + GetCurTime::getTimeObj()->getCurTime("%Y-%m-%d") + ".log";
+        file.open(filename, std::ios::out | std::ios::app);
+        if (!file.is_open()) {
+            throw std::runtime_error("Failed to open log file: " + filename);
         }
     }
 
@@ -27,9 +26,10 @@ namespace SSLog {
     }
 
     void LogFile::write(const std::string &message)  {
-        std::lock_guard<std::mutex> lock(mutex);  // 保证线程安全
+        std::lock_guard<std::mutex> lock(mutex);
         if (file.is_open()) {
             file << message << std::endl;
+            file.flush();
         }
     }
 

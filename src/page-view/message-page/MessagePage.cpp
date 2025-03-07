@@ -58,14 +58,14 @@ bool MessagePage::loadCacheMsg(const QList<MessageContentDTO> &caches) {
             if (!userBaseInfo.ssid.isEmpty()) {
                 addMsgCard({
                     userBaseInfo,{},{},
-                    it.content,it.createTime.toMSecsSinceEpoch(),isGroup
+                    it.content,it.createTime,isGroup
                 });
             }else {
                 LOG_WARNING("not find the ssid : " << it.recipient.recipientSSID.toStdString() << " , then ask for the data to the server database!");
                 addMsgCard({
                     {it.recipient.recipientSSID,"NULL",":/message-page/rc-page/img/SS-default-icon.jpg",
-                        "男生","UNKNOW",QDateTime::currentDateTime(),0,2,it.createTime},{},{},
-                    it.content,it.createTime.toMSecsSinceEpoch(),isGroup
+                        "男生","UNKNOWN",GetCurTime::getTimeObj()->getCurTimeStamp(),0,2,it.createTime},{},{},
+                    it.content,it.createTime,isGroup
                 });
             }
         }else {
@@ -83,14 +83,14 @@ bool MessagePage::loadCacheMsg(const QList<MessageContentDTO> &caches) {
             if (!gBaseInfo.ssidGroup.isEmpty()) {
                 addMsgCard({
                     {},gBaseInfo,gMemberInfos,
-                    it.content,it.createTime.toMSecsSinceEpoch(),isGroup
+                    it.content,it.createTime,isGroup
                 });
             }else {
                 LOG_WARNING("not find the ssid : " << it.recipient.recipientSSID.toStdString() << " , then ask for the data to the server database!");
                 addMsgCard({
                     {},{"","NULL",":/message-page/rc-page/img/SS-default-icon-flat.jpg","","",
-                        QDateTime::currentDateTime()},{},
-                    it.content,it.createTime.toMSecsSinceEpoch(),isGroup
+                        GetCurTime::getTimeObj()->getCurTimeStamp()},{},
+                    it.content,it.createTime,isGroup
                 });
             }
         }
@@ -115,7 +115,7 @@ void MessagePage::addMsgContent(const MessageContentDTO &content) {
     bool isGroup     = (content.recipient.recipientType==2);// 2 is group type
     if(isUserSend) {
         _ssidLinkCardHash[content.recipient.recipientSSID]->setTimeContent(QString::fromStdString(
-        GetCurTime::getTimeObj()->getMsgTypeTime(content.createTime.toMSecsSinceEpoch())),Qt::gray,font);
+        GetCurTime::getTimeObj()->getMsgTypeTime(content.createTime)),Qt::gray,font);
 
         // update conversation data
         if (isGroup) {
@@ -136,7 +136,7 @@ void MessagePage::addMsgContent(const MessageContentDTO &content) {
         _ssidLinkCardHash[content.senderSSID]->setStatusContent((unreadCount>99?"99+":QString::number(unreadCount)),font,40);
 
         _ssidLinkCardHash[content.senderSSID]->setTimeContent(QString::fromStdString(
-        GetCurTime::getTimeObj()->getMsgTypeTime(content.createTime.toMSecsSinceEpoch())),Qt::gray,font);
+        GetCurTime::getTimeObj()->getMsgTypeTime(content.createTime)),Qt::gray,font);
         _ssidLinkCardHash[content.senderSSID]->setSubTitle(docu.toPlainText());
 
         // update conversation data
@@ -158,12 +158,19 @@ void MessagePage::addMsgCard(const MsgCombineDTO &info) {
     QFont font;
     font.setPixelSize(8);
 
+    QString avatarPath;
+    if (info.userBaseInfo.avatarPath.isEmpty() || info.userBaseInfo.avatarPath == "-1") {
+        avatarPath = ":/message-page/rc-page/img/SS-default-icon.jpg";
+    }else {
+        avatarPath = info.userBaseInfo.avatarPath;
+    }
+
     if (!info.isGroup) { // not group
         if (!_ssidLinkCardHash.contains(info.userBaseInfo.ssid)) { // 没有添加
             ElaInteractiveCard * user = new ElaInteractiveCard(this);
             user->setTitle(info.userBaseInfo.username);
             user->setSubTitle(info.content);
-            user->setCardPixmap(QPixmap(info.userBaseInfo.avatarPath));
+            user->setCardPixmap(QPixmap(avatarPath));
             user->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
             user->setFixedWidth(245);
             user->setFixedHeight(60);
@@ -181,7 +188,7 @@ void MessagePage::addMsgCard(const MsgCombineDTO &info) {
                _unreadMsgCount[info.userBaseInfo.ssid] = 0;
                user->changeStatus(true);
                user->show();
-               _conversionWid->addTab(_cardLinkPageHash[user],QPixmap(info.userBaseInfo.avatarPath),info.userBaseInfo.username);
+               _conversionWid->addTab(_cardLinkPageHash[user],QPixmap(avatarPath),info.userBaseInfo.username);
            });
         }
         if (info.timestamp > 0) { // new msg come in
@@ -196,7 +203,7 @@ void MessagePage::addMsgCard(const MsgCombineDTO &info) {
             ElaInteractiveCard * user = new ElaInteractiveCard(this);
             user->setTitle(info.groupBaseInfo.groupName);
             user->setSubTitle(info.content);
-            user->setCardPixmap(QPixmap(info.groupBaseInfo.avatarPath));
+            user->setCardPixmap(QPixmap(avatarPath));
             user->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
             user->setFixedWidth(245);
             user->setFixedHeight(60);
@@ -214,7 +221,7 @@ void MessagePage::addMsgCard(const MsgCombineDTO &info) {
                _unreadMsgCount[info.groupBaseInfo.ssidGroup] = 0;
                user->changeStatus(true);
                user->show();
-               _conversionWid->addTab(_cardLinkPageHash[user],QPixmap(info.groupBaseInfo.avatarPath),info.groupBaseInfo.groupName);
+               _conversionWid->addTab(_cardLinkPageHash[user],QPixmap(avatarPath),info.groupBaseInfo.groupName);
            });
         }
         if (info.timestamp > 0) { // new msg come in

@@ -24,7 +24,8 @@
 
 #define g_pLandPage LandPage::getLandPage()
 
-class QTimer;
+class LoadingDialog;
+class SSMaskWidget;
 class ElaRadioButton;
 class ElaText;
 class ElaPushButton;
@@ -36,6 +37,7 @@ class QPushButton;
 class QComboBox;
 class QLineEdit;
 class QCheckBox;
+class QTimer;
 
 class SS_API LandPage : public QOpenGLWidget  {
     Q_OBJECT
@@ -47,12 +49,23 @@ public:
 
     // clear password
     void clearPasswordInput();
+
+    // freeze sign in btn
+    void isFreezeSignInBtn(bool enable);
 signals:
     // sign in request
     void sigSignInRequest(const QString& SSID,const QString& password);
 
     // change cur widget in top
     void sigCurrentWidChanged(QWidget * curWid);
+public slots:
+    // mask effect
+    void sltShowMaskEffect();
+    void sltHideMaskEffect();
+
+    // loading dialog
+    void sltShowLoading();
+    void sltHideLoading();
 private:
     explicit LandPage(QWidget *parent = nullptr);
     ~LandPage() override;
@@ -83,12 +96,13 @@ private:
     QPushButton   *  _signInButton              =   nullptr;
     QPushButton   *  _signUpButton              =   nullptr;
     QPushButton   *  _recoverPWButton           =   nullptr;
+
+    SSMaskWidget  * _maskWidget                 =   nullptr;
+    LoadingDialog * _loadingDialog              =   nullptr;
     // ----------------- UI -----------------
 
     // --------------- BackEnd --------------
-
-
-
+    QHash<QString,QString>                     _accToPasswordHash;
     // --------------- BackEnd --------------
 
     static LandPage* _landPage;
