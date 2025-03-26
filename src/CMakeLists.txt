@@ -22,6 +22,7 @@ set(SUB_PROS
         settings-page
         about-page
         user-page
+        llmapp-page
 )
 
 # Qt module

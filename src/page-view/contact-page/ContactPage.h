@@ -8,6 +8,8 @@
 #include "define.h"
 #include "ela-widget-tools/ElaScrollPage.h"
 
+#include "notice-page/NoticePage.h"
+
 #ifdef SS_PLATFORM_WINDOWS
     #ifdef SS_CONTACT_PAGE_EXPORTS
         #define SS_API __declspec(dllexport)
@@ -21,6 +23,7 @@
         #define SS_API
     #endif
 #endif
+
 
 class ElaToolButton;
 class ElaPivot;
@@ -47,6 +50,10 @@ public slots:
     void addContactInfo(const QString& groupingName,const MsgCombineDTO &info);
 signals:
     void sigTriggerAddMsgCard(const MsgCombineDTO &info);
+    void sigHideArchPageMaskEffect();
+    void sigShowArchPageMaskEffect();
+    void sigAddMakeFriendRecord(const UserBaseInfoDTO& dto, NoticeStatus status);
+    void sigAddJoinGroupRecord(const GroupBaseInfoDTO& dto, NoticeStatus status);
 private:
     explicit ContactPage(QWidget *parent = nullptr);
     ~ContactPage() override;
@@ -70,12 +77,16 @@ private:
     ContactModel  * _groupModel            = nullptr;
 
     QVBoxLayout   * _scrollTreeLayout      = nullptr;
+    NoticePage    * _noticePage            = nullptr;
     // ----------------- UI -----------------
 
     // --------------- BackEnd --------------
     QMap<QString,QMap<QString,QList<MsgCombineDTO>>>  _groupingInfos;
     // assist find MsgCardInfo
     QHash<QString, MsgCombineDTO>                     _ssidToCardInfoHash;
+    // cur contact data
+
+
     // --------------- BackEnd --------------
 
     static ContactPage* _contactPage;

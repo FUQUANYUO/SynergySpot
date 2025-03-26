@@ -30,6 +30,7 @@ public:
 
 signals:
     void sigHideArchPageMaskEffect();
+    void sigAddBtnClicked(const QString& ssid, bool isGroup);
 public slots:
     void sltAddUserRes(const UserBaseInfoDTO& dto);
     void sltAddGroupRes(const GroupBaseInfoDTO& dto);

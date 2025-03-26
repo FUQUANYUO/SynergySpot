@@ -27,6 +27,9 @@ public:
     // add item
     void addGroupingItem(const QString &groupingName,const GroupingItem &item);
 
+    // del item
+    void delGroupingItem(const QString &groupingName,const GroupingItem &item);
+
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 private:
     QStandardItem * getGrouping(const QString &groupingName);

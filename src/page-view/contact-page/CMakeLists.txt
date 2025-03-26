@@ -97,6 +97,7 @@ IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
             Qt6::Core                    Qt6::Gui                   Qt6::Widgets
             #--------------------------------    your lib file name    ----------------------------------   BEGIN
             PluginManagerd               ElaWidgetToolsd            CommonDataPlugind
+            yaml-cppd
             #--------------------------------    your lib file name    ----------------------------------   END
     )
 ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Release")

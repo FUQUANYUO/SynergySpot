@@ -84,6 +84,7 @@ private:
 
     int                _msgNoticeNum     = 0;
     int                _contactNoticeNum = 0;
+    int                _llmAppNum        = 0;
     QString            _aboutKey         = "about";
     QString            _settingsKey      = "settings";
     QString            _fileManagerKey   = "fileManager";

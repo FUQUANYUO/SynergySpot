@@ -18,7 +18,8 @@ public:
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
     enum CustomRoles {
-        StatusRole = Qt::UserRole + 1
+        StatusRole = Qt::UserRole + 1,
+        SSIDRole   = Qt::UserRole + 2
     };
 };
 

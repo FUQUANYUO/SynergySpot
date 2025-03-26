@@ -77,12 +77,8 @@ void ClientRequestHandler::addRequest(SSDTO::BusinessType type, std::string dto)
         case SSDTO::ENROLL_ACCOUNT:
             emit sigEnrollAccountRequest(dto);
             break;
-        case SSDTO::C_FRIENDSHIP:
-            emit sigAddFriendRequest(dto);
-            break;
         case SSDTO::MAKE_FRIEND_REQUEST:
-            break;
-        case SSDTO::MAKE_FRIEND_RESPONSE:
+            emit sigAddFriendRequest(dto);
             break;
         case SSDTO::FUZZY_SEARCH:
             emit sigFuzzySearchRequest(dto);
@@ -108,37 +104,36 @@ ClientRequestHandler::ClientRequestHandler(QObject* parent) : QObject(parent) {
     businessProcessor->moveToThread(_handlerThread);
 
     // 连接业务信号槽
-    connect(this, &ClientRequestHandler::sigEmailCodeRequest,           businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::EMAIL_VERIFY),Qt::QueuedConnection);
-    connect(this, &ClientRequestHandler::sigVerifyAccountRequest,       businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::LOGIN_CHECK),Qt::QueuedConnection);
-    connect(this, &ClientRequestHandler::sigForwardMessageRequest,      businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::C_MESSAGE_CONTENT),Qt::QueuedConnection);
-    connect(this, &ClientRequestHandler::sigContactListRequest,         businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_FRIENDSHIP_LIST),Qt::QueuedConnection);
-    connect(this, &ClientRequestHandler::sigEnrollAccountRequest,       businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::ENROLL_ACCOUNT),Qt::QueuedConnection);
-    connect(this, &ClientRequestHandler::sigAddFriendRequest,           businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::C_FRIENDSHIP),Qt::QueuedConnection);
-    connect(this, &ClientRequestHandler::sigFuzzySearchRequest,         businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::FUZZY_SEARCH),Qt::QueuedConnection);
-    connect(this, &ClientRequestHandler::sigQueryUserBaseInfoRequest,   businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_USER_BASE_INFO),Qt::QueuedConnection);
-    connect(this, &ClientRequestHandler::sigQueryGroupBaseInfoRequest,  businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_GROUP_BASE_INFO),Qt::QueuedConnection);
-    connect(this, &ClientRequestHandler::sigQueryGroupNoticesRequest,   businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_GROUP_NOTICE),Qt::QueuedConnection);
-    connect(this, &ClientRequestHandler::sigQueryNewMessageRequest,     businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_MESSAGE_CONTENT),Qt::QueuedConnection);
-    connect(this, &ClientRequestHandler::sigQueryFileInfoRequest,       businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_FILE),Qt::QueuedConnection);
-    connect(this, &ClientRequestHandler::sigQueryMsgPicInfoRequest,     businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_MESSAGE_PIC_INFO),Qt::QueuedConnection);
-
+    connect(this, &ClientRequestHandler::sigEmailCodeRequest,                businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::EMAIL_VERIFY),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigVerifyAccountRequest,            businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::LOGIN_CHECK),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigForwardMessageRequest,           businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::C_MESSAGE_CONTENT),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigContactListRequest,              businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_FRIENDSHIP_LIST),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigEnrollAccountRequest,            businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::ENROLL_ACCOUNT),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigAddFriendRequest,                businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::MAKE_FRIEND_REQUEST),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigFuzzySearchRequest,              businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::FUZZY_SEARCH),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigQueryUserBaseInfoRequest,        businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_USER_BASE_INFO),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigQueryGroupBaseInfoRequest,       businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_GROUP_BASE_INFO),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigQueryGroupNoticesRequest,        businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_GROUP_NOTICE),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigQueryNewMessageRequest,          businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_MESSAGE_CONTENT),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigQueryFileInfoRequest,            businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_FILE),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigQueryMsgPicInfoRequest,          businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_MESSAGE_PIC_INFO),Qt::QueuedConnection);
 
     // 连接响应信号槽
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigEmailCodeResponse,             this, &ClientRequestHandler::sigEmailCodeResponse);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigLoginResult,                   this, &ClientRequestHandler::sigLoginResult);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigForwardMessageResponse,        this, &ClientRequestHandler::sigForwardMessageResponse);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigContactListResponse,           this, &ClientRequestHandler::sigContactListResponse);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigEnrollAccountResponse,         this, &ClientRequestHandler::sigEnrollAccountResponse);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigFriendRequestResponse,         this, &ClientRequestHandler::sigFriendRequestResponse);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigFuzzySearchResponse,           this, &ClientRequestHandler::sigFuzzySearchResponse);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigConnServerFailed,              this, &ClientRequestHandler::sigConnServerFailed);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigStartGRPCService,              this, &ClientRequestHandler::sigStartGRPCService);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryUserBaseInfoResponse,     this, &ClientRequestHandler::sigQueryUserBaseInfoResponse);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryGroupBaseInfoResponse,    this, &ClientRequestHandler::sigQueryGroupBaseInfoResponse);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryGroupNoticesResponse,     this, &ClientRequestHandler::sigQueryGroupNoticesResponse);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryNewMessageResponse,       this, &ClientRequestHandler::sigQueryNewMessageResponse);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryFileInfoResponse,         this, &ClientRequestHandler::sigQueryFileInfoResponse);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryMsgPicInfoResponse,       this, &ClientRequestHandler::sigQueryMsgPicInfoResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigEmailCodeResponse,              this, &ClientRequestHandler::sigEmailCodeResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigLoginResult,                    this, &ClientRequestHandler::sigLoginResult);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigForwardMessageResponse,         this, &ClientRequestHandler::sigForwardMessageResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigContactListResponse,            this, &ClientRequestHandler::sigContactListResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigEnrollAccountResponse,          this, &ClientRequestHandler::sigEnrollAccountResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigFriendRequestResponse,          this, &ClientRequestHandler::sigFriendRequestResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigFuzzySearchResponse,            this, &ClientRequestHandler::sigFuzzySearchResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigConnServerFailed,               this, &ClientRequestHandler::sigConnServerFailed);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigStartGRPCService,               this, &ClientRequestHandler::sigStartGRPCService);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryUserBaseInfoResponse,      this, &ClientRequestHandler::sigQueryUserBaseInfoResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryGroupBaseInfoResponse,     this, &ClientRequestHandler::sigQueryGroupBaseInfoResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryGroupNoticesResponse,      this, &ClientRequestHandler::sigQueryGroupNoticesResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryNewMessageResponse,        this, &ClientRequestHandler::sigQueryNewMessageResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryFileInfoResponse,          this, &ClientRequestHandler::sigQueryFileInfoResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryMsgPicInfoResponse,        this, &ClientRequestHandler::sigQueryMsgPicInfoResponse);
 
     // 启动业务线程
     _handlerThread->start();
@@ -247,8 +242,8 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
         };
 
         // add friendship
-        _requestHandlerMap[SSDTO::C_FRIENDSHIP] = [=](const std::string & dto) {
-            SEND_PACKAGE(dto,SSDTO::C_FRIENDSHIP,"query of add friend dto has been send to server...")
+        _requestHandlerMap[SSDTO::MAKE_FRIEND_REQUEST] = [=](const std::string & dto) {
+            SEND_PACKAGE(dto,SSDTO::MAKE_FRIEND_REQUEST,"query of add friend dto has been send to server...")
         };
 
         // query search request
@@ -319,10 +314,16 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
             emit sigEnrollAccountResponse(dto);
         };
 
-        // other friend request
+        // user make friend response
         _responseHandlerMap[SSDTO::MAKE_FRIEND_RESPONSE] = [=](const std::string & dto) {
             LOG("make friend response")
-            emit sigFriendRequestResponse(dto);
+            emit sigFriendRequestResponse(dto,false);
+        };
+
+        // other user ask for be your friend
+        _responseHandlerMap[SSDTO::MAKE_FRIEND_REQUEST] = [=](const std::string & dto) {
+            LOG("make friend response")
+            emit sigFriendRequestResponse(dto,true);
         };
 
         // search fuzzy

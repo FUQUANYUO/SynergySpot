@@ -6,6 +6,8 @@
 
 #include "../contact-delegate/ContactDelegate.h"
 
+#include "help.h"
+
 ContactModel::ContactModel(QObject *parent) : QStandardItemModel(parent) {
 }
 
@@ -22,12 +24,34 @@ void ContactModel::addGrouping(const QString &groupingName) {
 void ContactModel::addGroupingItem(const QString &groupingName, const GroupingItem &item) {
     addGrouping(groupingName);
 
-    QStandardItem * gItem = new QStandardItem(item.name);
-    gItem->setData(QIcon(item.pic),Qt::DecorationRole);
-    gItem->setData(item.status,ContactDelegate::StatusRole);
-    gItem->setData(item.ssid);
-    QStandardItem * parentItem = getGrouping(groupingName);
+    QStandardItem *gItem = new QStandardItem(item.name);
+    gItem->setData(QIcon(item.pic), Qt::DecorationRole);
+    gItem->setData(item.status, ContactDelegate::StatusRole);
+    gItem->setData(item.ssid, ContactDelegate::SSIDRole);
+    QStandardItem *parentItem = getGrouping(groupingName);
     parentItem->appendRow(gItem);
+}
+
+void ContactModel::delGroupingItem(const QString &groupingName, const GroupingItem &item) {
+    // 获取父分组项
+    QStandardItem *parentItem = getGrouping(groupingName);
+    if (!parentItem) {
+        LOG_ERROR("Grouping not found:" + groupingName.toStdString());
+        return;
+    }
+
+    // 遍历父项的所有子项
+    for (int row = 0; row < parentItem->rowCount(); ++row) {
+        QStandardItem *childItem = parentItem->child(row);
+        if (!childItem) continue;
+
+        QString childSsid = childItem->data(ContactDelegate::SSIDRole).toString();
+
+        if (childSsid == item.ssid) {
+            parentItem->removeRow(row);
+            break;
+        }
+    }
 }
 QStandardItem *ContactModel::getGrouping(const QString &groupingName) {
     for(const auto &it : _itemMap.keys()){

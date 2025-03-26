@@ -158,6 +158,12 @@ signals:
     void sigFuzzySearchFriendResponse(QList<UserBaseInfoDTO> dto,int waitCount);
     void sigFuzzySearchGroupResponse(QList<GroupBaseInfoDTO> dto,int waitCount);
 
+    // add/join friend/group
+    void sigAddFriendOrGroup(const QString& ssid, bool isGroup);
+
+    // contact notice accept/reject
+    void sigReplyFriendOrGroup(const QString& ssid,bool isAccept, bool isGroup);
+
     // get file
     void sigGetAvatarFileFromRemote(
         const QString& fileID,

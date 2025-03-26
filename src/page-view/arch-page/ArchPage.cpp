@@ -12,6 +12,7 @@
 #include "../settings-page/SettingsPage.h"
 #include "../file-manager-page/FileManagerPage.h"
 #include "../user-page/UserPage.h"
+#include "../llmapp-page/LLMAppPage.h"
 
 #include "ela-widget-tools/ElaContentDialog.h"
 #include "ela-widget-tools/ElaStatusBar.h"
@@ -179,6 +180,9 @@ void ArchPage::initContent() {
     // contact page
     addPageNode("Contact", g_pContactPage, _contactNoticeNum, ElaIconType::User);
 
+    // open webui page
+    addPageNode("LLMApp", g_pLLMAppPage, _llmAppNum, ElaIconType::Code);
+
     // file manager
     addFooterNode("FileManager", g_pFileManagerPage, _fileManagerKey, 0, ElaIconType::Folders);
 
@@ -260,7 +264,8 @@ void ArchPage::initConnectFunc() {
 
     });
 
-
+    connect(g_pContactPage,&ContactPage::sigHideArchPageMaskEffect,this,&ArchPage::sltHideMaskEffect);
+    connect(g_pContactPage,&ContactPage::sigShowArchPageMaskEffect,this,&ArchPage::sltShowMaskEffect);
 
 }
 

@@ -84,6 +84,9 @@ void ContactPage::addContactInfo(const QString& groupingName,const MsgCombineDTO
             }else {
                 avatarPath = info.userBaseInfo.avatarPath;
             }
+            _friendModel->delGroupingItem(groupingName,{
+                info.userBaseInfo.ssid,info.userBaseInfo.username,"","","离线",QPixmap(avatarPath)
+            });
             _friendModel->addGroupingItem(groupingName,{
                 info.userBaseInfo.ssid,info.userBaseInfo.username,"","","离线",QPixmap(avatarPath)
             });
@@ -97,6 +100,9 @@ void ContactPage::addContactInfo(const QString& groupingName,const MsgCombineDTO
         }else {
             avatarPath = info.userBaseInfo.avatarPath;
         }
+        _groupModel->delGroupingItem(groupingName,{
+                        info.groupBaseInfo.ssidGroup,info.groupBaseInfo.groupName,"","","离线",QPixmap(avatarPath)
+                    });
         _groupModel->addGroupingItem(groupingName,{
                         info.groupBaseInfo.ssidGroup,info.groupBaseInfo.groupName,"","","离线",QPixmap(avatarPath)
                     });
@@ -115,6 +121,7 @@ ContactPage::ContactPage(QWidget *parent) : ElaScrollPage(parent) {
     initConnectFunc();
 }
 ContactPage::~ContactPage() {
+    _noticePage->deleteLater();
 }
 
 void ContactPage::initWindow() {
@@ -126,6 +133,7 @@ void ContactPage::initWindow() {
     _friendOrGroupPivot    = new ElaPivot(this);
     _friendTree            = new ElaTreeView(this);
     _groupTree             = new ElaTreeView(this);
+    _noticePage            = new NoticePage();
     _scrollTreeLayout      = new QVBoxLayout;
 }
 
@@ -219,14 +227,26 @@ void ContactPage::initConnectFunc() {
     // double-clicked add msg card and change to msg page
     connect(_friendTree,&QTreeView::doubleClicked,[=](const QModelIndex &index) {
         if (index.parent().isValid()) {
-            QString clickedSSID = index.data(Qt::UserRole + 1).toString();
+            QString clickedSSID = index.data(ContactDelegate::SSIDRole).toString();
+            if (clickedSSID.isEmpty()) return;
             emit sigTriggerAddMsgCard(_ssidToCardInfoHash.value(clickedSSID));
         }
     });
     connect(_groupTree,&QTreeView::doubleClicked,[=](const QModelIndex &index) {
         if (index.parent().isValid()) {
-            QString clickedSSID = index.data(Qt::UserRole + 1).toString();
+            QString clickedSSID = index.data(ContactDelegate::SSIDRole).toString();
+            if (clickedSSID.isEmpty()) return;
             emit sigTriggerAddMsgCard(_ssidToCardInfoHash.value(clickedSSID));
         }
     });
+
+    connect(_noticePage,&NoticePage::sigHideArchPageMaskEffect,this,&ContactPage::sigHideArchPageMaskEffect);
+
+    connect(_friendNoticeButton,&ElaToolButton::clicked,[=]() {
+        emit sigShowArchPageMaskEffect();
+        _noticePage->show();
+    });
+
+    connect(this,&ContactPage::sigAddMakeFriendRecord,_noticePage,&NoticePage::sltMakeFriendRecord);
+    connect(this,&ContactPage::sigAddJoinGroupRecord,_noticePage,&NoticePage::sltJoinGroupRecord);
 }

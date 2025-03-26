@@ -276,7 +276,7 @@ int MainLogic::startMainLogic(QApplication *app) {
                         resp["business-type"] = "avatar";
                         _pGRCSocket->write(QJsonDocument(resp).toJson());
                         _pGRCSocket->flush();
-                        // _dataLoadCounter++;
+                        _dataLoadCounter++;
                     } else {
                         baseInfoDto.avatarPath = res.storagePath;
                     }
@@ -329,7 +329,28 @@ int MainLogic::startMainLogic(QApplication *app) {
                         tmpDto.fileId.append(QString::fromStdString(fid));
                     }
 
+                    QString curSSID = QString::fromStdString(ldto.ssid());
                     newsMsg.append(tmpDto);
+
+                    SSDTO::UserBaseInfoDTO udto;
+                    if (tmpDto.senderSSID != curSSID &&
+                        g_pCommonData->getUserInfoBySSID(tmpDto.senderSSID).ssid.isEmpty())
+                    {
+                        udto.set_ssid(tmpDto.senderSSID.toStdString());
+                        std::string resDto;
+                        udto.SerializeToString(&resDto);
+                        emit g_pClientRequestHandler->sigQueryUserBaseInfoRequest(resDto);
+                        _dataLoadCounter++;
+                    }
+                    if (tmpDto.recipient.recipientSSID != curSSID &&
+                        g_pCommonData->getUserInfoBySSID(tmpDto.recipient.recipientSSID).ssid.isEmpty())
+                    {
+                        udto.set_ssid(tmpDto.recipient.recipientSSID.toStdString());
+                        std::string resDto;
+                        udto.SerializeToString(&resDto);
+                        emit g_pClientRequestHandler->sigQueryUserBaseInfoRequest(resDto);
+                        _dataLoadCounter++;
+                    }
                 }
                 if (!newsMsg.empty())
                     g_pCommonData->setMessageContentData(newsMsg, true);
@@ -365,7 +386,7 @@ int MainLogic::startMainLogic(QApplication *app) {
                             QString::fromStdString(info.ssid()),
                             QString::fromStdString(info.avatar_remote_path())
                         );
-                        // _dataLoadCounter++;
+                        _dataLoadCounter++;
                     } else {
                         baseInfoDto.avatarPath = res.storagePath;
                     }
@@ -395,7 +416,6 @@ int MainLogic::startMainLogic(QApplication *app) {
                 std::string resDto;
                 udto.SerializeToString(&resDto);
                 emit g_pClientRequestHandler->sigQueryUserBaseInfoRequest(resDto);
-                _dataLoadCounter++;
             }
 
             // get new msg from server
@@ -408,7 +428,6 @@ int MainLogic::startMainLogic(QApplication *app) {
                 std::string resUdto;
                 gudto.SerializeToString(&resUdto);
                 emit g_pClientRequestHandler->sigQueryNewMessageRequest(resUdto);
-                _dataLoadCounter++;
             }
 
             // get user contact
@@ -418,7 +437,6 @@ int MainLogic::startMainLogic(QApplication *app) {
                 std::string resgfDto;
                 gfdto.SerializeToString(&resgfDto);
                 emit g_pClientRequestHandler->sigContactListRequest(resgfDto);
-                _dataLoadCounter++;
             }
         }
         // login failed
@@ -583,7 +601,7 @@ int MainLogic::startMainLogic(QApplication *app) {
                    if (_pGRCSocket != nullptr) {
                        _pGRCSocket->write(QJsonDocument(cmd).toJson());
                        _pGRCSocket->flush();
-                       // _dataLoadCounter++;
+                       _dataLoadCounter++;
                    }
                }
                _dataLoadCounter --;
@@ -712,6 +730,55 @@ int MainLogic::startMainLogic(QApplication *app) {
         }
     });
 
+    // add friend request
+    connect(g_pCommonData,&CommonData::sigAddFriendOrGroup,this,[=](const QString& ssid, bool isGroup) {
+        SSDTO::MakeFriendDTO mdto;
+        mdto.set_sender(g_pCommonData->getCurUserInfo().ssid.toStdString());
+        mdto.set_recipient(ssid.toStdString());
+        mdto.set_accept(false);
+        mdto.set_isgroup(isGroup);
+
+        std::string resDto;
+        mdto.SerializeToString(&resDto);
+
+        emit g_pClientRequestHandler->sigAddFriendRequest(resDto);
+        if (isGroup)
+            emit g_pContactPage->sigAddJoinGroupRecord(g_pCommonData->getGroupInfoDataBySSID(ssid),NoticeStatus::Waiting);
+        else
+            emit g_pContactPage->sigAddMakeFriendRecord(g_pCommonData->getUserInfoBySSID(ssid),NoticeStatus::Waiting);
+    });
+
+    connect(g_pClientRequestHandler,&ClientRequestHandler::sigFriendRequestResponse,this,[=](const std::string& dto,bool isOtherAskFor) {
+        SSDTO::MakeFriendDTO mdto;
+        mdto.ParseFromString(dto);
+        if (isOtherAskFor) { // 添加请求信息
+            // TODO: 先缓存用户信息
+            if (mdto.isgroup()) {
+                emit g_pContactPage->sigAddJoinGroupRecord(
+                    g_pCommonData->getGroupInfoDataBySSID(QString::fromStdString(mdto.sender())),NoticeStatus::Request);
+            }else {
+                emit g_pContactPage->sigAddMakeFriendRecord(
+                    g_pCommonData->getUserInfoBySSID(QString::fromStdString(mdto.sender())),NoticeStatus::Request);
+            }
+        }else { // 更新 Waiting 状态
+            if (mdto.isgroup()) {
+                if (mdto.accept())
+                    emit g_pContactPage->sigAddJoinGroupRecord(
+                        g_pCommonData->getGroupInfoDataBySSID(QString::fromStdString(mdto.sender())),NoticeStatus::Accepted);
+                else
+                    emit g_pContactPage->sigAddJoinGroupRecord(
+                        g_pCommonData->getGroupInfoDataBySSID(QString::fromStdString(mdto.sender())),NoticeStatus::Rejected);
+            }else {
+                if (mdto.accept())
+                    emit g_pContactPage->sigAddMakeFriendRecord(
+                        g_pCommonData->getUserInfoBySSID(QString::fromStdString(mdto.sender())),NoticeStatus::Accepted);
+                else
+                    emit g_pContactPage->sigAddMakeFriendRecord(
+                        g_pCommonData->getUserInfoBySSID(QString::fromStdString(mdto.sender())),NoticeStatus::Rejected);
+            }
+        }
+    });
+
     // get avatar file
     connect(g_pCommonData,&CommonData::sigGetAvatarFileFromRemote,this,[=](
             const QString& fileID,
@@ -728,7 +795,6 @@ int MainLogic::startMainLogic(QApplication *app) {
         _pGRCSocket->write(QJsonDocument(resp).toJson());
         _pGRCSocket->flush();
     });
-
     return QApplication::exec();
 }
 

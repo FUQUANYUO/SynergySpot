@@ -67,6 +67,7 @@ bool MessagePage::loadCacheMsg(const QList<MessageContentDTO> &caches) {
                         "男生","UNKNOWN",GetCurTime::getTimeObj()->getCurTimeStamp(),0,2,it.createTime},{},{},
                     it.content,it.createTime,isGroup
                 });
+                return false;
             }
         }else {
             // get group ssid base info
@@ -92,6 +93,7 @@ bool MessagePage::loadCacheMsg(const QList<MessageContentDTO> &caches) {
                         GetCurTime::getTimeObj()->getCurTimeStamp()},{},
                     it.content,it.createTime,isGroup
                 });
+                return false;
             }
         }
         addMsgContent(it);
@@ -155,6 +157,7 @@ void MessagePage::addMsgContent(const MessageContentDTO &content) {
 }
 
 void MessagePage::addMsgCard(const MsgCombineDTO &info) {
+    if (info.groupBaseInfo.ssidGroup.isEmpty() && info.userBaseInfo.ssid.isEmpty())return;
     QFont font;
     font.setPixelSize(8);
 

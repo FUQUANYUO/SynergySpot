@@ -71,6 +71,11 @@ void AddPage::sltAddUserRes(const UserBaseInfoDTO &dto) {
 
     _userResLayout->insertWidget(_userResLayout->count()-1,card);
     _userResMap.insert(dto.ssid,card);
+
+    // 绑定按钮消息
+    connect(addBtn,&ElaToolButton::clicked,[=]() {
+        emit sigAddBtnClicked(dto.ssid,false);
+    });
 }
 
 void AddPage::sltAddGroupRes(const GroupBaseInfoDTO &dto) {
@@ -89,6 +94,11 @@ void AddPage::sltAddGroupRes(const GroupBaseInfoDTO &dto) {
 
     _groupResLayout->addWidget(card);
     _groupResMap.insert(dto.ssidGroup,card);
+
+    // 绑定按钮消息
+    connect(addBtn,&ElaToolButton::clicked,[=]() {
+        emit sigAddBtnClicked(dto.ssidGroup,false);
+    });
 }
 
 void AddPage::initWindow() {
@@ -150,11 +160,11 @@ void AddPage::initEdgeLayout() {
 }
 
 void AddPage::initContent() {
-    _search->setPlaceholderText("全网搜索");
+    _search->setPlaceholderText("键入关键词回车全网搜索...");
 
     _typeSwitch->appendPivot("好友");
     _typeSwitch->appendPivot("群组");
-    _typeSwitch->setPivotSpacing(20);
+    _typeSwitch->setPivotSpacing(15);
     _typeSwitch->setFixedHeight(30);
     _typeSwitch->setCurrentIndex(0);
 
@@ -233,6 +243,7 @@ void AddPage::initConnectFunc() {
         }
     });
 
+    connect(this,&AddPage::sigAddBtnClicked,g_pCommonData,&CommonData::sigAddFriendOrGroup);
 }
 
 void AddPage::paintEvent(QPaintEvent *event) {
