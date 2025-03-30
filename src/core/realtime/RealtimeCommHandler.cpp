@@ -13,12 +13,14 @@
 
 #include <QDir>
 #include <QTimer>
+#include <QBuffer>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QtNetwork/QLocalSocket>
 #include <utility>
 
 #include "testWindow.h"
+
 
 #define SEND_ERROR_RESPONSE(__MSG__)                        \
     resp["status"]  = "error";                              \
@@ -128,6 +130,9 @@ int RealtimeCommHandler::startGrpcService() {
 grpc::CompletionQueue *RealtimeCommHandler::getCompletionQueue() {
     return &_cq;
 }
+void RealtimeCommHandler::setUserSSID(const QString &ssid) {
+    curUserSSID = ssid;
+}
 
 QString RealtimeCommHandler::getUserSSID() {
     return curUserSSID;
@@ -211,7 +216,7 @@ void RealtimeCommHandler::endVideoCall() {
 
 void RealtimeCommHandler::handleRemoteOffer(const QString &sdp, const QString &senderSsid) {
     _webRTCHandler->initialize();
-    _webRTCHandler->handleAnswer(sdp, senderSsid);
+    _webRTCHandler->handleOffer(sdp, senderSsid);
     _isCallActive = true;
     emit sigCallStateChanged(1);
 }
@@ -224,17 +229,51 @@ void RealtimeCommHandler::handleRemoteIceCandidate(const QString &candidate, con
     _webRTCHandler->handleRemoteCandidate(candidate, mid);
 }
 
-void RealtimeCommHandler::sltSendResponse(const QJsonObject &resp)  {
+bool RealtimeCommHandler::isCallActive() {
+    return _isCallActive;
+}
+
+void RealtimeCommHandler::sltSendResponse(const QJsonObject &resp) {
     if (_pIPCSocket != nullptr) {
         if (_pIPCSocket->state() == QLocalSocket::ConnectedState) {
             _pIPCSocket->write(QJsonDocument(resp).toJson());
             _pIPCSocket->flush();
-        }else {
+        } else {
             LOG_ERROR("_pIPCSocket is not connected")
         }
-    }
-    else {
+    } else {
         LOG_ERROR("When program run find _pIPCSocket is nullptr");
+    }
+}
+
+void RealtimeCommHandler::sltSendVideoFrame(const QImage &frame) {
+    if (!_isCallActive || !_webRTCHandler) {
+        return;
+    }
+
+    try {
+        // 将QImage转换为压缩的JPEG字节数组（减少传输数据量）
+        QByteArray imageData;
+        QBuffer buffer(&imageData);
+        buffer.open(QIODevice::WriteOnly);
+        frame.save(&buffer, "JPEG", 80); // 80%质量
+
+        // 将图像数据转换为Base64编码的字符串
+        QString base64Image = QString::fromLatin1(imageData.toBase64());
+
+        // 创建JSON消息
+        QJsonObject videoFrameMsg;
+        videoFrameMsg["type"] = "video-frame";
+        videoFrameMsg["width"] = frame.width();
+        videoFrameMsg["height"] = frame.height();
+        videoFrameMsg["data"] = base64Image;
+
+        // 通过数据通道发送
+        QJsonDocument doc(videoFrameMsg);
+        _webRTCHandler->sendVideoFrame(doc.toJson(QJsonDocument::Compact).toStdString());
+
+    } catch (const std::exception &e) {
+        LOG_ERROR("Failed to send video frame: " << e.what());
     }
 }
 
@@ -323,6 +362,11 @@ void RealtimeCommHandler::setupWebRTCSignaling() {
                 sendSignalingMessage(msg);
             });
 
+    connect(_webRTCHandler.get(), &WebRTCHandler::sigDataChannelPicReceived,
+        this, [this](const QImage &frame) {
+            emit sigRemoteVideoFrameReceived(frame);
+        });
+
     std::lock_guard<std::mutex> lock(_streamMutex);
     if (_signalingStream) {
         _signalingStream->WritesDone();
@@ -341,11 +385,12 @@ void RealtimeCommHandler::setupWebRTCSignaling() {
 }
 
 void RealtimeCommHandler::sendSignalingMessage(const SignalingMessage &message) {
-    std::lock_guard<std::mutex> lock(_streamMutex);
     if (_signalingStream && !_streamShutdown) {
         if (!_signalingStream->Write(message)) {
             LOG_ERROR("发送信令消息失败");
             _streamShutdown = true; // 触发流关闭
+        }else {
+            LOG_INFO("信令消息发送成功: " << message.content());
         }
     }
 }

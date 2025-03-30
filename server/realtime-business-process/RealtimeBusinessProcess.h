@@ -96,6 +96,9 @@ private:
     std::unique_ptr<FileTransferServiceImpl> _fileTransferService;
     std::unique_ptr<WebRTCSignalingServiceImpl> _webrtcSignalingService;
     std::unique_ptr<grpc::Server> _grpcServer;
+
+    std::mutex _streamMutex;
+    std::atomic<bool> _streamShutdown{false};
 };
 
 

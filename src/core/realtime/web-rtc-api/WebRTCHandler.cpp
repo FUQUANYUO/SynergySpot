@@ -6,8 +6,8 @@
 #include "help.h"
 
 #include <QtCore>
-#include <rtc/rtc.hpp>
 #include <nlohmann/json.hpp>
+#include <QImage>
 
 using json = nlohmann::json;
 
@@ -74,10 +74,10 @@ void WebRTCHandler::initialize() {
 
     // Setup local description callback
     _peerConnection->onLocalDescription([this](rtc::Description description) {
-        QString sdp = QString::fromStdString(std::string(description));
+        QString sdp = QString::fromStdString(std::string());
         QString type = description.typeString() == "offer" ? "offer" : "answer";
-        emit sigLocalDescriptionCreated(sdp, type);
         LOG_INFO("Local description created of type: " << type.toStdString());
+        emit sigLocalDescriptionCreated(sdp, type);
     });
 
     _isInitialized = true;
@@ -119,7 +119,7 @@ void WebRTCHandler::createOffer(const QString& targetSsid) {
     setupDataChannel(_dataChannel);
 
     // Create offer
-    _peerConnection->setLocalDescription();
+    _peerConnection->setLocalDescription(rtc::Description::Type::Offer);
     LOG_INFO("Creating offer for target: " << targetSsid.toStdString());
 }
 
@@ -158,7 +158,7 @@ void WebRTCHandler::handleAnswer(const QString& sdp, const QString& remoteSsid) 
     LOG_INFO("Remote answer set from: " << remoteSsid.toStdString());
 }
 
-void WebRTCHandler::handleRemoteCandidate(const QString& candidate, const QString& mid) {
+void WebRTCHandler::handleRemoteCandidate(const QString &candidate, const QString &mid) {
     if (!_isInitialized) {
         LOG_ERROR("WebRTC not initialized");
         return;
@@ -169,9 +169,13 @@ void WebRTCHandler::handleRemoteCandidate(const QString& candidate, const QStrin
         rtc::Candidate ice(candidate.toStdString(), mid.toStdString());
         _peerConnection->addRemoteCandidate(ice);
         LOG_INFO("Added remote ICE candidate");
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
         LOG_ERROR("Failed to parse remote candidate: " << e.what());
     }
+}
+
+void WebRTCHandler::sendVideoFrame(const std::string &frame) {
+    _dataChannel->send(frame);
 }
 
 void WebRTCHandler::endCall() {
@@ -202,10 +206,34 @@ void WebRTCHandler::setupDataChannel(std::shared_ptr<rtc::DataChannel> dc) {
     dc->onMessage([this](std::variant<rtc::binary, std::string> message) {
         if (std::holds_alternative<std::string>(message)) {
             QString msg = QString::fromStdString(std::get<std::string>(message));
-            QMetaObject::invokeMethod(this, [this, msg]() {
-                emit sigDataChannelMessageReceived(msg);
-            }, Qt::QueuedConnection);
-            LOG_INFO("Data channel message received: " << msg.toStdString());
+
+            try {
+                QJsonDocument doc = QJsonDocument::fromJson(msg.toUtf8());
+                if (!doc.isNull() && doc.isObject()) {
+                    QJsonObject obj = doc.object();
+                    if (obj["type"].toString() == "video-frame") {
+                        // 解码视频帧
+                        QByteArray imageData = QByteArray::fromBase64(
+                            obj["data"].toString().toLatin1());
+                        QImage frame;
+                        frame.loadFromData(imageData, "JPEG");
+
+                        if (!frame.isNull()) {
+                            QMetaObject::invokeMethod(this, [this, frame]() {
+                                // 通过信号转发给RealtimeCommHandler
+                                emit sigDataChannelPicReceived(frame);
+                            }, Qt::QueuedConnection);
+                        }
+                    } else {
+                        // 其他类型消息
+                        QMetaObject::invokeMethod(this, [this, msg]() {
+                            emit sigDataChannelMessageReceived(msg);
+                        }, Qt::QueuedConnection);
+                    }
+                }
+            } catch (...) {
+                LOG_ERROR("Failed to parse video frame message");
+            }
         }
     });
 

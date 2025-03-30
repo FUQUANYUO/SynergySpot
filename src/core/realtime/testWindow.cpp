@@ -1,21 +1,30 @@
-// VideoWindow.cpp
 #include "testWindow.h"
 #include <QHBoxLayout>
 #include <QMessageBox>
-#include <QCamera>
-#include <QMediaCaptureSession>
-#include <QVideoSink>
+#include <QMediaDevices>
+#include <QTimer>
 
 VideoWindow::VideoWindow(QWidget *parent)
-    : QMainWindow(parent) {
+    : QMainWindow(parent),
+      _camera(nullptr),
+      _captureSession(nullptr),
+      _videoSink(nullptr) {
+
     _commHandler = new RealtimeCommHandler(this);
+    _commHandler->setUserSSID(LOCAL_SSID); // 设置固定本地SSID
+
+    _frameSendTimer = new QTimer(this);
+    _frameSendTimer->setInterval(1000 / _targetFPS);
 
     setupUI();
-    initWebRTC();
+    initCamera();
+    setupConnections();
 }
 
 VideoWindow::~VideoWindow() {
-
+    if (_camera && _camera->isActive()) {
+        _camera->stop();
+    }
 }
 
 void VideoWindow::setupUI() {
@@ -28,13 +37,7 @@ void VideoWindow::setupUI() {
     _remoteVideoLabel->setFixedSize(640, 480);
     _remoteVideoLabel->setStyleSheet("background-color: black;");
 
-    // 控制区域
-    _ssidEdit = new QLineEdit(this);
-    _ssidEdit->setPlaceholderText("输入你的SSID");
-
-    _targetSsidEdit = new QLineEdit(this);
-    _targetSsidEdit->setPlaceholderText("输入目标SSID");
-
+    // 控制按钮
     _callButton = new QPushButton("发起通话", this);
     _hangupButton = new QPushButton("结束通话", this);
     _hangupButton->setEnabled(false);
@@ -48,8 +51,6 @@ void VideoWindow::setupUI() {
     videoLayout->addWidget(_remoteVideoLabel);
 
     QHBoxLayout *controlLayout = new QHBoxLayout;
-    controlLayout->addWidget(_ssidEdit);
-    controlLayout->addWidget(_targetSsidEdit);
     controlLayout->addWidget(_callButton);
     controlLayout->addWidget(_hangupButton);
 
@@ -61,49 +62,64 @@ void VideoWindow::setupUI() {
     // 信号连接
     connect(_callButton, &QPushButton::clicked, this, &VideoWindow::startVideoCall);
     connect(_hangupButton, &QPushButton::clicked, this, &VideoWindow::endVideoCall);
-    connect(_commHandler, &RealtimeCommHandler::sigCallStateChanged, [this](int state) {
-        _hangupButton->setEnabled(state == 1);
-    });
 }
 
-void VideoWindow::initWebRTC() {
-    // 初始化本地视频采集
-    _camera = new QCamera(this);
-    _captureSession = new QMediaCaptureSession(this);
-    _captureSession->setCamera(_camera);
-
-    // 创建视频接收器并连接到槽函数
-    _videoSink = new QVideoSink(this);
-    _captureSession->setVideoOutput(_videoSink);
-
-    connect(_videoSink, &QVideoSink::videoFrameChanged, this, [this](const QVideoFrame &frame) {
-        QImage image = frame.toImage();
-        if (!image.isNull()) {
-            updateLocalVideo(image.scaled(640, 480));
-        }
-    });
-
-    _camera->start();
-}
-
-void VideoWindow::setUserSSID() {
-    _commHandler->getUserSSID();
-}
-
-void VideoWindow::startVideoCall() {
-    QString targetSsid = _targetSsidEdit->text();
-    if (targetSsid.isEmpty()) {
-        QMessageBox::warning(this, "错误", "请输入目标SSID");
+void VideoWindow::initCamera() {
+    const QList<QCameraDevice> cameras = QMediaDevices::videoInputs();
+    if (cameras.isEmpty()) {
+        QMessageBox::warning(this, "错误", "未找到可用的摄像头");
         return;
     }
 
-    if (_commHandler->startVideoCall(targetSsid)) {
-        QMessageBox::information(this, "提示", "已发起通话请求");
+    _camera = new QCamera(cameras.first(), this);
+    _captureSession = new QMediaCaptureSession(this);
+    _captureSession->setCamera(_camera);
+    _videoSink = new QVideoSink(this);
+    _captureSession->setVideoOutput(_videoSink);
+    _camera->start();
+}
+
+void VideoWindow::setupConnections() {
+    connect(_videoSink, &QVideoSink::videoFrameChanged,
+            this, &VideoWindow::handleVideoFrame);
+
+    connect(_frameSendTimer, &QTimer::timeout, this, [this]() {
+        QMutexLocker locker(&_frameMutex);
+        if (!_lastLocalFrame.isNull() && _commHandler->isCallActive()) {
+            _commHandler->sltSendVideoFrame(_lastLocalFrame.scaled(640, 480, Qt::KeepAspectRatio));
+        }
+    });
+
+    connect(_commHandler, &RealtimeCommHandler::sigRemoteVideoFrameReceived,
+            this, &VideoWindow::updateRemoteVideo);
+
+    connect(_commHandler, &RealtimeCommHandler::sigCallStateChanged, [this](int state) {
+        _hangupButton->setEnabled(state == 1);
+        if (state == 1) {
+            _frameSendTimer->start(1000 / _targetFPS);
+        }else {
+            _frameSendTimer->stop();
+        }
+    });
+}
+
+void VideoWindow::startVideoCall() {
+    if (_commHandler->startVideoCall(REMOTE_SSID)) {
+        QMessageBox::information(this, "提示", QString("已向 %1 发起通话请求").arg(REMOTE_SSID));
     }
 }
 
 void VideoWindow::endVideoCall() {
     _commHandler->endVideoCall();
+}
+
+void VideoWindow::handleVideoFrame(const QVideoFrame &frame) {
+    QImage image = frame.toImage();
+    if (!image.isNull()) {
+        QMutexLocker locker(&_frameMutex);
+        _lastLocalFrame = image.copy();
+        updateLocalVideo(image);
+    }
 }
 
 void VideoWindow::updateLocalVideo(const QImage &frame) {

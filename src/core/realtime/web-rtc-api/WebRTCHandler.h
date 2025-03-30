@@ -8,6 +8,7 @@
 #include <QObject>
 #include <QString>
 #include <memory>
+#include <rtc/rtc.hpp>
 
 // Forward declarations for libdatachannel types
 namespace rtc {
@@ -39,6 +40,9 @@ public:
     // Handle remote ICE candidate
     void handleRemoteCandidate(const QString& candidate, const QString& mid);
 
+    // 上传视频图像
+    void sendVideoFrame(const std::string &frame);
+
     // End current call
     void endCall();
 
@@ -51,6 +55,8 @@ signals:
 
     // Signal emitted when data channel message is received
     void sigDataChannelMessageReceived(const QString& message);
+
+    void sigDataChannelPicReceived(const QImage &pic);
 
     // Signal emitted when connection state changes
     void sigConnectionStateChanged(int state);
@@ -65,8 +71,8 @@ private:
 private:
     RealtimeCommHandler* _commHandler;
     std::shared_ptr<rtc::PeerConnection> _peerConnection;
-    std::shared_ptr<rtc::DataChannel> _dataChannel;
-    std::shared_ptr<rtc::Configuration> _config;
+    std::shared_ptr<rtc::DataChannel>    _dataChannel;
+    std::shared_ptr<rtc::Configuration>  _config;
 
     bool _isInitialized = false;
     QString _currentRemoteSsid;

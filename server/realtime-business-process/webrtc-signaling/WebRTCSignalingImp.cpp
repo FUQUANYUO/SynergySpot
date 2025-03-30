@@ -191,6 +191,7 @@ void WebRTCSignalingServiceImpl::queueSignalingMessage(const std::string& ssid, 
             queue->messages.push(message);
         }
         queue->cv.notify_one();
+        LOG_INFO("Message queued for client: " << ssid << ", message type: " << message.type());
     } else {
         LOG_INFO("Client not connected: " << ssid);
     }

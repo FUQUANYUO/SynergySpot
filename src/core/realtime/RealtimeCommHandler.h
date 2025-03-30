@@ -39,6 +39,9 @@ public:
 
     // 获取异步队列
     grpc::CompletionQueue *getCompletionQueue();
+
+    void setUserSSID(const QString& ssid);
+
     // 获取当前 ssid
     QString getUserSSID();
 
@@ -68,6 +71,8 @@ public:
     void handleRemoteAnswer(const QString& sdp);
 
     void handleRemoteIceCandidate(const QString& candidate, const QString& mid);
+
+    bool isCallActive();
 signals:
     void sigConnectionLost();
 
@@ -80,17 +85,20 @@ signals:
     void sigRemoteOfferReceived(const QString& sdp, const QString& senderSsid);
     void sigRemoteAnswerReceived(const QString& sdp);
     void sigRemoteIceCandidateReceived(const QString& candidate, const QString& mid);
+    void sigRemoteVideoFrameReceived(const QImage &frame);
     void sigCallStateChanged(int state);
 
     void sigGRPCDisconnect();
 public:
     static constexpr int CHUNK_SIZE = 3 * 1024 * 1024; // 4MB
 
-private slots:
+public slots:
     void sltCheckHeartbeat();
 
     // send res to main process
     void sltSendResponse(const QJsonObject &resp);
+
+    void sltSendVideoFrame(const QImage &frame);
 private:
     // void initWebRTC();
     void setupGRPCChannel();
