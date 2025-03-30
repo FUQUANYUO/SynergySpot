@@ -266,12 +266,14 @@ RealtimeBusinessProcess::~RealtimeBusinessProcess() {}
 void RealtimeBusinessProcess::Start() {
     _mediaService = std::make_unique<MediaServiceImpl>();
     _fileTransferService = std::make_unique<FileTransferServiceImpl>();
+    _webrtcSignalingService = std::make_unique<WebRTCSignalingServiceImpl>();
 
     grpc::ServerBuilder builder;
     builder.AddListeningPort(_serverAddr, grpc::InsecureServerCredentials());
 
     builder.RegisterService(_mediaService.get());
     builder.RegisterService(_fileTransferService.get());
+    builder.RegisterService(_webrtcSignalingService.get());
 
     builder.SetMaxReceiveMessageSize(INT_MAX);
     builder.SetMaxSendMessageSize(INT_MAX);

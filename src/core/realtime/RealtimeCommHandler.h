@@ -7,15 +7,20 @@
 
 #include "heartbeat/HeartbeatDTO.grpc.pb.h"
 #include "file-transfer/FileTransferDTO.grpc.pb.h"
+#include "webrtc-signaling/WebRTCSignaling.grpc.pb.h"
+
+#include "web-rtc-api/WebRTCHandler.h"
 
 #include <grpcpp/grpcpp.h>
-#include <QCoreApplication>
+#include <QApplication>
 
 #include "CommonData.h"
 
 class QLocalSocket;
 class AsyncDownloadTask;
 class SyncUploadTask;
+
+class VideoWindow;
 
 class AsyncTask {
 public:
@@ -52,10 +57,17 @@ public:
     // 下载失败结束回调
     void onUploadFailed(const std::string& error);
 
-//        // 初始化音视频通话
-//        bool initVideoCall(const QString& remoteId);
-//        // 结束音视频通话
-//        void endVideoCall();
+    // 启动/结束 视频通话
+    bool startVideoCall(const QString& targetSsid);
+    void endVideoCall();
+
+    // 远端请求
+    void handleRemoteOffer(const QString& sdp, const QString& senderSsid);
+
+    // 远端响应
+    void handleRemoteAnswer(const QString& sdp);
+
+    void handleRemoteIceCandidate(const QString& candidate, const QString& mid);
 signals:
     void sigConnectionLost();
 
@@ -64,6 +76,11 @@ signals:
 
     void sigDownloadProgress(int percent);
     void sigDownloadFinished(const QJsonObject &resp);
+
+    void sigRemoteOfferReceived(const QString& sdp, const QString& senderSsid);
+    void sigRemoteAnswerReceived(const QString& sdp);
+    void sigRemoteIceCandidateReceived(const QString& candidate, const QString& mid);
+    void sigCallStateChanged(int state);
 
     void sigGRPCDisconnect();
 public:
@@ -83,13 +100,19 @@ private:
     // file
     void handleUploadCommand(const QString& localUrl,const QString& type, FileStorageDTO fileDTO);
     void handleDownloadCommand(const QString& saveLocPath,const QString& type,const FileStorageDTO& fileDTO);
-//        std::unique_ptr<WebRTCInterface> _webrtc;
+
+    void setupWebRTCSignaling();
+    void sendSignalingMessage(const SignalingMessage& message);
+    void processSignalingStream();
+
 private:
     bool _isCallActive;
     bool _isHeartbeatActive;
     int  _coolDownTime;
     int  _maxRetryCount;
     int  _tryLinkCount;
+
+    VideoWindow * videoWin;
 
     QString  curUserSSID = "";
     QString _currentRemoteId;
@@ -99,11 +122,16 @@ private:
     std::shared_ptr<grpc::Channel> _channel;
     std::unique_ptr<FileTransferService::Stub> _fileStub;
     std::unique_ptr<MediaService::Stub> _mediaStub;
+    std::unique_ptr<WebRTCSignalingService::Stub> _signalingStub;
 
     // async do
     grpc::CompletionQueue _cq;
     std::atomic<bool> _shutdown{false};
     std::thread _cqThread;
+
+    std::unique_ptr<grpc::ClientReaderWriter<SignalingMessage, SignalingMessage>> _signalingStream;
+    std::unique_ptr<WebRTCHandler>  _webRTCHandler;
+    std::atomic<bool>               _isSignalingActive{false};
 };
 
 

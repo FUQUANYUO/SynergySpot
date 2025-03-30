@@ -28,18 +28,24 @@ find_package(gRPC CONFIG REQUIRED)
 find_package(Qt6 REQUIRED COMPONENTS
         Core
         Network
+        Widgets
+        Multimedia
+        MultimediaWidgets
 )
 
 file(GLOB_RECURSE   ProtoCC         ${CMAKE_CURRENT_SOURCE_DIR}/../../protofile-grpc/*.cc     )
 file(GLOB_RECURSE   RealtimeCpp     ${CMAKE_CURRENT_SOURCE_DIR}/business/*.cpp)
+file(GLOB_RECURSE   WebRTCCpp       ${CMAKE_CURRENT_SOURCE_DIR}/web-rtc-api/*.cpp)
 
-set(RealtimeCpp ${RealtimeCpp} main.cpp RealtimeCommHandler.cpp)
+set(RealtimeCpp ${RealtimeCpp} main.cpp RealtimeCommHandler.cpp testWindow.cpp)
 
 # common data
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../common-data)
 
 # grpc
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../lib-common/include/grpc-inc)
+# datachannel
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../lib-common/include/webrtc-datachannel)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../lib-common/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../utils)
 # protofile
@@ -50,6 +56,7 @@ qt_add_executable(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/log/Log.cpp
         ${RealtimeCpp}
         ${ProtoCC}
+        ${WebRTCCpp}
 )
 
 # 使用 yaml 静态库
@@ -69,10 +76,13 @@ if(SS_CLIENT_WIN)
         target_link_libraries(${PROJECT_NAME} PRIVATE
                 Qt::Core
                 Qt::Network
+                Qt::Multimedia
+                Qt::MultimediaWidgets
                 yaml-cppd
                 gRPC::grpc++
                 gRPC::grpc
                 libprotobuf
+                datachannel
 
                 CommonDataPlugind
         )
@@ -80,10 +90,13 @@ if(SS_CLIENT_WIN)
         target_link_libraries(${PROJECT_NAME} PRIVATE
                 Qt::Core
                 Qt::Network
+                Qt::Multimedia
+                Qt::MultimediaWidgets
                 yaml-cpp
                 gRPC::grpc++
                 gRPC::grpc
                 libprotobuf
+                datachannel
 
                 CommonDataPlugin
         )
@@ -102,6 +115,8 @@ else()
     elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
         target_link_libraries(${PROJECT_NAME} PRIVATE
                 Qt::Core
+                Qt::Widgets
+                Qt::multimedia
                 libmysql
                 yaml-cpp
         )

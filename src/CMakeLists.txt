@@ -31,6 +31,7 @@ find_package(Qt6 REQUIRED COMPONENTS
         Gui
         Widgets
         Network
+        multimedia
 
         OpenGLWidgets
 )
@@ -98,6 +99,7 @@ if(SS_CLIENT_WIN)
                         Qt::Widgets
                         Qt::Network
                         Qt::OpenGLWidgets
+                        Qt::Multimedia
                         libprotobufd
                         yaml-cppd
                         libmysql
@@ -122,6 +124,7 @@ if(SS_CLIENT_WIN)
                         Qt::Widgets
                         Qt::Network
                         Qt::OpenGLWidgets
+                        Qt::Multimedia
                         libprotobuf
                         yaml-cpp
                         libmysql
@@ -163,6 +166,7 @@ else()
                         Qt::Widgets
                         Qt::Network
                         Qt::OpenGLWidgets
+                        Qt::Multimedia
                         libprotobuf
                         sqlite3
                         libmysql
@@ -181,6 +185,7 @@ else()
                         Qt::Widgets
                         Qt::Network
                         Qt::OpenGLWidgets
+                        Qt::Multimedia
                         libprotobuf
                         sqlite3
                         libmysql

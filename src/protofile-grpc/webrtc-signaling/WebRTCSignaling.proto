@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+// Define service for WebRTC signaling
+service WebRTCSignalingService {
+  // Create an offer to initiate a call
+  rpc CreateOffer(SignalingRequest) returns (SignalingResponse);
+
+  // Handle answer from remote peer
+  rpc HandleAnswer(SignalingRequest) returns (SignalingResponse);
+
+  // Exchange ICE candidates
+  rpc ExchangeIceCandidate(IceCandidateRequest) returns (SignalingResponse);
+
+  // Bi-directional stream for real-time signaling updates
+  rpc SignalingStream(stream SignalingMessage) returns (stream SignalingMessage);
+}
+
+// Request for signaling operations
+message SignalingRequest {
+  string sender_ssid = 1;     // Sender's session ID
+  string target_ssid = 2;     // Target's session ID
+  string sdp = 3;             // SDP content (offer or answer)
+  string type = 4;            // Type: "offer" or "answer"
+}
+
+// Response for signaling operations
+message SignalingResponse {
+  bool success = 1;           // Operation success status
+  string message = 2;         // Status message
+  string sdp = 3;             // SDP response if applicable
+  string type = 4;            // Type of response if applicable
+}
+
+// ICE candidate exchange
+message IceCandidateRequest {
+  string sender_ssid = 1;     // Sender's session ID
+  string target_ssid = 2;     // Target's session ID
+  string candidate = 3;       // ICE candidate string
+  string sdp_mid = 4;         // SDP mid attribute
+}
+
+// Bi-directional signaling message
+message SignalingMessage {
+  enum MessageType {
+    OFFER = 0;
+    ANSWER = 1;
+    ICE_CANDIDATE = 2;
+    HANGUP = 3;
+  }
+
+  MessageType type = 1;       // Message type
+  string sender_ssid = 2;     // Sender's session ID
+  string target_ssid = 3;     // Target's session ID
+  string content = 4;         // Message content (SDP or candidate)
+  string sdp_mid = 5;         // SDP mid attribute for ICE candidates
+}

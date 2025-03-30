@@ -9,3 +9,7 @@
     path = src/3rdparty/sqlcipher
     url = https://github.com/sqlcipher/sqlcipher.git
     branch = v4.6.1
+[submodule "src/3rdparty/libdatachannel"]
+    path = src/3rdparty/libdatachannel
+    url = https://github.com/paullouisageneau/libdatachannel.git
+    branch = v0.18

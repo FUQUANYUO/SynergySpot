@@ -12,6 +12,7 @@
 
 #include "grpcpp/grpcpp.h"
 
+#include "webrtc-signaling/WebRTCSignalingImp.h"
 #include "heartbeat/HeartbeatDTO.grpc.pb.h"
 #include "file-transfer/FileTransferDTO.grpc.pb.h"
 
@@ -93,6 +94,7 @@ private:
     std::string _serverAddr;
     std::unique_ptr<MediaServiceImpl> _mediaService;
     std::unique_ptr<FileTransferServiceImpl> _fileTransferService;
+    std::unique_ptr<WebRTCSignalingServiceImpl> _webrtcSignalingService;
     std::unique_ptr<grpc::Server> _grpcServer;
 };
 

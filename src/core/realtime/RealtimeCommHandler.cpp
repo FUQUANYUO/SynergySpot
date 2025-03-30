@@ -18,6 +18,8 @@
 #include <QtNetwork/QLocalSocket>
 #include <utility>
 
+#include "testWindow.h"
+
 #define SEND_ERROR_RESPONSE(__MSG__)                        \
     resp["status"]  = "error";                              \
     resp["message"] = __MSG__;
@@ -31,6 +33,7 @@ RealtimeCommHandler::RealtimeCommHandler(QObject* parent)
 {
     // initWebRTC();
     setupGRPCChannel();
+    setupWebRTCSignaling();
 
     // 设置心跳定时器
     connect(_heartbeatTimer, &QTimer::timeout, this, &RealtimeCommHandler::sltCheckHeartbeat);
@@ -73,6 +76,13 @@ RealtimeCommHandler::RealtimeCommHandler(QObject* parent)
         SEND_ERROR_RESPONSE(msg)
     });
 
+    connect(this, &RealtimeCommHandler::sigRemoteOfferReceived,
+            this, &RealtimeCommHandler::handleRemoteOffer);
+    connect(this, &RealtimeCommHandler::sigRemoteAnswerReceived,
+            this, &RealtimeCommHandler::handleRemoteAnswer);
+    connect(this, &RealtimeCommHandler::sigRemoteIceCandidateReceived,
+            this, &RealtimeCommHandler::handleRemoteIceCandidate);
+
     _cqThread = std::thread([this]() {
         void* tag;
         bool ok;
@@ -84,16 +94,18 @@ RealtimeCommHandler::RealtimeCommHandler(QObject* parent)
 }
 
 RealtimeCommHandler::~RealtimeCommHandler() {
-    // if (_isCallActive) {
-    //     endVideoCall();
-    // }
+    if (_isCallActive) {
+        endVideoCall();
+    }
+    videoWin->deleteLater();
     _shutdown = true;
     _cq.Shutdown();
     if (_cqThread.joinable()) _cqThread.join();
 }
 
 int RealtimeCommHandler::startGrpcService() {
-    return QCoreApplication::exec();
+    // return QApplication::exec();
+    return 0;
 }
 
 grpc::CompletionQueue *RealtimeCommHandler::getCompletionQueue() {
@@ -154,6 +166,47 @@ void RealtimeCommHandler::onUploadFailed(const std::string &error) {
     emit sigUploadFinished(resp);
 }
 
+bool RealtimeCommHandler::startVideoCall(const QString &targetSsid) {
+    if (_isCallActive) {
+        LOG_ERROR("Call already in progress");
+        return false;
+    }
+
+    _webRTCHandler->initialize();
+    _webRTCHandler->createOffer(targetSsid);
+    _isCallActive = true;
+    return true;
+}
+
+void RealtimeCommHandler::endVideoCall() {
+    if (!_isCallActive) return;
+
+    SignalingMessage msg;
+    msg.set_type(SignalingMessage::HANGUP);
+    msg.set_sender_ssid(curUserSSID.toStdString());
+    msg.set_target_ssid(_currentRemoteId.toStdString());
+    sendSignalingMessage(msg);
+
+    _webRTCHandler->endCall();
+    _isCallActive = false;
+    emit sigCallStateChanged(0);
+}
+
+void RealtimeCommHandler::handleRemoteOffer(const QString &sdp, const QString &senderSsid) {
+    _webRTCHandler->initialize();
+    _webRTCHandler->handleAnswer(sdp, senderSsid);
+    _isCallActive = true;
+    emit sigCallStateChanged(1);
+}
+
+void RealtimeCommHandler::handleRemoteAnswer(const QString &sdp) {
+    _webRTCHandler->handleAnswer(sdp, _currentRemoteId);
+}
+
+void RealtimeCommHandler::handleRemoteIceCandidate(const QString &candidate, const QString &mid) {
+    _webRTCHandler->handleRemoteCandidate(candidate, mid);
+}
+
 void RealtimeCommHandler::sltSendResponse(const QJsonObject &resp)  {
     if (_pIPCSocket != nullptr) {
         if (_pIPCSocket->state() == QLocalSocket::ConnectedState) {
@@ -178,6 +231,7 @@ void RealtimeCommHandler::setupGRPCChannel() {
         _channel = grpc::CreateChannel(ip + ":" + port, grpc::InsecureChannelCredentials());
         _mediaStub = MediaService::NewStub(_channel);
         _fileStub = FileTransferService::NewStub(_channel);
+        _signalingStub = WebRTCSignalingService::NewStub(_channel);
     }
     else{
         LOG_INFO("set up grpc channel failed! conf is null, please check path! ")
@@ -228,6 +282,91 @@ void RealtimeCommHandler::handleDownloadCommand(const QString &saveLocPath, cons
         onDownloadFailed(e.what());
     }
 }
+void RealtimeCommHandler::setupWebRTCSignaling() {
+    _webRTCHandler = std::make_unique<WebRTCHandler>(this);
+
+    grpc::ClientContext context;
+    _signalingStream = _signalingStub->SignalingStream(&context);
+    _isSignalingActive = true;
+
+    connect(_webRTCHandler.get(), &WebRTCHandler::sigLocalDescriptionCreated,
+                [=](const QString& sdp, const QString& type) {
+                    SignalingMessage msg;
+                    msg.set_sender_ssid(curUserSSID.toStdString());
+                    msg.set_target_ssid(_currentRemoteId.toStdString());
+                    msg.set_content(sdp.toStdString());
+                    msg.set_type(type == "offer" ? SignalingMessage::OFFER : SignalingMessage::ANSWER);
+                    sendSignalingMessage(msg);
+                });
+
+    connect(_webRTCHandler.get(), &WebRTCHandler::sigIceCandidateFound,
+            [this](const QString& candidate, const QString& mid) {
+                SignalingMessage msg;
+                msg.set_type(SignalingMessage::ICE_CANDIDATE);
+                msg.set_sender_ssid(curUserSSID.toStdString());
+                msg.set_target_ssid(_currentRemoteId.toStdString());
+                msg.set_content(candidate.toStdString());
+                msg.set_sdp_mid(mid.toStdString());
+                sendSignalingMessage(msg);
+            });
+
+    std::thread([this]() {
+        processSignalingStream();
+    }).detach();
+}
+
+void RealtimeCommHandler::sendSignalingMessage(const SignalingMessage &message) {
+    if (_isSignalingActive) {
+        _signalingStream->Write(message);
+    }
+}
+
+void RealtimeCommHandler::processSignalingStream() {
+    // 确保信令流已初始化
+    if (!_signalingStream) {
+        LOG_ERROR("Signaling stream is not initialized");
+        return;
+    }
+
+    // 持续读取信令流中的消息
+    SignalingMessage msg;
+    while (_signalingStream->Read(&msg)) {
+        // 根据消息类型触发信号
+        switch (msg.type()) {
+            case SignalingMessage::OFFER:
+                emit sigRemoteOfferReceived(
+                    QString::fromStdString(msg.content()),
+                    QString::fromStdString(msg.sender_ssid())
+                );
+            break;
+            case SignalingMessage::ANSWER:
+                emit sigRemoteAnswerReceived(
+                    QString::fromStdString(msg.content())
+                );
+            break;
+            case SignalingMessage::ICE_CANDIDATE:
+                emit sigRemoteIceCandidateReceived(
+                    QString::fromStdString(msg.content()),
+                    QString::fromStdString(msg.sdp_mid())
+                );
+            break;
+            case SignalingMessage::HANGUP:
+                endVideoCall();
+            break;
+            default:
+                LOG_WARNING("Unknown signaling message type: " << msg.type());
+            break;
+        }
+    }
+
+    // 流读取结束或发生错误
+    grpc::Status status = _signalingStream->Finish();
+    if (!status.ok()) {
+        LOG_ERROR("Signaling stream closed with error: " << status.error_message());
+        emit sigGRPCDisconnect();
+    }
+    _isSignalingActive = false;
+}
 
 QString RealtimeCommHandler::calculateChunkMD5(const QByteArray &data) {
     unsigned char digest[MD5_DIGEST_LENGTH];
@@ -239,38 +378,6 @@ QString RealtimeCommHandler::calculateChunkMD5(const QByteArray &data) {
 
     return QString(mdStr);
 }
-
-// bool RealtimeCommHandler::initVideoCall(const QString& remoteId) {
-//     if (_isCallActive) {
-//         qWarning() << "Call already in progress";
-//         return false;
-//     }
-//
-//     _currentRemoteId = remoteId;
-//     startChildProcess();
-//
-//     // 创建新的WebRTC连接
-//     _webrtc->createPeerConnection();
-//     _webrtc->setRemoteDescription(remoteId);
-//
-//     _isCallActive = true;
-//     emit signalCallStateChanged(1); // 1 = 通话开始
-//     return true;
-// }
-
-// void RealtimeCommHandler::endVideoCall() {
-//     if (!_isCallActive) return;
-//
-//     _webrtc->closePeerConnection();
-//     if (_mediaProcess) {
-//         _mediaProcess->terminate();
-//         _mediaProcess->waitForFinished();
-//     }
-//
-//     _isCallActive = false;
-//     _currentRemoteId.clear();
-//     emit signalCallStateChanged(0); // 0 = 通话结束
-// }
 
 void RealtimeCommHandler::sltCheckHeartbeat() {
     // 发送心跳包到服务器
