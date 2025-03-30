@@ -130,8 +130,12 @@ private:
     std::thread _cqThread;
 
     std::unique_ptr<grpc::ClientReaderWriter<SignalingMessage, SignalingMessage>> _signalingStream;
-    std::unique_ptr<WebRTCHandler>  _webRTCHandler;
-    std::atomic<bool>               _isSignalingActive{false};
+    std::unique_ptr<grpc::ClientContext>    _signalingContext;
+    std::unique_ptr<WebRTCHandler>          _webRTCHandler;
+    std::atomic<bool>                       _isSignalingActive{false};
+    std::atomic<bool>                       _streamShutdown{false}; // 流式读取终止标志
+    std::thread                             _signalingThread;
+    std::mutex                              _streamMutex; // 流式读写互斥锁
 };
 
 

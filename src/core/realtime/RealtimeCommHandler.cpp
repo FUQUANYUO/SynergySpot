@@ -94,6 +94,23 @@ RealtimeCommHandler::RealtimeCommHandler(QObject* parent)
 }
 
 RealtimeCommHandler::~RealtimeCommHandler() {
+    // 先停止心跳等依赖流的组件
+    _heartbeatTimer->stop();
+    _isHeartbeatActive = false;
+
+    _streamShutdown = true; // 设置关闭标志
+    {
+        std::lock_guard<std::mutex> lock(_streamMutex);
+        if (_signalingStream) {
+            _signalingStream->WritesDone(); // 通知服务端不再发送数据
+            _signalingStream->Finish().IgnoreError(); // 安全关闭流
+            _signalingStream.reset();
+        }
+    }
+    if (_signalingThread.joinable()) {
+        _signalingThread.join(); // 等待信令线程退出
+    }
+
     if (_isCallActive) {
         endVideoCall();
     }
@@ -285,10 +302,6 @@ void RealtimeCommHandler::handleDownloadCommand(const QString &saveLocPath, cons
 void RealtimeCommHandler::setupWebRTCSignaling() {
     _webRTCHandler = std::make_unique<WebRTCHandler>(this);
 
-    grpc::ClientContext context;
-    _signalingStream = _signalingStub->SignalingStream(&context);
-    _isSignalingActive = true;
-
     connect(_webRTCHandler.get(), &WebRTCHandler::sigLocalDescriptionCreated,
                 [=](const QString& sdp, const QString& type) {
                     SignalingMessage msg;
@@ -310,27 +323,60 @@ void RealtimeCommHandler::setupWebRTCSignaling() {
                 sendSignalingMessage(msg);
             });
 
-    std::thread([this]() {
+    std::lock_guard<std::mutex> lock(_streamMutex);
+    if (_signalingStream) {
+        _signalingStream->WritesDone();
+        _signalingStream->Finish().IgnoreError();
+        _signalingStream.reset();
+    }
+
+    _signalingContext = std::make_unique<grpc::ClientContext>();
+    _signalingStream = _signalingStub->SignalingStream(_signalingContext.get());
+    _isSignalingActive = true;
+
+    // 启动信令处理线程
+    _signalingThread = std::thread([this]() {
         processSignalingStream();
-    }).detach();
+    });
 }
 
 void RealtimeCommHandler::sendSignalingMessage(const SignalingMessage &message) {
-    if (_isSignalingActive) {
-        _signalingStream->Write(message);
+    std::lock_guard<std::mutex> lock(_streamMutex);
+    if (_signalingStream && !_streamShutdown) {
+        if (!_signalingStream->Write(message)) {
+            LOG_ERROR("发送信令消息失败");
+            _streamShutdown = true; // 触发流关闭
+        }
     }
 }
 
 void RealtimeCommHandler::processSignalingStream() {
     // 确保信令流已初始化
-    if (!_signalingStream) {
-        LOG_ERROR("Signaling stream is not initialized");
-        return;
+    {
+        std::lock_guard<std::mutex> lock(_streamMutex);
+        if (!_signalingStream) {
+            LOG_ERROR("Signaling stream is not initialized");
+            return;
+        }
     }
 
     // 持续读取信令流中的消息
-    SignalingMessage msg;
-    while (_signalingStream->Read(&msg)) {
+    while (!_streamShutdown) {
+        SignalingMessage msg;
+        {
+            std::lock_guard<std::mutex> lock(_streamMutex);
+            if (!_signalingStream || !_signalingStream->Read(&msg)) {
+                if (_signalingStream) {
+                    grpc::Status status = _signalingStream->Finish();
+                    if (!status.ok()) {
+                        LOG_ERROR("信令流错误: " << status.error_message());
+                    }
+                    _signalingStream.reset();
+                }
+                _isSignalingActive = false;
+                break; // 流正常结束
+            }
+        }
         // 根据消息类型触发信号
         switch (msg.type()) {
             case SignalingMessage::OFFER:
@@ -358,14 +404,6 @@ void RealtimeCommHandler::processSignalingStream() {
             break;
         }
     }
-
-    // 流读取结束或发生错误
-    grpc::Status status = _signalingStream->Finish();
-    if (!status.ok()) {
-        LOG_ERROR("Signaling stream closed with error: " << status.error_message());
-        emit sigGRPCDisconnect();
-    }
-    _isSignalingActive = false;
 }
 
 QString RealtimeCommHandler::calculateChunkMD5(const QByteArray &data) {
