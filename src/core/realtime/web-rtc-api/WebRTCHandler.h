@@ -73,6 +73,8 @@ private:
     std::shared_ptr<rtc::PeerConnection> _peerConnection;
     std::shared_ptr<rtc::DataChannel>    _dataChannel;
     std::shared_ptr<rtc::Configuration>  _config;
+    std::queue<rtc::Candidate>           _pendingCandidates; // 缓存候选
+    std::mutex                           _candidateMutex;
 
     bool _isInitialized = false;
     QString _currentRemoteSsid;

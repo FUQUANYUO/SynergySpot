@@ -147,15 +147,20 @@ void WebRTCHandler::handleAnswer(const QString& sdp, const QString& remoteSsid) 
         LOG_ERROR("WebRTC not initialized");
         return;
     }
+    try {
+        rtc::Description answer(sdp.toStdString(), "answer");
+        _peerConnection->setRemoteDescription(answer);
+        LOG_INFO("Remote description set, applying " << _pendingCandidates.size() << " pending candidates");
 
-    _currentRemoteSsid = remoteSsid;
-
-    // Parse SDP
-    rtc::Description description(sdp.toStdString(), "answer");
-
-    // Set remote description
-    _peerConnection->setRemoteDescription(description);
-    LOG_INFO("Remote answer set from: " << remoteSsid.toStdString());
+        std::lock_guard<std::mutex> lock(_candidateMutex);
+        while (!_pendingCandidates.empty()) {
+            auto candidate = _pendingCandidates.front();
+            _peerConnection->addRemoteCandidate(candidate);
+            _pendingCandidates.pop();
+        }
+    } catch (const std::exception& e) {
+        LOG_ERROR("Failed to set remote answer: " << e.what());
+    }
 }
 
 void WebRTCHandler::handleRemoteCandidate(const QString &candidate, const QString &mid) {
@@ -163,14 +168,19 @@ void WebRTCHandler::handleRemoteCandidate(const QString &candidate, const QStrin
         LOG_ERROR("WebRTC not initialized");
         return;
     }
-
-    // Parse ICE candidate
     try {
         rtc::Candidate ice(candidate.toStdString(), mid.toStdString());
+        std::lock_guard<std::mutex> lock(_candidateMutex);
+
+        if (!_peerConnection->remoteDescription().has_value()) {
+            _pendingCandidates.push(ice);
+            LOG_WARNING("Deferred candidate (no remote description): " << candidate.toStdString());
+            return;
+        }
+
         _peerConnection->addRemoteCandidate(ice);
-        LOG_INFO("Added remote ICE candidate");
-    } catch (const std::exception &e) {
-        LOG_ERROR("Failed to parse remote candidate: " << e.what());
+    } catch (const std::exception& e) {
+        LOG_ERROR("Invalid candidate format: " << candidate.toStdString() << ", error: " << e.what());
     }
 }
 
