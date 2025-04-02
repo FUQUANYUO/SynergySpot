@@ -127,10 +127,13 @@ grpc::Status WebRTCSignalingServiceImpl::SignalingStream(
                     message.set_target_ssid(targetSsid);
                     queueSignalingMessage(targetSsid, message);
                 }
+                LOG_INFO("HangUp process!");
             } else if (!message.target_ssid().empty()) {
                 // Forward the message to the target
                 queueSignalingMessage(message.target_ssid(), message);
+                LOG_INFO("forward message :" << message.type() << " to:" << message.target_ssid());
             }
+            LOG_INFO("[ERR] Received signaling message: " << message.type() << " to:" << message.target_ssid());
         }
     });
 

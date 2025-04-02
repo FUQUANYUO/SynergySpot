@@ -116,7 +116,6 @@ RealtimeCommHandler::~RealtimeCommHandler() {
     if (_isCallActive) {
         endVideoCall();
     }
-    videoWin->deleteLater();
     _shutdown = true;
     _cq.Shutdown();
     if (_cqThread.joinable()) _cqThread.join();
@@ -187,14 +186,15 @@ void RealtimeCommHandler::onUploadFailed(const std::string &error) {
     LOG_ERROR("U : occur failed : " << error)
     emit sigUploadFinished(resp);
 }
+void RealtimeCommHandler::connectToSignalingServer() {
+    _webRTCHandler->initialize();
+}
 
 bool RealtimeCommHandler::startVideoCall(const QString &targetSsid) {
     if (_isCallActive) {
         LOG_ERROR("Call already in progress");
         return false;
     }
-
-    _webRTCHandler->initialize();
     _webRTCHandler->createOffer(targetSsid);
     _isCallActive = true;
     return true;

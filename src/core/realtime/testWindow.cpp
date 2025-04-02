@@ -1,7 +1,8 @@
 #include "testWindow.h"
 #include <QHBoxLayout>
-#include <QMessageBox>
 #include <QMediaDevices>
+#include <QMessageBox>
+#include <QStatusBar>
 #include <QTimer>
 
 VideoWindow::VideoWindow(QWidget *parent)
@@ -11,7 +12,7 @@ VideoWindow::VideoWindow(QWidget *parent)
       _videoSink(nullptr) {
 
     _commHandler = new RealtimeCommHandler(this);
-    _commHandler->setUserSSID(LOCAL_SSID); // 设置固定本地SSID
+    _commHandler->setUserSSID(LOCAL_SSID);
 
     _frameSendTimer = new QTimer(this);
     _frameSendTimer->setInterval(1000 / _targetFPS);
@@ -19,6 +20,7 @@ VideoWindow::VideoWindow(QWidget *parent)
     setupUI();
     initCamera();
     setupConnections();
+    initSignaling();  // 启动时初始化信令
 }
 
 VideoWindow::~VideoWindow() {
@@ -37,10 +39,11 @@ void VideoWindow::setupUI() {
     _remoteVideoLabel->setFixedSize(640, 480);
     _remoteVideoLabel->setStyleSheet("background-color: black;");
 
-    // 控制按钮
-    _callButton = new QPushButton("发起通话", this);
+    // 控制按钮（仅保留结束通话）
     _hangupButton = new QPushButton("结束通话", this);
     _hangupButton->setEnabled(false);
+    _startBtn = new QPushButton("开始通话", this);
+    _startBtn->setEnabled(true);
 
     // 布局
     QWidget *centralWidget = new QWidget(this);
@@ -51,7 +54,7 @@ void VideoWindow::setupUI() {
     videoLayout->addWidget(_remoteVideoLabel);
 
     QHBoxLayout *controlLayout = new QHBoxLayout;
-    controlLayout->addWidget(_callButton);
+    controlLayout->addWidget(_startBtn);
     controlLayout->addWidget(_hangupButton);
 
     mainLayout->addLayout(videoLayout);
@@ -60,8 +63,12 @@ void VideoWindow::setupUI() {
     setCentralWidget(centralWidget);
 
     // 信号连接
-    connect(_callButton, &QPushButton::clicked, this, &VideoWindow::startVideoCall);
     connect(_hangupButton, &QPushButton::clicked, this, &VideoWindow::endVideoCall);
+    connect(_startBtn, &QPushButton::clicked, this, [=]() {
+        _startBtn->setEnabled(false);
+        _hangupButton->setEnabled(true);
+        onCallBtn();
+    });
 }
 
 void VideoWindow::initCamera() {
@@ -95,17 +102,18 @@ void VideoWindow::setupConnections() {
 
     connect(_commHandler, &RealtimeCommHandler::sigCallStateChanged, [this](int state) {
         _hangupButton->setEnabled(state == 1);
-        if (state == 1) {
-            _frameSendTimer->start(1000 / _targetFPS);
-        }else {
-            _frameSendTimer->stop();
-        }
+        _frameSendTimer->setInterval(1000 / _targetFPS);
+        state == 1 ? _frameSendTimer->start() : _frameSendTimer->stop();
     });
 }
 
-void VideoWindow::startVideoCall() {
-    if (_commHandler->startVideoCall(REMOTE_SSID)) {
-        QMessageBox::information(this, "提示", QString("已向 %1 发起通话请求").arg(REMOTE_SSID));
+void VideoWindow::initSignaling() {
+    _commHandler->connectToSignalingServer();
+}
+
+void VideoWindow::onCallBtn() {
+    if (!_commHandler->startVideoCall(REMOTE_SSID)) {
+        QMessageBox::critical(this, "错误", "已经有call连接");
     }
 }
 
@@ -123,7 +131,7 @@ void VideoWindow::handleVideoFrame(const QVideoFrame &frame) {
 }
 
 void VideoWindow::updateLocalVideo(const QImage &frame) {
-    _localVideoLabel->setPixmap(QPixmap::fromImage(frame));
+    _localVideoLabel->setPixmap(QPixmap::fromImage(frame.scaled(640, 480, Qt::KeepAspectRatio)));
 }
 
 void VideoWindow::updateRemoteVideo(const QImage &frame) {

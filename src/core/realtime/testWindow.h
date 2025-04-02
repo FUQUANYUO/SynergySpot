@@ -18,24 +18,25 @@ public:
     ~VideoWindow();
 
     private slots:
-        void startVideoCall();
     void endVideoCall();
     void handleVideoFrame(const QVideoFrame &frame);
     void updateRemoteVideo(const QImage &frame);
+    void onCallBtn();
 
 private:
     void setupUI();
     void initCamera();
     void setupConnections();
     void updateLocalVideo(const QImage &frame);
+    void initSignaling();  // 新增信令初始化方法
 
     RealtimeCommHandler* _commHandler;
 
     // UI 组件
     QLabel *_localVideoLabel;
     QLabel *_remoteVideoLabel;
-    QPushButton *_callButton;
     QPushButton *_hangupButton;
+    QPushButton *_startBtn;
 
     // 视频捕获组件
     QCamera *_camera;
@@ -49,8 +50,8 @@ private:
     int _targetFPS = 15;
 
     // 固定SSID
-    const QString LOCAL_SSID = "user123";
-    const QString REMOTE_SSID = "target456";
+    const QString LOCAL_SSID = "100";
+    const QString REMOTE_SSID = "1000";
 };
 
 #endif // TESTWINDOW_H

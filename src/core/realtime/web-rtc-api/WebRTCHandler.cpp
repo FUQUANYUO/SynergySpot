@@ -74,7 +74,7 @@ void WebRTCHandler::initialize() {
 
     // Setup local description callback
     _peerConnection->onLocalDescription([this](rtc::Description description) {
-        QString sdp = QString::fromStdString(std::string());
+        QString sdp = QString::fromStdString(description.generateSdp());
         QString type = description.typeString() == "offer" ? "offer" : "answer";
         LOG_INFO("Local description created of type: " << type.toStdString());
         emit sigLocalDescriptionCreated(sdp, type);

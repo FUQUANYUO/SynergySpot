@@ -60,6 +60,9 @@ public:
     // 下载失败结束回调
     void onUploadFailed(const std::string& error);
 
+    // 连接信令服务器
+    void connectToSignalingServer();
+
     // 启动/结束 视频通话
     bool startVideoCall(const QString& targetSsid);
     void endVideoCall();
@@ -82,6 +85,7 @@ signals:
     void sigDownloadProgress(int percent);
     void sigDownloadFinished(const QJsonObject &resp);
 
+    void sigSignalingConnected();
     void sigRemoteOfferReceived(const QString& sdp, const QString& senderSsid);
     void sigRemoteAnswerReceived(const QString& sdp);
     void sigRemoteIceCandidateReceived(const QString& candidate, const QString& mid);
@@ -120,10 +124,8 @@ private:
     int  _maxRetryCount;
     int  _tryLinkCount;
 
-    VideoWindow * videoWin;
-
-    QString  curUserSSID = "";
-    QString _currentRemoteId;
+    QString  curUserSSID = "100";
+    QString _currentRemoteId = "1000";
     QTimer* _heartbeatTimer;
     QLocalSocket * _pIPCSocket;
 
