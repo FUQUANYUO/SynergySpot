@@ -359,7 +359,9 @@ void RealtimeCommHandler::setupWebRTCSignaling() {
                 msg.set_target_ssid(_currentRemoteId.toStdString());
                 msg.set_content(candidate.toStdString());
                 msg.set_sdp_mid(mid.toStdString());
-                sendSignalingMessage(msg);
+                QTimer::singleShot(500, [=]() {
+                    sendSignalingMessage(msg);
+                });
             });
 
     connect(_webRTCHandler.get(), &WebRTCHandler::sigDataChannelPicReceived,

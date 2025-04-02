@@ -14,7 +14,7 @@
 
 // Structure to hold pending signaling messages for each client
 struct ClientSignalingQueue {
-    std::queue<SignalingMessage> messages;
+    std::deque<SignalingMessage> messages;
     std::mutex mutex;
     std::condition_variable cv;
     bool active = true;

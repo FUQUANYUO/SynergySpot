@@ -147,7 +147,7 @@ grpc::Status WebRTCSignalingServiceImpl::SignalingStream(
                     clientQueue->active = false;
                     break;
                 }
-                clientQueue->messages.pop();
+                clientQueue->messages.pop_front();
             }
 
             if (clientQueue->active) {
@@ -188,14 +188,15 @@ void WebRTCSignalingServiceImpl::queueSignalingMessage(const std::string& ssid, 
     std::lock_guard<std::mutex> lock(_clientsMutex);
     auto it = _clientQueues.find(ssid);
     if (it != _clientQueues.end()) {
-        std::shared_ptr<ClientSignalingQueue> queue = it->second;
-        {
-            std::lock_guard<std::mutex> queueLock(queue->mutex);
-            queue->messages.push(message);
-        }
-        queue->cv.notify_one();
-        LOG_INFO("Message queued for client: " << ssid << ", message type: " << message.type());
-    } else {
-        LOG_INFO("Client not connected: " << ssid);
+        auto& queue = it->second->messages;
+        // 优先处理SDP消息
+        if (message.type() == SignalingMessage_MessageType_OFFER ||
+            message.type() == SignalingMessage_MessageType_ANSWER) {
+            queue.push_front(message);
+            } else {
+                queue.push_back(message);
+            }
+        // 唤醒等待线程
+        it->second->cv.notify_one();
     }
 }
