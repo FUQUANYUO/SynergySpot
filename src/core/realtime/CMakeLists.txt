@@ -35,8 +35,11 @@ file(GLOB_RECURSE   ProtoCC         ${CMAKE_CURRENT_SOURCE_DIR}/../../protofile-
 file(GLOB_RECURSE   RealtimeCpp     ${CMAKE_CURRENT_SOURCE_DIR}/business/*.cpp)
 file(GLOB_RECURSE   TRTCCpp     ${CMAKE_CURRENT_SOURCE_DIR}/trtc-realtime-comm/*.cpp)
 
+QT_ADD_RESOURCES(
+        QRC_FILES                    Realtime.qrc
+)
 
-set(RealtimeCpp ${RealtimeCpp} main.cpp RealtimeCommHandler.cpp TRTCTestWindow.cpp)
+set(RealtimeCpp ${RealtimeCpp} main.cpp RealtimeCommHandler.cpp)
 
 # common data
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../common-data)
@@ -55,6 +58,7 @@ qt_add_executable(${PROJECT_NAME}
         ${RealtimeCpp}
         ${ProtoCC}
         ${TRTCCpp}
+        ${QRC_FILES}
 )
 
 # 使用 yaml 静态库

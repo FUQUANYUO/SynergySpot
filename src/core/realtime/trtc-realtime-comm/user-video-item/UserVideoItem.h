@@ -47,14 +47,6 @@ private:
     void setRenderParams();
     void setRemoteVideoStreamType();
     virtual void updateDynamicTextUI();
-private slots:
-    void on_audioMuteBt_clicked();
-    void on_videoMuteBt_clicked();
-    void on_fitScreenBt_clicked();
-    void on_preSmallVideoBt_clicked();
-    void on_mirrorBt_clicked();
-    void on_roateBt_clicked();
-
 public:
     void updateAVMuteView(VIDEO_ITEM::MuteAllType muteType);
     void setVolume(int volume);
@@ -64,7 +56,7 @@ public:
     bool getAudioMuteStatus();
     bool getVideoMuteStatus();
     VIDEO_ITEM::ViewItemType getViewType();
-    void updateAVMuteStatus(bool mute, VIDEO_ITEM::MuteAllType muteType);
+    void updateAVMuteStatus(bool mute, VIDEO_ITEM::MuteAllType muteType,VIDEO_ITEM::ViewItemType viewType);
     void updateAVAvailableStatus(bool available, bool mute_all_remote, VIDEO_ITEM::MuteAllType muteType);
     void initViews();
     void changeEvent(QEvent* event);

@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/realtime/">
+        <file>rc-page/img/camera_close.png</file>
+        <file>rc-page/img/camera_normal.png</file>
+        <file>rc-page/img/hang-up.png</file>
+        <file>rc-page/img/screen-shared.png</file>
+        <file>rc-page/img/microphone_close.png</file>
+        <file>rc-page/img/microphone_normal.png</file>
+        <file>rc-page/img/microphone_speaking.png</file>
+    </qresource>
+</RCC>

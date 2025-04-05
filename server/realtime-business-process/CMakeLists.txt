@@ -7,7 +7,7 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../out/${CMAKE_BUILD_TYPE
 
 set(CMAKE_PREFIX_PATH "/root/grpc_install")
 
-# need you install grpc
+# you need install grpc
 find_package(Threads REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(gRPC REQUIRED)
