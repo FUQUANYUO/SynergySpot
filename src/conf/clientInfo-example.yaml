@@ -8,6 +8,9 @@ mysql-info:
  maxSize: 1024
  maxIdleTime: 60 # 最大空闲事件（单位秒）
  timeout: 100    # 连接超时时间（单位毫秒）
+sqlite-info:
+ dbName: cacheData.db
+ accessKey: SynergySpot2025
 server-host-info:
  ip: xxxxxxxxx
  port: xxxxxxxxx
@@ -16,6 +19,9 @@ log:
 request-friend-msg:
  default: 久闻大名，能否交流交流~
 realtime-info:
- grpcIP: xxxxxxxxx
- grpcPort: xxxxxxxxx
+ grpcIP: 43.134.116.49
+ grpcPort: 12994
  maxRetryCount: 5              # 重连最大尝试次数
+open-webui-info:
+ url: "xxxxxxxxx"
+

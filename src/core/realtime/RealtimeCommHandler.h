@@ -52,10 +52,10 @@ public:
     // 下载失败结束回调
     void onUploadFailed(const std::string& error);
 
-//        // 初始化音视频通话
-//        bool initVideoCall(const QString& remoteId);
-//        // 结束音视频通话
-//        void endVideoCall();
+    // 开始音视频通话
+    bool startVideoCall(const QString& remoteId);
+    // 结束音视频通话
+    void endVideoCall();
 signals:
     void sigConnectionLost();
 
@@ -83,9 +83,7 @@ private:
     // file
     void handleUploadCommand(const QString& localUrl,const QString& type, FileStorageDTO fileDTO);
     void handleDownloadCommand(const QString& saveLocPath,const QString& type,const FileStorageDTO& fileDTO);
-//        std::unique_ptr<WebRTCInterface> _webrtc;
 private:
-    bool _isCallActive;
     bool _isHeartbeatActive;
     int  _coolDownTime;
     int  _maxRetryCount;

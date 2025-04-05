@@ -1,9 +1,9 @@
 mysql-info:
  ip: 127.0.0.1
  port: 3306
- userName: xxxxxxxxx
- password: xxxxxxxxx
- dbName: synergy_spot
+ userName: "xxxxxxxxx"
+ password: "xxxxxxxxx"
+ dbName: "synergy_spot"
  minSize: 10
  maxSize: 1024
  maxIdleTime: 60 # 最大空闲事件（单位秒）
@@ -12,20 +12,22 @@ thread-pool:
  minSize: 10
  maxSize: 1024
 host-info:
- listenPort: xxxxxxxxx
+ listenPort: "xxxxxxxxx"
 email-info:
- sendAccount: xxxxxxxxx
- emailServer: smtp://smtp.qq.com:587
- accessToken: xxxxxxxxx
+ sendAccount: "xxxxxxxxx"
+ emailServer: "smtp://smtp.qq.com:587"
+ accessToken: "xxxxxxxxx"
 request-friend-status:
- acceptStr: 对方已接受你的好友申请~;
- rejectStr: 对方拒绝了你的申请;
- waitedStr: 等待回应;
+ acceptStr: "对方已接受你的好友申请~;"
+ rejectStr: "对方拒绝了你的申请;"
+ waitedStr: "等待回应;"
 offline-maintenance-cfg:
  maxGroupMsg: 99
 realtime-info:
- grpcIP: 0.0.0.0
- grpcPort: xxxxxxxxx
+ grpcIP: "0.0.0.0"
+ grpcPort: "xxxxxxxxx"
  maxRetryCount: 5
+ fileSavePath: "xxxxxxxxx"
 log:
- logName: log/SynergySpot
+ logName: "log/SynergySpot"
+

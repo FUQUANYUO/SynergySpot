@@ -28,18 +28,22 @@ find_package(gRPC CONFIG REQUIRED)
 find_package(Qt6 REQUIRED COMPONENTS
         Core
         Network
+        Widgets
 )
 
 file(GLOB_RECURSE   ProtoCC         ${CMAKE_CURRENT_SOURCE_DIR}/../../protofile-grpc/*.cc     )
 file(GLOB_RECURSE   RealtimeCpp     ${CMAKE_CURRENT_SOURCE_DIR}/business/*.cpp)
+file(GLOB_RECURSE   TRTCCpp     ${CMAKE_CURRENT_SOURCE_DIR}/trtc-realtime-comm/*.cpp)
 
-set(RealtimeCpp ${RealtimeCpp} main.cpp RealtimeCommHandler.cpp)
+
+set(RealtimeCpp ${RealtimeCpp} main.cpp RealtimeCommHandler.cpp TRTCTestWindow.cpp)
 
 # common data
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../common-data)
 
 # grpc
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../lib-common/include/grpc-inc)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../lib-common/include/trtc)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../lib-common/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../utils)
 # protofile
@@ -50,6 +54,7 @@ qt_add_executable(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/log/Log.cpp
         ${RealtimeCpp}
         ${ProtoCC}
+        ${TRTCCpp}
 )
 
 # 使用 yaml 静态库
@@ -69,22 +74,28 @@ if(SS_CLIENT_WIN)
         target_link_libraries(${PROJECT_NAME} PRIVATE
                 Qt::Core
                 Qt::Network
+                Qt::Widgets
                 yaml-cppd
                 gRPC::grpc++
                 gRPC::grpc
                 libprotobuf
+                liteav.lib
 
+                ElaWidgetToolsd
                 CommonDataPlugind
         )
     elseif (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
         target_link_libraries(${PROJECT_NAME} PRIVATE
                 Qt::Core
                 Qt::Network
+                Qt::Widgets
                 yaml-cpp
                 gRPC::grpc++
                 gRPC::grpc
                 libprotobuf
+                liteav.lib
 
+                ElaWidgetTools
                 CommonDataPlugin
         )
     endif ()

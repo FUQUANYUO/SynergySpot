@@ -24,7 +24,6 @@
 
 RealtimeCommHandler::RealtimeCommHandler(QObject* parent)
     : QObject(parent)
-    , _isCallActive(false)
     , _isHeartbeatActive(false)
     , _coolDownTime(30 * 1000)
     , _heartbeatTimer(new QTimer(this))
@@ -240,37 +239,15 @@ QString RealtimeCommHandler::calculateChunkMD5(const QByteArray &data) {
     return QString(mdStr);
 }
 
-// bool RealtimeCommHandler::initVideoCall(const QString& remoteId) {
-//     if (_isCallActive) {
-//         qWarning() << "Call already in progress";
-//         return false;
-//     }
-//
-//     _currentRemoteId = remoteId;
-//     startChildProcess();
-//
-//     // 创建新的WebRTC连接
-//     _webrtc->createPeerConnection();
-//     _webrtc->setRemoteDescription(remoteId);
-//
-//     _isCallActive = true;
-//     emit signalCallStateChanged(1); // 1 = 通话开始
-//     return true;
-// }
+bool RealtimeCommHandler::startVideoCall(const QString &remoteId) {
+    return false;
+}
 
-// void RealtimeCommHandler::endVideoCall() {
-//     if (!_isCallActive) return;
-//
-//     _webrtc->closePeerConnection();
-//     if (_mediaProcess) {
-//         _mediaProcess->terminate();
-//         _mediaProcess->waitForFinished();
-//     }
-//
-//     _isCallActive = false;
-//     _currentRemoteId.clear();
-//     emit signalCallStateChanged(0); // 0 = 通话结束
-// }
+void RealtimeCommHandler::endVideoCall() {
+
+
+
+}
 
 void RealtimeCommHandler::sltCheckHeartbeat() {
     // 发送心跳包到服务器
