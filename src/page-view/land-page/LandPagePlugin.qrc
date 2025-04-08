@@ -21,8 +21,8 @@
            <file>rc-page/img/windmill-bk.png</file>
            <file>rc-page/img/windmill-bk.png</file>
            <file>rc-page/video/bk_src.mp4</file>
+           <file>rc-page/video/bk_src.mp4</file>
      </qresource>
 </RCC>
-           <file>rc-page/video/bk_src.mp4</file>
      </qresource>
 </RCC>

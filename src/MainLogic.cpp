@@ -817,13 +817,42 @@ int MainLogic::startMainLogic(QApplication *app) {
         }
     });
 
+    connect(g_pClientRequestHandler,&ClientRequestHandler::sigNewFriendshipInfoResponse,this,[=](const std::string& dto) {
+        SSDTO::NewFriendInfoDTO newFriendDto;
+        newFriendDto.ParseFromString(dto);
+        if (!newFriendDto.isgroup()) {
+            UserBaseInfoDTO newUserBaseInfo;
+            auto protoDTO = newFriendDto.user_info();
+            newUserBaseInfo.ssid = QString::fromStdString(protoDTO.ssid());
+            newUserBaseInfo.username = QString::fromStdString(protoDTO.ssname());
+            newUserBaseInfo.avatarPath = "";
+            newUserBaseInfo.sex = protoDTO.sex()=="M"?"男生":"女生";
+            newUserBaseInfo.personalSign = QString::fromStdString(protoDTO.personal_sign());
+            newUserBaseInfo.thumbUpCount = protoDTO.thumb_up_count();
+            newUserBaseInfo.birthDate = protoDTO.birthday();
+            newUserBaseInfo.region = protoDTO.region();
+            newUserBaseInfo.createTime = protoDTO.create_time();
+
+            auto userRes = g_pCommonData->getUserInfoBySSID(newUserBaseInfo.ssid);
+            if (!userRes.ssid.isEmpty() || userRes.ssid != "-1") {
+                newUserBaseInfo.avatarPath = userRes.avatarPath;
+            }
+            g_pContactPage->addContactInfo(QString::fromStdString(newFriendDto.grouping()),{
+                newUserBaseInfo,{},{},"",0,false
+            });
+        }
+        else {
+            //TODO : group...
+        }
+    });
+
     connect(g_pCommonData,&CommonData::sigReplyFriendOrGroup,this,
         [=](const QString& ssid,bool isAccept, bool isGroup)
     {
         SSDTO::MakeFriendDTO mdto;
         mdto.set_accept(isAccept);
         mdto.set_isgroup(isGroup);
-        mdto.set_sender(ssid);
+        mdto.set_sender(ssid.toStdString());
         mdto.set_recipient(g_pCommonData->getCurUserInfo().ssid.toStdString());
 
         std::string resDto;
@@ -851,7 +880,7 @@ int MainLogic::startMainLogic(QApplication *app) {
     // video call request
     connect(g_pCommonData,&CommonData::sigCallVideoToOtherUser,this,[=](const QString& remoteSSID) {
         SSDTO::VideoCallDTO vcallDto;
-        vcallDto.set_sender_ssid(g_pCommonData->getCurUserInfo().ssid);
+        vcallDto.set_sender_ssid(g_pCommonData->getCurUserInfo().ssid.toStdString());
         vcallDto.set_target_ssid(remoteSSID.toStdString());
         vcallDto.set_user_sig("");
 

@@ -245,6 +245,103 @@ int ProcessBusiness::processBusiness(std::string dto, int businessType, std::sha
         mdto.ParseFromString(dto);
         if (mdto.sender() != info->ssid) { // 好友请求回应
             targetSSID = mdto.sender();
+            if (mdto.accept()) {           // 持久化并将 friendship list 转发给在线用户
+                FriendshipService fService;
+                GroupService gService;
+                uint8_t friendType = (mdto.isgroup()?2:1);
+                std::string grouping = mdto.isgroup()?"我加入的群聊":u8"我的好友";
+                if (!mdto.isgroup()) {
+                    if (fService.addFriendship(
+                        {-1,mdto.sender(),grouping,"",
+                            mdto.recipient(),1,friendType}))
+                    {
+                        FileService fFileService;
+                        UserService uService;
+                        SSDTO::NewFriendInfoDTO newFriendInfoSender;
+                        SSDTO::NewFriendInfoDTO newFriendInfoRecipient;
+
+                        newFriendInfoSender.set_isgroup(false);
+                        newFriendInfoRecipient.set_isgroup(false);
+                        newFriendInfoSender.set_grouping(grouping);
+                        newFriendInfoRecipient.set_grouping(grouping);
+
+                        auto userSenderInfo = uService.getUserInfo(mdto.sender());
+                        auto userRecipientInfo = uService.getUserInfo(mdto.recipient());
+
+                        auto toSender = newFriendInfoSender.mutable_user_info();
+                        auto toRecipient = newFriendInfoRecipient.mutable_user_info();
+                        if (!userSenderInfo.ssid.empty() && userSenderInfo.ssid != "-1") {
+                            toSender->set_ssid(userSenderInfo.ssid);
+                            toSender->set_ssname(userSenderInfo.ssname);
+
+                            FileStorageDTO fileInfo = fFileService.getFileByFilePath(userSenderInfo.avatarPath);
+                            if (fileInfo.fileId != "-1" && !fileInfo.fileId.empty()) {
+                                toSender->set_avatar_file_id(fileInfo.fileId);
+                                toSender->set_avatar_remote_path(fileInfo.storagePath);
+                            }
+                            else {
+                                toSender->set_avatar_file_id("-1");
+                                toSender->set_avatar_remote_path("");
+                            }
+                            toSender->set_sex(std::string(1,userSenderInfo.sex));
+                            toSender->set_personal_sign(userSenderInfo.personalSign);
+                            toSender->set_thumb_up_count(userSenderInfo.thumbUpCount);
+                            toSender->set_birthday(userSenderInfo.birthday);
+                            toSender->set_region(userSenderInfo.region);
+                            toSender->set_create_time(userSenderInfo.createTime);
+
+                            std::string resDto;
+                            newFriendInfoSender.SerializeToString(&resDto);
+
+                            info->tcp->sendMsg(resDto, SSDTO::BusinessType::C_FRIENDSHIP);
+                        }
+
+                        if (!userRecipientInfo.ssid.empty() && userRecipientInfo.ssid != "-1") {
+                            toRecipient->set_ssid(userRecipientInfo.ssid);
+                            toRecipient->set_ssname(userRecipientInfo.ssname);
+
+                            FileStorageDTO fileInfo = fFileService.getFileByFilePath(userRecipientInfo.avatarPath);
+                            if (fileInfo.fileId != "-1" && !fileInfo.fileId.empty()) {
+                                toRecipient->set_avatar_file_id(fileInfo.fileId);
+                                toRecipient->set_avatar_remote_path(fileInfo.storagePath);
+                            }
+                            else {
+                                toRecipient->set_avatar_file_id("-1");
+                                toRecipient->set_avatar_remote_path("");
+                            }
+                            toRecipient->set_sex(std::string(1,userRecipientInfo.sex));
+                            toRecipient->set_personal_sign(userRecipientInfo.personalSign);
+                            toRecipient->set_thumb_up_count(userRecipientInfo.thumbUpCount);
+                            toRecipient->set_birthday(userRecipientInfo.birthday);
+                            toRecipient->set_region(userRecipientInfo.region);
+                            toRecipient->set_create_time(userRecipientInfo.createTime);
+
+                            std::string resDto;
+                            newFriendInfoRecipient.SerializeToString(&resDto);
+
+                            auto isOnline = onlineList.find(mdto.sender());
+                            if (isOnline != onlineList.end()) {
+                                isOnline->second->tcp->sendMsg(resDto, SSDTO::BusinessType::C_FRIENDSHIP);
+                            }
+                        }
+                    }
+                }
+                else {
+                    // if (gService.(
+                    //                         {-1,mdto.sender(),grouping,"",
+                    //                             mdto.recipient(),1,friendType}))
+                    // {
+                    //     FileService fFileService;
+                    //     SSDTO::NewFriendInfoDTO newFriendInfo;
+                    //     newFriendInfo.set_isgroup(mdto.isgroup());
+                    //     newFriendInfo.set_grouping(grouping);
+                    //
+                    //     fService.get
+                    //     auto groupInfo = newFriendInfo.mutable_group_info();
+                    //     groupInfo->set_id()
+                    // }
+                }
+            }
         }else {                            // 向 recipient 好友申请
             dto.clear();
             mdto.set_accept(false);

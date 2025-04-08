@@ -8,6 +8,7 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/out/${CMAKE_BUILD_TYPE})
 add_subdirectory(realtime-business-process)
 
 find_package(Threads REQUIRED)
+find_package(ZLIB    REQUIRED)
 
 include_directories(normal-business-process)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../src/protofile)
@@ -45,6 +46,7 @@ target_link_directories(Server PRIVATE
 
 target_link_libraries(Server PRIVATE
         Threads::Threads
+        ZLIB::ZLIB
         curl
         ssl
         crypto

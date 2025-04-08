@@ -1,11 +1,14 @@
 <RCC>
      <qresource prefix="/message-page/">
+           <file>rc-page/img/SS-default-icon.jpg</file>
+           <file>rc-page/img/SS-default-icon-flat.jpg</file>
+           <file>rc-page/img/default-avatar-1.jpg</file>
+           <file>rc-page/img/SS-default-icon.jpg</file>
+           <file>rc-page/img/default-avatar-2.jpg</file>
+           <file>rc-page/img/default-avatar-1.jpg</file>
            <file>rc-page/img/default-avatar-3.jpg</file>
      </qresource>
 </RCC>
-           <file>rc-page/img/SS-default-icon-flat.jpg</file>
-           <file>rc-page/img/SS-default-icon.jpg</file>
-           <file>rc-page/img/default-avatar-1.jpg</file>
            <file>rc-page/img/default-avatar-2.jpg</file>
            <file>rc-page/img/default-avatar-3.jpg</file>
      </qresource>

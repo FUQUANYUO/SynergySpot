@@ -118,6 +118,13 @@ message EmailVerifyDTO{
   bytes ip = 6;
 };
 
+message NewFriendInfoDTO{
+  bool isGroup = 1;
+  UserBaseInfoDTO user_info = 2;
+  GroupBaseInfoDTO group_info = 3;
+  bytes grouping = 4;
+};
+
 message MakeFriendDTO{
   bytes sender = 1;
   bytes recipient = 2;

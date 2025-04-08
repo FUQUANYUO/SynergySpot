@@ -99,6 +99,7 @@ ClientRequestHandler::ClientRequestHandler(QObject* parent) : QObject(parent) {
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryFileInfoResponse,          this, &ClientRequestHandler::sigQueryFileInfoResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryMsgPicInfoResponse,        this, &ClientRequestHandler::sigQueryMsgPicInfoResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigCallVideoResponse,              this, &ClientRequestHandler::sigCallVideoResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigNewFriendshipInfoResponse,      this, &ClientRequestHandler::sigNewFriendshipInfoResponse);
 
     // 启动业务线程
     _handlerThread->start();
@@ -131,7 +132,7 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
     });
 
     // wait 6s check net stable which the net connected the server
-    QTimer::singleShot(2000,this, [=]() {
+    QTimer::singleShot(5000,this, [=]() {
         if (_ccon && !_ccon->isConnected()) {
             emit sigConnServerFailed();
         }
@@ -338,6 +339,12 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
         _responseHandlerMap[SSDTO::VIDEO_CALL_RESPONSE] = [=](const std::string & dto) {
             LOG("call video response")
             emit sigCallVideoResponse(dto);
+        };
+
+        // new friendship info update to contact response
+        _responseHandlerMap[SSDTO::C_FRIENDSHIP] = [=](const std::string & dto) {
+            LOG("new friendship info update response")
+            emit sigNewFriendshipInfoResponse(dto);
         };
     }
 

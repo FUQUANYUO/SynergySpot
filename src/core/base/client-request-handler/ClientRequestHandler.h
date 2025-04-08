@@ -69,6 +69,7 @@ signals:
     void sigFriendRequestResponse(const std::string& dto);
     void sigFuzzySearchResponse(const std::string& dto);
     void sigCallVideoResponse(const std::string& dto);
+    void sigNewFriendshipInfoResponse(const std::string& dto);
 
     void sigQueryUserBaseInfoResponse(const std::string& dto);
     void sigQueryGroupBaseInfoResponse(const std::string& dto);
@@ -119,6 +120,7 @@ namespace BusinessLayer {
         void sigFriendRequestResponse(const std::string& dto);
         void sigFuzzySearchResponse(const std::string& dto);
         void sigCallVideoResponse(const std::string& dto);
+        void sigNewFriendshipInfoResponse(const std::string& dto);
 
         void sigQueryUserBaseInfoResponse(const std::string& dto);
         void sigQueryGroupBaseInfoResponse(const std::string& dto);

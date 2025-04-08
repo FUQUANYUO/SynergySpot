@@ -50,7 +50,7 @@ struct TableStruct_DTO_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[26]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[27]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -121,6 +121,9 @@ extern MessageContentDTODefaultTypeInternal _MessageContentDTO_default_instance_
 class MessageRecipientDTO;
 struct MessageRecipientDTODefaultTypeInternal;
 extern MessageRecipientDTODefaultTypeInternal _MessageRecipientDTO_default_instance_;
+class NewFriendInfoDTO;
+struct NewFriendInfoDTODefaultTypeInternal;
+extern NewFriendInfoDTODefaultTypeInternal _NewFriendInfoDTO_default_instance_;
 class OperationLogDTO;
 struct OperationLogDTODefaultTypeInternal;
 extern OperationLogDTODefaultTypeInternal _OperationLogDTO_default_instance_;
@@ -159,6 +162,7 @@ template<> ::SSDTO::LoginCheckDTO* Arena::CreateMaybeMessage<::SSDTO::LoginCheck
 template<> ::SSDTO::MakeFriendDTO* Arena::CreateMaybeMessage<::SSDTO::MakeFriendDTO>(Arena*);
 template<> ::SSDTO::MessageContentDTO* Arena::CreateMaybeMessage<::SSDTO::MessageContentDTO>(Arena*);
 template<> ::SSDTO::MessageRecipientDTO* Arena::CreateMaybeMessage<::SSDTO::MessageRecipientDTO>(Arena*);
+template<> ::SSDTO::NewFriendInfoDTO* Arena::CreateMaybeMessage<::SSDTO::NewFriendInfoDTO>(Arena*);
 template<> ::SSDTO::OperationLogDTO* Arena::CreateMaybeMessage<::SSDTO::OperationLogDTO>(Arena*);
 template<> ::SSDTO::UserBaseInfoDTO* Arena::CreateMaybeMessage<::SSDTO::UserBaseInfoDTO>(Arena*);
 template<> ::SSDTO::UserCollectedStickerDTO* Arena::CreateMaybeMessage<::SSDTO::UserCollectedStickerDTO>(Arena*);
@@ -1807,6 +1811,208 @@ class EmailVerifyDTO final :
 };
 // -------------------------------------------------------------------
 
+class NewFriendInfoDTO final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:SSDTO.NewFriendInfoDTO) */ {
+ public:
+  inline NewFriendInfoDTO() : NewFriendInfoDTO(nullptr) {}
+  ~NewFriendInfoDTO() override;
+  explicit constexpr NewFriendInfoDTO(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  NewFriendInfoDTO(const NewFriendInfoDTO& from);
+  NewFriendInfoDTO(NewFriendInfoDTO&& from) noexcept
+    : NewFriendInfoDTO() {
+    *this = ::std::move(from);
+  }
+
+  inline NewFriendInfoDTO& operator=(const NewFriendInfoDTO& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline NewFriendInfoDTO& operator=(NewFriendInfoDTO&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const NewFriendInfoDTO& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const NewFriendInfoDTO* internal_default_instance() {
+    return reinterpret_cast<const NewFriendInfoDTO*>(
+               &_NewFriendInfoDTO_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    8;
+
+  friend void swap(NewFriendInfoDTO& a, NewFriendInfoDTO& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(NewFriendInfoDTO* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(NewFriendInfoDTO* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  NewFriendInfoDTO* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<NewFriendInfoDTO>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const NewFriendInfoDTO& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const NewFriendInfoDTO& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(NewFriendInfoDTO* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "SSDTO.NewFriendInfoDTO";
+  }
+  protected:
+  explicit NewFriendInfoDTO(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kGroupingFieldNumber = 4,
+    kUserInfoFieldNumber = 2,
+    kGroupInfoFieldNumber = 3,
+    kIsGroupFieldNumber = 1,
+  };
+  // bytes grouping = 4;
+  void clear_grouping();
+  const std::string& grouping() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_grouping(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_grouping();
+  PROTOBUF_NODISCARD std::string* release_grouping();
+  void set_allocated_grouping(std::string* grouping);
+  private:
+  const std::string& _internal_grouping() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_grouping(const std::string& value);
+  std::string* _internal_mutable_grouping();
+  public:
+
+  // .SSDTO.UserBaseInfoDTO user_info = 2;
+  bool has_user_info() const;
+  private:
+  bool _internal_has_user_info() const;
+  public:
+  void clear_user_info();
+  const ::SSDTO::UserBaseInfoDTO& user_info() const;
+  PROTOBUF_NODISCARD ::SSDTO::UserBaseInfoDTO* release_user_info();
+  ::SSDTO::UserBaseInfoDTO* mutable_user_info();
+  void set_allocated_user_info(::SSDTO::UserBaseInfoDTO* user_info);
+  private:
+  const ::SSDTO::UserBaseInfoDTO& _internal_user_info() const;
+  ::SSDTO::UserBaseInfoDTO* _internal_mutable_user_info();
+  public:
+  void unsafe_arena_set_allocated_user_info(
+      ::SSDTO::UserBaseInfoDTO* user_info);
+  ::SSDTO::UserBaseInfoDTO* unsafe_arena_release_user_info();
+
+  // .SSDTO.GroupBaseInfoDTO group_info = 3;
+  bool has_group_info() const;
+  private:
+  bool _internal_has_group_info() const;
+  public:
+  void clear_group_info();
+  const ::SSDTO::GroupBaseInfoDTO& group_info() const;
+  PROTOBUF_NODISCARD ::SSDTO::GroupBaseInfoDTO* release_group_info();
+  ::SSDTO::GroupBaseInfoDTO* mutable_group_info();
+  void set_allocated_group_info(::SSDTO::GroupBaseInfoDTO* group_info);
+  private:
+  const ::SSDTO::GroupBaseInfoDTO& _internal_group_info() const;
+  ::SSDTO::GroupBaseInfoDTO* _internal_mutable_group_info();
+  public:
+  void unsafe_arena_set_allocated_group_info(
+      ::SSDTO::GroupBaseInfoDTO* group_info);
+  ::SSDTO::GroupBaseInfoDTO* unsafe_arena_release_group_info();
+
+  // bool isGroup = 1;
+  void clear_isgroup();
+  bool isgroup() const;
+  void set_isgroup(bool value);
+  private:
+  bool _internal_isgroup() const;
+  void _internal_set_isgroup(bool value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:SSDTO.NewFriendInfoDTO)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr grouping_;
+  ::SSDTO::UserBaseInfoDTO* user_info_;
+  ::SSDTO::GroupBaseInfoDTO* group_info_;
+  bool isgroup_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_DTO_2eproto;
+};
+// -------------------------------------------------------------------
+
 class MakeFriendDTO final :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:SSDTO.MakeFriendDTO) */ {
  public:
@@ -1855,7 +2061,7 @@ class MakeFriendDTO final :
                &_MakeFriendDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    9;
 
   friend void swap(MakeFriendDTO& a, MakeFriendDTO& b) {
     a.Swap(&b);
@@ -2044,7 +2250,7 @@ class LoginCheckDTO final :
                &_LoginCheckDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    10;
 
   friend void swap(LoginCheckDTO& a, LoginCheckDTO& b) {
     a.Swap(&b);
@@ -2238,7 +2444,7 @@ class DisconnectDTO final :
                &_DisconnectDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    11;
 
   friend void swap(DisconnectDTO& a, DisconnectDTO& b) {
     a.Swap(&b);
@@ -2405,7 +2611,7 @@ class GetAllUserFriendship final :
                &_GetAllUserFriendship_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    12;
 
   friend void swap(GetAllUserFriendship& a, GetAllUserFriendship& b) {
     a.Swap(&b);
@@ -2612,7 +2818,7 @@ class UserBaseInfoDTO final :
                &_UserBaseInfoDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    13;
 
   friend void swap(UserBaseInfoDTO& a, UserBaseInfoDTO& b) {
     a.Swap(&b);
@@ -2903,7 +3109,7 @@ class UserPrivateInfoDTO final :
                &_UserPrivateInfoDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    14;
 
   friend void swap(UserPrivateInfoDTO& a, UserPrivateInfoDTO& b) {
     a.Swap(&b);
@@ -3129,7 +3335,7 @@ class FriendshipDTO final :
                &_FriendshipDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    15;
 
   friend void swap(FriendshipDTO& a, FriendshipDTO& b) {
     a.Swap(&b);
@@ -3388,7 +3594,7 @@ class GroupAdminDTO final :
                &_GroupAdminDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    16;
 
   friend void swap(GroupAdminDTO& a, GroupAdminDTO& b) {
     a.Swap(&b);
@@ -3577,7 +3783,7 @@ class GroupBaseInfoDTO final :
                &_GroupBaseInfoDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    17;
 
   friend void swap(GroupBaseInfoDTO& a, GroupBaseInfoDTO& b) {
     a.Swap(&b);
@@ -3872,7 +4078,7 @@ class GroupNoticeDTO final :
                &_GroupNoticeDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    18;
 
   friend void swap(GroupNoticeDTO& a, GroupNoticeDTO& b) {
     a.Swap(&b);
@@ -4072,7 +4278,7 @@ class GroupMemberInfoDTO final :
                &_GroupMemberInfoDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    18;
+    19;
 
   friend void swap(GroupMemberInfoDTO& a, GroupMemberInfoDTO& b) {
     a.Swap(&b);
@@ -4277,7 +4483,7 @@ class MessageRecipientDTO final :
                &_MessageRecipientDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    19;
+    20;
 
   friend void swap(MessageRecipientDTO& a, MessageRecipientDTO& b) {
     a.Swap(&b);
@@ -4488,7 +4694,7 @@ class MessageContentDTO final :
                &_MessageContentDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    20;
+    21;
 
   friend void swap(MessageContentDTO& a, MessageContentDTO& b) {
     a.Swap(&b);
@@ -4750,7 +4956,7 @@ class DistrictDTO final :
                &_DistrictDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    21;
+    22;
 
   friend void swap(DistrictDTO& a, DistrictDTO& b) {
     a.Swap(&b);
@@ -4950,7 +5156,7 @@ class FileStorageDTO final :
                &_FileStorageDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    22;
+    23;
 
   friend void swap(FileStorageDTO& a, FileStorageDTO& b) {
     a.Swap(&b);
@@ -5203,7 +5409,7 @@ class OperationLogDTO final :
                &_OperationLogDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    23;
+    24;
 
   friend void swap(OperationLogDTO& a, OperationLogDTO& b) {
     a.Swap(&b);
@@ -5440,7 +5646,7 @@ class BaseStickerDTO final :
                &_BaseStickerDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    24;
+    25;
 
   friend void swap(BaseStickerDTO& a, BaseStickerDTO& b) {
     a.Swap(&b);
@@ -5645,7 +5851,7 @@ class UserCollectedStickerDTO final :
                &_UserCollectedStickerDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    25;
+    26;
 
   friend void swap(UserCollectedStickerDTO& a, UserCollectedStickerDTO& b) {
     a.Swap(&b);
@@ -7554,6 +7760,261 @@ inline void EmailVerifyDTO::set_allocated_ip(std::string* ip) {
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:SSDTO.EmailVerifyDTO.ip)
+}
+
+// -------------------------------------------------------------------
+
+// NewFriendInfoDTO
+
+// bool isGroup = 1;
+inline void NewFriendInfoDTO::clear_isgroup() {
+  isgroup_ = false;
+}
+inline bool NewFriendInfoDTO::_internal_isgroup() const {
+  return isgroup_;
+}
+inline bool NewFriendInfoDTO::isgroup() const {
+  // @@protoc_insertion_point(field_get:SSDTO.NewFriendInfoDTO.isGroup)
+  return _internal_isgroup();
+}
+inline void NewFriendInfoDTO::_internal_set_isgroup(bool value) {
+  
+  isgroup_ = value;
+}
+inline void NewFriendInfoDTO::set_isgroup(bool value) {
+  _internal_set_isgroup(value);
+  // @@protoc_insertion_point(field_set:SSDTO.NewFriendInfoDTO.isGroup)
+}
+
+// .SSDTO.UserBaseInfoDTO user_info = 2;
+inline bool NewFriendInfoDTO::_internal_has_user_info() const {
+  return this != internal_default_instance() && user_info_ != nullptr;
+}
+inline bool NewFriendInfoDTO::has_user_info() const {
+  return _internal_has_user_info();
+}
+inline void NewFriendInfoDTO::clear_user_info() {
+  if (GetArenaForAllocation() == nullptr && user_info_ != nullptr) {
+    delete user_info_;
+  }
+  user_info_ = nullptr;
+}
+inline const ::SSDTO::UserBaseInfoDTO& NewFriendInfoDTO::_internal_user_info() const {
+  const ::SSDTO::UserBaseInfoDTO* p = user_info_;
+  return p != nullptr ? *p : reinterpret_cast<const ::SSDTO::UserBaseInfoDTO&>(
+      ::SSDTO::_UserBaseInfoDTO_default_instance_);
+}
+inline const ::SSDTO::UserBaseInfoDTO& NewFriendInfoDTO::user_info() const {
+  // @@protoc_insertion_point(field_get:SSDTO.NewFriendInfoDTO.user_info)
+  return _internal_user_info();
+}
+inline void NewFriendInfoDTO::unsafe_arena_set_allocated_user_info(
+    ::SSDTO::UserBaseInfoDTO* user_info) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(user_info_);
+  }
+  user_info_ = user_info;
+  if (user_info) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:SSDTO.NewFriendInfoDTO.user_info)
+}
+inline ::SSDTO::UserBaseInfoDTO* NewFriendInfoDTO::release_user_info() {
+  
+  ::SSDTO::UserBaseInfoDTO* temp = user_info_;
+  user_info_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
+}
+inline ::SSDTO::UserBaseInfoDTO* NewFriendInfoDTO::unsafe_arena_release_user_info() {
+  // @@protoc_insertion_point(field_release:SSDTO.NewFriendInfoDTO.user_info)
+  
+  ::SSDTO::UserBaseInfoDTO* temp = user_info_;
+  user_info_ = nullptr;
+  return temp;
+}
+inline ::SSDTO::UserBaseInfoDTO* NewFriendInfoDTO::_internal_mutable_user_info() {
+  
+  if (user_info_ == nullptr) {
+    auto* p = CreateMaybeMessage<::SSDTO::UserBaseInfoDTO>(GetArenaForAllocation());
+    user_info_ = p;
+  }
+  return user_info_;
+}
+inline ::SSDTO::UserBaseInfoDTO* NewFriendInfoDTO::mutable_user_info() {
+  ::SSDTO::UserBaseInfoDTO* _msg = _internal_mutable_user_info();
+  // @@protoc_insertion_point(field_mutable:SSDTO.NewFriendInfoDTO.user_info)
+  return _msg;
+}
+inline void NewFriendInfoDTO::set_allocated_user_info(::SSDTO::UserBaseInfoDTO* user_info) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete user_info_;
+  }
+  if (user_info) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper<::SSDTO::UserBaseInfoDTO>::GetOwningArena(user_info);
+    if (message_arena != submessage_arena) {
+      user_info = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, user_info, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  user_info_ = user_info;
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.NewFriendInfoDTO.user_info)
+}
+
+// .SSDTO.GroupBaseInfoDTO group_info = 3;
+inline bool NewFriendInfoDTO::_internal_has_group_info() const {
+  return this != internal_default_instance() && group_info_ != nullptr;
+}
+inline bool NewFriendInfoDTO::has_group_info() const {
+  return _internal_has_group_info();
+}
+inline void NewFriendInfoDTO::clear_group_info() {
+  if (GetArenaForAllocation() == nullptr && group_info_ != nullptr) {
+    delete group_info_;
+  }
+  group_info_ = nullptr;
+}
+inline const ::SSDTO::GroupBaseInfoDTO& NewFriendInfoDTO::_internal_group_info() const {
+  const ::SSDTO::GroupBaseInfoDTO* p = group_info_;
+  return p != nullptr ? *p : reinterpret_cast<const ::SSDTO::GroupBaseInfoDTO&>(
+      ::SSDTO::_GroupBaseInfoDTO_default_instance_);
+}
+inline const ::SSDTO::GroupBaseInfoDTO& NewFriendInfoDTO::group_info() const {
+  // @@protoc_insertion_point(field_get:SSDTO.NewFriendInfoDTO.group_info)
+  return _internal_group_info();
+}
+inline void NewFriendInfoDTO::unsafe_arena_set_allocated_group_info(
+    ::SSDTO::GroupBaseInfoDTO* group_info) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(group_info_);
+  }
+  group_info_ = group_info;
+  if (group_info) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:SSDTO.NewFriendInfoDTO.group_info)
+}
+inline ::SSDTO::GroupBaseInfoDTO* NewFriendInfoDTO::release_group_info() {
+  
+  ::SSDTO::GroupBaseInfoDTO* temp = group_info_;
+  group_info_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
+}
+inline ::SSDTO::GroupBaseInfoDTO* NewFriendInfoDTO::unsafe_arena_release_group_info() {
+  // @@protoc_insertion_point(field_release:SSDTO.NewFriendInfoDTO.group_info)
+  
+  ::SSDTO::GroupBaseInfoDTO* temp = group_info_;
+  group_info_ = nullptr;
+  return temp;
+}
+inline ::SSDTO::GroupBaseInfoDTO* NewFriendInfoDTO::_internal_mutable_group_info() {
+  
+  if (group_info_ == nullptr) {
+    auto* p = CreateMaybeMessage<::SSDTO::GroupBaseInfoDTO>(GetArenaForAllocation());
+    group_info_ = p;
+  }
+  return group_info_;
+}
+inline ::SSDTO::GroupBaseInfoDTO* NewFriendInfoDTO::mutable_group_info() {
+  ::SSDTO::GroupBaseInfoDTO* _msg = _internal_mutable_group_info();
+  // @@protoc_insertion_point(field_mutable:SSDTO.NewFriendInfoDTO.group_info)
+  return _msg;
+}
+inline void NewFriendInfoDTO::set_allocated_group_info(::SSDTO::GroupBaseInfoDTO* group_info) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete group_info_;
+  }
+  if (group_info) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper<::SSDTO::GroupBaseInfoDTO>::GetOwningArena(group_info);
+    if (message_arena != submessage_arena) {
+      group_info = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, group_info, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  group_info_ = group_info;
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.NewFriendInfoDTO.group_info)
+}
+
+// bytes grouping = 4;
+inline void NewFriendInfoDTO::clear_grouping() {
+  grouping_.ClearToEmpty();
+}
+inline const std::string& NewFriendInfoDTO::grouping() const {
+  // @@protoc_insertion_point(field_get:SSDTO.NewFriendInfoDTO.grouping)
+  return _internal_grouping();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void NewFriendInfoDTO::set_grouping(ArgT0&& arg0, ArgT... args) {
+ 
+ grouping_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:SSDTO.NewFriendInfoDTO.grouping)
+}
+inline std::string* NewFriendInfoDTO::mutable_grouping() {
+  std::string* _s = _internal_mutable_grouping();
+  // @@protoc_insertion_point(field_mutable:SSDTO.NewFriendInfoDTO.grouping)
+  return _s;
+}
+inline const std::string& NewFriendInfoDTO::_internal_grouping() const {
+  return grouping_.Get();
+}
+inline void NewFriendInfoDTO::_internal_set_grouping(const std::string& value) {
+  
+  grouping_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* NewFriendInfoDTO::_internal_mutable_grouping() {
+  
+  return grouping_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* NewFriendInfoDTO::release_grouping() {
+  // @@protoc_insertion_point(field_release:SSDTO.NewFriendInfoDTO.grouping)
+  return grouping_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+}
+inline void NewFriendInfoDTO::set_allocated_grouping(std::string* grouping) {
+  if (grouping != nullptr) {
+    
+  } else {
+    
+  }
+  grouping_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), grouping,
+      GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (grouping_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
+    grouping_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.NewFriendInfoDTO.grouping)
 }
 
 // -------------------------------------------------------------------
@@ -12055,6 +12516,8 @@ inline void UserCollectedStickerDTO::set_allocated_ip(std::string* ip) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

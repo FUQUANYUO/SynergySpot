@@ -6,7 +6,6 @@
 #include "TRTC/ITRTCCloud.h"
 #include "TRTC/TRTCCloudCallback.h"
 #include "TRTC/TRTCTypeDef.h"
-#include "GenerateUserSig.h"
 #include "TRTC/ITXDeviceManager.h"
 
 class TRTCCloudCallbackDefaultImpl : public liteav::ITRTCCloudCallback
