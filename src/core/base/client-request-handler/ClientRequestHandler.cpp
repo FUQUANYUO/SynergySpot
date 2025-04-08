@@ -60,43 +60,6 @@ void ClientRequestHandler::destroyInstance() {
         m.unlock();
     }
 }
-void ClientRequestHandler::addRequest(SSDTO::BusinessType type, std::string dto) {
-    switch (type) {
-        case SSDTO::LOGIN_CHECK:
-            emit sigVerifyAccountRequest(dto);
-            break;
-        case SSDTO::C_MESSAGE_CONTENT:
-            emit sigForwardMessageRequest(dto);
-            break;
-        case SSDTO::R_FRIENDSHIP_LIST:
-            emit sigContactListRequest(dto);
-            break;
-        case SSDTO::EMAIL_VERIFY:
-            emit sigEmailCodeRequest(dto);
-            break;
-        case SSDTO::ENROLL_ACCOUNT:
-            emit sigEnrollAccountRequest(dto);
-            break;
-        case SSDTO::MAKE_FRIEND_REQUEST:
-            emit sigAddFriendRequest(dto);
-            break;
-        case SSDTO::FUZZY_SEARCH:
-            emit sigFuzzySearchRequest(dto);
-            break;
-        case SSDTO::R_USER_BASE_INFO:
-            emit sigQueryUserBaseInfoRequest(dto);
-            break;
-        case SSDTO::R_GROUP_BASE_INFO:
-            emit sigQueryGroupBaseInfoRequest(dto);
-            break;
-        case SSDTO::R_GROUP_NOTICE:
-            emit sigQueryGroupNoticesRequest(dto);
-            break;
-        default:
-            LOG("Unsupported business type:" << type)
-            break;
-    }
-}
 
 ClientRequestHandler::ClientRequestHandler(QObject* parent) : QObject(parent) {
     businessProcessor = new BusinessLayer::BusinessProcessor();
@@ -117,6 +80,7 @@ ClientRequestHandler::ClientRequestHandler(QObject* parent) : QObject(parent) {
     connect(this, &ClientRequestHandler::sigQueryNewMessageRequest,          businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_MESSAGE_CONTENT),Qt::QueuedConnection);
     connect(this, &ClientRequestHandler::sigQueryFileInfoRequest,            businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_FILE),Qt::QueuedConnection);
     connect(this, &ClientRequestHandler::sigQueryMsgPicInfoRequest,          businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_MESSAGE_PIC_INFO),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigCallVideoRequest,                businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::VIDEO_CALL_REQUEST),Qt::QueuedConnection);
 
     // 连接响应信号槽
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigEmailCodeResponse,              this, &ClientRequestHandler::sigEmailCodeResponse);
@@ -134,6 +98,7 @@ ClientRequestHandler::ClientRequestHandler(QObject* parent) : QObject(parent) {
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryNewMessageResponse,        this, &ClientRequestHandler::sigQueryNewMessageResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryFileInfoResponse,          this, &ClientRequestHandler::sigQueryFileInfoResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryMsgPicInfoResponse,        this, &ClientRequestHandler::sigQueryMsgPicInfoResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigCallVideoResponse,              this, &ClientRequestHandler::sigCallVideoResponse);
 
     // 启动业务线程
     _handlerThread->start();
@@ -210,6 +175,7 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
 
     // register slot function
     // request slot manager by dto type mapping
+    // send package to server
     {
         // login
         _requestHandlerMap[SSDTO::LOGIN_CHECK] = [=](const std::string & dto) {
@@ -280,9 +246,15 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
         _requestHandlerMap[SSDTO::R_MESSAGE_PIC_INFO] = [=](const std::string & dto) {
             SEND_PACKAGE(dto,SSDTO::R_MESSAGE_PIC_INFO,"query of pic embedding msg dto has been send to server...")
         };
+
+        // call video request
+        _requestHandlerMap[SSDTO::VIDEO_CALL_REQUEST] = [=](const std::string & dto) {
+            SEND_PACKAGE(dto,SSDTO::VIDEO_CALL_REQUEST,"call request to other user by server...")
+        };
     }
 
     // response slot manager by dto type mapping
+    // parse server response
     {
         // login
         _responseHandlerMap[SSDTO::LOGIN_CHECK] = [=](const std::string & dto) {
@@ -316,14 +288,8 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
 
         // user make friend response
         _responseHandlerMap[SSDTO::MAKE_FRIEND_RESPONSE] = [=](const std::string & dto) {
-            LOG("make friend response")
-            emit sigFriendRequestResponse(dto,false);
-        };
-
-        // other user ask for be your friend
-        _responseHandlerMap[SSDTO::MAKE_FRIEND_REQUEST] = [=](const std::string & dto) {
-            LOG("make friend response")
-            emit sigFriendRequestResponse(dto,true);
+            LOG("make friend response / make friend request")
+            emit sigFriendRequestResponse(dto);
         };
 
         // search fuzzy
@@ -366,6 +332,12 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
         _responseHandlerMap[SSDTO::R_MESSAGE_PIC_INFO] = [=](const std::string & dto) {
             LOG("get msg pic response")
             emit sigQueryMsgPicInfoResponse(dto);
+        };
+
+        // call video response
+        _responseHandlerMap[SSDTO::VIDEO_CALL_RESPONSE] = [=](const std::string & dto) {
+            LOG("call video response")
+            emit sigCallVideoResponse(dto);
         };
     }
 

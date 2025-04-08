@@ -30,6 +30,7 @@ public:
     ~BackgroundStrategyPlugin() override = default;
     virtual bool initialize(const QString& videoSource) = 0;
     virtual void updateFrame() = 0;
+    virtual void releaseCamera() = 0;
     virtual QImage getCurrentFrame() const = 0;
     virtual bool isFinished() const = 0;
     virtual void reset() = 0;

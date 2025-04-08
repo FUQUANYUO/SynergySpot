@@ -241,7 +241,10 @@ void NoticePage::initConnectFunc() {
             _waitToReloadCount = 0;
 
             for (auto it = _noticeCardMap.begin(); it != _noticeCardMap.end(); it++) {
-                it.value()->setCardPixmap(g_pCommonData->getUserInfoBySSID(it.key()).avatarPath);
+                auto res = g_pCommonData->getUserInfoBySSID(it.key());
+                if ((!res.ssid.isEmpty() || res.ssid != "-1") && (!res.avatarPath.isEmpty() || res.avatarPath != "-1")) {
+                    it.value()->setCardPixmap(res.avatarPath);
+                }
             }
         }
     });

@@ -6,18 +6,23 @@
 #define VIDEOAUDIOCALLPAGE_H
 
 #include "ela-widget-tools/ElaWidget.h"
-#include "TRTCCloudCallbackDefaultImpl.h"
+#include "../TRTCCloudCallbackDefaultImpl.h"
 
 class ElaToolButton;
 class QVBoxLayout;
 class QHBoxLayout;
 class UserVideoItem;
+class QLabel;
 
 class VideoAudioCallPage : public ElaWidget,public TRTCCloudCallbackDefaultImpl{
     Q_OBJECT
+signals:
+    void sigVideoHangUp();
 public:
-    VideoAudioCallPage(QString curSSID = "",QString targetSSID = "", int roomId = -1);
+    VideoAudioCallPage(QString curSSID = "",QString targetSSID = "", int roomId = -1, QString userSig = "");
     ~VideoAudioCallPage();
+
+    void setUserSig(const QString &userSig);
 
     void initWindow();
     void initEdgeLayout();
@@ -56,6 +61,8 @@ private:
     QHBoxLayout                *videoLayout        = nullptr;
     QHBoxLayout                *btnLayout          = nullptr;
     QVBoxLayout                *mainLayout         = nullptr;
+    QLabel                     *curUserNameLabel   = nullptr;
+    QLabel                     *targetNameLabel    = nullptr;
     // ----------------- UI -----------------
 
     // --------------- BackEnd --------------
@@ -68,16 +75,9 @@ private:
     TRTCAppScene                app_scene_;
     TRTCRoleType                role_type_;
     std::string                 stream_id_;
-    // TODO: will remove
-    int                         SDKAppID;
-    std::string                 sdkSecret;
+    std::string                 userSig_;
     // --------------- BackEnd --------------
 };
-
-inline void VideoAudioCallPage::setMainRoomId(int roomId)
-{
-    room_id_ = roomId;
-}
 
 
 #endif //VIDEOAUDIOCALLPAGE_H

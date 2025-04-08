@@ -8,6 +8,9 @@ enum BusinessType {
   DISCONNECT = 3;
   EMAIL_VERIFY = 4;
 
+  VIDEO_CALL_REQUEST = 5;
+  VIDEO_CALL_RESPONSE = 6;
+
   LOGIN_CHECK = 11;
   ENROLL_ACCOUNT = 12;
   RECOVER_PASSWORD = 13;
@@ -35,6 +38,7 @@ enum BusinessType {
   R_MESSAGE_CONTENT = 61;             // 离线转发
   C_MESSAGE_CONTENT = 62;             // 转发消息
   R_MESSAGE_PIC_INFO = 63;            // 消息中的图片
+
   MAKE_FRIEND_REQUEST = 64;
   MAKE_FRIEND_RESPONSE = 65;
 
@@ -54,6 +58,12 @@ enum BusinessType {
   C_FILE = 92;
   D_FILE = 93;
 }
+
+message VideoCallDTO{
+  bytes sender_ssid = 1;
+  bytes target_ssid = 2;
+  string user_sig   = 3;
+};
 
 message GetMessagePicInfoDTO{
   bytes ssid = 1;

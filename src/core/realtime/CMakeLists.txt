@@ -29,11 +29,12 @@ find_package(Qt6 REQUIRED COMPONENTS
         Core
         Network
         Widgets
+        OpenGLWidgets
 )
 
 file(GLOB_RECURSE   ProtoCC         ${CMAKE_CURRENT_SOURCE_DIR}/../../protofile-grpc/*.cc     )
 file(GLOB_RECURSE   RealtimeCpp     ${CMAKE_CURRENT_SOURCE_DIR}/business/*.cpp)
-file(GLOB_RECURSE   TRTCCpp     ${CMAKE_CURRENT_SOURCE_DIR}/trtc-realtime-comm/*.cpp)
+file(GLOB_RECURSE   TRTCCpp         ${CMAKE_CURRENT_SOURCE_DIR}/trtc-realtime-comm/*.cpp)
 
 QT_ADD_RESOURCES(
         QRC_FILES                    Realtime.qrc
@@ -79,6 +80,7 @@ if(SS_CLIENT_WIN)
                 Qt::Core
                 Qt::Network
                 Qt::Widgets
+                Qt::OpenGLWidgets
                 yaml-cppd
                 gRPC::grpc++
                 gRPC::grpc
@@ -87,12 +89,14 @@ if(SS_CLIENT_WIN)
 
                 ElaWidgetToolsd
                 CommonDataPlugind
+                PluginManagerd
         )
     elseif (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
         target_link_libraries(${PROJECT_NAME} PRIVATE
                 Qt::Core
                 Qt::Network
                 Qt::Widgets
+                Qt::OpenGLWidgets
                 yaml-cpp
                 gRPC::grpc++
                 gRPC::grpc
@@ -101,6 +105,7 @@ if(SS_CLIENT_WIN)
 
                 ElaWidgetTools
                 CommonDataPlugin
+                PluginManager
         )
     endif ()
 else()

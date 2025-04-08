@@ -215,7 +215,8 @@ void AddPage::initConnectFunc() {
         sltHideLoading();
         _waitToReloadCount += waitCount;
         for (const auto& it : dto) {
-            sltAddUserRes(it);
+            if (_userResMap.find(it.ssid) == _userResMap.end() && it.ssid != g_pCommonData->getCurUserInfo().ssid)
+                sltAddUserRes(it);
         }
     });
 
@@ -223,7 +224,8 @@ void AddPage::initConnectFunc() {
         sltHideLoading();
         _waitToReloadCount += waitCount;
         for (const auto& it : dto) {
-            sltAddGroupRes(it);
+            if (_groupResMap.find(it.ssidGroup) == _groupResMap.end())
+                sltAddGroupRes(it);
         }
     });
 

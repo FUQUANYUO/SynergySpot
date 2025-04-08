@@ -5,17 +5,18 @@
 #include "VideoAudioCallPage.h"
 
 #include <QVBoxLayout>
+#include <QLabel>
+
 #include "CommonData.h"
-#include "RoomInfoHolder.h"
+#include "../RoomInfoHolder.h"
 #include "ela-widget-tools/ElaToolButton.h"
-#include "user-video-item/UserVideoItem.h"
+#include "../user-video-item/UserVideoItem.h"
 
 #include <sstream>
 
-VideoAudioCallPage::VideoAudioCallPage(QString curSSID, QString targetSSID, int roomId) {
-    // TODO: from server
-    SDKAppID = g_pCommonData->getYamlNode()["trtc-api"]["sdkAppId"].as<int>();
-    sdkSecret = g_pCommonData->getYamlNode()["trtc-api"]["sdkSecretKey"].as<std::string>();
+VideoAudioCallPage::VideoAudioCallPage(QString curSSID, QString targetSSID, int roomId,QString userSig)
+    : userSig_(userSig.toStdString())
+{
     getTRTCShareInstance()->addCallback(this);
 
     initWindow();
@@ -32,7 +33,11 @@ VideoAudioCallPage::VideoAudioCallPage(QString curSSID, QString targetSSID, int 
 }
 
 VideoAudioCallPage::~VideoAudioCallPage() {
-    getTRTCShareInstance()->addCallback(this);
+    getTRTCShareInstance()->removeCallback(this);
+}
+
+void VideoAudioCallPage::setUserSig(const QString &userSig) {
+    userSig_ = userSig.toStdString();
 }
 
 void VideoAudioCallPage::initWindow() {
@@ -80,6 +85,8 @@ void VideoAudioCallPage::initEdgeLayout() {
 }
 
 void VideoAudioCallPage::initContent() {
+    curUserVideoHolder->setUserName("my name");
+
     setWindowTitle("音视频通话");
     micControlBtn->setBorderRadius(15);
     cameraControlBtn->setBorderRadius(15);
@@ -134,14 +141,15 @@ void VideoAudioCallPage::initConnectFunc() {
             cameraControlBtn->setIconSize(QSize(40,40));
             cameraControlBtn->setText("打开视频");
         }
-        curUserVideoHolder->updateAVMuteStatus(isCloseCamera, VIDEO_ITEM::MuteVideo,VIDEO_ITEM::RemoteView);
+        curUserVideoHolder->updateAVMuteStatus(isCloseCamera, VIDEO_ITEM::MuteVideo,VIDEO_ITEM::LocalView);
+        curUserVideoHolder->update();
     });
     connect(screenSharedBtn,&ElaToolButton::clicked,this,[=]() {
 
     });
     connect(hangUpCallBtn,&ElaToolButton::clicked,this,[=]() {
         exitRoom();
-        qApp->quit();
+        emit sigVideoHangUp();
     });
 }
 
@@ -155,13 +163,15 @@ void VideoAudioCallPage::enterRoom(
     role_type_ = roleType;
 
     std::ostringstream streamid_os;
-    streamid_os << SDKAppID << "_" << room_id_ << "_" << curUserSSID << "_" << "main";
+    streamid_os  << "_" << room_id_ << "_" << curUserSSID << "_" << "main";
     stream_id_ = streamid_os.str();
 
+    int sdkID = g_pCommonData->getYamlNode()["trtc-api"]["sdkAppId"].as<int>();
+
     liteav::TRTCParams params;
-    params.sdkAppId = SDKAppID;
+    params.sdkAppId = sdkID;
     params.userId = curUserSSID.c_str();
-    params.userSig = GenerateUserSig::genUserSig(params.userId, SDKAppID, sdkSecret.c_str());
+    params.userSig = userSig_.c_str();
     params.roomId = room_id_;
     params.role = roleType;
     params.streamId = stream_id_.c_str();
@@ -171,6 +181,10 @@ void VideoAudioCallPage::enterRoom(
 
 void VideoAudioCallPage::exitRoom() {
     getTRTCShareInstance()->exitRoom();
+}
+
+void VideoAudioCallPage::setMainRoomId(int roomId) {
+    room_id_ = roomId;
 }
 
 void VideoAudioCallPage::onEnterRoom(int result) {
@@ -207,9 +221,17 @@ void VideoAudioCallPage::onRemoteUserEnterRoom(const char *userId) {
         this,getTRTCShareInstance(),
         room_id_,userId,VIDEO_ITEM::RemoteView
     );
+    targetVideoHolder->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    videoLayout->addWidget(targetVideoHolder);
+
     targetVideoHolder->show();
     targetVideoHolder->raise();
     RoomInfoHolder::GetInstance().addRemoteUser(userId);
+
+    auto res = g_pCommonData->getUserInfoBySSID(QString::fromStdString(userId));
+    if (!res.ssid.isEmpty() && res.ssid != "-1" ) {
+        targetVideoHolder->setUserName(res.username);
+    }
 }
 
 void VideoAudioCallPage::onRemoteUserLeaveRoom(const char *userId, int reason) {
@@ -235,7 +257,13 @@ void VideoAudioCallPage::onUserAudioAvailable(const char *userId, bool available
 }
 
 void VideoAudioCallPage::onUserVoiceVolume(liteav::TRTCVolumeInfo *userVolumes, uint32_t userVolumesCount, uint32_t totalVolume) {
-    TRTCCloudCallbackDefaultImpl::onUserVoiceVolume(userVolumes, userVolumesCount, totalVolume);
+    for (uint32_t i = 0; i < userVolumesCount; i++) {
+        if (strcmp(userVolumes[i].userId, curUserVideoHolder->getUserId().c_str()) == 0) {
+            curUserVideoHolder->setVolume(userVolumes[i].volume); // 更新本地用户进度条
+        } else if (targetVideoHolder && strcmp(userVolumes[i].userId, targetVideoHolder->getUserId().c_str()) == 0) {
+            targetVideoHolder->setVolume(userVolumes[i].volume);   // 更新远程用户进度条
+        }
+    }
 }
 
 

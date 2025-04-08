@@ -73,6 +73,4 @@ private:
     static MessagePage* _messagePage;
 };
 
-
-
 #endif//SYNERGYSPOT_MESSAGEPAGE_H

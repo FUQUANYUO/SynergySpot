@@ -10,12 +10,30 @@ extern "C" SS_API BackgroundStrategyPlugin* createCVProVideoStrategyPlugin(){
 }
 
 bool CVProVideoStrategy::initialize(const QString &videoSrc) {
-    cap = new cv::VideoCapture(videoSrc.toStdString());
+    bool ok;
+    int cameraIndex = videoSrc.toInt(&ok);       // 通过字符串判断启动是摄像头还是视频文件
+    if (ok) {
+        cap = new cv::VideoCapture(cameraIndex); // 摄像头初始化
+        isCamera = true;
+    } else {
+        cap = new cv::VideoCapture(videoSrc.toStdString()); // 文件初始化
+        isCamera = false;
+    }
     if (!cap->isOpened()) {
         LOG("Failed to open video source");
         return false;
     }
     return true;
+}
+
+void CVProVideoStrategy::releaseCamera() {
+    if (cap && isCamera) {
+        cap->release();
+        delete cap;
+        cap = nullptr;
+        isCamera = false;
+    }
+    currentFrame = QImage();
 }
 
 void CVProVideoStrategy::updateFrame() {
@@ -32,7 +50,7 @@ QImage CVProVideoStrategy::getCurrentFrame() const {
 }
 
 bool CVProVideoStrategy::isFinished() const {
-    return cap->get(cv::CAP_PROP_POS_FRAMES) >= cap->get(cv::CAP_PROP_FRAME_COUNT);
+    return isCamera ? false : (cap->get(cv::CAP_PROP_POS_FRAMES) >= cap->get(cv::CAP_PROP_FRAME_COUNT));
 }
 
 void CVProVideoStrategy::reset() {

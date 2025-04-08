@@ -1,5 +1,9 @@
 #include "UserVideoItem.h"
 
+#include <QPainter>
+#include <QPainterPath>
+#include <QLabel>
+
 UserVideoItem::UserVideoItem(QWidget * parent,liteav::ITRTCCloud* cloud, int roomid, std::string userid, VIDEO_ITEM::ViewItemType type)
     :QWidget(parent), ui_video_item_(new Ui::UserVideoItem), viewtype_(type) {
     setAttribute(Qt::WA_TranslucentBackground);
@@ -7,8 +11,16 @@ UserVideoItem::UserVideoItem(QWidget * parent,liteav::ITRTCCloud* cloud, int roo
     this->room_id_ = roomid;
     this->user_id_ = userid;
     this->trtccloud_ = cloud;
+
     ui_video_item_->setupUi(this);
     ui_video_item_->verticalLayout->setContentsMargins(0,0,0,0);
+
+    ui_video_item_->volumePb->setRange(0, 100);
+    ui_video_item_->volumePb->raise();
+
+    ui_video_item_->userName->move(10, height() - ui_video_item_->userName->height() + 10);
+    ui_video_item_->userName->raise();
+
     setWindowFlags(windowFlags()&~Qt::WindowContextHelpButtonHint);
     initViews();
     if(this->trtccloud_ != nullptr) {
@@ -21,6 +33,27 @@ UserVideoItem::~UserVideoItem() {
     if(trtccloud_ != nullptr){
        trtccloud_ = nullptr;
     }
+}
+
+void UserVideoItem::paintEvent(QPaintEvent *event) {
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    // 创建圆角矩形路径
+    QPainterPath path;
+    path.addRoundedRect(rect(), 10, 10);
+
+    // 设置裁剪路径
+    painter.setClipPath(path);
+
+    QColor backgroundColor(0, 0, 0);
+    painter.fillPath(path, backgroundColor);
+}
+
+void UserVideoItem::resizeEvent(QResizeEvent *event) {
+    QWidget::resizeEvent(event);
+    ui_video_item_->userName->move(10, height() - ui_video_item_->userName->height() - 10);
+    ui_video_item_->userName->raise();
 }
 
 void UserVideoItem::muteAudio(bool mute) {
@@ -106,9 +139,16 @@ void UserVideoItem::updateAVMuteStatus(bool mute, VIDEO_ITEM::MuteAllType muteTy
     }
     if(muteType == VIDEO_ITEM::MuteVideo){
         video_mute_ = mute;
-        if (viewType == VIDEO_ITEM::LocalView) {
+        if (viewtype_ == VIDEO_ITEM::LocalView) {
+            if (mute) {
+                // 停止本地预览并关闭摄像头
+                trtccloud_->stopLocalPreview();
+            } else {
+                // 重新开启摄像头并启动预览
+                trtccloud_->startLocalPreview(reinterpret_cast<liteav::TXView>(getVideoWId()));
+            }
             trtccloud_->muteLocalVideo(mute);
-        }else if (viewType == VIDEO_ITEM::RemoteView){
+        } else if (viewtype_ == VIDEO_ITEM::RemoteView) {
             trtccloud_->muteRemoteVideoStream(user_id_.c_str(), mute);
         }
     }
@@ -145,6 +185,7 @@ void UserVideoItem::updateAVMuteView(VIDEO_ITEM::MuteAllType muteType){
 void UserVideoItem::setVolume(int volume)
 {
     ui_video_item_->volumePb->setValue(volume);
+    ui_video_item_->volumePb->update();
 }
 
 WId UserVideoItem::getVideoWId()
@@ -172,6 +213,10 @@ bool UserVideoItem::getVideoMuteStatus() {
 VIDEO_ITEM::ViewItemType UserVideoItem::getViewType()
 {
     return viewtype_;
+}
+
+void UserVideoItem::setUserName(const QString &username) {
+    ui_video_item_->userName->setText(username);
 }
 
 void UserVideoItem::updateDynamicTextUI() {

@@ -25,8 +25,11 @@ public:
         }
     }
 
-    // initial MP4 video
+    // initial MP4 video / camera source
     bool initialize(const QString& videoSrc) override;
+
+    // release camera source
+    void releaseCamera();
 
     // update video frame and make video get in loop
     void updateFrame() override;
@@ -47,6 +50,7 @@ private:
     cv::VideoCapture* cap;
     cv::Mat frame;
     QImage currentFrame;
+    bool isCamera;
 };
 
 

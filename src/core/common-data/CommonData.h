@@ -172,6 +172,9 @@ signals:
     );
 
     void sigAllDataLoadFinished();
+
+    // video signal
+    void sigCallVideoToOtherUser(const QString& remoteSSID);
 private:
     void init();
     explicit CommonData();

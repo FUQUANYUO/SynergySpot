@@ -9,13 +9,13 @@
 #include <vector>
 #include <stdint.h>
 
-#define EXPIRETIME 604800 // 7 day
+#define EXPIRETIME 3600 // 1 hour
 
 class GenerateUserSig {
 public:
     GenerateUserSig();
     ~GenerateUserSig();
-    static const char* genUserSig(const char* identifier, int appId, const char* secretKey);
+    static const char* genUserSig(const char* userId, int appId, const char* token);
 };
 
 

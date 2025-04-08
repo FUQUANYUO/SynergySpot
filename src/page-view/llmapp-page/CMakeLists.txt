@@ -109,7 +109,12 @@ ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Release")
 ENDIF ()
 # auto search rc file fill into *.qrc
 # 清空*.qrc文件，准备覆写
-file(
+CMAKE_POLICY(
+        SET
+        CMP0076
+        NEW
+)
+FILE(
         GLOB_RECURSE                 RC_FILES
         ${CMAKE_SOURCE_DIR}/src/page-view/${QRC_PREFIX}/rc-page/*.*
 )

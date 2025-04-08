@@ -17,6 +17,20 @@
 
 PROTOBUF_PRAGMA_INIT_SEG
 namespace SSDTO {
+constexpr VideoCallDTO::VideoCallDTO(
+  ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
+  : sender_ssid_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , target_ssid_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , user_sig_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string){}
+struct VideoCallDTODefaultTypeInternal {
+  constexpr VideoCallDTODefaultTypeInternal()
+    : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
+  ~VideoCallDTODefaultTypeInternal() {}
+  union {
+    VideoCallDTO _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT VideoCallDTODefaultTypeInternal _VideoCallDTO_default_instance_;
 constexpr GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUse::GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUse(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized){}
 struct GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUseDefaultTypeInternal {
@@ -439,11 +453,20 @@ struct UserCollectedStickerDTODefaultTypeInternal {
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT UserCollectedStickerDTODefaultTypeInternal _UserCollectedStickerDTO_default_instance_;
 }  // namespace SSDTO
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_DTO_2eproto[25];
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_DTO_2eproto[26];
 static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_DTO_2eproto[1];
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_DTO_2eproto = nullptr;
 
 const uint32_t TableStruct_DTO_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::SSDTO::VideoCallDTO, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::SSDTO::VideoCallDTO, sender_ssid_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::VideoCallDTO, target_ssid_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::VideoCallDTO, user_sig_),
   PROTOBUF_FIELD_OFFSET(::SSDTO::GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUse, _has_bits_),
   PROTOBUF_FIELD_OFFSET(::SSDTO::GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUse, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -746,34 +769,36 @@ const uint32_t TableStruct_DTO_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(prot
   PROTOBUF_FIELD_OFFSET(::SSDTO::UserCollectedStickerDTO, ip_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, 8, -1, sizeof(::SSDTO::GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUse)},
-  { 10, -1, -1, sizeof(::SSDTO::GetMessagePicInfoDTO)},
-  { 19, -1, -1, sizeof(::SSDTO::GetUserMessageDTO)},
-  { 31, -1, -1, sizeof(::SSDTO::GetFileDTO)},
-  { 45, -1, -1, sizeof(::SSDTO::FuzzySearchDTO)},
-  { 57, -1, -1, sizeof(::SSDTO::EnrollAccountDTO)},
-  { 69, -1, -1, sizeof(::SSDTO::EmailVerifyDTO)},
-  { 81, -1, -1, sizeof(::SSDTO::MakeFriendDTO)},
-  { 91, -1, -1, sizeof(::SSDTO::LoginCheckDTO)},
-  { 101, -1, -1, sizeof(::SSDTO::DisconnectDTO)},
-  { 109, -1, -1, sizeof(::SSDTO::GetAllUserFriendship)},
-  { 119, -1, -1, sizeof(::SSDTO::UserBaseInfoDTO)},
-  { 136, -1, -1, sizeof(::SSDTO::UserPrivateInfoDTO)},
-  { 148, -1, -1, sizeof(::SSDTO::FriendshipDTO)},
-  { 163, -1, -1, sizeof(::SSDTO::GroupAdminDTO)},
-  { 173, -1, -1, sizeof(::SSDTO::GroupBaseInfoDTO)},
-  { 189, -1, -1, sizeof(::SSDTO::GroupNoticeDTO)},
-  { 200, -1, -1, sizeof(::SSDTO::GroupMemberInfoDTO)},
-  { 211, -1, -1, sizeof(::SSDTO::MessageRecipientDTO)},
-  { 223, -1, -1, sizeof(::SSDTO::MessageContentDTO)},
-  { 237, -1, -1, sizeof(::SSDTO::DistrictDTO)},
-  { 248, -1, -1, sizeof(::SSDTO::FileStorageDTO)},
-  { 262, -1, -1, sizeof(::SSDTO::OperationLogDTO)},
-  { 275, -1, -1, sizeof(::SSDTO::BaseStickerDTO)},
-  { 286, -1, -1, sizeof(::SSDTO::UserCollectedStickerDTO)},
+  { 0, -1, -1, sizeof(::SSDTO::VideoCallDTO)},
+  { 9, 17, -1, sizeof(::SSDTO::GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUse)},
+  { 19, -1, -1, sizeof(::SSDTO::GetMessagePicInfoDTO)},
+  { 28, -1, -1, sizeof(::SSDTO::GetUserMessageDTO)},
+  { 40, -1, -1, sizeof(::SSDTO::GetFileDTO)},
+  { 54, -1, -1, sizeof(::SSDTO::FuzzySearchDTO)},
+  { 66, -1, -1, sizeof(::SSDTO::EnrollAccountDTO)},
+  { 78, -1, -1, sizeof(::SSDTO::EmailVerifyDTO)},
+  { 90, -1, -1, sizeof(::SSDTO::MakeFriendDTO)},
+  { 100, -1, -1, sizeof(::SSDTO::LoginCheckDTO)},
+  { 110, -1, -1, sizeof(::SSDTO::DisconnectDTO)},
+  { 118, -1, -1, sizeof(::SSDTO::GetAllUserFriendship)},
+  { 128, -1, -1, sizeof(::SSDTO::UserBaseInfoDTO)},
+  { 145, -1, -1, sizeof(::SSDTO::UserPrivateInfoDTO)},
+  { 157, -1, -1, sizeof(::SSDTO::FriendshipDTO)},
+  { 172, -1, -1, sizeof(::SSDTO::GroupAdminDTO)},
+  { 182, -1, -1, sizeof(::SSDTO::GroupBaseInfoDTO)},
+  { 198, -1, -1, sizeof(::SSDTO::GroupNoticeDTO)},
+  { 209, -1, -1, sizeof(::SSDTO::GroupMemberInfoDTO)},
+  { 220, -1, -1, sizeof(::SSDTO::MessageRecipientDTO)},
+  { 232, -1, -1, sizeof(::SSDTO::MessageContentDTO)},
+  { 246, -1, -1, sizeof(::SSDTO::DistrictDTO)},
+  { 257, -1, -1, sizeof(::SSDTO::FileStorageDTO)},
+  { 271, -1, -1, sizeof(::SSDTO::OperationLogDTO)},
+  { 284, -1, -1, sizeof(::SSDTO::BaseStickerDTO)},
+  { 295, -1, -1, sizeof(::SSDTO::UserCollectedStickerDTO)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SSDTO::_VideoCallDTO_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SSDTO::_GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUse_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SSDTO::_GetMessagePicInfoDTO_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SSDTO::_GetUserMessageDTO_default_instance_),
@@ -802,116 +827,119 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_DTO_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\tDTO.proto\022\005SSDTO\"\260\001\n\024GetMessagePicInfo"
-  "DTO\022\014\n\004ssid\030\001 \001(\014\022H\n\020pic_name_to_path\030\002 "
-  "\003(\0132..SSDTO.GetMessagePicInfoDTO.PicName"
-  "ToPathEntry\022\n\n\002ip\030\003 \001(\014\0324\n\022PicNameToPath"
-  "Entry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"\214\001"
-  "\n\021GetUserMessageDTO\022\014\n\004ssid\030\001 \001(\014\022%\n\003msg"
-  "\030\002 \003(\0132\030.SSDTO.MessageContentDTO\022\021\n\tlast"
-  "_time\030\003 \001(\014\022\021\n\tpage_size\030\004 \001(\005\022\020\n\010page_n"
-  "um\030\005 \001(\005\022\n\n\002ip\030\006 \001(\014\"\253\001\n\nGetFileDTO\022\014\n\004s"
-  "sid\030\001 \001(\014\022\017\n\007file_id\030\002 \001(\014\022\021\n\tfile_name\030"
-  "\003 \001(\014\022\024\n\014file_storage\030\004 \001(\014\022\021\n\tpage_size"
-  "\030\005 \001(\005\022\020\n\010page_num\030\006 \001(\005\022$\n\005files\030\007 \003(\0132"
-  "\025.SSDTO.FileStorageDTO\022\n\n\002ip\030\010 \001(\014\"\244\001\n\016F"
-  "uzzySearchDTO\022\020\n\010is_group\030\001 \001(\010\022\014\n\004ssid\030"
-  "\002 \001(\014\022\014\n\004name\030\003 \001(\014\022*\n\nuser_infos\030\004 \003(\0132"
-  "\026.SSDTO.UserBaseInfoDTO\022,\n\013group_infos\030\005"
-  " \003(\0132\027.SSDTO.GroupBaseInfoDTO\022\n\n\002ip\030\006 \001("
-  "\014\"w\n\020EnrollAccountDTO\022\014\n\004ssid\030\001 \001(\014\022\021\n\tu"
-  "ser_name\030\002 \001(\014\022\020\n\010password\030\003 \001(\014\022\025\n\rpass"
-  "word_salt\030\004 \001(\014\022\r\n\005email\030\005 \001(\014\022\n\n\002ip\030\006 \001"
-  "(\014\"\204\001\n\016EmailVerifyDTO\022\022\n\nis_request\030\001 \001("
-  "\010\022\025\n\remail_address\030\002 \001(\014\022\023\n\013verify_code\030"
-  "\003 \001(\014\022\022\n\nstart_time\030\004 \001(\014\022\022\n\nvalid_time\030"
-  "\005 \001(\014\022\n\n\002ip\030\006 \001(\014\"S\n\rMakeFriendDTO\022\016\n\006se"
-  "nder\030\001 \001(\014\022\021\n\trecipient\030\002 \001(\014\022\016\n\006accept\030"
-  "\003 \001(\010\022\017\n\007isGroup\030\004 \001(\010\"L\n\rLoginCheckDTO\022"
-  "\014\n\004ssid\030\001 \001(\014\022\020\n\010password\030\002 \001(\014\022\017\n\007is_pa"
-  "ss\030\003 \001(\010\022\n\n\002ip\030\005 \001(\014\")\n\rDisconnectDTO\022\014\n"
-  "\004ssid\030\001 \001(\014\022\n\n\002ip\030\002 \001(\014\"\222\001\n\024GetAllUserFr"
-  "iendship\022\014\n\004ssid\030\001 \001(\t\0221\n\021friends_base_i"
-  "nfo\030\002 \003(\0132\026.SSDTO.UserBaseInfoDTO\022-\n\017fri"
-  "endship_info\030\003 \003(\0132\024.SSDTO.FriendshipDTO"
-  "\022\n\n\002ip\030\004 \001(\014\"\342\001\n\017UserBaseInfoDTO\022\014\n\004ssid"
-  "\030\001 \001(\t\022\016\n\006ssname\030\002 \001(\t\022\026\n\016avatar_file_id"
-  "\030\003 \001(\t\022\032\n\022avatar_remote_path\030\004 \001(\t\022\013\n\003se"
-  "x\030\005 \001(\t\022\025\n\rpersonal_sign\030\006 \001(\t\022\026\n\016thumb_"
-  "up_count\030\007 \001(\r\022\020\n\010birthday\030\010 \001(\003\022\016\n\006regi"
-  "on\030\t \001(\r\022\023\n\013create_time\030\n \001(\003\022\n\n\002ip\030\013 \001("
-  "\014\"~\n\022UserPrivateInfoDTO\022\014\n\004ssid\030\001 \001(\t\022\r\n"
-  "\005email\030\002 \001(\t\022\020\n\010password\030\003 \001(\t\022\025\n\rpasswo"
-  "rd_salt\030\004 \001(\t\022\026\n\016account_status\030\005 \001(\r\022\n\n"
-  "\002ip\030\006 \001(\014\"\253\001\n\rFriendshipDTO\022\n\n\002id\030\001 \001(\003\022"
-  "\014\n\004ssid\030\002 \001(\t\022\020\n\010grouping\030\003 \001(\t\022\016\n\006remar"
-  "k\030\004 \001(\t\022\023\n\013friend_ssid\030\005 \001(\t\022\023\n\013ship_sta"
-  "tus\030\006 \001(\r\022\023\n\013friend_type\030\007 \001(\r\022\023\n\013create"
-  "_time\030\010 \001(\003\022\n\n\002ip\030\t \001(\014\"J\n\rGroupAdminDTO"
-  "\022\n\n\002id\030\001 \001(\003\022\020\n\010group_id\030\002 \001(\003\022\017\n\007op_ssi"
-  "d\030\003 \001(\t\022\n\n\002ip\030\004 \001(\014\"\313\001\n\020GroupBaseInfoDTO"
-  "\022\n\n\002id\030\001 \001(\003\022\022\n\nssid_group\030\002 \001(\t\022\014\n\004name"
-  "\030\003 \001(\t\022\026\n\016avatar_file_id\030\004 \001(\t\022\032\n\022avatar"
-  "_remote_path\030\005 \001(\t\022\023\n\013create_ssid\030\006 \001(\t\022"
-  "\017\n\007profile\030\007 \001(\t\022\016\n\006admins\030\010 \003(\t\022\023\n\013crea"
-  "te_time\030\t \001(\003\022\n\n\002ip\030\n \001(\014\"_\n\016GroupNotice"
-  "DTO\022\n\n\002id\030\001 \001(\003\022\020\n\010group_id\030\002 \001(\003\022\016\n\006not"
-  "ice\030\003 \001(\t\022\023\n\013create_time\030\004 \001(\003\022\n\n\002ip\030\005 \001"
-  "(\014\"j\n\022GroupMemberInfoDTO\022\n\n\002id\030\001 \001(\003\022\022\n\n"
-  "ssid_group\030\002 \001(\t\022\023\n\013ssid_member\030\003 \001(\t\022\023\n"
-  "\013create_time\030\004 \001(\003\022\n\n\002ip\030\005 \001(\014\"\206\001\n\023Messa"
-  "geRecipientDTO\022\n\n\002id\030\001 \001(\003\022\022\n\nmessage_id"
-  "\030\002 \001(\003\022\026\n\016recipient_type\030\003 \001(\r\022\026\n\016recipi"
-  "ent_ssid\030\004 \001(\t\022\023\n\013read_status\030\005 \001(\010\022\n\n\002i"
-  "p\030\006 \001(\014\"\274\001\n\021MessageContentDTO\022\n\n\002id\030\001 \001("
-  "\003\022\023\n\013sender_ssid\030\002 \001(\t\022\024\n\014content_type\030\003"
-  " \001(\r\022\017\n\007content\030\004 \001(\t\022\017\n\007file_id\030\005 \003(\t\022-"
-  "\n\trecipient\030\006 \001(\0132\032.SSDTO.MessageRecipie"
-  "ntDTO\022\023\n\013create_time\030\007 \001(\003\022\n\n\002ip\030\010 \001(\014\"\\"
-  "\n\013DistrictDTO\022\023\n\013district_id\030\001 \001(\r\022\013\n\003pi"
-  "d\030\002 \001(\r\022\020\n\010district\030\003 \001(\t\022\r\n\005level\030\004 \001(\r"
-  "\022\n\n\002ip\030\005 \001(\014\"\250\001\n\016FileStorageDTO\022\017\n\007file_"
-  "id\030\001 \001(\t\022\025\n\ruploader_ssid\030\002 \001(\t\022\021\n\tfile_"
-  "name\030\003 \001(\t\022\021\n\tfile_size\030\004 \001(\003\022\021\n\tfile_ty"
-  "pe\030\005 \001(\t\022\024\n\014storage_path\030\006 \001(\t\022\023\n\013upload"
-  "_time\030\007 \001(\003\022\n\n\002ip\030\010 \001(\014\"\210\001\n\017OperationLog"
-  "DTO\022\n\n\002id\030\001 \001(\003\022\014\n\004ssid\030\002 \001(\t\022\026\n\016operati"
-  "on_type\030\003 \001(\t\022\016\n\006detail\030\004 \001(\t\022\022\n\nip_addr"
-  "ess\030\005 \001(\t\022\023\n\013create_time\030\006 \001(\003\022\n\n\002ip\030\007 \001"
-  "(\014\"e\n\016BaseStickerDTO\022\022\n\nsticker_id\030\001 \001(\003"
-  "\022\021\n\timage_url\030\002 \001(\t\022\014\n\004tags\030\003 \001(\t\022\022\n\ncre"
-  "ated_at\030\004 \001(\003\022\n\n\002ip\030\005 \001(\014\"\256\001\n\027UserCollec"
-  "tedStickerDTO\022\025\n\rcollection_id\030\001 \001(\003\022\021\n\t"
-  "user_ssid\030\002 \001(\t\022\021\n\tis_custom\030\003 \001(\010\022\021\n\tim"
-  "age_url\030\004 \001(\t\022\022\n\ncreated_at\030\005 \001(\003\022\021\n\tpag"
-  "e_size\030\006 \001(\005\022\020\n\010page_num\030\007 \001(\005\022\n\n\002ip\030\010 \001"
-  "(\014*\327\006\n\014BusinessType\022\024\n\020R_USER_BASE_INFO\020"
-  "\000\022\024\n\020U_USER_BASE_INFO\020\001\022\016\n\nDISCONNECT\020\003\022"
-  "\020\n\014EMAIL_VERIFY\020\004\022\017\n\013LOGIN_CHECK\020\013\022\022\n\016EN"
-  "ROLL_ACCOUNT\020\014\022\024\n\020RECOVER_PASSWORD\020\r\022\025\n\021"
-  "R_FRIENDSHIP_LIST\020\025\022\020\n\014U_FRIENDSHIP\020\026\022\020\n"
-  "\014D_FRIENDSHIP\020\027\022\020\n\014C_FRIENDSHIP\020\030\022\025\n\021C_G"
-  "ROUP_BASE_INFO\020\037\022\025\n\021R_GROUP_BASE_INFO\020 \022"
-  "\025\n\021D_GROUP_BASE_INFO\020!\022\025\n\021U_GROUP_BASE_I"
-  "NF0\020\"\022\027\n\023C_GROUP_MEMBER_INFO\020)\022\027\n\023D_GROU"
-  "P_MEMBER_INFO\020*\022\027\n\023R_GROUP_MEMBER_INFO\020+"
-  "\022\022\n\016C_GROUP_NOTICE\0203\022\022\n\016D_GROUP_NOTICE\0204"
-  "\022\022\n\016R_GROUP_NOTICE\0205\022\020\n\014FUZZY_SEARCH\0208\022\025"
-  "\n\021R_MESSAGE_CONTENT\020=\022\025\n\021C_MESSAGE_CONTE"
-  "NT\020>\022\026\n\022R_MESSAGE_PIC_INFO\020\?\022\027\n\023MAKE_FRI"
-  "END_REQUEST\020@\022\030\n\024MAKE_FRIEND_RESPONSE\020A\022"
-  "\025\n\021R_DISTRICT_BY_PID\020G\022\027\n\023R_DISTRICT_PRO"
-  "VINCE\020H\022\023\n\017R_DISTRICT_CITY\020I\022\024\n\020R_DISTRI"
-  "CT_BLOCK\020J\022\026\n\022R_DISTRICT_BY_NAME\020K\022\022\n\016R_"
-  "BASE_STICKER\020Q\022\034\n\030R_USER_COLLECTED_STICK"
-  "ER\020R\022\034\n\030C_USER_COLLECTED_STICKER\020S\022\034\n\030D_"
-  "USER_COLLECTED_STICKER\020T\022\n\n\006R_FILE\020[\022\n\n\006"
-  "C_FILE\020\\\022\n\n\006D_FILE\020]b\006proto3"
+  "\n\tDTO.proto\022\005SSDTO\"J\n\014VideoCallDTO\022\023\n\013se"
+  "nder_ssid\030\001 \001(\014\022\023\n\013target_ssid\030\002 \001(\014\022\020\n\010"
+  "user_sig\030\003 \001(\t\"\260\001\n\024GetMessagePicInfoDTO\022"
+  "\014\n\004ssid\030\001 \001(\014\022H\n\020pic_name_to_path\030\002 \003(\0132"
+  "..SSDTO.GetMessagePicInfoDTO.PicNameToPa"
+  "thEntry\022\n\n\002ip\030\003 \001(\014\0324\n\022PicNameToPathEntr"
+  "y\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"\214\001\n\021Ge"
+  "tUserMessageDTO\022\014\n\004ssid\030\001 \001(\014\022%\n\003msg\030\002 \003"
+  "(\0132\030.SSDTO.MessageContentDTO\022\021\n\tlast_tim"
+  "e\030\003 \001(\014\022\021\n\tpage_size\030\004 \001(\005\022\020\n\010page_num\030\005"
+  " \001(\005\022\n\n\002ip\030\006 \001(\014\"\253\001\n\nGetFileDTO\022\014\n\004ssid\030"
+  "\001 \001(\014\022\017\n\007file_id\030\002 \001(\014\022\021\n\tfile_name\030\003 \001("
+  "\014\022\024\n\014file_storage\030\004 \001(\014\022\021\n\tpage_size\030\005 \001"
+  "(\005\022\020\n\010page_num\030\006 \001(\005\022$\n\005files\030\007 \003(\0132\025.SS"
+  "DTO.FileStorageDTO\022\n\n\002ip\030\010 \001(\014\"\244\001\n\016Fuzzy"
+  "SearchDTO\022\020\n\010is_group\030\001 \001(\010\022\014\n\004ssid\030\002 \001("
+  "\014\022\014\n\004name\030\003 \001(\014\022*\n\nuser_infos\030\004 \003(\0132\026.SS"
+  "DTO.UserBaseInfoDTO\022,\n\013group_infos\030\005 \003(\013"
+  "2\027.SSDTO.GroupBaseInfoDTO\022\n\n\002ip\030\006 \001(\014\"w\n"
+  "\020EnrollAccountDTO\022\014\n\004ssid\030\001 \001(\014\022\021\n\tuser_"
+  "name\030\002 \001(\014\022\020\n\010password\030\003 \001(\014\022\025\n\rpassword"
+  "_salt\030\004 \001(\014\022\r\n\005email\030\005 \001(\014\022\n\n\002ip\030\006 \001(\014\"\204"
+  "\001\n\016EmailVerifyDTO\022\022\n\nis_request\030\001 \001(\010\022\025\n"
+  "\remail_address\030\002 \001(\014\022\023\n\013verify_code\030\003 \001("
+  "\014\022\022\n\nstart_time\030\004 \001(\014\022\022\n\nvalid_time\030\005 \001("
+  "\014\022\n\n\002ip\030\006 \001(\014\"S\n\rMakeFriendDTO\022\016\n\006sender"
+  "\030\001 \001(\014\022\021\n\trecipient\030\002 \001(\014\022\016\n\006accept\030\003 \001("
+  "\010\022\017\n\007isGroup\030\004 \001(\010\"L\n\rLoginCheckDTO\022\014\n\004s"
+  "sid\030\001 \001(\014\022\020\n\010password\030\002 \001(\014\022\017\n\007is_pass\030\003"
+  " \001(\010\022\n\n\002ip\030\005 \001(\014\")\n\rDisconnectDTO\022\014\n\004ssi"
+  "d\030\001 \001(\014\022\n\n\002ip\030\002 \001(\014\"\222\001\n\024GetAllUserFriend"
+  "ship\022\014\n\004ssid\030\001 \001(\t\0221\n\021friends_base_info\030"
+  "\002 \003(\0132\026.SSDTO.UserBaseInfoDTO\022-\n\017friends"
+  "hip_info\030\003 \003(\0132\024.SSDTO.FriendshipDTO\022\n\n\002"
+  "ip\030\004 \001(\014\"\342\001\n\017UserBaseInfoDTO\022\014\n\004ssid\030\001 \001"
+  "(\t\022\016\n\006ssname\030\002 \001(\t\022\026\n\016avatar_file_id\030\003 \001"
+  "(\t\022\032\n\022avatar_remote_path\030\004 \001(\t\022\013\n\003sex\030\005 "
+  "\001(\t\022\025\n\rpersonal_sign\030\006 \001(\t\022\026\n\016thumb_up_c"
+  "ount\030\007 \001(\r\022\020\n\010birthday\030\010 \001(\003\022\016\n\006region\030\t"
+  " \001(\r\022\023\n\013create_time\030\n \001(\003\022\n\n\002ip\030\013 \001(\014\"~\n"
+  "\022UserPrivateInfoDTO\022\014\n\004ssid\030\001 \001(\t\022\r\n\005ema"
+  "il\030\002 \001(\t\022\020\n\010password\030\003 \001(\t\022\025\n\rpassword_s"
+  "alt\030\004 \001(\t\022\026\n\016account_status\030\005 \001(\r\022\n\n\002ip\030"
+  "\006 \001(\014\"\253\001\n\rFriendshipDTO\022\n\n\002id\030\001 \001(\003\022\014\n\004s"
+  "sid\030\002 \001(\t\022\020\n\010grouping\030\003 \001(\t\022\016\n\006remark\030\004 "
+  "\001(\t\022\023\n\013friend_ssid\030\005 \001(\t\022\023\n\013ship_status\030"
+  "\006 \001(\r\022\023\n\013friend_type\030\007 \001(\r\022\023\n\013create_tim"
+  "e\030\010 \001(\003\022\n\n\002ip\030\t \001(\014\"J\n\rGroupAdminDTO\022\n\n\002"
+  "id\030\001 \001(\003\022\020\n\010group_id\030\002 \001(\003\022\017\n\007op_ssid\030\003 "
+  "\001(\t\022\n\n\002ip\030\004 \001(\014\"\313\001\n\020GroupBaseInfoDTO\022\n\n\002"
+  "id\030\001 \001(\003\022\022\n\nssid_group\030\002 \001(\t\022\014\n\004name\030\003 \001"
+  "(\t\022\026\n\016avatar_file_id\030\004 \001(\t\022\032\n\022avatar_rem"
+  "ote_path\030\005 \001(\t\022\023\n\013create_ssid\030\006 \001(\t\022\017\n\007p"
+  "rofile\030\007 \001(\t\022\016\n\006admins\030\010 \003(\t\022\023\n\013create_t"
+  "ime\030\t \001(\003\022\n\n\002ip\030\n \001(\014\"_\n\016GroupNoticeDTO\022"
+  "\n\n\002id\030\001 \001(\003\022\020\n\010group_id\030\002 \001(\003\022\016\n\006notice\030"
+  "\003 \001(\t\022\023\n\013create_time\030\004 \001(\003\022\n\n\002ip\030\005 \001(\014\"j"
+  "\n\022GroupMemberInfoDTO\022\n\n\002id\030\001 \001(\003\022\022\n\nssid"
+  "_group\030\002 \001(\t\022\023\n\013ssid_member\030\003 \001(\t\022\023\n\013cre"
+  "ate_time\030\004 \001(\003\022\n\n\002ip\030\005 \001(\014\"\206\001\n\023MessageRe"
+  "cipientDTO\022\n\n\002id\030\001 \001(\003\022\022\n\nmessage_id\030\002 \001"
+  "(\003\022\026\n\016recipient_type\030\003 \001(\r\022\026\n\016recipient_"
+  "ssid\030\004 \001(\t\022\023\n\013read_status\030\005 \001(\010\022\n\n\002ip\030\006 "
+  "\001(\014\"\274\001\n\021MessageContentDTO\022\n\n\002id\030\001 \001(\003\022\023\n"
+  "\013sender_ssid\030\002 \001(\t\022\024\n\014content_type\030\003 \001(\r"
+  "\022\017\n\007content\030\004 \001(\t\022\017\n\007file_id\030\005 \003(\t\022-\n\tre"
+  "cipient\030\006 \001(\0132\032.SSDTO.MessageRecipientDT"
+  "O\022\023\n\013create_time\030\007 \001(\003\022\n\n\002ip\030\010 \001(\014\"\\\n\013Di"
+  "strictDTO\022\023\n\013district_id\030\001 \001(\r\022\013\n\003pid\030\002 "
+  "\001(\r\022\020\n\010district\030\003 \001(\t\022\r\n\005level\030\004 \001(\r\022\n\n\002"
+  "ip\030\005 \001(\014\"\250\001\n\016FileStorageDTO\022\017\n\007file_id\030\001"
+  " \001(\t\022\025\n\ruploader_ssid\030\002 \001(\t\022\021\n\tfile_name"
+  "\030\003 \001(\t\022\021\n\tfile_size\030\004 \001(\003\022\021\n\tfile_type\030\005"
+  " \001(\t\022\024\n\014storage_path\030\006 \001(\t\022\023\n\013upload_tim"
+  "e\030\007 \001(\003\022\n\n\002ip\030\010 \001(\014\"\210\001\n\017OperationLogDTO\022"
+  "\n\n\002id\030\001 \001(\003\022\014\n\004ssid\030\002 \001(\t\022\026\n\016operation_t"
+  "ype\030\003 \001(\t\022\016\n\006detail\030\004 \001(\t\022\022\n\nip_address\030"
+  "\005 \001(\t\022\023\n\013create_time\030\006 \001(\003\022\n\n\002ip\030\007 \001(\014\"e"
+  "\n\016BaseStickerDTO\022\022\n\nsticker_id\030\001 \001(\003\022\021\n\t"
+  "image_url\030\002 \001(\t\022\014\n\004tags\030\003 \001(\t\022\022\n\ncreated"
+  "_at\030\004 \001(\003\022\n\n\002ip\030\005 \001(\014\"\256\001\n\027UserCollectedS"
+  "tickerDTO\022\025\n\rcollection_id\030\001 \001(\003\022\021\n\tuser"
+  "_ssid\030\002 \001(\t\022\021\n\tis_custom\030\003 \001(\010\022\021\n\timage_"
+  "url\030\004 \001(\t\022\022\n\ncreated_at\030\005 \001(\003\022\021\n\tpage_si"
+  "ze\030\006 \001(\005\022\020\n\010page_num\030\007 \001(\005\022\n\n\002ip\030\010 \001(\014*\210"
+  "\007\n\014BusinessType\022\024\n\020R_USER_BASE_INFO\020\000\022\024\n"
+  "\020U_USER_BASE_INFO\020\001\022\016\n\nDISCONNECT\020\003\022\020\n\014E"
+  "MAIL_VERIFY\020\004\022\026\n\022VIDEO_CALL_REQUEST\020\005\022\027\n"
+  "\023VIDEO_CALL_RESPONSE\020\006\022\017\n\013LOGIN_CHECK\020\013\022"
+  "\022\n\016ENROLL_ACCOUNT\020\014\022\024\n\020RECOVER_PASSWORD\020"
+  "\r\022\025\n\021R_FRIENDSHIP_LIST\020\025\022\020\n\014U_FRIENDSHIP"
+  "\020\026\022\020\n\014D_FRIENDSHIP\020\027\022\020\n\014C_FRIENDSHIP\020\030\022\025"
+  "\n\021C_GROUP_BASE_INFO\020\037\022\025\n\021R_GROUP_BASE_IN"
+  "FO\020 \022\025\n\021D_GROUP_BASE_INFO\020!\022\025\n\021U_GROUP_B"
+  "ASE_INF0\020\"\022\027\n\023C_GROUP_MEMBER_INFO\020)\022\027\n\023D"
+  "_GROUP_MEMBER_INFO\020*\022\027\n\023R_GROUP_MEMBER_I"
+  "NFO\020+\022\022\n\016C_GROUP_NOTICE\0203\022\022\n\016D_GROUP_NOT"
+  "ICE\0204\022\022\n\016R_GROUP_NOTICE\0205\022\020\n\014FUZZY_SEARC"
+  "H\0208\022\025\n\021R_MESSAGE_CONTENT\020=\022\025\n\021C_MESSAGE_"
+  "CONTENT\020>\022\026\n\022R_MESSAGE_PIC_INFO\020\?\022\027\n\023MAK"
+  "E_FRIEND_REQUEST\020@\022\030\n\024MAKE_FRIEND_RESPON"
+  "SE\020A\022\025\n\021R_DISTRICT_BY_PID\020G\022\027\n\023R_DISTRIC"
+  "T_PROVINCE\020H\022\023\n\017R_DISTRICT_CITY\020I\022\024\n\020R_D"
+  "ISTRICT_BLOCK\020J\022\026\n\022R_DISTRICT_BY_NAME\020K\022"
+  "\022\n\016R_BASE_STICKER\020Q\022\034\n\030R_USER_COLLECTED_"
+  "STICKER\020R\022\034\n\030C_USER_COLLECTED_STICKER\020S\022"
+  "\034\n\030D_USER_COLLECTED_STICKER\020T\022\n\n\006R_FILE\020"
+  "[\022\n\n\006C_FILE\020\\\022\n\n\006D_FILE\020]b\006proto3"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_DTO_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_DTO_2eproto = {
-  false, false, 4188, descriptor_table_protodef_DTO_2eproto, "DTO.proto", 
-  &descriptor_table_DTO_2eproto_once, nullptr, 0, 25,
+  false, false, 4313, descriptor_table_protodef_DTO_2eproto, "DTO.proto", 
+  &descriptor_table_DTO_2eproto_once, nullptr, 0, 26,
   schemas, file_default_instances, TableStruct_DTO_2eproto::offsets,
   file_level_metadata_DTO_2eproto, file_level_enum_descriptors_DTO_2eproto, file_level_service_descriptors_DTO_2eproto,
 };
@@ -932,6 +960,8 @@ bool BusinessType_IsValid(int value) {
     case 1:
     case 3:
     case 4:
+    case 5:
+    case 6:
     case 11:
     case 12:
     case 13:
@@ -976,6 +1006,297 @@ bool BusinessType_IsValid(int value) {
 
 // ===================================================================
 
+class VideoCallDTO::_Internal {
+ public:
+};
+
+VideoCallDTO::VideoCallDTO(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor();
+  if (!is_message_owned) {
+    RegisterArenaDtor(arena);
+  }
+  // @@protoc_insertion_point(arena_constructor:SSDTO.VideoCallDTO)
+}
+VideoCallDTO::VideoCallDTO(const VideoCallDTO& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  sender_ssid_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    sender_ssid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_sender_ssid().empty()) {
+    sender_ssid_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_sender_ssid(), 
+      GetArenaForAllocation());
+  }
+  target_ssid_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    target_ssid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_target_ssid().empty()) {
+    target_ssid_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_target_ssid(), 
+      GetArenaForAllocation());
+  }
+  user_sig_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    user_sig_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_user_sig().empty()) {
+    user_sig_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_user_sig(), 
+      GetArenaForAllocation());
+  }
+  // @@protoc_insertion_point(copy_constructor:SSDTO.VideoCallDTO)
+}
+
+inline void VideoCallDTO::SharedCtor() {
+sender_ssid_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  sender_ssid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+target_ssid_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  target_ssid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+user_sig_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  user_sig_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+}
+
+VideoCallDTO::~VideoCallDTO() {
+  // @@protoc_insertion_point(destructor:SSDTO.VideoCallDTO)
+  if (GetArenaForAllocation() != nullptr) return;
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+inline void VideoCallDTO::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  sender_ssid_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  target_ssid_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  user_sig_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+
+void VideoCallDTO::ArenaDtor(void* object) {
+  VideoCallDTO* _this = reinterpret_cast< VideoCallDTO* >(object);
+  (void)_this;
+}
+void VideoCallDTO::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void VideoCallDTO::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+
+void VideoCallDTO::Clear() {
+// @@protoc_insertion_point(message_clear_start:SSDTO.VideoCallDTO)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  sender_ssid_.ClearToEmpty();
+  target_ssid_.ClearToEmpty();
+  user_sig_.ClearToEmpty();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* VideoCallDTO::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // bytes sender_ssid = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
+          auto str = _internal_mutable_sender_ssid();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // bytes target_ssid = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
+          auto str = _internal_mutable_target_ssid();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // string user_sig = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
+          auto str = _internal_mutable_user_sig();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "SSDTO.VideoCallDTO.user_sig"));
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* VideoCallDTO::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:SSDTO.VideoCallDTO)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // bytes sender_ssid = 1;
+  if (!this->_internal_sender_ssid().empty()) {
+    target = stream->WriteBytesMaybeAliased(
+        1, this->_internal_sender_ssid(), target);
+  }
+
+  // bytes target_ssid = 2;
+  if (!this->_internal_target_ssid().empty()) {
+    target = stream->WriteBytesMaybeAliased(
+        2, this->_internal_target_ssid(), target);
+  }
+
+  // string user_sig = 3;
+  if (!this->_internal_user_sig().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_user_sig().data(), static_cast<int>(this->_internal_user_sig().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "SSDTO.VideoCallDTO.user_sig");
+    target = stream->WriteStringMaybeAliased(
+        3, this->_internal_user_sig(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:SSDTO.VideoCallDTO)
+  return target;
+}
+
+size_t VideoCallDTO::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:SSDTO.VideoCallDTO)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // bytes sender_ssid = 1;
+  if (!this->_internal_sender_ssid().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+        this->_internal_sender_ssid());
+  }
+
+  // bytes target_ssid = 2;
+  if (!this->_internal_target_ssid().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+        this->_internal_target_ssid());
+  }
+
+  // string user_sig = 3;
+  if (!this->_internal_user_sig().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_user_sig());
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData VideoCallDTO::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSizeCheck,
+    VideoCallDTO::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*VideoCallDTO::GetClassData() const { return &_class_data_; }
+
+void VideoCallDTO::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
+                      const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+  static_cast<VideoCallDTO *>(to)->MergeFrom(
+      static_cast<const VideoCallDTO &>(from));
+}
+
+
+void VideoCallDTO::MergeFrom(const VideoCallDTO& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:SSDTO.VideoCallDTO)
+  GOOGLE_DCHECK_NE(&from, this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_sender_ssid().empty()) {
+    _internal_set_sender_ssid(from._internal_sender_ssid());
+  }
+  if (!from._internal_target_ssid().empty()) {
+    _internal_set_target_ssid(from._internal_target_ssid());
+  }
+  if (!from._internal_user_sig().empty()) {
+    _internal_set_user_sig(from._internal_user_sig());
+  }
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void VideoCallDTO::CopyFrom(const VideoCallDTO& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:SSDTO.VideoCallDTO)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool VideoCallDTO::IsInitialized() const {
+  return true;
+}
+
+void VideoCallDTO::InternalSwap(VideoCallDTO* other) {
+  using std::swap;
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &sender_ssid_, lhs_arena,
+      &other->sender_ssid_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &target_ssid_, lhs_arena,
+      &other->target_ssid_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &user_sig_, lhs_arena,
+      &other->user_sig_, rhs_arena
+  );
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata VideoCallDTO::GetMetadata() const {
+  return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
+      &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
+      file_level_metadata_DTO_2eproto[0]);
+}
+
+// ===================================================================
+
 GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUse::GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUse() {}
 GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUse::GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUse(::PROTOBUF_NAMESPACE_ID::Arena* arena)
     : SuperType(arena) {}
@@ -985,7 +1306,7 @@ void GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUse::MergeFrom(const GetMessag
 ::PROTOBUF_NAMESPACE_ID::Metadata GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUse::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[0]);
+      file_level_metadata_DTO_2eproto[1]);
 }
 
 // ===================================================================
@@ -1304,7 +1625,7 @@ void GetMessagePicInfoDTO::InternalSwap(GetMessagePicInfoDTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata GetMessagePicInfoDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[1]);
+      file_level_metadata_DTO_2eproto[2]);
 }
 
 // ===================================================================
@@ -1683,7 +2004,7 @@ void GetUserMessageDTO::InternalSwap(GetUserMessageDTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata GetUserMessageDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[2]);
+      file_level_metadata_DTO_2eproto[3]);
 }
 
 // ===================================================================
@@ -2150,7 +2471,7 @@ void GetFileDTO::InternalSwap(GetFileDTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata GetFileDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[3]);
+      file_level_metadata_DTO_2eproto[4]);
 }
 
 // ===================================================================
@@ -2528,7 +2849,7 @@ void FuzzySearchDTO::InternalSwap(FuzzySearchDTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata FuzzySearchDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[4]);
+      file_level_metadata_DTO_2eproto[5]);
 }
 
 // ===================================================================
@@ -2946,7 +3267,7 @@ void EnrollAccountDTO::InternalSwap(EnrollAccountDTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata EnrollAccountDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[5]);
+      file_level_metadata_DTO_2eproto[6]);
 }
 
 // ===================================================================
@@ -3346,7 +3667,7 @@ void EmailVerifyDTO::InternalSwap(EmailVerifyDTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata EmailVerifyDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[6]);
+      file_level_metadata_DTO_2eproto[7]);
 }
 
 // ===================================================================
@@ -3648,7 +3969,7 @@ void MakeFriendDTO::InternalSwap(MakeFriendDTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata MakeFriendDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[7]);
+      file_level_metadata_DTO_2eproto[8]);
 }
 
 // ===================================================================
@@ -3960,7 +4281,7 @@ void LoginCheckDTO::InternalSwap(LoginCheckDTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata LoginCheckDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[8]);
+      file_level_metadata_DTO_2eproto[9]);
 }
 
 // ===================================================================
@@ -4202,7 +4523,7 @@ void DisconnectDTO::InternalSwap(DisconnectDTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata DisconnectDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[9]);
+      file_level_metadata_DTO_2eproto[10]);
 }
 
 // ===================================================================
@@ -4515,7 +4836,7 @@ void GetAllUserFriendship::InternalSwap(GetAllUserFriendship* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata GetAllUserFriendship::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[10]);
+      file_level_metadata_DTO_2eproto[11]);
 }
 
 // ===================================================================
@@ -5111,7 +5432,7 @@ void UserBaseInfoDTO::InternalSwap(UserBaseInfoDTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata UserBaseInfoDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[11]);
+      file_level_metadata_DTO_2eproto[12]);
 }
 
 // ===================================================================
@@ -5531,7 +5852,7 @@ void UserPrivateInfoDTO::InternalSwap(UserPrivateInfoDTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata UserPrivateInfoDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[12]);
+      file_level_metadata_DTO_2eproto[13]);
 }
 
 // ===================================================================
@@ -6029,7 +6350,7 @@ void FriendshipDTO::InternalSwap(FriendshipDTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata FriendshipDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[13]);
+      file_level_metadata_DTO_2eproto[14]);
 }
 
 // ===================================================================
@@ -6336,7 +6657,7 @@ void GroupAdminDTO::InternalSwap(GroupAdminDTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata GroupAdminDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[14]);
+      file_level_metadata_DTO_2eproto[15]);
 }
 
 // ===================================================================
@@ -6926,7 +7247,7 @@ void GroupBaseInfoDTO::InternalSwap(GroupBaseInfoDTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata GroupBaseInfoDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[15]);
+      file_level_metadata_DTO_2eproto[16]);
 }
 
 // ===================================================================
@@ -7255,7 +7576,7 @@ void GroupNoticeDTO::InternalSwap(GroupNoticeDTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata GroupNoticeDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[16]);
+      file_level_metadata_DTO_2eproto[17]);
 }
 
 // ===================================================================
@@ -7611,7 +7932,7 @@ void GroupMemberInfoDTO::InternalSwap(GroupMemberInfoDTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata GroupMemberInfoDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[17]);
+      file_level_metadata_DTO_2eproto[18]);
 }
 
 // ===================================================================
@@ -7962,7 +8283,7 @@ void MessageRecipientDTO::InternalSwap(MessageRecipientDTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata MessageRecipientDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[18]);
+      file_level_metadata_DTO_2eproto[19]);
 }
 
 // ===================================================================
@@ -8419,7 +8740,7 @@ void MessageContentDTO::InternalSwap(MessageContentDTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata MessageContentDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[19]);
+      file_level_metadata_DTO_2eproto[20]);
 }
 
 // ===================================================================
@@ -8748,7 +9069,7 @@ void DistrictDTO::InternalSwap(DistrictDTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata DistrictDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[20]);
+      file_level_metadata_DTO_2eproto[21]);
 }
 
 // ===================================================================
@@ -9251,7 +9572,7 @@ void FileStorageDTO::InternalSwap(FileStorageDTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata FileStorageDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[21]);
+      file_level_metadata_DTO_2eproto[22]);
 }
 
 // ===================================================================
@@ -9705,7 +10026,7 @@ void OperationLogDTO::InternalSwap(OperationLogDTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata OperationLogDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[22]);
+      file_level_metadata_DTO_2eproto[23]);
 }
 
 // ===================================================================
@@ -10061,7 +10382,7 @@ void BaseStickerDTO::InternalSwap(BaseStickerDTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata BaseStickerDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[23]);
+      file_level_metadata_DTO_2eproto[24]);
 }
 
 // ===================================================================
@@ -10483,12 +10804,15 @@ void UserCollectedStickerDTO::InternalSwap(UserCollectedStickerDTO* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata UserCollectedStickerDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
-      file_level_metadata_DTO_2eproto[24]);
+      file_level_metadata_DTO_2eproto[25]);
 }
 
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace SSDTO
 PROTOBUF_NAMESPACE_OPEN
+template<> PROTOBUF_NOINLINE ::SSDTO::VideoCallDTO* Arena::CreateMaybeMessage< ::SSDTO::VideoCallDTO >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::SSDTO::VideoCallDTO >(arena);
+}
 template<> PROTOBUF_NOINLINE ::SSDTO::GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUse* Arena::CreateMaybeMessage< ::SSDTO::GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUse >(Arena* arena) {
   return Arena::CreateMessageInternal< ::SSDTO::GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUse >(arena);
 }

@@ -50,7 +50,7 @@ struct TableStruct_DTO_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[25]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[26]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -133,6 +133,9 @@ extern UserCollectedStickerDTODefaultTypeInternal _UserCollectedStickerDTO_defau
 class UserPrivateInfoDTO;
 struct UserPrivateInfoDTODefaultTypeInternal;
 extern UserPrivateInfoDTODefaultTypeInternal _UserPrivateInfoDTO_default_instance_;
+class VideoCallDTO;
+struct VideoCallDTODefaultTypeInternal;
+extern VideoCallDTODefaultTypeInternal _VideoCallDTO_default_instance_;
 }  // namespace SSDTO
 PROTOBUF_NAMESPACE_OPEN
 template<> ::SSDTO::BaseStickerDTO* Arena::CreateMaybeMessage<::SSDTO::BaseStickerDTO>(Arena*);
@@ -160,6 +163,7 @@ template<> ::SSDTO::OperationLogDTO* Arena::CreateMaybeMessage<::SSDTO::Operatio
 template<> ::SSDTO::UserBaseInfoDTO* Arena::CreateMaybeMessage<::SSDTO::UserBaseInfoDTO>(Arena*);
 template<> ::SSDTO::UserCollectedStickerDTO* Arena::CreateMaybeMessage<::SSDTO::UserCollectedStickerDTO>(Arena*);
 template<> ::SSDTO::UserPrivateInfoDTO* Arena::CreateMaybeMessage<::SSDTO::UserPrivateInfoDTO>(Arena*);
+template<> ::SSDTO::VideoCallDTO* Arena::CreateMaybeMessage<::SSDTO::VideoCallDTO>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace SSDTO {
 
@@ -168,6 +172,8 @@ enum BusinessType : int {
   U_USER_BASE_INFO = 1,
   DISCONNECT = 3,
   EMAIL_VERIFY = 4,
+  VIDEO_CALL_REQUEST = 5,
+  VIDEO_CALL_RESPONSE = 6,
   LOGIN_CHECK = 11,
   ENROLL_ACCOUNT = 12,
   RECOVER_PASSWORD = 13,
@@ -226,6 +232,189 @@ inline bool BusinessType_Parse(
     BusinessType_descriptor(), name, value);
 }
 // ===================================================================
+
+class VideoCallDTO final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:SSDTO.VideoCallDTO) */ {
+ public:
+  inline VideoCallDTO() : VideoCallDTO(nullptr) {}
+  ~VideoCallDTO() override;
+  explicit constexpr VideoCallDTO(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  VideoCallDTO(const VideoCallDTO& from);
+  VideoCallDTO(VideoCallDTO&& from) noexcept
+    : VideoCallDTO() {
+    *this = ::std::move(from);
+  }
+
+  inline VideoCallDTO& operator=(const VideoCallDTO& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline VideoCallDTO& operator=(VideoCallDTO&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const VideoCallDTO& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const VideoCallDTO* internal_default_instance() {
+    return reinterpret_cast<const VideoCallDTO*>(
+               &_VideoCallDTO_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    0;
+
+  friend void swap(VideoCallDTO& a, VideoCallDTO& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(VideoCallDTO* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(VideoCallDTO* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  VideoCallDTO* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<VideoCallDTO>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const VideoCallDTO& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const VideoCallDTO& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(VideoCallDTO* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "SSDTO.VideoCallDTO";
+  }
+  protected:
+  explicit VideoCallDTO(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kSenderSsidFieldNumber = 1,
+    kTargetSsidFieldNumber = 2,
+    kUserSigFieldNumber = 3,
+  };
+  // bytes sender_ssid = 1;
+  void clear_sender_ssid();
+  const std::string& sender_ssid() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_sender_ssid(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_sender_ssid();
+  PROTOBUF_NODISCARD std::string* release_sender_ssid();
+  void set_allocated_sender_ssid(std::string* sender_ssid);
+  private:
+  const std::string& _internal_sender_ssid() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_sender_ssid(const std::string& value);
+  std::string* _internal_mutable_sender_ssid();
+  public:
+
+  // bytes target_ssid = 2;
+  void clear_target_ssid();
+  const std::string& target_ssid() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_target_ssid(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_target_ssid();
+  PROTOBUF_NODISCARD std::string* release_target_ssid();
+  void set_allocated_target_ssid(std::string* target_ssid);
+  private:
+  const std::string& _internal_target_ssid() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_target_ssid(const std::string& value);
+  std::string* _internal_mutable_target_ssid();
+  public:
+
+  // string user_sig = 3;
+  void clear_user_sig();
+  const std::string& user_sig() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_user_sig(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_user_sig();
+  PROTOBUF_NODISCARD std::string* release_user_sig();
+  void set_allocated_user_sig(std::string* user_sig);
+  private:
+  const std::string& _internal_user_sig() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_user_sig(const std::string& value);
+  std::string* _internal_mutable_user_sig();
+  public:
+
+  // @@protoc_insertion_point(class_scope:SSDTO.VideoCallDTO)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr sender_ssid_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr target_ssid_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr user_sig_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_DTO_2eproto;
+};
+// -------------------------------------------------------------------
 
 class GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUse : public ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUse, 
     std::string, std::string,
@@ -302,7 +491,7 @@ class GetMessagePicInfoDTO final :
                &_GetMessagePicInfoDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    1;
+    2;
 
   friend void swap(GetMessagePicInfoDTO& a, GetMessagePicInfoDTO& b) {
     a.Swap(&b);
@@ -493,7 +682,7 @@ class GetUserMessageDTO final :
                &_GetUserMessageDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    3;
 
   friend void swap(GetUserMessageDTO& a, GetUserMessageDTO& b) {
     a.Swap(&b);
@@ -718,7 +907,7 @@ class GetFileDTO final :
                &_GetFileDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    4;
 
   friend void swap(GetFileDTO& a, GetFileDTO& b) {
     a.Swap(&b);
@@ -975,7 +1164,7 @@ class FuzzySearchDTO final :
                &_FuzzySearchDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    5;
 
   friend void swap(FuzzySearchDTO& a, FuzzySearchDTO& b) {
     a.Swap(&b);
@@ -1209,7 +1398,7 @@ class EnrollAccountDTO final :
                &_EnrollAccountDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   friend void swap(EnrollAccountDTO& a, EnrollAccountDTO& b) {
     a.Swap(&b);
@@ -1440,7 +1629,7 @@ class EmailVerifyDTO final :
                &_EmailVerifyDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   friend void swap(EmailVerifyDTO& a, EmailVerifyDTO& b) {
     a.Swap(&b);
@@ -1666,7 +1855,7 @@ class MakeFriendDTO final :
                &_MakeFriendDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    8;
 
   friend void swap(MakeFriendDTO& a, MakeFriendDTO& b) {
     a.Swap(&b);
@@ -1855,7 +2044,7 @@ class LoginCheckDTO final :
                &_LoginCheckDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    9;
 
   friend void swap(LoginCheckDTO& a, LoginCheckDTO& b) {
     a.Swap(&b);
@@ -2049,7 +2238,7 @@ class DisconnectDTO final :
                &_DisconnectDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    10;
 
   friend void swap(DisconnectDTO& a, DisconnectDTO& b) {
     a.Swap(&b);
@@ -2216,7 +2405,7 @@ class GetAllUserFriendship final :
                &_GetAllUserFriendship_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    11;
 
   friend void swap(GetAllUserFriendship& a, GetAllUserFriendship& b) {
     a.Swap(&b);
@@ -2423,7 +2612,7 @@ class UserBaseInfoDTO final :
                &_UserBaseInfoDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    12;
 
   friend void swap(UserBaseInfoDTO& a, UserBaseInfoDTO& b) {
     a.Swap(&b);
@@ -2714,7 +2903,7 @@ class UserPrivateInfoDTO final :
                &_UserPrivateInfoDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    13;
 
   friend void swap(UserPrivateInfoDTO& a, UserPrivateInfoDTO& b) {
     a.Swap(&b);
@@ -2940,7 +3129,7 @@ class FriendshipDTO final :
                &_FriendshipDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    14;
 
   friend void swap(FriendshipDTO& a, FriendshipDTO& b) {
     a.Swap(&b);
@@ -3199,7 +3388,7 @@ class GroupAdminDTO final :
                &_GroupAdminDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    15;
 
   friend void swap(GroupAdminDTO& a, GroupAdminDTO& b) {
     a.Swap(&b);
@@ -3388,7 +3577,7 @@ class GroupBaseInfoDTO final :
                &_GroupBaseInfoDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    16;
 
   friend void swap(GroupBaseInfoDTO& a, GroupBaseInfoDTO& b) {
     a.Swap(&b);
@@ -3683,7 +3872,7 @@ class GroupNoticeDTO final :
                &_GroupNoticeDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    17;
 
   friend void swap(GroupNoticeDTO& a, GroupNoticeDTO& b) {
     a.Swap(&b);
@@ -3883,7 +4072,7 @@ class GroupMemberInfoDTO final :
                &_GroupMemberInfoDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    18;
 
   friend void swap(GroupMemberInfoDTO& a, GroupMemberInfoDTO& b) {
     a.Swap(&b);
@@ -4088,7 +4277,7 @@ class MessageRecipientDTO final :
                &_MessageRecipientDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    18;
+    19;
 
   friend void swap(MessageRecipientDTO& a, MessageRecipientDTO& b) {
     a.Swap(&b);
@@ -4299,7 +4488,7 @@ class MessageContentDTO final :
                &_MessageContentDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    19;
+    20;
 
   friend void swap(MessageContentDTO& a, MessageContentDTO& b) {
     a.Swap(&b);
@@ -4561,7 +4750,7 @@ class DistrictDTO final :
                &_DistrictDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    20;
+    21;
 
   friend void swap(DistrictDTO& a, DistrictDTO& b) {
     a.Swap(&b);
@@ -4761,7 +4950,7 @@ class FileStorageDTO final :
                &_FileStorageDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    21;
+    22;
 
   friend void swap(FileStorageDTO& a, FileStorageDTO& b) {
     a.Swap(&b);
@@ -5014,7 +5203,7 @@ class OperationLogDTO final :
                &_OperationLogDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    22;
+    23;
 
   friend void swap(OperationLogDTO& a, OperationLogDTO& b) {
     a.Swap(&b);
@@ -5251,7 +5440,7 @@ class BaseStickerDTO final :
                &_BaseStickerDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    23;
+    24;
 
   friend void swap(BaseStickerDTO& a, BaseStickerDTO& b) {
     a.Swap(&b);
@@ -5456,7 +5645,7 @@ class UserCollectedStickerDTO final :
                &_UserCollectedStickerDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    24;
+    25;
 
   friend void swap(UserCollectedStickerDTO& a, UserCollectedStickerDTO& b) {
     a.Swap(&b);
@@ -5653,6 +5842,163 @@ class UserCollectedStickerDTO final :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
+// VideoCallDTO
+
+// bytes sender_ssid = 1;
+inline void VideoCallDTO::clear_sender_ssid() {
+  sender_ssid_.ClearToEmpty();
+}
+inline const std::string& VideoCallDTO::sender_ssid() const {
+  // @@protoc_insertion_point(field_get:SSDTO.VideoCallDTO.sender_ssid)
+  return _internal_sender_ssid();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void VideoCallDTO::set_sender_ssid(ArgT0&& arg0, ArgT... args) {
+ 
+ sender_ssid_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:SSDTO.VideoCallDTO.sender_ssid)
+}
+inline std::string* VideoCallDTO::mutable_sender_ssid() {
+  std::string* _s = _internal_mutable_sender_ssid();
+  // @@protoc_insertion_point(field_mutable:SSDTO.VideoCallDTO.sender_ssid)
+  return _s;
+}
+inline const std::string& VideoCallDTO::_internal_sender_ssid() const {
+  return sender_ssid_.Get();
+}
+inline void VideoCallDTO::_internal_set_sender_ssid(const std::string& value) {
+  
+  sender_ssid_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* VideoCallDTO::_internal_mutable_sender_ssid() {
+  
+  return sender_ssid_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* VideoCallDTO::release_sender_ssid() {
+  // @@protoc_insertion_point(field_release:SSDTO.VideoCallDTO.sender_ssid)
+  return sender_ssid_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+}
+inline void VideoCallDTO::set_allocated_sender_ssid(std::string* sender_ssid) {
+  if (sender_ssid != nullptr) {
+    
+  } else {
+    
+  }
+  sender_ssid_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), sender_ssid,
+      GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (sender_ssid_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
+    sender_ssid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.VideoCallDTO.sender_ssid)
+}
+
+// bytes target_ssid = 2;
+inline void VideoCallDTO::clear_target_ssid() {
+  target_ssid_.ClearToEmpty();
+}
+inline const std::string& VideoCallDTO::target_ssid() const {
+  // @@protoc_insertion_point(field_get:SSDTO.VideoCallDTO.target_ssid)
+  return _internal_target_ssid();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void VideoCallDTO::set_target_ssid(ArgT0&& arg0, ArgT... args) {
+ 
+ target_ssid_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:SSDTO.VideoCallDTO.target_ssid)
+}
+inline std::string* VideoCallDTO::mutable_target_ssid() {
+  std::string* _s = _internal_mutable_target_ssid();
+  // @@protoc_insertion_point(field_mutable:SSDTO.VideoCallDTO.target_ssid)
+  return _s;
+}
+inline const std::string& VideoCallDTO::_internal_target_ssid() const {
+  return target_ssid_.Get();
+}
+inline void VideoCallDTO::_internal_set_target_ssid(const std::string& value) {
+  
+  target_ssid_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* VideoCallDTO::_internal_mutable_target_ssid() {
+  
+  return target_ssid_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* VideoCallDTO::release_target_ssid() {
+  // @@protoc_insertion_point(field_release:SSDTO.VideoCallDTO.target_ssid)
+  return target_ssid_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+}
+inline void VideoCallDTO::set_allocated_target_ssid(std::string* target_ssid) {
+  if (target_ssid != nullptr) {
+    
+  } else {
+    
+  }
+  target_ssid_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), target_ssid,
+      GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (target_ssid_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
+    target_ssid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.VideoCallDTO.target_ssid)
+}
+
+// string user_sig = 3;
+inline void VideoCallDTO::clear_user_sig() {
+  user_sig_.ClearToEmpty();
+}
+inline const std::string& VideoCallDTO::user_sig() const {
+  // @@protoc_insertion_point(field_get:SSDTO.VideoCallDTO.user_sig)
+  return _internal_user_sig();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void VideoCallDTO::set_user_sig(ArgT0&& arg0, ArgT... args) {
+ 
+ user_sig_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:SSDTO.VideoCallDTO.user_sig)
+}
+inline std::string* VideoCallDTO::mutable_user_sig() {
+  std::string* _s = _internal_mutable_user_sig();
+  // @@protoc_insertion_point(field_mutable:SSDTO.VideoCallDTO.user_sig)
+  return _s;
+}
+inline const std::string& VideoCallDTO::_internal_user_sig() const {
+  return user_sig_.Get();
+}
+inline void VideoCallDTO::_internal_set_user_sig(const std::string& value) {
+  
+  user_sig_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* VideoCallDTO::_internal_mutable_user_sig() {
+  
+  return user_sig_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* VideoCallDTO::release_user_sig() {
+  // @@protoc_insertion_point(field_release:SSDTO.VideoCallDTO.user_sig)
+  return user_sig_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+}
+inline void VideoCallDTO::set_allocated_user_sig(std::string* user_sig) {
+  if (user_sig != nullptr) {
+    
+  } else {
+    
+  }
+  user_sig_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), user_sig,
+      GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (user_sig_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
+    user_sig_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.VideoCallDTO.user_sig)
+}
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // GetMessagePicInfoDTO
@@ -11709,6 +12055,8 @@ inline void UserCollectedStickerDTO::set_allocated_ip(std::string* ip) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

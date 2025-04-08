@@ -13,8 +13,10 @@
 #include "data-process/service/sticker/StickerService.h"
 
 #include "do-business/do-email-code/DoEmailCode.h"
+#include "do-business/gen-trtc-sig/GenerateUserSig.h"
 
 #include <unistd.h>
+#include <yaml-cpp/yaml.h>
 
 using namespace std;
 
@@ -22,6 +24,8 @@ using namespace std;
 std::mutex m;
 // 限制子线程添加群聊消息的并发操作
 std::mutex groupM;
+
+extern std::string yamlPath;
 
 extern std::mutex onlineListMutex;
 extern std::mutex fdSocketsMutex;
@@ -50,6 +54,7 @@ bool ProcessBusiness::parseCompleteRequest(std::vector<char> &buffer, std::strin
 
 int ProcessBusiness::processBusiness(std::string dto, int businessType, std::shared_ptr<SockInfo> info) {
     LOG_INFO("business type : " << businessType);
+    YAML::Node node = YAML::LoadFile(yamlPath);
     if (businessType == SSDTO::BusinessType::LOGIN_CHECK) {
         UserService uService;
         SSDTO::LoginCheckDTO ldto;
@@ -235,46 +240,26 @@ int ProcessBusiness::processBusiness(std::string dto, int businessType, std::sha
     }
     // 添加好友
     else if (businessType == SSDTO::BusinessType::MAKE_FRIEND_REQUEST){
+        std::string targetSSID;
         SSDTO::MakeFriendDTO mdto;
         mdto.ParseFromString(dto);
-        mdto.set_accept(false);
-        mdto.SerializeToString(&dto);
-
-        std::string targetSSID = mdto.recipient();
-        auto targetSockInfo = onlineList.find(targetSSID);
-        if (targetSockInfo != onlineList.end()) {
-            targetSockInfo->second->tcp->sendMsg(dto,SSDTO::MAKE_FRIEND_REQUEST);
-        }else {
-            auto resDequeue = businessSent.find(targetSSID);
-            if (resDequeue != businessSent.end()) {
-                resDequeue->second.push_back({targetSSID,SSDTO::MAKE_FRIEND_REQUEST});
-            }else {
-                businessSent[targetSSID] = {{targetSSID,SSDTO::MAKE_FRIEND_REQUEST}};
-            }
+        if (mdto.sender() != info->ssid) { // 好友请求回应
+            targetSSID = mdto.sender();
+        }else {                            // 向 recipient 好友申请
+            dto.clear();
+            mdto.set_accept(false);
+            mdto.SerializeToString(&dto);
+            targetSSID = mdto.recipient();
         }
-    }
-    // 好友请求响应
-    else if (businessType == SSDTO::BusinessType::MAKE_FRIEND_RESPONSE) {
-        SSDTO::MakeFriendDTO mdto;
-        mdto.ParseFromString(dto);
-
-        std::string targetSSID = mdto.sender();
-        if (mdto.accept()) { // 持久化好友
-            FriendshipService fService;
-            uint8_t friendType = (mdto.isgroup()?2:1);
-            std::string grouping = mdto.isgroup()?"我加入的群聊":u8"我的好友";
-            fService.addFriendship({-1,mdto.sender(),grouping,"",mdto.sender(),1,friendType});
-        }
-
         auto targetSockInfo = onlineList.find(targetSSID);
         if (targetSockInfo != onlineList.end()) {
             targetSockInfo->second->tcp->sendMsg(dto,SSDTO::MAKE_FRIEND_RESPONSE);
         }else {
             auto resDequeue = businessSent.find(targetSSID);
             if (resDequeue != businessSent.end()) {
-                resDequeue->second.push_back({targetSSID,SSDTO::MAKE_FRIEND_RESPONSE});
+                resDequeue->second.push_back({dto,SSDTO::MAKE_FRIEND_RESPONSE});
             }else {
-                businessSent[targetSSID] = {{targetSSID,SSDTO::MAKE_FRIEND_RESPONSE}};
+                businessSent[targetSSID] = {{dto,SSDTO::MAKE_FRIEND_RESPONSE}};
             }
         }
     }
@@ -481,8 +466,52 @@ int ProcessBusiness::processBusiness(std::string dto, int businessType, std::sha
         gmpdto.SerializeToString(&resDto);
         info->tcp->sendMsg(resDto, SSDTO::BusinessType::R_MESSAGE_PIC_INFO);
     }
+    // video call request
+    else if (businessType == SSDTO::BusinessType::VIDEO_CALL_REQUEST) {
+        SSDTO::VideoCallDTO vcdto;
+        vcdto.ParseFromString(dto);
+
+        int appID = node["trtc-api"]["sdkAppId"].as<int>();
+        std::string key = node["trtc-api"]["sdkSecretKey"].as<std::string>();
+        std::string senderSig = GenerateUserSig::genUserSig(
+                vcdto.sender_ssid().c_str(),
+                appID,
+                key.c_str()
+            );
+
+        std::string targetSig = GenerateUserSig::genUserSig(
+                vcdto.target_ssid().c_str(),
+                appID,
+                key.c_str()
+            );
+        vcdto.set_user_sig(senderSig.c_str());
+
+        std::string resDto;
+        vcdto.SerializeToString(&resDto);
+        // send response to cur user
+        info->tcp->sendMsg(resDto,SSDTO::VIDEO_CALL_RESPONSE);
+
+        // send to target
+        resDto.clear();
+        vcdto.set_user_sig(targetSig.c_str());
+        vcdto.SerializeToString(&resDto);
+
+        std::string targetSSID = vcdto.target_ssid();
+        auto targetSockInfo = onlineList.find(targetSSID);
+        if (targetSockInfo != onlineList.end()) {
+            targetSockInfo->second->tcp->sendMsg(dto,SSDTO::VIDEO_CALL_RESPONSE);
+        }else {
+            auto resDequeue = businessSent.find(targetSSID);
+            if (resDequeue != businessSent.end()) {
+                resDequeue->second.push_back({dto,SSDTO::VIDEO_CALL_RESPONSE});
+            }else {
+                businessSent[targetSSID] = {{dto,SSDTO::VIDEO_CALL_RESPONSE}};
+            }
+        }
+    }
     else {
         LOG("some error occur in parse business!")
     }
     return 0;
 }
+

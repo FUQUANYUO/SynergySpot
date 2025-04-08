@@ -51,7 +51,7 @@ void EmailVerify::sendEmailVerifyCode(const std::string& emailAddress,const std:
     evdto.set_verify_code("");
     evdto.SerializeToString(&outEdto);
 
-    g_pClientRequestHandler->addRequest(SSDTO::BusinessType::EMAIL_VERIFY,outEdto);
+    emit g_pClientRequestHandler->sigEmailCodeRequest(outEdto);
 }
 
 std::string EmailVerify::parseEmailVerifyCode(const std::string& rawdto) {

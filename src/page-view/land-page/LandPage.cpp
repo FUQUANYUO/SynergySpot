@@ -364,6 +364,7 @@ bool LandPage::saveQrcToFile(const QString &qrcPath, const QString &targetFilePa
 void LandPage::clearPasswordInput() {
     _inputPassword->clear();
 }
+
 void LandPage::isFreezeSignInBtn(bool enable) {
     _signInButton->setEnabled(!enable);
 }

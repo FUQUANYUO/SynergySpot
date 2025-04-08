@@ -249,7 +249,6 @@ void ConversationFriendPage::initWindow() {
     setContentsMargins(0,0,0,0);
     setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
     // user name
-    _callButton          =      new ElaToolButton(this);
     _userNameButton      =      new ElaToolButton(this);
     _videoButton         =      new ElaToolButton(this);
     _createGroupButton   =      new ElaToolButton(this);
@@ -263,7 +262,6 @@ void ConversationFriendPage::initEdgeLayout() {
     // toolbar layout
     _toolLayout->addWidget(_userNameButton);
     _toolLayout->addStretch();
-    _toolLayout->addWidget(_callButton);
     _toolLayout->addWidget(_videoButton);
     _toolLayout->addWidget(_createGroupButton);
     _toolLayout->addWidget(_moreOptionButton);
@@ -297,9 +295,6 @@ void ConversationFriendPage::initContent() {
     // tool button settings
     _userNameButton->setText(_userInfo.username);
     _userNameButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
-    _callButton->setElaIcon(ElaIconType::CirclePhone);
-    _callButton->setIconSize(QSize(32,32));
-    _callButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
     _videoButton->setElaIcon(ElaIconType::CircleVideo);
     _videoButton->setIconSize(QSize(32,32));
     _videoButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -341,6 +336,10 @@ void ConversationFriendPage::initConnectFunc() {
         QPoint globalPos = QCursor::pos();
         wid->showAt(globalPos + QPoint(10,10));
     });
+
+    connect(_videoButton,&ElaToolButton::clicked,[=]() {
+        emit g_pCommonData->sigCallVideoToOtherUser(_userInfo.ssid);
+    });
 }
 
 ConversationGroupPage::ConversationGroupPage(
@@ -372,9 +371,9 @@ void ConversationGroupPage::initWindow() {
     setContentsMargins(0,0,0,0);
     setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
     // group name
-    _callButton          =      new ElaToolButton(this);
+    // _callButton          =      new ElaToolButton(this);
+    // _videoButton         =      new ElaToolButton(this);
     _groupNameButton     =      new ElaToolButton(this);
-    _videoButton         =      new ElaToolButton(this);
     _fileOfGroup         =      new ElaToolButton(this);
     _inviteAddButton     =      new ElaToolButton(this);
     _moreOptionButton    =      new ElaToolButton(this);
@@ -388,8 +387,8 @@ void ConversationGroupPage::initEdgeLayout() {
     // toolbar layout
     _toolLayout->addWidget(_groupNameButton);
     _toolLayout->addStretch();
-    _toolLayout->addWidget(_callButton);
-    _toolLayout->addWidget(_videoButton);
+    // _toolLayout->addWidget(_callButton);
+    // _toolLayout->addWidget(_videoButton);
     _toolLayout->addWidget(_fileOfGroup);
     _toolLayout->addWidget(_inviteAddButton);
     _toolLayout->addWidget(_moreOptionButton);
@@ -423,12 +422,12 @@ void ConversationGroupPage::initContent() {
     // tool button settings
     _groupNameButton->setText(_groupBaseInfo.groupName);
     _groupNameButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
-    _callButton->setElaIcon(ElaIconType::CirclePhone);
-    _callButton->setIconSize(QSize(32,32));
-    _callButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    _videoButton->setElaIcon(ElaIconType::CircleVideo);
-    _videoButton->setIconSize(QSize(32,32));
-    _videoButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    // _callButton->setElaIcon(ElaIconType::CirclePhone);
+    // _callButton->setIconSize(QSize(32,32));
+    // _callButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    // _videoButton->setElaIcon(ElaIconType::CircleVideo);
+    // _videoButton->setIconSize(QSize(32,32));
+    // _videoButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
     _fileOfGroup->setElaIcon(ElaIconType::Folder);
     _fileOfGroup->setIconSize(QSize(32,32));
     _fileOfGroup->setToolButtonStyle(Qt::ToolButtonIconOnly);

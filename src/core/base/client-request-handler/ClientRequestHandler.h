@@ -26,7 +26,6 @@ public:
     static ClientRequestHandler* getInstance();
     static void destroyInstance();
 
-    void addRequest(SSDTO::BusinessType type,std::string rawData);
 signals:
     // --------------- 请求信号 --------------- //
 
@@ -56,6 +55,8 @@ signals:
     void sigQueryFileInfoRequest(const std::string& dto);
     // 获取消息中的图片相关的信息
     void sigQueryMsgPicInfoRequest(const std::string& dto);
+    // 发起音视频请求
+    void sigCallVideoRequest(const std::string& dto);
 
     // --------------- 响应信号 --------------- //
     void sigEmailCodeResponse(const std::string& dto);
@@ -65,8 +66,10 @@ signals:
     void sigForwardMessageResponse(const std::string& dto);
     void sigContactListResponse(const std::string& dto);
     void sigEnrollAccountResponse(const std::string& dto);
-    void sigFriendRequestResponse(const std::string& dto,bool isOtherAskFor);
+    void sigFriendRequestResponse(const std::string& dto);
     void sigFuzzySearchResponse(const std::string& dto);
+    void sigCallVideoResponse(const std::string& dto);
+
     void sigQueryUserBaseInfoResponse(const std::string& dto);
     void sigQueryGroupBaseInfoResponse(const std::string& dto);
     void sigQueryGroupNoticesResponse(const std::string& dto);
@@ -113,8 +116,10 @@ namespace BusinessLayer {
         void sigForwardMessageResponse(const std::string& dto);
         void sigContactListResponse(const std::string& dto);
         void sigEnrollAccountResponse(const std::string& dto);
-        void sigFriendRequestResponse(const std::string& dto,bool isOtherAskFor);
+        void sigFriendRequestResponse(const std::string& dto);
         void sigFuzzySearchResponse(const std::string& dto);
+        void sigCallVideoResponse(const std::string& dto);
+
         void sigQueryUserBaseInfoResponse(const std::string& dto);
         void sigQueryGroupBaseInfoResponse(const std::string& dto);
         void sigQueryGroupNoticesResponse(const std::string& dto);

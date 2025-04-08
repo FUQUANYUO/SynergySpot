@@ -16,6 +16,8 @@
 #include "ui_UserVideoItem.h"
 #include "../TRTCCloudCallbackDefaultImpl.h"
 
+class QLabel;
+
 namespace VIDEO_ITEM {
     // Image type
     enum ViewItemType
@@ -41,6 +43,9 @@ public:
                       std::string userid = nullptr,
                       VIDEO_ITEM::ViewItemType type = VIDEO_ITEM::ViewItemType::RemoteView);
     ~UserVideoItem();
+protected:
+    void paintEvent(QPaintEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 private:
     void muteAudio(bool mute);
     void muteVideo(bool mute);
@@ -50,32 +55,37 @@ private:
 public:
     void updateAVMuteView(VIDEO_ITEM::MuteAllType muteType);
     void setVolume(int volume);
+
     WId getVideoWId();
     std::string& getUserId();
+    VIDEO_ITEM::ViewItemType getViewType();
+
+    void setUserName(const QString& username);
+
     int getRoomId();
     bool getAudioMuteStatus();
     bool getVideoMuteStatus();
-    VIDEO_ITEM::ViewItemType getViewType();
     void updateAVMuteStatus(bool mute, VIDEO_ITEM::MuteAllType muteType,VIDEO_ITEM::ViewItemType viewType);
     void updateAVAvailableStatus(bool available, bool mute_all_remote, VIDEO_ITEM::MuteAllType muteType);
     void initViews();
     void changeEvent(QEvent* event);
 private:
     std::unique_ptr<Ui::UserVideoItem> ui_video_item_;
-    liteav::ITRTCCloud* trtccloud_;
-    int room_id_;
-    std::string user_id_;
-    VIDEO_ITEM::ViewItemType viewtype_;
+    VIDEO_ITEM::ViewItemType           viewtype_;
+    ITRTCCloud*                        trtccloud_;
 
-    bool audio_available_ = false;
-    bool video_available_ = false;
-    bool audio_mute_ = false;
-    bool video_mute_ = false;
+    int                                room_id_;
+    std::string                        user_id_;
 
-    liteav::TRTCVideoRotation rotation_ = liteav::TRTCVideoRotation0;
-    liteav::TRTCVideoFillMode fill_mode_ = liteav::TRTCVideoFillMode_Fit;
-    liteav::TRTCVideoMirrorType mirror_type_ = liteav::TRTCVideoMirrorType_Disable;
-    liteav::TRTCVideoStreamType video_stream_type_ = liteav::TRTCVideoStreamType::TRTCVideoStreamTypeBig;
+    bool                               audio_available_     = false;
+    bool                               video_available_     = false;
+    bool                               audio_mute_          = false;
+    bool                               video_mute_          = false;
+
+    TRTCVideoRotation                  rotation_            = TRTCVideoRotation0;
+    TRTCVideoFillMode                  fill_mode_           = TRTCVideoFillMode_Fit;
+    TRTCVideoMirrorType                mirror_type_         = TRTCVideoMirrorType_Disable;
+    TRTCVideoStreamType                video_stream_type_   = TRTCVideoStreamTypeBig;
 };
 
 #endif // USERVIDEOITEM_H

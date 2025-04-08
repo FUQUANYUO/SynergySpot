@@ -7,6 +7,8 @@
 #include "yaml-cpp/yaml.h"
 
 #include "help.h"
+#include "trtc-realtime-comm/video-audio-call-page/VideoAudioCallPage.h"
+#include "trtc-realtime-comm/video-audio-call-page/VideoAudioInvitePage.h"
 
 #include <openssl/md5.h>
 #include <fstream>
@@ -83,9 +85,9 @@ RealtimeCommHandler::RealtimeCommHandler(QObject* parent)
 }
 
 RealtimeCommHandler::~RealtimeCommHandler() {
-    // if (_isCallActive) {
-    //     endVideoCall();
-    // }
+    if (_isCallActive) {
+        endVideoCall();
+    }
     _shutdown = true;
     _cq.Shutdown();
     if (_cqThread.joinable()) _cqThread.join();
@@ -153,6 +155,14 @@ void RealtimeCommHandler::onUploadFailed(const std::string &error) {
     emit sigUploadFinished(resp);
 }
 
+void RealtimeCommHandler::onStartVideoFailed(int errorCode) {
+    QJsonObject resp;
+    resp["status"]       = "error";
+    resp["type"]         = "video-call";
+    resp["error-code"]   = QString::number(errorCode);
+    emit sigUploadFinished(resp);
+}
+
 void RealtimeCommHandler::sltSendResponse(const QJsonObject &resp)  {
     if (_pIPCSocket != nullptr) {
         if (_pIPCSocket->state() == QLocalSocket::ConnectedState) {
@@ -207,6 +217,15 @@ void RealtimeCommHandler::processCommand(const QString &line)  {
             curUserSSID = cmd["ssid"].toString();
             g_pCommonData->setCurUserInfo({curUserSSID});
         }
+        else if (command == "video-call") {
+            QString targetSSID     = cmd["target-ssid"].toString();
+            bool isOtherUserInvite = cmd["is-other-invite"].toBool();
+            QString userSig        = cmd["user-sig"].toString();
+            int res = startVideoCall(targetSSID,isOtherUserInvite,userSig);
+            if (res != 0) {
+                onStartVideoFailed(res);
+            }
+        }
     }
 }
 
@@ -239,14 +258,53 @@ QString RealtimeCommHandler::calculateChunkMD5(const QByteArray &data) {
     return QString(mdStr);
 }
 
-bool RealtimeCommHandler::startVideoCall(const QString &remoteId) {
-    return false;
+int RealtimeCommHandler::startVideoCall(const QString &remoteId,bool isOtherUserInvite,const QString& userSig) {
+    if (_isCallActive) {
+        if (isOtherUserInvite) {
+            LOG_WARNING("some one call again in other call holding! call id: " << remoteId.toStdString());
+            return -2;
+        }
+        LOG_WARNING("you can't call other user when you holding call")
+        return -1;
+    }
+    if (userSig.isEmpty()) {
+        LOG_ERROR("user sig is empty")
+        return -3;
+    }
+    _isCallActive = true;
+    // init call video page
+    _videoAudioInvitePage = std::make_unique<VideoAudioInvitePage>(g_pCommonData->getCurUserInfo().ssid,remoteId,!isOtherUserInvite);
+
+    _videoAudioInvitePage->show();
+
+    connect(_videoAudioInvitePage.get(),&VideoAudioInvitePage::sigUserProcessResult,this,[=](bool isAccept) {
+        if (isAccept) {
+            auto curInfo = g_pCommonData->getCurUserInfo();
+            _videoAudioCallPage = std::make_unique<VideoAudioCallPage>(
+                curInfo.ssid,remoteId,(!isOtherUserInvite)?curInfo.ssid.toInt():remoteId.toInt(),userSig);
+            _videoAudioCallPage->setUserSig(userSig);
+            _videoAudioCallPage->show();
+
+            connect(_videoAudioCallPage.get(),&VideoAudioCallPage::sigVideoHangUp,this,[=]() {
+                _videoAudioCallPage->hide();
+                _videoAudioCallPage.reset();
+
+                _isCallActive = false;
+            });
+        }
+        _videoAudioInvitePage->hide();
+        _videoAudioInvitePage.reset();
+
+        _isCallActive = false;
+    });
+    return 0;
 }
 
 void RealtimeCommHandler::endVideoCall() {
+    if (!_isCallActive)return ;
 
-
-
+    _isCallActive = false;
+    _videoAudioCallPage.reset();
 }
 
 void RealtimeCommHandler::sltCheckHeartbeat() {

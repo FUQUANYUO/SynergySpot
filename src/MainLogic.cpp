@@ -177,10 +177,20 @@ int MainLogic::startMainLogic(QApplication *app) {
                             _dataLoadCounter--;
                             checkAllDataLoaded();
                         }
-                    } else if (resp["status"] == "error" && resp["message"].toString().contains("grpc")) {
+                    }
+                    else if (resp["status"] == "error" && resp["message"].toString().contains("grpc")) {
                         LOG(resp["message"].toString().toStdString())
                         ElaMessageBar::error(ElaMessageBarType::Top, "错误", "GRPC 服务端连接出现错误！!", 3000, _curWindow);
-                    } else {
+                    }
+                    else if (resp["status"] == "error" && resp["type"].toString().contains("video-call")) {
+                        int errorCode = resp["error-code"].toString().toInt();
+                        if (errorCode == -1) {
+                            ElaMessageBar::error(ElaMessageBarType::Top, "错误", "请关闭当前通话的窗口！!", 3000, _curWindow);
+                        }else if (errorCode == -2) {
+                            ElaMessageBar::warning(ElaMessageBarType::Top, "警告", "其他用户请求与您通话，但您还未关闭遗留通话！", 3000, _curWindow);
+                        }
+                    }
+                    else {
                         LOG("file failed : " << resp["message"].toString().toStdString())
                         _dataLoadCounter--;
                         checkAllDataLoaded();
@@ -748,35 +758,77 @@ int MainLogic::startMainLogic(QApplication *app) {
             emit g_pContactPage->sigAddMakeFriendRecord(g_pCommonData->getUserInfoBySSID(ssid),NoticeStatus::Waiting);
     });
 
-    connect(g_pClientRequestHandler,&ClientRequestHandler::sigFriendRequestResponse,this,[=](const std::string& dto,bool isOtherAskFor) {
+    // other user accept be friend response / request of be friend from other user
+    connect(g_pClientRequestHandler,&ClientRequestHandler::sigFriendRequestResponse,this,[=](const std::string& dto) {
         SSDTO::MakeFriendDTO mdto;
         mdto.ParseFromString(dto);
-        if (isOtherAskFor) { // 添加请求信息
+        std::string curSSID = g_pCommonData->getCurUserInfo().ssid.toStdString();
+
+        UserBaseInfoDTO userInfoRes;
+        GroupBaseInfoDTO groupInfoRes;
+
+        if (mdto.sender() != curSSID) { // 添加请求信息
             // TODO: 先缓存用户信息
             if (mdto.isgroup()) {
+                groupInfoRes = g_pCommonData->getGroupInfoDataBySSID(QString::fromStdString(mdto.sender()));
+                if (groupInfoRes.ssidGroup.isEmpty() || groupInfoRes.ssidGroup == "-1") {
+                    groupInfoRes.ssidGroup = QString::fromStdString(mdto.sender());
+                    groupInfoRes.avatarPath = "-1";
+                }
                 emit g_pContactPage->sigAddJoinGroupRecord(
-                    g_pCommonData->getGroupInfoDataBySSID(QString::fromStdString(mdto.sender())),NoticeStatus::Request);
+                    groupInfoRes,NoticeStatus::Request);
             }else {
+                userInfoRes = g_pCommonData->getUserInfoBySSID(QString::fromStdString(mdto.sender()));
+                if (userInfoRes.ssid.isEmpty() || userInfoRes.ssid == "-1") {
+                    userInfoRes.ssid = QString::fromStdString(mdto.sender());
+                    userInfoRes.avatarPath = "-1";
+                }
                 emit g_pContactPage->sigAddMakeFriendRecord(
-                    g_pCommonData->getUserInfoBySSID(QString::fromStdString(mdto.sender())),NoticeStatus::Request);
-            }
-        }else { // 更新 Waiting 状态
-            if (mdto.isgroup()) {
-                if (mdto.accept())
-                    emit g_pContactPage->sigAddJoinGroupRecord(
-                        g_pCommonData->getGroupInfoDataBySSID(QString::fromStdString(mdto.sender())),NoticeStatus::Accepted);
-                else
-                    emit g_pContactPage->sigAddJoinGroupRecord(
-                        g_pCommonData->getGroupInfoDataBySSID(QString::fromStdString(mdto.sender())),NoticeStatus::Rejected);
-            }else {
-                if (mdto.accept())
-                    emit g_pContactPage->sigAddMakeFriendRecord(
-                        g_pCommonData->getUserInfoBySSID(QString::fromStdString(mdto.sender())),NoticeStatus::Accepted);
-                else
-                    emit g_pContactPage->sigAddMakeFriendRecord(
-                        g_pCommonData->getUserInfoBySSID(QString::fromStdString(mdto.sender())),NoticeStatus::Rejected);
+                    userInfoRes,NoticeStatus::Request);
             }
         }
+        else { // 更新 Waiting 状态
+            if (mdto.isgroup()) {
+                groupInfoRes = g_pCommonData->getGroupInfoDataBySSID(QString::fromStdString(mdto.recipient()));
+                if (groupInfoRes.ssidGroup.isEmpty() || groupInfoRes.ssidGroup == "-1") {
+                    groupInfoRes.ssidGroup = QString::fromStdString(mdto.recipient());
+                    groupInfoRes.avatarPath = "-1";
+                }
+                if (mdto.accept())
+                    emit g_pContactPage->sigAddJoinGroupRecord(
+                        groupInfoRes,NoticeStatus::Accepted);
+                else
+                    emit g_pContactPage->sigAddJoinGroupRecord(
+                        groupInfoRes,NoticeStatus::Rejected);
+            }
+            else {
+                userInfoRes = g_pCommonData->getUserInfoBySSID(QString::fromStdString(mdto.recipient()));
+                if (userInfoRes.ssid.isEmpty() || userInfoRes.ssid == "-1") {
+                    userInfoRes.ssid = QString::fromStdString(mdto.recipient());
+                    userInfoRes.avatarPath = "-1";
+                }
+                if (mdto.accept())
+                    emit g_pContactPage->sigAddMakeFriendRecord(
+                        userInfoRes,NoticeStatus::Accepted);
+                else
+                    emit g_pContactPage->sigAddMakeFriendRecord(
+                        userInfoRes,NoticeStatus::Rejected);
+            }
+        }
+    });
+
+    connect(g_pCommonData,&CommonData::sigReplyFriendOrGroup,this,
+        [=](const QString& ssid,bool isAccept, bool isGroup)
+    {
+        SSDTO::MakeFriendDTO mdto;
+        mdto.set_accept(isAccept);
+        mdto.set_isgroup(isGroup);
+        mdto.set_sender(ssid);
+        mdto.set_recipient(g_pCommonData->getCurUserInfo().ssid.toStdString());
+
+        std::string resDto;
+        mdto.SerializeToString(&resDto);
+        emit g_pClientRequestHandler->sigAddFriendRequest(resDto);
     });
 
     // get avatar file
@@ -795,6 +847,44 @@ int MainLogic::startMainLogic(QApplication *app) {
         _pGRCSocket->write(QJsonDocument(resp).toJson());
         _pGRCSocket->flush();
     });
+
+    // video call request
+    connect(g_pCommonData,&CommonData::sigCallVideoToOtherUser,this,[=](const QString& remoteSSID) {
+        SSDTO::VideoCallDTO vcallDto;
+        vcallDto.set_sender_ssid(g_pCommonData->getCurUserInfo().ssid);
+        vcallDto.set_target_ssid(remoteSSID.toStdString());
+        vcallDto.set_user_sig("");
+
+        std::string resDto;
+        vcallDto.SerializeToString(&resDto);
+        emit g_pClientRequestHandler->sigCallVideoRequest(resDto);
+    });
+
+    // video call response
+    connect(g_pClientRequestHandler,&ClientRequestHandler::sigCallVideoResponse,this,[=](const std::string& dto) {
+        SSDTO::VideoCallDTO vcallDto;
+        vcallDto.ParseFromString(dto);
+
+        auto curUserInfo = g_pCommonData->getCurUserInfo();
+
+        QJsonObject resp;
+        resp["command"]         = "video-call";
+        // other user call video to you
+        if (curUserInfo.ssid.toStdString() != vcallDto.sender_ssid()) {
+            resp["target-ssid"]     = QString::fromStdString(vcallDto.sender_ssid());
+            resp["is-other-invite"] = true;
+            resp["user-sig"]        = QString::fromStdString(vcallDto.user_sig());
+        }
+        // user-sig come from server
+        else {
+            resp["target-ssid"]     = QString::fromStdString(vcallDto.target_ssid());
+            resp["is-other-invite"] = false;
+            resp["user-sig"]        = QString::fromStdString(vcallDto.user_sig());
+        }
+        _pGRCSocket->write(QJsonDocument(resp).toJson());
+        _pGRCSocket->flush();
+    });
+
     return QApplication::exec();
 }
 

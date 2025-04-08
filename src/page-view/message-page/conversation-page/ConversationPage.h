@@ -72,7 +72,6 @@ protected:
 private:
     // ----------------- UI -----------------
     ElaToolButton    * _userNameButton     =   nullptr;
-    ElaToolButton    * _callButton         =   nullptr;
     ElaToolButton    * _videoButton        =   nullptr;
     ElaToolButton    * _createGroupButton  =   nullptr;
     ElaToolButton    * _moreOptionButton   =   nullptr;
@@ -82,7 +81,7 @@ private:
     // ----------------- UI -----------------
 
     // --------------- BackEnd --------------
-    UserBaseInfoDTO    _userInfo;
+    UserBaseInfoDTO    _userInfo;                           // cur conversation user info
     MsgBubbleModel   * _msgBubbleModel     =   nullptr;
     // --------------- BackEnd --------------
 };
@@ -108,8 +107,7 @@ protected:
 private:
     // ----------------- UI -----------------
     ElaToolButton    * _groupNameButton    =   nullptr;
-    ElaToolButton    * _callButton         =   nullptr;
-    ElaToolButton    * _videoButton        =   nullptr;
+    // ElaToolButton    * _videoButton        =   nullptr;
     ElaToolButton    * _fileOfGroup        =   nullptr;
     ElaToolButton    * _inviteAddButton    =   nullptr;
     ElaToolButton    * _moreOptionButton   =   nullptr;

@@ -13,6 +13,8 @@
 
 #include "CommonData.h"
 
+class VideoAudioCallPage;
+class VideoAudioInvitePage;
 class QLocalSocket;
 class AsyncDownloadTask;
 class SyncUploadTask;
@@ -52,8 +54,12 @@ public:
     // 下载失败结束回调
     void onUploadFailed(const std::string& error);
 
+    // 音视频启动失败回调
+    void onStartVideoFailed(int errorCode);
+
     // 开始音视频通话
-    bool startVideoCall(const QString& remoteId);
+    int startVideoCall(const QString& remoteId,bool isOtherUserInvite,const QString& userSig);
+
     // 结束音视频通话
     void endVideoCall();
 signals:
@@ -85,6 +91,7 @@ private:
     void handleDownloadCommand(const QString& saveLocPath,const QString& type,const FileStorageDTO& fileDTO);
 private:
     bool _isHeartbeatActive;
+    bool _isCallActive = false;
     int  _coolDownTime;
     int  _maxRetryCount;
     int  _tryLinkCount;
@@ -102,6 +109,10 @@ private:
     grpc::CompletionQueue _cq;
     std::atomic<bool> _shutdown{false};
     std::thread _cqThread;
+
+    // video
+    std::unique_ptr<VideoAudioInvitePage> _videoAudioInvitePage;
+    std::unique_ptr<VideoAudioCallPage>   _videoAudioCallPage;
 };
 
 

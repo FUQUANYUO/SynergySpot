@@ -1,6 +1,8 @@
 #include "RealtimeCommHandler.h"
 
-#include "trtc-realtime-comm/VideoAudioCallPage.h"
+#include "trtc-realtime-comm/video-audio-call-page/VideoAudioInvitePage.h"
+#include "trtc-realtime-comm/video-audio-call-page/VideoAudioCallPage.h"
+
 #include <ela-widget-tools/ElaApplication.h>
 
 #include "help.h"
@@ -16,12 +18,8 @@ int main(int argc, char *argv[]){
     std::string logName = "SynergySpot_gRPC";
     SSLog::initLogFile(logName);
     LOG_INFO("--------------------------- SynergySpot-GRPC-Client.exe Beginning ----------------------------")
-    // RealtimeCommHandler realtime;
-    // int res = realtime.startGrpcService();
-    // TRTCTestWindow testWindow;
-    // testWindow.show();
-    VideoAudioCallPage w("1000","1001",123);
-    w.show();
+    RealtimeCommHandler realtime;
+    int res = realtime.startGrpcService();
     LOG_INFO("--------------------------- SynergySpot-GRPC-Client.exe Ending ----------------------------")
-    return a.exec();
+    return res;
 }
