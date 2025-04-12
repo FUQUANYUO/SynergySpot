@@ -320,9 +320,9 @@ int MainLogic::startMainLogic(QApplication *app) {
                     checkAllDataLoaded();
                });
             connect(g_pClientRequestHandler, &ClientRequestHandler::sigQueryNewMessageResponse, this, [=](const std::string& dto) {
+
                 SSDTO::GetUserMessageDTO gudto;
                 gudto.ParseFromString(dto);
-
                 QList<MessageContentDTO> newsMsg;
                 for (const auto &msg: gudto.msg()) {
                     MessageContentDTO tmpDto;
@@ -531,9 +531,6 @@ int MainLogic::startMainLogic(QApplication *app) {
 
     // forward msg
     connect(g_pClientRequestHandler,&ClientRequestHandler::sigForwardMessageResponse,this,[=](const std::string &dto) {
-        _dataLoadCounter--;
-        checkAllDataLoaded();
-
         SSDTO::MessageContentDTO mdto;
         mdto.ParseFromString(dto);
 

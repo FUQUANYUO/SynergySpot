@@ -146,7 +146,7 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
         _msgBuffer.append(_ccon->getClientSocket()->readAll());
     
         while (true) {
-            // 读取消息头
+            // 读取消息头 4 + 4 + n
             if (_expectedSize == -1 && _msgBuffer.size() >= 8) {
                 QDataStream headerStream(_msgBuffer);
                 headerStream >> _expectedSize;
@@ -269,6 +269,12 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
             emit sigForwardMessageResponse(dto);
         };
 
+        // query message content
+        _responseHandlerMap[SSDTO::R_MESSAGE_CONTENT] = [=](const std::string & dto) {
+            LOG("get message content response")
+            emit sigQueryNewMessageResponse(dto);
+        };
+
         // friendship
         _responseHandlerMap[SSDTO::R_FRIENDSHIP_LIST] = [=](const std::string & dto) {
             LOG("friendship response")
@@ -315,12 +321,6 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
         _responseHandlerMap[SSDTO::R_GROUP_NOTICE] = [=](const std::string & dto) {
             LOG("get group notice info response")
             emit sigQueryGroupNoticesResponse(dto);
-        };
-
-        // query message content
-        _responseHandlerMap[SSDTO::R_MESSAGE_CONTENT] = [=](const std::string & dto) {
-            LOG("get message content response")
-            emit sigQueryNewMessageResponse(dto);
         };
 
         // file info

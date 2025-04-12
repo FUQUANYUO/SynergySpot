@@ -44,6 +44,10 @@ VideoAudioInvitePage::~VideoAudioInvitePage() {
     g_pPluginManager->releasePlugin(BK_PLUGIN_NAME);
 }
 
+void VideoAudioInvitePage::setHangUpBtnEnable(bool isEnable) {
+    hangUpCallBtn->setEnabled(isEnable);
+}
+
 void VideoAudioInvitePage::initWindow() {
     setWindowFlags(Qt::FramelessWindowHint);
     setAttribute(Qt::WA_TranslucentBackground);
@@ -134,7 +138,7 @@ void VideoAudioInvitePage::initContent() {
 }
 
 void VideoAudioInvitePage::initConnectFunc() {
-    // connect(_timer, &QTimer::timeout, this, &VideoAudioInvitePage::sltUpdateFrame);
+    connect(_timer, &QTimer::timeout, this, &VideoAudioInvitePage::sltUpdateFrame);
     connect(pickUpCallBtn,&QToolButton::clicked,this,[=]() {
         _timer->stop();
         g_pPluginManager->destroyInstance();

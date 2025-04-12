@@ -19,6 +19,7 @@
 #include <QJsonObject>
 #include <QtNetwork/QLocalSocket>
 #include <utility>
+#include <ela-widget-tools/ElaMessageBar.h>
 
 #define SEND_ERROR_RESPONSE(__MSG__)                        \
     resp["status"]  = "error";                              \
@@ -42,6 +43,8 @@ RealtimeCommHandler::RealtimeCommHandler(QObject* parent)
 
     _pIPCSocket = new QLocalSocket(this);
     _pIPCSocket->connectToServer("SynergySpotIPC");
+
+    _timer      = new QTimer(this);
 
     if (!_pIPCSocket->waitForConnected()) {
         LOG_ERROR("Failed to connect to client:" << _pIPCSocket->errorString().toStdString());
@@ -82,6 +85,9 @@ RealtimeCommHandler::RealtimeCommHandler(QObject* parent)
             task->proceed(ok);
         }
     });
+    // g_pCommonData->setCurUserInfo({"1000001","绅士柴"});
+    // startVideoCall("1000000",false,
+    //     "eAGrVgrxCdYrSy1SslIy0jNQ0gHzM1NS80oy0zLBwoYGIGAIlSpOyU4sKMhMUbIyNAMKWxiYGllANKVWFGQWpSpZGQPFISIlmblAvqG5iYmJkamJEVS0ODMdaFlaZUSyWYiBS1JlRqmrj39alKdTdpCzhV*SfmpEuqFxcLBrXr63V5KJmVm*rVItADmIL2k_");
 }
 
 RealtimeCommHandler::~RealtimeCommHandler() {
@@ -273,28 +279,97 @@ int RealtimeCommHandler::startVideoCall(const QString &remoteId,bool isOtherUser
     }
     _isCallActive = true;
     // init call video page
-    _videoAudioInvitePage = std::make_unique<VideoAudioInvitePage>(g_pCommonData->getCurUserInfo().ssid,remoteId,!isOtherUserInvite);
+    if (_videoAudioInvitePage == nullptr)
+        _videoAudioInvitePage = new VideoAudioInvitePage(g_pCommonData->getCurUserInfo().ssid,remoteId,!isOtherUserInvite);
 
     _videoAudioInvitePage->show();
 
-    connect(_videoAudioInvitePage.get(),&VideoAudioInvitePage::sigUserProcessResult,this,[=](bool isAccept) {
+    if (!isOtherUserInvite) {
+        auto curInfo = g_pCommonData->getCurUserInfo();
+        if (_videoAudioCallPage != nullptr) {
+            _videoAudioCallPage->deleteLater();
+            _videoAudioCallPage = nullptr;
+        }
+        _videoAudioCallPage = new VideoAudioCallPage(
+                curInfo.ssid,remoteId,curInfo.ssid.toInt(),userSig);
+        _videoAudioCallPage->setUserSig(userSig);
+        _videoAudioCallPage->setMyName(curInfo.username.toStdString());
+        _videoAudioCallPage->hide();
+
+        connect(_videoAudioCallPage,&VideoAudioCallPage::sigVideoHangUp,this,[=]() {
+            _videoAudioCallPage->hide();
+            _videoAudioCallPage->deleteLater();
+            _timer->stop();
+
+            _isCallActive = false;
+        });
+
+        connect(_videoAudioCallPage,&VideoAudioCallPage::sigRemoteUserEnterRoom,this,[=](std::string userId) {
+            _videoAudioInvitePage->hide();
+            _videoAudioInvitePage->deleteLater();
+            _timer->stop();
+
+            _videoAudioCallPage->show();
+            _isCallActive = true;
+        });
+
+        connect(_videoAudioCallPage,&VideoAudioCallPage::sigRemoteUserLeaveRoom,this,[=]() {
+            _videoAudioCallPage->hide();
+            _videoAudioCallPage->deleteLater();
+
+            _isCallActive = false;
+        });
+
+        connect(_timer,&QTimer::timeout,this,[=]() {
+            _videoAudioInvitePage->setHangUpBtnEnable(false);
+            ElaMessageBar::warning(ElaMessageBarType::Top, "无人响应", "对方暂时无法接听!", 3000, _videoAudioInvitePage);
+            _videoAudioCallPage->exitRoom();
+            _videoAudioCallPage->deleteLater();
+            _isCallActive = false;
+
+            QTimer::singleShot(5000,this,[=] {
+                _timer->stop();
+                _videoAudioInvitePage->hide();
+                _videoAudioInvitePage->deleteLater();
+            });
+        });
+        _timer->start(30000);// 30s等待
+    }
+
+    connect(_videoAudioInvitePage,&VideoAudioInvitePage::sigUserProcessResult,this,[=](bool isAccept) {
         if (isAccept) {
+            _videoAudioInvitePage->setHangUpBtnEnable(false);
             auto curInfo = g_pCommonData->getCurUserInfo();
-            _videoAudioCallPage = std::make_unique<VideoAudioCallPage>(
+            _videoAudioCallPage = new VideoAudioCallPage(
                 curInfo.ssid,remoteId,(!isOtherUserInvite)?curInfo.ssid.toInt():remoteId.toInt(),userSig);
             _videoAudioCallPage->setUserSig(userSig);
             _videoAudioCallPage->show();
 
-            connect(_videoAudioCallPage.get(),&VideoAudioCallPage::sigVideoHangUp,this,[=]() {
+            connect(_videoAudioCallPage,&VideoAudioCallPage::sigVideoHangUp,this,[=]() {
                 _videoAudioCallPage->hide();
-                _videoAudioCallPage.reset();
+                _videoAudioCallPage->deleteLater();
 
                 _isCallActive = false;
             });
-        }
-        _videoAudioInvitePage->hide();
-        _videoAudioInvitePage.reset();
 
+            connect(_videoAudioCallPage,&VideoAudioCallPage::sigRemoteUserLeaveRoom,this,[=]() {
+                _videoAudioCallPage->hide();
+                _videoAudioCallPage->deleteLater();
+
+                _isCallActive = false;
+            });
+        }else {
+            _timer->stop();
+            _videoAudioInvitePage->setHangUpBtnEnable(false);
+            _videoAudioCallPage->exitRoom();
+            _videoAudioCallPage->deleteLater();
+            _isCallActive = false;
+
+            QTimer::singleShot(2000,this,[=] {
+               _videoAudioInvitePage->hide();
+               _videoAudioInvitePage->deleteLater();
+            });
+        }
         _isCallActive = false;
     });
     return 0;
@@ -304,7 +379,10 @@ void RealtimeCommHandler::endVideoCall() {
     if (!_isCallActive)return ;
 
     _isCallActive = false;
-    _videoAudioCallPage.reset();
+    if (_videoAudioCallPage)
+        _videoAudioCallPage->deleteLater();
+    if (_videoAudioInvitePage)
+        _videoAudioInvitePage->deleteLater();
 }
 
 void RealtimeCommHandler::sltCheckHeartbeat() {

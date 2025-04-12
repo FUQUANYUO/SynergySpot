@@ -57,6 +57,8 @@ signals:
     void sigQueryMsgPicInfoRequest(const std::string& dto);
     // 发起音视频请求
     void sigCallVideoRequest(const std::string& dto);
+    // 创建群聊
+    void sigCreateGroupRequest(const std::string& dto);
 
     // --------------- 响应信号 --------------- //
     void sigEmailCodeResponse(const std::string& dto);

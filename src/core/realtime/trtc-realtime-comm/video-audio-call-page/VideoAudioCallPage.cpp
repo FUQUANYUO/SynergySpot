@@ -15,7 +15,7 @@
 #include <sstream>
 
 VideoAudioCallPage::VideoAudioCallPage(QString curSSID, QString targetSSID, int roomId,QString userSig)
-    : userSig_(userSig.toStdString())
+    : userSig_(userSig.toStdString()), isCloseCamera(true)
 {
     getTRTCShareInstance()->addCallback(this);
 
@@ -33,11 +33,20 @@ VideoAudioCallPage::VideoAudioCallPage(QString curSSID, QString targetSSID, int 
 }
 
 VideoAudioCallPage::~VideoAudioCallPage() {
+    exitRoom();
     getTRTCShareInstance()->removeCallback(this);
 }
 
 void VideoAudioCallPage::setUserSig(const QString &userSig) {
     userSig_ = userSig.toStdString();
+}
+
+void VideoAudioCallPage::setMyName(std::string name) {
+    curUserVideoHolder->setUserName(QString::fromStdString(name));
+}
+
+void VideoAudioCallPage::setRemoteName(std::string name) {
+    targetVideoHolder->setUserName(QString::fromStdString(name));
 }
 
 void VideoAudioCallPage::initWindow() {
@@ -55,6 +64,9 @@ void VideoAudioCallPage::initWindow() {
     btnLayout          = new QHBoxLayout;
     videoLayout        = new QHBoxLayout;
     mainLayout         = new QVBoxLayout;
+
+    curUserVideoHolder->updateAVMuteStatus(true, VIDEO_ITEM::MuteAudio, VIDEO_ITEM::LocalView);
+    curUserVideoHolder->updateAVMuteStatus(true, VIDEO_ITEM::MuteVideo, VIDEO_ITEM::LocalView);
 }
 
 void VideoAudioCallPage::initEdgeLayout() {
@@ -68,6 +80,7 @@ void VideoAudioCallPage::initEdgeLayout() {
     curUserVideoHolder->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     videoLayout->addWidget(curUserVideoHolder);
+    videoLayout->setSpacing(10);
     videoLayout->setContentsMargins(0,0,0,0);
 
     btnLayout->addStretch();
@@ -99,7 +112,7 @@ void VideoAudioCallPage::initContent() {
     hangUpCallBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
     micControlBtn->setIcon(QPixmap(":/realtime/rc-page/img/microphone_normal.png"));
-    cameraControlBtn->setIcon(QPixmap(":/realtime/rc-page/img/camera_normal.png"));
+    cameraControlBtn->setIcon(QPixmap(":/realtime/rc-page/img/camera_close.png"));
     screenSharedBtn->setIcon(QPixmap(":/realtime/rc-page/img/screen-shared.png"));
     hangUpCallBtn->setIcon(QPixmap(":/realtime/rc-page/img/hang-up.png"));
 
@@ -108,8 +121,8 @@ void VideoAudioCallPage::initContent() {
     screenSharedBtn->setIconSize(QSize(40,40));
     hangUpCallBtn->setIconSize(QSize(40,40));
 
-    micControlBtn->setText("关闭麦克风");
-    cameraControlBtn->setText("关闭视频");
+    micControlBtn->setText("打开麦克风");
+    cameraControlBtn->setText("打开视频");
     screenSharedBtn->setText("屏幕共享");
     hangUpCallBtn->setText("退出通话");
 }
@@ -180,6 +193,7 @@ void VideoAudioCallPage::enterRoom(
 }
 
 void VideoAudioCallPage::exitRoom() {
+    getTRTCShareInstance()->stopLocalPreview();
     getTRTCShareInstance()->exitRoom();
 }
 
@@ -192,6 +206,11 @@ void VideoAudioCallPage::onEnterRoom(int result) {
         // Enable audio
         getTRTCShareInstance()->enableAudioVolumeEvaluation(300); // Effective before the calling of startLocalAudio
         getTRTCShareInstance()->startLocalAudio(liteav::TRTCAudioQualityDefault);
+
+        // mutable to enable device
+        // getTRTCShareInstance()->muteLocalAudio(true);
+        getTRTCShareInstance()->muteLocalVideo(true);
+        getTRTCShareInstance()->stopLocalPreview();
 
         // Enable video
         if(app_scene_ == liteav::TRTCAppScene::TRTCAppSceneVideoCall || app_scene_ == liteav::TRTCAppScene::TRTCAppSceneLIVE){
@@ -215,8 +234,6 @@ void VideoAudioCallPage::onExitRoom(int reason) {
 
 void VideoAudioCallPage::onRemoteUserEnterRoom(const char *userId) {
     // 当前业务场景下有且只有两个用户
-    LOG_INFO("RoomState: onRemoteUserEnterRoom(userId:" << userId);
-
     targetVideoHolder = new UserVideoItem(
         this,getTRTCShareInstance(),
         room_id_,userId,VIDEO_ITEM::RemoteView
@@ -228,14 +245,20 @@ void VideoAudioCallPage::onRemoteUserEnterRoom(const char *userId) {
     targetVideoHolder->raise();
     RoomInfoHolder::GetInstance().addRemoteUser(userId);
 
-    auto res = g_pCommonData->getUserInfoBySSID(QString::fromStdString(userId));
-    if (!res.ssid.isEmpty() && res.ssid != "-1" ) {
-        targetVideoHolder->setUserName(res.username);
+    LOG_INFO("RoomState: onRemoteUserEnterRoom(userId:" << userId);
+    emit sigRemoteUserEnterRoom(userId);
+
+    auto remoteInfo = g_pCommonData->getUserInfoBySSID(QString::fromStdString(userId));
+    if (remoteInfo.ssid.isEmpty() || remoteInfo.ssid == "-1" || remoteInfo.username.isEmpty()) {
+        targetVideoHolder->setUserName(userId);
+    }else {
+        targetVideoHolder->setUserName(remoteInfo.username);
     }
 }
 
 void VideoAudioCallPage::onRemoteUserLeaveRoom(const char *userId, int reason) {
     LOG_INFO("RoomState: onRemoteUserLeaveRoom(userId:" << userId);
+    emit sigRemoteUserLeaveRoom();
     RoomInfoHolder::GetInstance().removeRemoteUser(userId);
 }
 

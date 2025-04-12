@@ -22,6 +22,8 @@ public:
     VideoAudioInvitePage(QString curSSID = "",QString targetSSID = "",bool isSender = true);
     ~VideoAudioInvitePage();
 
+    void setHangUpBtnEnable(bool isEnable);
+
     void initWindow();
     void initEdgeLayout();
     void initContent();

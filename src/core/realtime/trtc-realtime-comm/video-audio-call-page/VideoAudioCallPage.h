@@ -18,11 +18,16 @@ class VideoAudioCallPage : public ElaWidget,public TRTCCloudCallbackDefaultImpl{
     Q_OBJECT
 signals:
     void sigVideoHangUp();
+    void sigRemoteUserEnterRoom(std::string userId);
+    void sigRemoteUserLeaveRoom();
 public:
     VideoAudioCallPage(QString curSSID = "",QString targetSSID = "", int roomId = -1, QString userSig = "");
     ~VideoAudioCallPage();
 
     void setUserSig(const QString &userSig);
+
+    void setMyName(std::string name);
+    void setRemoteName(std::string name);
 
     void initWindow();
     void initEdgeLayout();
@@ -61,8 +66,6 @@ private:
     QHBoxLayout                *videoLayout        = nullptr;
     QHBoxLayout                *btnLayout          = nullptr;
     QVBoxLayout                *mainLayout         = nullptr;
-    QLabel                     *curUserNameLabel   = nullptr;
-    QLabel                     *targetNameLabel    = nullptr;
     // ----------------- UI -----------------
 
     // --------------- BackEnd --------------

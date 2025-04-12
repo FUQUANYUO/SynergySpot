@@ -111,8 +111,9 @@ private:
     std::thread _cqThread;
 
     // video
-    std::unique_ptr<VideoAudioInvitePage> _videoAudioInvitePage;
-    std::unique_ptr<VideoAudioCallPage>   _videoAudioCallPage;
+    VideoAudioInvitePage                 *_videoAudioInvitePage = nullptr;
+    VideoAudioCallPage                   *_videoAudioCallPage = nullptr;
+    QTimer                               *_timer = nullptr;         // video call countdown
 };
 
 

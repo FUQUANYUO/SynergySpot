@@ -80,7 +80,7 @@
       <bool>false</bool>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgba(0,0,0,100); border-radius: 10px;</string>
+      <string notr="true">background-color: rgba(0,0,0,100);border-radius: 15px;</string>
      </property>
     </widget>
    </item>
