@@ -8,6 +8,7 @@
 #include <QTextDocument>
 #include <QWidget.h>
 #include "common-data/common-dto/CommonDatabaseDTO.h"
+#include "define.h"
 
 class ElaToolButton;
 class ElaDockWidget;
@@ -33,13 +34,14 @@ class InputWidget : public QWidget{
 public:
     explicit InputWidget(QWidget * parent = nullptr);
     ~InputWidget() override;
-    signals:
-        void sigSendBtnClicked(const QString& inputHtml);
+signals:
+    void sigSendBtnClicked(const QString& inputHtml);
 protected:
     void initConnectFunc();
     void initWindow();
     void initEdgeLayout();
     void initContent();
+
 private:
     // ----------------- UI -----------------
     ElaToolButton    * _emojiButton        =   nullptr;
@@ -58,6 +60,9 @@ private:
 
 class ConversationFriendPage : public QWidget {
     Q_OBJECT
+signals:
+    // user page to call video
+    void sigCallVideoByOtherButton();
 public:
     explicit ConversationFriendPage(const UserBaseInfoDTO& userInfo,QWidget * parent = nullptr);
     ~ConversationFriendPage() override;
@@ -120,6 +125,7 @@ private:
     GroupBaseInfoDTO          _groupBaseInfo;
     QList<GroupMemberInfoDTO> _groupMemberInfo;
     MsgBubbleModel   *        _msgBubbleModel     =   nullptr;
+    UserType                  _curType;
     // --------------- BackEnd --------------
 };
 

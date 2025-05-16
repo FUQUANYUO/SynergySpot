@@ -14,6 +14,7 @@ public:
 
     qint64 createGroup(const GroupBaseInfoDO& group) override;
     bool updateProfile(const QString& groupSsid, const QString& newProfile) override;
+    bool updateAvatar(const QString& groupSsid, const QString& path);
     GroupBaseInfoDO findBySsid(const QString& groupSsid) override;
     QList<GroupBaseInfoDO> getAllGroupInfos(int pageSize = 20, int pageNum = 1) override;
 

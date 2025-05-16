@@ -164,9 +164,9 @@ CREATE TABLE `message_recipient` (
 DROP TABLE IF EXISTS `district`;
 CREATE TABLE `district` (
   `district_id` smallint(5) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增id',
-  `pid` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT '父及关系',
+  `pid` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT '父子关系',
   `district` VARCHAR(120) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '地区名称',
-  `level` tinyint(1) NOT NULL COMMENT '子属关系',
+  `level` tinyint(1) NOT NULL COMMENT '省份等级',
   PRIMARY KEY (`district_id`),
   KEY `parent_id` (`pid`),
   KEY `region_type` (`level`)

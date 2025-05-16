@@ -4,6 +4,7 @@
 
 #include "ArchPage.h"
 #include "add-page/AddPage.h"
+#include "create-page/CreateGroupPage.h"
 
 #include "../CommonFunc.hpp"
 #include "../about-page/AboutPage.h"
@@ -119,6 +120,9 @@ ArchPage::ArchPage(QWidget *parent) : ElaWindow(parent) {
 
 ArchPage::~ArchPage() {
     delete _addPage;
+    _addPage = nullptr;
+    delete _createGroupPage;
+    _createGroupPage = nullptr;
 }
 
 void ArchPage::initWindow() {
@@ -129,14 +133,15 @@ void ArchPage::initWindow() {
 
     setWindowTitle("Synergy-Spot \t\t version:  " + QString(SS_VERSION));
 
-    _statusBar      =   new ElaStatusBar(this);
-    _statusText     =   new ElaText("初始化成功！", this);
-    _toolBar        =   new ElaToolBar("Tool Bar", this);
-    _addButton      =   new ElaToolButton(this);
-    _searchSuggest  =   new ElaSuggestBox(this);
+    _statusBar       =   new ElaStatusBar(this);
+    _statusText      =   new ElaText("初始化成功！", this);
+    _toolBar         =   new ElaToolBar("Tool Bar", this);
+    _addButton       =   new ElaToolButton(this);
+    _searchSuggest   =   new ElaSuggestBox(this);
 
-    _maskWidget     =   new SSMaskWidget(this);
-    _loadingDialog  =   new LoadingDialog(this);
+    _maskWidget      =   new SSMaskWidget(this);
+    _loadingDialog   =   new LoadingDialog(this);
+    _addPage         =   new AddPage();
 
     _maskWidget->setParent(this);
     _maskWidget->setVisible(false);
@@ -175,7 +180,7 @@ void ArchPage::initEdgeLayout() {
 
 void ArchPage::initContent() {
     // message page
-    addPageNode("Message", g_pMessagePage,  _msgNoticeNum, ElaIconType::Comment);
+    addPageNode("Message", g_pMessagePage, _msgNoticeNum, ElaIconType::Comment);
 
     // contact page
     addPageNode("Contact", g_pContactPage, _contactNoticeNum, ElaIconType::User);
@@ -207,6 +212,8 @@ void ArchPage::initContent() {
     _maskWidget->setVisible(false);
     _maskWidget->move(0,0);
     _maskWidget->setFixedSize(this->size());
+
+    g_pSettingsPage->setMainWindowWidget(this);
 }
 
 void ArchPage::initConnectFunc() {
@@ -243,30 +250,64 @@ void ArchPage::initConnectFunc() {
         sltShowMaskEffect();
         g_pUserPage(UserType::Myself,{},{})->moveUserEditPageToCenter(pos() + QPoint(width()/2,height()/2) - QPoint(200,300));
     });
+    connect(g_pUserPage(UserType::Group_OP,{},{}),&UserPage::sigShowArchPageMaskEffect,this,[=]() {
+        sltShowMaskEffect();
+        g_pUserPage(UserType::Group_OP,{},{})->moveUserEditPageToCenter(pos() + QPoint(width()/2,height()/2) - QPoint(200,300));
+    });
+    connect(g_pUserPage(UserType::Group_Creater,{},{}),&UserPage::sigShowArchPageMaskEffect,this,[=]() {
+        sltShowMaskEffect();
+        g_pUserPage(UserType::Group_Creater,{},{})->moveUserEditPageToCenter(pos() + QPoint(width()/2,height()/2) - QPoint(200,300));
+    });
     connect(g_pUserPage(UserType::Myself,{},{}),&UserPage::sigHideArchPageMaskEffect,this,&ArchPage::sltHideMaskEffect);
+    connect(g_pUserPage(UserType::Group_OP,{},{}),&UserPage::sigHideArchPageMaskEffect,this,&ArchPage::sltHideMaskEffect);
+    connect(g_pUserPage(UserType::Group_Creater,{},{}),&UserPage::sigHideArchPageMaskEffect,this,&ArchPage::sltHideMaskEffect);
 
     // refresh data
     connect(g_pCommonData,&CommonData::sigUpdateAvatarData,this,&ArchPage::sltTriggerUpdate);
 
     // add friend
     connect(_addAction,&QAction::triggered,this,[=]() {
-        if (_addPage == nullptr) {
-            _addPage = new AddPage();
-            connect(_addPage,&AddPage::sigHideArchPageMaskEffect,this,&ArchPage::sltHideMaskEffect);
-        }
-
         sltShowMaskEffect();
         _addPage->show();
     });
 
+    // add page request mask effect
+    connect(_addPage,&AddPage::sigHideArchPageMaskEffect,this,&ArchPage::sltHideMaskEffect);
+
     // create group
     connect(_createAction,&QAction::triggered,this,[=]() {
+        if (_createGroupPage == nullptr) {
+            _createGroupPage = new CreateGroupPage();
+            // create group page request mask effect
+            connect(_createGroupPage,&CreateGroupPage::sigHideArchPageMaskEffect,this,&ArchPage::sltHideMaskEffect);
+        }
 
+        sltShowMaskEffect();
+        _createGroupPage->show();
+    });
+
+    connect(this,&ArchPage::sigJumpOtherPageRequest,this,[=](PageName pageName) {
+        switch (pageName) {
+            case MessagePage:
+                navigation(g_pMessagePage->property("ElaPageKey").toString());
+                break;
+            case ContactPage:
+                navigation(g_pContactPage->property("ElaPageKey").toString());
+                break;
+            case LLMPage:
+                navigation(g_pLLMAppPage->property("ElaPageKey").toString());
+                break;
+            case FileManagerPage:
+                navigation(g_pFileManagerPage->property("ElaPageKey").toString());
+                break;
+            case SettingsPage:
+                navigation(g_pSettingsPage->property("ElaPageKey").toString());
+                break;
+        }
     });
 
     connect(g_pContactPage,&ContactPage::sigHideArchPageMaskEffect,this,&ArchPage::sltHideMaskEffect);
     connect(g_pContactPage,&ContactPage::sigShowArchPageMaskEffect,this,&ArchPage::sltShowMaskEffect);
-
 }
 
 void ArchPage::resizeEvent(QResizeEvent *event) {

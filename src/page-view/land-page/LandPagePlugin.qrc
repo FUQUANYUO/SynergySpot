@@ -1,28 +1,15 @@
 <RCC>
      <qresource prefix="/land-page/">
            <file>rc-page/img/SS-default-icon.jpg</file>
-           <file>rc-page/img/SS-default-icon.jpg</file>
-           <file>rc-page/img/broken-bk.png</file>
            <file>rc-page/img/broken-bk.png</file>
            <file>rc-page/img/default-avatar.jpg</file>
-           <file>rc-page/img/default-avatar.jpg</file>
-           <file>rc-page/img/drop-down.png</file>
            <file>rc-page/img/drop-down.png</file>
            <file>rc-page/img/eyes-closed.png</file>
-           <file>rc-page/img/eyes-closed.png</file>
-           <file>rc-page/img/eyes-opened.png</file>
            <file>rc-page/img/eyes-opened.png</file>
            <file>rc-page/img/sunrise-bk.png</file>
-           <file>rc-page/img/sunrise-bk.png</file>
-           <file>rc-page/img/sunset-bk.png</file>
            <file>rc-page/img/sunset-bk.png</file>
            <file>rc-page/img/toward-sea-bk.png</file>
-           <file>rc-page/img/toward-sea-bk.png</file>
-           <file>rc-page/img/windmill-bk.png</file>
            <file>rc-page/img/windmill-bk.png</file>
            <file>rc-page/video/bk_src.mp4</file>
-           <file>rc-page/video/bk_src.mp4</file>
-     </qresource>
-</RCC>
      </qresource>
 </RCC>

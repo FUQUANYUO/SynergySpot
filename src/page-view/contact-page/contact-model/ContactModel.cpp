@@ -8,63 +8,198 @@
 
 #include "help.h"
 
+#include <QMimeData>
+#include <qiodevice.h>
+
 ContactModel::ContactModel(QObject *parent) : QStandardItemModel(parent) {
 }
 
 void ContactModel::addGrouping(const QString &groupingName) {
-    bool flag = (getGrouping(groupingName)==nullptr);
-    if(flag){
-        QStandardItem * grouping = new QStandardItem(groupingName);
-        _itemMap.insert({groupingName,grouping},{});
-        appendRow(grouping);
+    if (!_groupingHash.contains(groupingName)) {
+        QStandardItem *parent = new QStandardItem(groupingName);
+        appendRow(parent);
+        _itemMap[groupingName] = QList<QPair<QStandardItem*, GroupingItem>>();
+        _groupingHash.insert(groupingName, parent);
     }
 }
 
+void ContactModel::delGrouping(const QString &groupingName) {
+    if (!_groupingHash.contains(groupingName) || groupingName == "我的好友")
+        return;
 
-void ContactModel::addGroupingItem(const QString &groupingName, const GroupingItem &item) {
+    QStandardItem *parent = _groupingHash.value(groupingName);
+    QList<QPair<QStandardItem*, GroupingItem>> items = _itemMap.value(groupingName);
+
+    // 转移子项到默认分组
+    QStandardItem *defaultParent = _groupingHash.value("我的好友");
+    for (auto &pair : items) {
+        parent->removeRow(pair.first->row());
+        defaultParent->appendRow(pair.first);
+        _itemMap["我的好友"].append(pair);
+    }
+
+    // 清理数据
+    _itemMap.remove(groupingName);
+    _groupingHash.remove(groupingName);
+    removeRow(parent->row());
+    delete parent;
+}
+
+void ContactModel::addGroupingItem(const QString &groupingName, GroupingItem item) {
     addGrouping(groupingName);
 
-    QStandardItem *gItem = new QStandardItem(item.name);
-    gItem->setData(QIcon(item.pic), Qt::DecorationRole);
-    gItem->setData(item.status, ContactDelegate::StatusRole);
-    gItem->setData(item.ssid, ContactDelegate::SSIDRole);
-    QStandardItem *parentItem = getGrouping(groupingName);
-    parentItem->appendRow(gItem);
+    if (QStandardItem *parent = _groupingHash.value(groupingName)) {
+        QStandardItem *child = new QStandardItem(item.name);
+        child->setData(QIcon(item.picPath), Qt::DecorationRole);
+        child->setData(item.status, Qt::UserRole + 1);  // StatusRole
+        child->setData(item.ssid, Qt::UserRole + 2);     // SSIDRole
+
+        parent->appendRow(child);
+        _itemMap[groupingName].append(qMakePair(child, item));
+    }
 }
 
 void ContactModel::delGroupingItem(const QString &groupingName, const GroupingItem &item) {
-    // 获取父分组项
-    QStandardItem *parentItem = getGrouping(groupingName);
-    if (!parentItem) {
-        LOG_ERROR("Grouping not found:" + groupingName.toStdString());
-        return;
-    }
+    if (!_itemMap.contains(groupingName)) return;
 
-    // 遍历父项的所有子项
-    for (int row = 0; row < parentItem->rowCount(); ++row) {
-        QStandardItem *childItem = parentItem->child(row);
-        if (!childItem) continue;
-
-        QString childSsid = childItem->data(ContactDelegate::SSIDRole).toString();
-
-        if (childSsid == item.ssid) {
-            parentItem->removeRow(row);
-            break;
+    auto &items = _itemMap[groupingName];
+    for (auto it = items.begin(); it != items.end(); ++it) {
+        if (it->second.ssid == item.ssid) {
+            if (QStandardItem *parent = _groupingHash.value(groupingName)) {
+                parent->removeRow(it->first->row());
+                delete it->first;
+                items.erase(it);
+                break;
+            }
         }
     }
 }
-QStandardItem *ContactModel::getGrouping(const QString &groupingName) {
-    for(const auto &it : _itemMap.keys()){
-        if(it.first == groupingName){
-            return it.second;
+
+QVariant ContactModel::headerData(int section, Qt::Orientation orientation, int role) const {
+    return QVariant(); // 空表头
+}
+
+Qt::ItemFlags ContactModel::flags(const QModelIndex &index) const {
+    Qt::ItemFlags flags = QStandardItemModel::flags(index);
+
+    if (index.isValid()) {
+        if (index.parent().isValid()) { // 子节点可拖拽
+            flags |= Qt::ItemIsDragEnabled;
+        } else { // 父节点可放置
+            flags |= Qt::ItemIsDropEnabled;
         }
     }
-    return nullptr;
+    return flags;
 }
-QVariant ContactModel::headerData(int section, Qt::Orientation orientation, int role) const{
-    if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
-    {
-        return QString("");
+
+QStringList ContactModel::mimeTypes() const {
+    return {"application/x-contact-data"};
+}
+
+bool ContactModel::canDropMimeData(const QMimeData *data, Qt::DropAction action,
+                                  int row, int column, const QModelIndex &parent) const {
+    if (!parent.isValid() || parent.parent().isValid())
+        return false;
+
+    QByteArray encoded = data->data("application/x-contact-data");
+    QDataStream stream(&encoded, QIODevice::ReadOnly);
+    QString srcGroup, ssid;
+    int srcRow;
+    stream >> srcGroup >> srcRow >> ssid;
+
+    return srcGroup != parent.data(Qt::DisplayRole).toString();
+}
+
+QMimeData* ContactModel::mimeData(const QModelIndexList &indexes) const {
+    QMimeData *mimeData = new QMimeData();
+    QByteArray encoded;
+    QDataStream stream(&encoded, QIODevice::WriteOnly);
+
+    if (!indexes.isEmpty()) {
+        const QModelIndex &index = indexes.first();
+        if (index.parent().isValid()) {
+            stream << index.parent().data(Qt::DisplayRole).toString()
+                   << index.row()
+                   << index.data(Qt::UserRole + 2).toString(); // SSID
+        }
     }
-    return QAbstractItemModel::headerData(section, orientation, role);
+    mimeData->setData("application/x-contact-data", encoded);
+    return mimeData;
+}
+
+bool ContactModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
+                              int row, int column, const QModelIndex &parent) {
+    if (!canDropMimeData(data, action, row, column, parent))
+        return false;
+
+    QByteArray encoded = data->data("application/x-contact-data");
+    QDataStream stream(&encoded, QIODevice::ReadOnly);
+    QString srcGroup, ssid;
+    int srcRow;
+    stream >> srcGroup >> srcRow >> ssid;
+
+    // 查找源项目
+    auto &srcItems = _itemMap[srcGroup];
+    auto it = std::find_if(srcItems.begin(), srcItems.end(),
+                          [&ssid](const QPair<QStandardItem*, GroupingItem> &item) {
+                              return item.second.ssid == ssid;
+                          });
+    if (it == srcItems.end()) return false;
+
+    // 执行移动
+    QString destGroup = parent.data(Qt::DisplayRole).toString();
+    QStandardItem *destParent = _groupingHash[destGroup];
+
+    if (beginMoveRows(createIndex(_groupingHash[srcGroup]->row(), 0, _groupingHash[srcGroup]),
+                    srcRow, srcRow,
+                    createIndex(destParent->row(), 0, destParent),
+                    row)) {
+        QStandardItem *child = it->first;
+        GroupingItem item = it->second;
+
+        _groupingHash[srcGroup]->removeRow(srcRow);
+
+        destParent->insertRow(row, child);
+
+        updateItemMapping(child, srcGroup, destGroup, item);
+        endMoveRows();
+        return true;
+    }
+    return false;
+}
+
+void ContactModel::updateItemMapping(QStandardItem *child,
+                                    const QString &oldGroup,
+                                    const QString &newGroup,
+                                    const GroupingItem &item) {
+    _itemMap[oldGroup].removeAll(qMakePair(child, item));
+    _itemMap[newGroup].append(qMakePair(child, item));
+}
+
+ContactModel * ContactModel::deepCopy(QObject *parent) const {
+    ContactModel* newModel = new ContactModel(parent);
+    // 复制所有分组
+    for (const QString& groupName : _groupingHash.keys()) {
+        newModel->addGrouping(groupName);
+        QStandardItem* newParent = newModel->getParentItem(groupName);
+        // 复制分组下的所有子项
+        for (const auto& pair : _itemMap.value(groupName)) {
+            GroupingItem item = pair.second;
+            QStandardItem* newChild = new QStandardItem(item.name);
+            newChild->setData(pair.first->data(Qt::DecorationRole), Qt::DecorationRole);
+            newChild->setData(item.status, Qt::UserRole + 1);
+            newChild->setData(item.ssid, Qt::UserRole + 2);
+            newParent->appendRow(newChild);
+            newModel->_itemMap[groupName].append(qMakePair(newChild, item));
+        }
+    }
+    return newModel;
+}
+
+QString ContactModel::getGroupingName(const QModelIndex &index) const {
+    return index.data(Qt::DisplayRole).toString();
+}
+
+QStandardItem* ContactModel::getParentItem(const QString &groupingName) const {
+    return _groupingHash.value(groupingName);
 }

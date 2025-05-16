@@ -5,6 +5,7 @@
 #include "msg-bubble-model/MsgBubbleModel.h"
 #include "msg-bubble-delegate/MsgBubbleDelegate.h"
 #include "msg-bubble-view/MsgBubbleView.h"
+#include "screenshot-page/ScreenshotPage.h"
 #include "group-member-dock/GroupMemberDock.h"
 #include "../user-page/UserPage.h"
 #include "../MessagePage.h"
@@ -14,9 +15,16 @@
 #include "common-data/CommonData.h"
 #include "ela-widget-tools/ElaToolButton.h"
 #include "ela-widget-tools/ElaDockWidget.h"
+#include "ela-widget-tools/ElaPushButton.h"
 #include "ela-widget-tools/ElaMenu.h"
 #include "ela-widget-tools/Def.h"
 #include "ela-widget-tools/ElaInteractiveCard.h"
+#include "ela-widget-tools/ElaTheme.h"
+
+#ifdef WIN32
+    #include <windows.h>
+    #include <shellapi.h>
+#endif
 
 #include <QGridLayout>
 #include <QTextEdit>
@@ -33,6 +41,7 @@ public:
     SSTextEdit(QWidget *parent = nullptr);
 
     QMap<QString, QImage>& getImageTmpMap();
+
 protected:
     // image from paste board
     void insertFromMimeData(const QMimeData *source) override;
@@ -47,7 +56,7 @@ protected:
     // insert logic default scale is 0.3
     void insertImage(const QImage &image, double scale = 0.3);
 private:
-    QMap<QString, QImage> _imagesTmpMap;    // pic name without suffix : pic pixmap
+    QMap<QString, QImage>   _imagesTmpMap;    // pic name without suffix : pic pixmap
 };
 
 SSTextEdit::SSTextEdit(QWidget *parent): QTextEdit(parent) {
@@ -198,6 +207,7 @@ void InputWidget::initContent() {
 
     _inputEditFrame->setObjectName(QString::fromUtf8("_inputEditFrame"));
     _inputEditFrame->setStyleSheet("#_inputEditFrame{border:none;background-color:rgb(242,242,242);}");
+    _inputEditFrame->viewport()->setAutoFillBackground(true);
 
     _sendMod->addElaIconAction(ElaIconType::CircleCheck,"按 Enter 发送消息");
     _sendMod->addElaIconAction(ElaIconType::Circle,"按 Ctrl + Enter 发送消息");
@@ -215,13 +225,25 @@ void InputWidget::initContent() {
     _sendButton->setFixedWidth(50);
     setObjectName(QString::fromUtf8("_inputEditWid"));
     setStyleSheet("#_inputEditWid {border:none;background-color:rgb(242,242,242);border-bottom-left-radius: 30px;}");
+
+    setMouseTracking(true);
 }
 
 void InputWidget::initConnectFunc() {
+    connect(_screenCutButton, &ElaPushButton::clicked, this, [=]() {
+        ScreenshotPage *screenshotWidget = new ScreenshotPage();
+        screenshotWidget->show();
+    });
+
     connect(_sendButton, &QPushButton::clicked, this, [=]() {
         if (!_inputEditFrame->document()->isEmpty()) {
             emit sigSendBtnClicked(_inputEditFrame->toHtml());
         }
+    });
+    connect(_emojiButton,&QPushButton::clicked, this, [=]() {
+#ifdef WIN32
+        ShellExecuteW(NULL, NULL, L"explorer.exe", L"ms-windows-store://emojipicker", NULL, SW_SHOWNORMAL);
+#endif
     });
 }
 
@@ -340,6 +362,10 @@ void ConversationFriendPage::initConnectFunc() {
     connect(_videoButton,&ElaToolButton::clicked,[=]() {
         emit g_pCommonData->sigCallVideoToOtherUser(_userInfo.ssid);
     });
+
+    connect(this, &ConversationFriendPage::sigCallVideoByOtherButton, [=]() {
+        emit g_pCommonData->sigCallVideoToOtherUser(_userInfo.ssid);
+    });
 }
 
 ConversationGroupPage::ConversationGroupPage(
@@ -351,6 +377,15 @@ ConversationGroupPage::ConversationGroupPage(
 {
     _groupBaseInfo = groupBaseInfo;
     _groupMemberInfo = groupMemberInfo;
+
+    QString curUserSSID = g_pCommonData->getCurUserInfo().ssid;
+    _curType = Group_Member;
+    if (groupBaseInfo.admins.contains(curUserSSID)) {
+        _curType = Group_OP;
+    }
+    if (groupBaseInfo.createSSID == curUserSSID) {
+        _curType = Group_Creater;
+    }
 
     initWindow();
 
@@ -461,13 +496,13 @@ void ConversationGroupPage::initConnectFunc() {
     connect(_groupNameButton,&QPushButton::clicked,[=]() {
         // TODO: remark and region need to get from server
         GroupInfo groupInfo{
-            UserType::Groups,_groupBaseInfo.ssidGroup,_groupBaseInfo.groupName,"",
+            _curType,_groupBaseInfo.ssidGroup,_groupBaseInfo.groupName,"",
             _groupBaseInfo.profile,_groupBaseInfo.avatarPath,static_cast<int>(_groupMemberInfo.count()),
             {
                 {"这是一个公告"}
             }
         };
-        UserPage * wid = g_pUserPage(Groups,{},groupInfo);
+        UserPage * wid = g_pUserPage(_curType,{},groupInfo);
         QPoint globalPos = QCursor::pos();
         wid->showAt(globalPos + QPoint(10,10));
     });
@@ -564,6 +599,9 @@ ConversationPage::ConversationPage(ConversationType type,const MsgCombineDTO& dt
         QHash<QString,UserBaseInfoDTO> tmpUserHash;
         for (const auto &it : dto.groupMemberInfo ) {
             UserBaseInfoDTO user = g_pCommonData->getUserInfoBySSID(it.ssidMember);
+            if (user.avatarPath == "-1" || user.avatarPath.isEmpty()) {
+                user.avatarPath = ":/message-page/rc-page/img/SS-default-icon.jpg";
+            }
             _memberOfGroupList->addMember(user.avatarPath, user.ssid, user.username );
             tmpUserHash.insert(it.ssidMember,user);
         }
@@ -581,16 +619,22 @@ ConversationPage::ConversationPage(ConversationType type,const MsgCombineDTO& dt
         connect(_memberOfGroupList,&GroupMemberDock::sigClickedMember,this,[=](QString ssid) {
             // TODO : send request to server
             UserBaseInfoDTO user = tmpUserHash.value(ssid);
-            bool isFriend = g_pCommonData->isCurUserFriend(ssid);
+            UserType clickedType = Strangers;
+            if ( g_pCommonData->getCurUserInfo().ssid == ssid) {
+                clickedType = Myself;
+            }
+            if (g_pCommonData->isCurUserFriend(ssid)) {
+                clickedType = Friends;
+            }
 
             UserInfo uInfo{
-                (isFriend?UserType::Friends:UserType::Strangers),
+                clickedType,
                 static_cast<int>(std::difftime(GetCurTime::getTimeObj()->getCurTimeStamp(),user.createTime) / (60 * 60 * 24) + 1),
                 static_cast<int>(user.thumbUpCount) , user.ssid, user.username, "", user.personalSign,
                 user.avatarPath,{""}
             };
 
-            UserPage * wid = g_pUserPage((isFriend?UserType::Friends:UserType::Strangers),uInfo,{});
+            UserPage * wid = g_pUserPage(clickedType,uInfo,{});
 
             QPoint globalPos = QCursor::pos();
             QPoint offset(wid->width(),wid->height());

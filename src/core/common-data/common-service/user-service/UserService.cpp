@@ -6,7 +6,6 @@
 
 #include <CommonData.h>
 
-
 UserService::UserService(LiteConn& db): userDAO(db) {}
 
 UserBaseInfoDTO UserService::getUserBySSID(const QString& ssid) {

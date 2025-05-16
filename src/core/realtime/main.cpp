@@ -8,6 +8,8 @@
 #include "help.h"
 
 #include <QApplication>
+#include <QCommandLineParser>
+#include <QCommandLineOption>
 
 #include <Windows.h>
 #include <DbgHelp.h>
@@ -52,6 +54,16 @@ int main(int argc, char *argv[]){
     SetUnhandledExceptionFilter(GenerateDump);
 
     QApplication a(argc,argv);
+    QCommandLineParser parser;
+    parser.setApplicationDescription("SynergySpot gRPC Subprocess");
+    parser.addHelpOption();
+    QCommandLineOption ssidOption("ssid", "Unique identifier for the server", "ssid");
+    parser.addOption(ssidOption);
+    parser.process(a);
+
+    QString ssid = parser.value("ssid");
+    g_pCommonData->setCurUserInfo({ssid});
+
     eApp->init();
     // enable mica style
     eApp->setIsEnableMica(true);

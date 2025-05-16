@@ -30,7 +30,9 @@ enum UserType{
     Myself,
     Strangers,
     Friends,
-    Groups,
+    Group_Member,
+    Group_OP,
+    Group_Creater
 };
 
 struct ChatMessage{

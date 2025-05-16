@@ -52,11 +52,10 @@ foreach(SUB_PATH ${SUB_PROS})
         endif ()
 endforeach()
 
-add_subdirectory(core/realtime)
-#if(CMAKE_BUILD_TYPE STREQUAL "Release")
-#        # 添加实时子项目
-#        add_subdirectory(core/realtime)
-#endif ()
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+        # 添加实时子项目
+        add_subdirectory(core/realtime)
+endif ()
 # 公共数据插件
 add_subdirectory(core/common-data)
 

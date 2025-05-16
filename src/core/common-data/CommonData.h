@@ -82,6 +82,15 @@ public:
     bool                       updateUserInfoBySSID(const UserBaseInfoDTO& userInfo);
     bool                       addUserInfoByServer(const UserBaseInfoDTO& userInfo);
 
+    // group info //
+    GroupBaseInfoDTO           getGroupBaseInfoBySSID(const QString& ssid);
+    bool                       updateGroupBaseInfoBySSID(const GroupBaseInfoDTO& groupInfo);
+    bool                       addGroupInfoByServer(const GroupBaseInfoDTO& groupInfo);
+
+    // group member
+    QList<GroupMemberInfoDTO>  getGroupMemberInfoData(const QString& ssidGroup,int pageSize, int pageNum);
+    bool                       setGroupMemberInfoData(const QList<GroupMemberInfoDTO>& dto);
+
     // user login record
     bool                       setLoginRecord(const LoginRecordDTO& loginInfo);
     bool                       removeLoginRecordBySSID(const QString& ssid);
@@ -103,10 +112,6 @@ public:
     QList<GroupBaseInfoDTO>    getAllGroupInfo(int pageSize, int pageNum);
     GroupBaseInfoDTO           getGroupInfoDataBySSID(const QString& ssidGroup);
     bool                       setGroupInfoData(const QList<GroupBaseInfoDTO>& dto);
-
-    // group member
-    QList<GroupMemberInfoDTO>  getGroupMemberInfoData(const QString& ssidGroup,int pageSize, int pageNum);
-    bool                       setGroupMemberInfoData(const QList<GroupMemberInfoDTO>& dto);
 
     // init user app cache
     bool                       initCurUserInfoDir();
@@ -163,6 +168,9 @@ signals:
 
     // contact notice accept/reject
     void sigReplyFriendOrGroup(const QString& ssid,bool isAccept, bool isGroup);
+
+    // create group
+    void sigCreateGroupRequest(QList<QString> members);
 
     // get file
     void sigGetAvatarFileFromRemote(

@@ -42,7 +42,7 @@ RealtimeCommHandler::RealtimeCommHandler(QObject* parent)
     _isHeartbeatActive = true;
 
     _pIPCSocket = new QLocalSocket(this);
-    _pIPCSocket->connectToServer("SynergySpotIPC");
+    _pIPCSocket->connectToServer("SynergySpotIPC-" + g_pCommonData->getCurUserInfo().ssid);
 
     _timer      = new QTimer(this);
 
@@ -77,17 +77,16 @@ RealtimeCommHandler::RealtimeCommHandler(QObject* parent)
         SEND_ERROR_RESPONSE(msg)
     });
 
-    _cqThread = std::thread([this]() {
-        void* tag;
-        bool ok;
-        while (_cq.Next(&tag, &ok)) {
-            auto* task = static_cast<AsyncTask*>(tag);
-            task->proceed(ok);
-        }
-    });
-    // g_pCommonData->setCurUserInfo({"1000001","绅士柴"});
-    // startVideoCall("1000000",false,
-    //     "eAGrVgrxCdYrSy1SslIy0jNQ0gHzM1NS80oy0zLBwoYGIGAIlSpOyU4sKMhMUbIyNAMKWxiYGllANKVWFGQWpSpZGQPFISIlmblAvqG5iYmJkamJEVS0ODMdaFlaZUSyWYiBS1JlRqmrj39alKdTdpCzhV*SfmpEuqFxcLBrXr63V5KJmVm*rVItADmIL2k_");
+    for (int i = 0; i < 4; ++i) {
+        _workers.emplace_back([this]() {
+            void* tag;
+            bool ok;
+            while (!_shutdown && _cq.Next(&tag, &ok)) {
+                auto* task = static_cast<AsyncTask*>(tag);
+                task->proceed(ok);
+            }
+        });
+    }
 }
 
 RealtimeCommHandler::~RealtimeCommHandler() {
@@ -96,7 +95,9 @@ RealtimeCommHandler::~RealtimeCommHandler() {
     }
     _shutdown = true;
     _cq.Shutdown();
-    if (_cqThread.joinable()) _cqThread.join();
+    for (auto& thread : _workers) {
+        if (thread.joinable()) thread.join();
+    }
 }
 
 int RealtimeCommHandler::startGrpcService() {
@@ -172,9 +173,12 @@ void RealtimeCommHandler::onStartVideoFailed(int errorCode) {
 void RealtimeCommHandler::sltSendResponse(const QJsonObject &resp)  {
     if (_pIPCSocket != nullptr) {
         if (_pIPCSocket->state() == QLocalSocket::ConnectedState) {
-            _pIPCSocket->write(QJsonDocument(resp).toJson());
+            // add char '\t\n' to divided json info
+            QByteArray data = QJsonDocument(resp).toJson();
+            data.append("\t\n");
+            _pIPCSocket->write(data);
             _pIPCSocket->flush();
-        }else {
+        } else {
             LOG_ERROR("_pIPCSocket is not connected")
         }
     }
@@ -212,6 +216,11 @@ void RealtimeCommHandler::processCommand(const QString &line)  {
             );
         }
         else if (command == "download") {
+            if (cmd["file-id"].toString().isEmpty() || cmd["file-id"].toString() == "-1") {
+                LOG_WARNING("file-id is -1 skip down request")
+                return;
+            }
+
             handleDownloadCommand(cmd["local-path"].toString(),cmd["business-type"].toString(),{
                     cmd["file-id"].toString(),cmd["uploader-ssid"].toString(),
                     "",-1,"",
@@ -237,7 +246,8 @@ void RealtimeCommHandler::processCommand(const QString &line)  {
 
 void RealtimeCommHandler::handleUploadCommand(const QString &localUrl,const QString& type, FileStorageDTO fileDTO) {
     try {
-        std::unique_ptr<SyncUploadTask> _upload(new SyncUploadTask{this,std::move(_fileStub),localUrl,type,std::move(fileDTO)});
+        auto stub = FileTransferService::NewStub(_channel);
+        std::unique_ptr<SyncUploadTask> _upload(new SyncUploadTask{this,std::move(stub),localUrl,type,std::move(fileDTO)});
         _upload->execute();
     }catch (std::exception &e) {
         onUploadFailed(e.what());
@@ -278,18 +288,27 @@ int RealtimeCommHandler::startVideoCall(const QString &remoteId,bool isOtherUser
         return -3;
     }
     _isCallActive = true;
-    // init call video page
-    if (_videoAudioInvitePage == nullptr)
-        _videoAudioInvitePage = new VideoAudioInvitePage(g_pCommonData->getCurUserInfo().ssid,remoteId,!isOtherUserInvite);
+    _timer->stop();
 
+    if (_videoAudioCallPage) {
+        _videoAudioCallPage->deleteLater();
+        _videoAudioCallPage = nullptr;
+    }
+    if (_videoAudioInvitePage) {
+        _videoAudioInvitePage->deleteLater();
+        _videoAudioInvitePage = nullptr;
+    }
+
+    // init call video page
+    if (_videoAudioInvitePage == nullptr) {
+        disconnect(_videoAudioInvitePage, 0, this, 0);
+        _videoAudioInvitePage = new VideoAudioInvitePage(g_pCommonData->getCurUserInfo().ssid,remoteId,!isOtherUserInvite);
+    }
     _videoAudioInvitePage->show();
+    _videoAudioInvitePage->raise();
 
     if (!isOtherUserInvite) {
         auto curInfo = g_pCommonData->getCurUserInfo();
-        if (_videoAudioCallPage != nullptr) {
-            _videoAudioCallPage->deleteLater();
-            _videoAudioCallPage = nullptr;
-        }
         _videoAudioCallPage = new VideoAudioCallPage(
                 curInfo.ssid,remoteId,curInfo.ssid.toInt(),userSig);
         _videoAudioCallPage->setUserSig(userSig);
@@ -299,6 +318,8 @@ int RealtimeCommHandler::startVideoCall(const QString &remoteId,bool isOtherUser
         connect(_videoAudioCallPage,&VideoAudioCallPage::sigVideoHangUp,this,[=]() {
             _videoAudioCallPage->hide();
             _videoAudioCallPage->deleteLater();
+            _videoAudioCallPage = nullptr;
+
             _timer->stop();
 
             _isCallActive = false;
@@ -307,15 +328,19 @@ int RealtimeCommHandler::startVideoCall(const QString &remoteId,bool isOtherUser
         connect(_videoAudioCallPage,&VideoAudioCallPage::sigRemoteUserEnterRoom,this,[=](std::string userId) {
             _videoAudioInvitePage->hide();
             _videoAudioInvitePage->deleteLater();
+            _videoAudioInvitePage = nullptr;
+
             _timer->stop();
 
             _videoAudioCallPage->show();
+            _videoAudioCallPage->raise();
             _isCallActive = true;
         });
 
         connect(_videoAudioCallPage,&VideoAudioCallPage::sigRemoteUserLeaveRoom,this,[=]() {
             _videoAudioCallPage->hide();
             _videoAudioCallPage->deleteLater();
+            _videoAudioCallPage = nullptr;
 
             _isCallActive = false;
         });
@@ -325,12 +350,15 @@ int RealtimeCommHandler::startVideoCall(const QString &remoteId,bool isOtherUser
             ElaMessageBar::warning(ElaMessageBarType::Top, "无人响应", "对方暂时无法接听!", 3000, _videoAudioInvitePage);
             _videoAudioCallPage->exitRoom();
             _videoAudioCallPage->deleteLater();
+            _videoAudioCallPage = nullptr;
+
             _isCallActive = false;
 
             QTimer::singleShot(5000,this,[=] {
                 _timer->stop();
                 _videoAudioInvitePage->hide();
                 _videoAudioInvitePage->deleteLater();
+                _videoAudioInvitePage = nullptr;
             });
         });
         _timer->start(30000);// 30s等待
@@ -344,10 +372,12 @@ int RealtimeCommHandler::startVideoCall(const QString &remoteId,bool isOtherUser
                 curInfo.ssid,remoteId,(!isOtherUserInvite)?curInfo.ssid.toInt():remoteId.toInt(),userSig);
             _videoAudioCallPage->setUserSig(userSig);
             _videoAudioCallPage->show();
+            _videoAudioCallPage->raise();
 
             connect(_videoAudioCallPage,&VideoAudioCallPage::sigVideoHangUp,this,[=]() {
                 _videoAudioCallPage->hide();
                 _videoAudioCallPage->deleteLater();
+                _videoAudioCallPage = nullptr;
 
                 _isCallActive = false;
             });
@@ -355,6 +385,7 @@ int RealtimeCommHandler::startVideoCall(const QString &remoteId,bool isOtherUser
             connect(_videoAudioCallPage,&VideoAudioCallPage::sigRemoteUserLeaveRoom,this,[=]() {
                 _videoAudioCallPage->hide();
                 _videoAudioCallPage->deleteLater();
+                _videoAudioCallPage = nullptr;
 
                 _isCallActive = false;
             });
@@ -363,11 +394,14 @@ int RealtimeCommHandler::startVideoCall(const QString &remoteId,bool isOtherUser
             _videoAudioInvitePage->setHangUpBtnEnable(false);
             _videoAudioCallPage->exitRoom();
             _videoAudioCallPage->deleteLater();
+            _videoAudioCallPage = nullptr;
+
             _isCallActive = false;
 
             QTimer::singleShot(2000,this,[=] {
                _videoAudioInvitePage->hide();
                _videoAudioInvitePage->deleteLater();
+                _videoAudioInvitePage = nullptr;
             });
         }
         _isCallActive = false;

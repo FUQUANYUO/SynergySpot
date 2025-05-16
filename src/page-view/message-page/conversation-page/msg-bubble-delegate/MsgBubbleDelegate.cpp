@@ -11,11 +11,13 @@
 #include <QPainterPath>
 
 MsgBubbleDelegate::MsgBubbleDelegate(QObject *parent) : QStyledItemDelegate(parent) {
+    connect(eTheme,&ElaTheme::themeModeChanged,this,[=](ElaThemeType::ThemeMode mode) {
+        _theme = mode;
+    });
 }
 
 void MsgBubbleDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
     auto msg = index.data(MsgRole).value<ChatMessage>();
-
     // 填充默认头像
     if (msg.avatarPath.isEmpty() || msg.avatarPath == "-1") {
         msg.avatarPath = ":/message-page/rc-page/img/SS-default-icon.jpg";

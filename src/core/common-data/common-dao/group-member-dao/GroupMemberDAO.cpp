@@ -9,7 +9,7 @@ GroupMemberDAO::GroupMemberDAO(LiteConn &db) : _db(db) {}
 GroupMemberDAO::~GroupMemberDAO() {}
 
 bool GroupMemberDAO::addMember(const GroupMemberInfoDO &member) {
-    std::string sql = "INSERT INTO group_member_info (ssid_group, ssid_member, create_time) "
+    std::string sql = "INSERT OR IGNORE INTO group_member_info (ssid_group, ssid_member, create_time) "
                   "VALUES (?, ?, ?);";
     std::vector<std::string> params = {
         member.ssidGroup.toStdString(),
@@ -31,10 +31,17 @@ bool GroupMemberDAO::removeMember(const QString &groupSsid, const QString &membe
 }
 
 QList<GroupMemberInfoDO> GroupMemberDAO::listMembers(const QString &groupSsid, int pageSize, int pageNum) {
+    bool enableLimit = (pageSize >= 0 && pageSize >= 0);
     std::string sql = "SELECT id, ssid_group, ssid_member, create_time "
-                  "FROM group_member_info WHERE ssid_group = ? LIMIT ? OFFSET ?;";
-    std::vector<std::string> params = { groupSsid.toStdString(), std::to_string(pageSize), std::to_string(pageNum)};
-
+                  "FROM group_member_info WHERE ssid_group = ? ";
+    std::vector<std::string> params = { groupSsid.toStdString()};
+    if (enableLimit) {
+        sql += "LIMIT ? OFFSET ?;";
+        params.push_back(std::to_string(pageSize));
+        params.push_back(std::to_string((pageNum - 1) * pageSize));
+    }else {
+        sql += ";";
+    }
     auto result = _db.query(sql, params);
     QList<GroupMemberInfoDO> members;
     for (const auto &row : result) {

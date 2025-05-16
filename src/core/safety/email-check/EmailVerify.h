@@ -17,18 +17,19 @@ public:
     static void destroyInstance();
 
     // 发送邮箱验证码（不能并发进行发生或解析验证码）
-    void sendEmailVerifyCode(const std::string &emailAddress, const std::string& queryTime);
+    void sendEmailVerifyCode(const std::string &emailAddress, const std::string& queryTime, std::string ssid = "-1");
 
-    // 获取信息
+    // 获取有效期时间
     std::string getStartTime();
     std::string getValidTime();
+
+    // 设置有效期时间
+    void setStartTime(std::string time);
+    void setValidTime(std::string time);
 
 private:
     EmailVerify(QObject *bobj = nullptr);
     ~EmailVerify() = default;
-public slots:
-    // 解析邮箱验证码（不能并发进行发生或解析验证码）
-    std::string parseEmailVerifyCode(const std::string &rawdto);
 
 private:
     // 获取请求的时刻

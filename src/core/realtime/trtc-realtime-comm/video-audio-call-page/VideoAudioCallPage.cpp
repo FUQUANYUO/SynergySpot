@@ -50,6 +50,7 @@ void VideoAudioCallPage::setRemoteName(std::string name) {
 }
 
 void VideoAudioCallPage::initWindow() {
+    setWindowFlags(Qt::WindowStaysOnTopHint);
     curUserVideoHolder = new UserVideoItem(
         this,
         getTRTCShareInstance(),

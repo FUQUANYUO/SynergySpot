@@ -10,7 +10,6 @@
 #include <QWidget>
 #include <QVBoxLayout>
 
-
 struct GroupBaseInfoDTO;
 struct UserBaseInfoDTO;
 

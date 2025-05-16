@@ -63,6 +63,7 @@ struct GroupBaseInfoDO {
     QString avatar;
     QString createSSID;
     QString profile;
+    QList<QString> admins;
     time_t createTime;
 };
 

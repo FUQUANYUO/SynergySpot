@@ -176,7 +176,9 @@ grpc::Status FileTransferServiceImpl::DownloadFile(
     grpc::ServerWriter<FileChunk> *writer)
 {
     std::string filePath = request->file_path();
+    LOG_INFO("download request file path: " << filePath);
     if (!std::filesystem::exists(filePath)) {
+        LOG_ERROR("file not exist");
         return grpc::Status(grpc::NOT_FOUND, "文件不存在");
     }
 
@@ -198,9 +200,11 @@ grpc::Status FileTransferServiceImpl::DownloadFile(
         chunk.set_total_chunks(total_chunks);
         chunk.set_data(buffer, bytes_read);
         chunk.set_checksum(calculateChunkMD5(std::string(buffer, bytes_read)));
-
+        if (i == total_chunks / 2 || i == total_chunks - 1)
+            LOG_INFO("download file " << filePath << "\n current process : " << std::to_string(i * 100/total_chunks) << "%")
         if (!writer->Write(chunk)) {
-            break;
+            LOG_ERROR("Write chunk failed, client may disconnect.");
+            return grpc::Status::CANCELLED;
         }
     }
     return grpc::Status::OK;
@@ -275,6 +279,10 @@ void RealtimeBusinessProcess::Start() {
 
     builder.SetMaxReceiveMessageSize(INT_MAX);
     builder.SetMaxSendMessageSize(INT_MAX);
+
+    builder.SetSyncServerOption(grpc::ServerBuilder::NUM_CQS, 4);
+    builder.SetSyncServerOption(grpc::ServerBuilder::MIN_POLLERS, 4);
+    builder.SetSyncServerOption(grpc::ServerBuilder::MAX_POLLERS, 16);
 
     _grpcServer = builder.BuildAndStart();
 

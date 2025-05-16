@@ -39,6 +39,8 @@ signals:
     void sigContactListRequest(const std::string& dto);
     // 注册账号
     void sigEnrollAccountRequest(const std::string& dto);
+    // 找回密码
+    void sigRecoverPasswordRequest(const std::string& dto);
     // 添加好友
     void sigAddFriendRequest(const std::string& dto);
     // 搜索好友
@@ -72,6 +74,7 @@ signals:
     void sigFuzzySearchResponse(const std::string& dto);
     void sigCallVideoResponse(const std::string& dto);
     void sigNewFriendshipInfoResponse(const std::string& dto);
+    void sigCreateGroupResponse(const std::string& dto);
 
     void sigQueryUserBaseInfoResponse(const std::string& dto);
     void sigQueryGroupBaseInfoResponse(const std::string& dto);
@@ -123,6 +126,7 @@ namespace BusinessLayer {
         void sigFuzzySearchResponse(const std::string& dto);
         void sigCallVideoResponse(const std::string& dto);
         void sigNewFriendshipInfoResponse(const std::string& dto);
+        void sigCreateGroupResponse(const std::string& dto);
 
         void sigQueryUserBaseInfoResponse(const std::string& dto);
         void sigQueryGroupBaseInfoResponse(const std::string& dto);

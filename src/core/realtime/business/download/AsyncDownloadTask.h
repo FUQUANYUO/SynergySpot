@@ -18,6 +18,8 @@ public:
         const QString& type
     );
 
+    ~AsyncDownloadTask();
+
     void proceed(bool ok);
 private:
     enum class State { START_CALL, READING, FINISH };

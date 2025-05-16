@@ -11,15 +11,17 @@
 #include "yaml-cpp/yaml.h"
 #include "curl/curl.h"
 
+#include "../../data-process/service/user/UserService.h"
+
 extern std::string yamlPath;
 
 class EmailSendByCurl{
 public:
     EmailSendByCurl() = default;
     EmailSendByCurl(const std::string& sender,const std::string& receivers,const std::string& accessToken,const std::string& emailServer = "smtp.qq.com:587");
-    std::string content(const std::string& sender, const std::string& receiver, const std::string& subject, const std::string& emailCode);
+    std::string content(int businessType,const std::string& sender, const std::string& receiver, const std::string& subject, const std::string& emailCode);
 
-    void sendEmail(const std::string& emailCode);
+    void sendEmail(int businessType,const std::string& emailCode);
     ~EmailSendByCurl();
 private:
     CURL *curl;
@@ -75,25 +77,52 @@ std::string DoEmailCode::sendEmailCode(std::string &rawdto) {
     SSDTO::EmailVerifyDTO evdto;
     evdto.ParseFromString(rawdto);
 
-    if(!evdto.is_request())
-       return "";
+    if (evdto.request_ssid().empty() || evdto.request_ssid() == "-1") { // 注册业务
+        if(!evdto.is_request())
+            return "";
 
-    LOG(evdto.email_address())
-    std::string targetEmail = evdto.email_address();
-    EmailSendByCurl ecl(sender,targetEmail,accessToken,emailServer);
+        LOG(evdto.email_address())
+        std::string targetEmail = evdto.email_address();
+        EmailSendByCurl ecl(sender,targetEmail,accessToken,emailServer);
 
-    // 生成验证码
-    genEmailCode(6);
+        // 生成验证码
+        genEmailCode(6);
 
-    // 发送
-    ecl.sendEmail(emailCode);
+        // 发送 注册业务 business type = 0
+        ecl.sendEmail(0,emailCode);
 
-    // 回传信息
-    evdto.set_verify_code(emailCode);
-    evdto.set_valid_time("10");
-    evdto.set_is_request(false);
-    rawdto = "";
-    evdto.SerializeToString(&rawdto);
+        // 回传信息
+        evdto.set_verify_code(emailCode);
+        evdto.set_valid_time("10");
+        evdto.set_is_request(false);
+        rawdto.clear();
+        evdto.SerializeToString(&rawdto);
+    }else {                             // 验证业务
+        std::string senderSSID = evdto.request_ssid();
+
+        // find sender bind email and verify it
+        UserService uService;
+        auto email = uService.getUserBindEmail(senderSSID);
+        if (email != "-1") {
+            EmailSendByCurl ecl(sender,email,accessToken,emailServer);
+
+            // 生成验证码
+            genEmailCode(6);
+
+            // 发送 找回密码 business type = 1
+            ecl.sendEmail(1,emailCode);
+
+            // 回传信息
+            evdto.set_verify_code(emailCode);
+        }else {
+            evdto.set_verify_code("-1");
+        }
+        evdto.set_valid_time("10");
+        evdto.set_is_request(false);
+        rawdto.clear();
+        evdto.SerializeToString(&rawdto);
+        LOG_ERROR("not exist this user's email")
+    }
     return rawdto;
 }
 
@@ -122,12 +151,18 @@ EmailSendByCurl::EmailSendByCurl(const std::string& sender,const std::string& re
     }
 }
 
-void EmailSendByCurl::sendEmail(const std::string& emailCode) {
+void EmailSendByCurl::sendEmail(int businessType,const std::string& emailCode) {
     if(curl){
         CURLcode res;
         // 收件人
         curl_slist * recipients = nullptr;
-        std::string data = content(_sender,_receivers,"SynergySpot Register (注册验证码)",emailCode);
+        std::string subTitle = "";
+        if (businessType == 0) {
+            subTitle = "SynergySpot Register (注册验证码)";
+        }else if (businessType == 1) {
+            subTitle = "SynergySpot Register (找回密码验证码)";
+        }
+        std::string data = content(businessType,_sender,_receivers,subTitle,emailCode);
         recipients = curl_slist_append(recipients,_receivers.c_str());
 
         curl_easy_setopt(curl, CURLOPT_MAIL_RCPT, recipients);
@@ -147,7 +182,13 @@ EmailSendByCurl::~EmailSendByCurl() {
     curl_easy_cleanup(curl);
 }
 
-std::string generatorHtmlTemp(const std::string& emailCode){
+std::string generatorHtmlTemp(int businessType,const std::string& emailCode){
+    std::string businessPrompt = "";
+    if (businessType == 0) { // enroll
+        businessPrompt = "您正在进行注册操作的身份验证操作";
+    }else if (businessType == 1) { // recover pd
+        businessPrompt = "您正在进行找回密码操作的身份验证操作";
+    }
     return
             R"(
             <!DOCTYPE html>
@@ -193,7 +234,7 @@ std::string generatorHtmlTemp(const std::string& emailCode){
             <body>
                 <div class="container">
                     <h1>SynergySpot注册验证码</h1>
-                    <p>亲爱的用户，您正在进行注册操作的身份验证操作。请在客户端输入您的验证码：</p>
+                    <p>亲爱的用户，)" + businessPrompt + R"(。请在客户端输入您的验证码：</p>
                     <p><span class="code">)" + emailCode + R"(</span></p>
                     <p>注意：验证码有效期为10分钟。</p>
                 </div>
@@ -201,7 +242,7 @@ std::string generatorHtmlTemp(const std::string& emailCode){
             </html>)";
 }
 
-std::string EmailSendByCurl::content(const std::string &sender, const std::string &receiver, const std::string &subject, const std::string &emailCode) {
+std::string EmailSendByCurl::content(int businessType,const std::string &sender, const std::string &receiver, const std::string &subject, const std::string &emailCode) {
     return
             "To: <" + receiver + ">\r\n"
             "From: SynergySpot 注册中心 <" + sender + ">\r\n"
@@ -209,5 +250,5 @@ std::string EmailSendByCurl::content(const std::string &sender, const std::strin
             "MIME-version: 1.0\r\n"
             "Content-Type: text/html; charset=\"UTF-8\"\r\n"
             "\r\n"
-            + generatorHtmlTemp(emailCode) + "\r\n";
+            + generatorHtmlTemp(businessType,emailCode) + "\r\n";
 }

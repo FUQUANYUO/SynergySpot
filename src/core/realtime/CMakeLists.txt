@@ -36,6 +36,12 @@ file(GLOB_RECURSE   ProtoCC         ${CMAKE_CURRENT_SOURCE_DIR}/../../protofile-
 file(GLOB_RECURSE   RealtimeCpp     ${CMAKE_CURRENT_SOURCE_DIR}/business/*.cpp)
 file(GLOB_RECURSE   TRTCCpp         ${CMAKE_CURRENT_SOURCE_DIR}/trtc-realtime-comm/*.cpp)
 
+set(UtilsCpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/get-time/GetCurTime.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/log/Log.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/uuid/GenUUID.cpp
+)
+
 QT_ADD_RESOURCES(
         QRC_FILES                    Realtime.qrc
 )
@@ -54,10 +60,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../utils)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../protofile-grpc)
 
 qt_add_executable(${PROJECT_NAME}
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/get-time/GetCurTime.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/log/Log.cpp
         ${RealtimeCpp}
         ${ProtoCC}
+        ${UtilsCpp}
         ${TRTCCpp}
         ${QRC_FILES}
 )

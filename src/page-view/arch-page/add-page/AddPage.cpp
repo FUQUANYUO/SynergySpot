@@ -215,7 +215,9 @@ void AddPage::initConnectFunc() {
         sltHideLoading();
         _waitToReloadCount += waitCount;
         for (const auto& it : dto) {
-            if (_userResMap.find(it.ssid) == _userResMap.end() && it.ssid != g_pCommonData->getCurUserInfo().ssid)
+            if (_userResMap.find(it.ssid) == _userResMap.end() &&
+                it.ssid != g_pCommonData->getCurUserInfo().ssid &&
+                !g_pCommonData->isCurUserFriend(it.ssid))
                 sltAddUserRes(it);
         }
     });

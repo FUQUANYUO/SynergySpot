@@ -31,14 +31,22 @@ UserPage *UserPage::getInstance(UserType type,UserInfo uInfo, GroupInfo gInfo, Q
             _userObjMap[UserType::Myself] = new UserPage(UserType::Myself,parent);
             _userObjMap[UserType::Strangers] = new UserPage(UserType::Strangers,parent);
             _userObjMap[UserType::Friends] = new UserPage(UserType::Friends,parent);
-            _userObjMap[UserType::Groups] = new UserPage(UserType::Groups,parent);
+            _userObjMap[UserType::Group_Member] = new UserPage(UserType::Group_Member,parent);
+            _userObjMap[UserType::Group_OP] = new UserPage(UserType::Group_OP,parent);
+            _userObjMap[UserType::Group_Creater] = new UserPage(UserType::Group_Creater,parent);
         }
         m.unlock();
     }
     UserPage *p = _userObjMap[type];
-    if (type != UserType::Groups && !uInfo._ssid.isEmpty())
+    if ((type == UserType::Myself   ||
+        type == UserType::Strangers ||
+        type == UserType::Friends)  &&
+        !uInfo._ssid.isEmpty())
         p->setInfo(uInfo);
-    else if (type == UserType::Groups && !uInfo._ssid.isEmpty())
+    if ((type == UserType::Group_Member   ||
+        type == UserType::Group_OP        ||
+        type == UserType::Group_Creater)  &&
+        !gInfo._ssid.isEmpty())
         p->setInfo(gInfo);
     return p;
 }
@@ -51,15 +59,19 @@ void UserPage::destroyUserPage() {
         delete _userObjMap[UserType::Myself];
         delete _userObjMap[UserType::Strangers];
         delete _userObjMap[UserType::Friends];
-        delete _userObjMap[UserType::Groups];
+        delete _userObjMap[UserType::Group_Member];
+        delete _userObjMap[UserType::Group_OP];
+        delete _userObjMap[UserType::Group_Creater];
         _userObjMap.clear();
         m.unlock();
     }
 }
 
 UserPage::UserPage(UserType type,QWidget *parent) : ElaWidget(parent) {
-
-    _isGroup = (type==UserType::Groups);
+    _curType =  type;
+    _isGroup = (type==UserType::Group_Member  ||
+                type==UserType::Group_OP      ||
+                type==UserType::Group_Creater);
 
     initWindow();
 
@@ -78,9 +90,12 @@ UserPage::UserPage(UserType type,QWidget *parent) : ElaWidget(parent) {
             _signContentText->show();
 
             _addFriendButton->hide();
+            _sendMsgButton->hide();
             _callButton->hide();
             _groupNotice->hide();
             _groupResume->hide();
+            _groupManagerButton->hide();
+            _editGroupButton->hide();
             break;
         case Strangers:
             _addFriendButton->show();
@@ -88,11 +103,14 @@ UserPage::UserPage(UserType type,QWidget *parent) : ElaWidget(parent) {
             _localInfoText->show();
             _joinDayText->show();
             _signContentText->show();
+            _sendMsgButton->show();
 
             _editUserButton->hide();
             _callButton->hide();
             _groupNotice->hide();
             _groupResume->hide();
+            _groupManagerButton->hide();
+            _editGroupButton->hide();
             break;
         case Friends:
             _callButton->show();
@@ -100,24 +118,37 @@ UserPage::UserPage(UserType type,QWidget *parent) : ElaWidget(parent) {
             _localInfoText->show();
             _joinDayText->show();
             _signContentText->show();
+            _sendMsgButton->show();
 
             _addFriendButton->hide();
             _editUserButton->hide();
             _groupNotice->hide();
             _groupResume->hide();
+            _groupManagerButton->hide();
+            _editGroupButton->hide();
             break;
-        case Groups:
-            _callButton->show();
+        case Group_Member:
+        case Group_OP:
+        case Group_Creater:
             _groupNotice->show();
             _groupResume->show();
+            _sendMsgButton->show();
 
             // hide friends component
             _addFriendButton->hide();
+            _callButton->hide();
             _editUserButton->hide();
             _likeButton->hide();
             _localInfoText->hide();
             _joinDayText->hide();
             _signContentText->hide();
+            _groupManagerButton->hide();
+            _editGroupButton->hide();
+
+            if (Group_OP || Group_Creater) {
+                _groupManagerButton->show();
+                _editGroupButton->show();
+            }
             break;
     }
 }
@@ -153,6 +184,8 @@ void UserPage::initWindow() {
     _groupResume        = new ElaText(this);
     _groupNotice        = new ElaPushButton(this);
     _editPage           = new EditInfoPage(this);
+    _groupManagerButton = new ElaToolButton(this);
+    _editGroupButton    = new ElaPushButton(this);
 
     _mainLayout         = new QVBoxLayout;
     _buttonLayout       = new QHBoxLayout;
@@ -191,20 +224,20 @@ void UserPage::initEdgeLayout() {
         _textLayout->addWidget(_remarkText,4,1,1,1);
         _textLayout->addWidget(_signContentText,5,1,1,1);
         _textLayout->addWidget(_localInfoText,6,1,1,1);
-        _textLayout->setContentsMargins(0,0,0,0);
+        _textLayout->setContentsMargins(10,0,0,0);
     }
     else{
-        setFixedSize(300,300);
+        setFixedSize(300,350);
 
-        auto *remark = new ElaText("备注",this);
         auto *resume = new ElaText("介绍",this);
         auto *notice = new ElaText("群公告",this);
-        remark->setTextPixelSize(12);
+        auto *groupManager = new ElaText("群管理",this);
         resume->setTextPixelSize(12);
         notice->setTextPixelSize(12);
+        groupManager->setTextPixelSize(12);
         resume->setTextStyle(ElaTextType::BodyStrong);
-        remark->setTextStyle(ElaTextType::BodyStrong);
         notice->setTextStyle(ElaTextType::BodyStrong);
+        groupManager->setTextStyle(ElaTextType::BodyStrong);
         QFont font;
         font.setPixelSize(12);
         _remarkText->setTextPixelSize(12);
@@ -212,21 +245,23 @@ void UserPage::initEdgeLayout() {
         _groupNotice->setFont(font);
         _remarkText->setTextStyle(ElaTextType::Body);
         _groupResume->setTextStyle(ElaTextType::Body);
-        _textLayout->addWidget(remark,2,0,1,1);
         _textLayout->addWidget(resume,3,0,1,1);
         _textLayout->addWidget(notice,4,0,1,1);
+        _textLayout->addWidget(groupManager,5,0,1,1);
         _textLayout->addWidget(_remarkText,2,1,1,1);
         _textLayout->addWidget(_groupResume,3,1,1,1);
         _textLayout->addWidget(_groupNotice,4,1,1,1);
-        _textLayout->setContentsMargins(0,0,0,0);
+        _textLayout->addWidget(_groupManagerButton,5,1,1,1);
+        _textLayout->setContentsMargins(10,0,0,0);
     }
 
-    // add | call | edit | send
+    // add | call | user edit | group edit | send
     _buttonLayout->setSpacing(20);
     _buttonLayout->insertWidget(0,_addFriendButton);
     _buttonLayout->insertWidget(1,_callButton);
     _buttonLayout->insertWidget(2,_editUserButton);
-    _buttonLayout->insertWidget(3,_sendMsgButton);
+    _buttonLayout->insertWidget(3,_editGroupButton);
+    _buttonLayout->insertWidget(4,_sendMsgButton);
     _buttonLayout->setContentsMargins(0,0,0,0);
 
     _mainLayout->addItem(_textLayout);
@@ -277,6 +312,13 @@ void UserPage::initContent() {
     _editUserButton->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
     _editUserButton->setFixedHeight(40);
 
+    _editGroupButton->setBorderRadius(10);
+    _editGroupButton->setText("编辑群资料");
+    _editGroupButton->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
+    _editGroupButton->setFixedHeight(40);
+
+    _groupManagerButton->setElaIcon(ElaIconType::Ballot);
+
     _remarkText->setText("{Remark}");
     _signContentText->setText("{Sign Text}");
     _localInfoText->setText("{Country/Province}");
@@ -302,17 +344,41 @@ void UserPage::initConnectFunc() {
         };
         _editPage->sltSetEditPageInfo(ifo);
         _editPage->show();
-        this->hide();
-        emit this->sigShowArchPageMaskEffect();
+        _userObjMap[_curType]->hide();
+        emit _userObjMap[_curType]->sigShowArchPageMaskEffect();
+    });
+
+    connect(_editGroupButton,&ElaPushButton::clicked,[=]() {
+        GroupBaseInfoDTO gdto = g_pCommonData->getGroupBaseInfoBySSID(_avatarInfo->getSubTitle());
+        QList<GroupMemberInfoDTO> mdto = g_pCommonData->getGroupMemberInfoData(_avatarInfo->getSubTitle(),-1,-1);
+        GroupInfo gfo{
+            _curType,
+            gdto.ssidGroup,
+            gdto.groupName,
+            "",
+            gdto.profile,
+            gdto.avatarPath,
+            static_cast<int>(mdto.count()),
+            {{"test notice"}}
+        };
+        _editPage->sltSetEditPageInfo(gfo,_curType);
+        _editPage->show();
+        _userObjMap[_curType]->hide();
+        emit _userObjMap[_curType]->sigShowArchPageMaskEffect();
     });
 
     connect(_editPage,&EditInfoPage::sigEditPageClosed,this,[=]() {
         _editPage->hide();
         emit this->sigHideArchPageMaskEffect();
     });
-
+    connect(_sendMsgButton,&QPushButton::clicked, this,[=]() {
+        emit _userObjMap[_curType]->sigCommunicateRequestBySSID(_avatarInfo->getSubTitle());
+        hide();
+    });
     connect(_editPage,&EditInfoPage::sigUserAvatarChanged,this,&UserPage::sigUserAvatarChanged);
     connect(_editPage,&EditInfoPage::sigUserInfoChanged,this,&UserPage::sigUserInfoChanged);
+    connect(_editPage,&EditInfoPage::sigGroupAvatarChanged,this,&UserPage::sigGroupAvatarChanged);
+    connect(_editPage,&EditInfoPage::sigGroupInfoChanged,this,&UserPage::sigGroupInfoChanged);
 }
 
 void UserPage::setInfo(const UserInfo &info) {

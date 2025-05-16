@@ -25,6 +25,7 @@
 #define g_pUserPage(_TYPE_,_INFO1_,_INFO2_) UserPage::getInstance(_TYPE_,_INFO1_,_INFO2_)
 
 struct UserBaseInfoDTO;
+struct GroupBaseInfoDTO;
 
 class ElaInteractiveCard;
 class ElaToolButton;
@@ -53,6 +54,11 @@ signals:
 
     void sigUserAvatarChanged(const QString& localPath);
     void sigUserInfoChanged(const UserBaseInfoDTO& userInfo);
+
+    void sigGroupAvatarChanged(const QString& ssid, const QString& localPath);
+    void sigGroupInfoChanged(const QString& ssid, const GroupBaseInfoDTO& userInfo);
+
+    void sigCommunicateRequestBySSID(const QString& ssid);
 public slots:
 private:
     UserPage() = default;
@@ -70,24 +76,26 @@ protected:
 protected slots:
 private:
     // ----------------- UI -----------------
-    ElaInteractiveCard * _avatarInfo        = nullptr;
-    ElaToolButton      * _likeButton        = nullptr;
-    ElaPushButton      * _addFriendButton   = nullptr;
-    QPushButton        * _sendMsgButton     = nullptr;
-    ElaPushButton      * _callButton        = nullptr;
-    ElaPushButton      * _editUserButton    = nullptr;
-    ElaText            * _remarkText        = nullptr;
-    ElaText            * _signContentText   = nullptr;
-    ElaText            * _joinDayText       = nullptr;
-    ElaText            * _localInfoText     = nullptr;
+    ElaInteractiveCard * _avatarInfo         = nullptr;
+    ElaToolButton      * _likeButton         = nullptr;
+    ElaPushButton      * _addFriendButton    = nullptr;
+    QPushButton        * _sendMsgButton      = nullptr;
+    ElaPushButton      * _callButton         = nullptr;
+    ElaPushButton      * _editUserButton     = nullptr;
+    ElaText            * _remarkText         = nullptr;
+    ElaText            * _signContentText    = nullptr;
+    ElaText            * _joinDayText        = nullptr;
+    ElaText            * _localInfoText      = nullptr;
 
-    ElaText            * _groupResume       = nullptr;
-    ElaPushButton      * _groupNotice       = nullptr;
+    ElaText            * _groupResume        = nullptr;
+    ElaPushButton      * _groupNotice        = nullptr;
+    ElaToolButton      * _groupManagerButton = nullptr;
+    ElaPushButton      * _editGroupButton    = nullptr;
 
-    QVBoxLayout        * _mainLayout        = nullptr;
-    QGridLayout        * _textLayout        = nullptr;
-    QHBoxLayout        * _buttonLayout      = nullptr;
-    EditInfoPage       * _editPage          = nullptr;
+    QVBoxLayout        * _mainLayout         = nullptr;
+    QGridLayout        * _textLayout         = nullptr;
+    QHBoxLayout        * _buttonLayout       = nullptr;
+    EditInfoPage       * _editPage           = nullptr;
     // ----------------- UI -----------------
 
     // --------------- BackEnd --------------
@@ -97,6 +105,7 @@ private:
     QString              _localInfo         = "";
     QWidget            * _archPage          = nullptr;
     bool                 _isGroup           = false;
+    UserType             _curType           = Strangers;
     // --------------- BackEnd --------------
 
     static QMap<UserType,UserPage*> _userObjMap;

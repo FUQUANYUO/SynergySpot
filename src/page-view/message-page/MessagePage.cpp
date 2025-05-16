@@ -89,7 +89,7 @@ bool MessagePage::loadCacheMsg(const QList<MessageContentDTO> &caches) {
             }else {
                 LOG_WARNING("not find the ssid : " << it.recipient.recipientSSID.toStdString() << " , then ask for the data to the server database!");
                 addMsgCard({
-                    {},{"","NULL",":/message-page/rc-page/img/SS-default-icon-flat.jpg","","",
+                    {},{"","NULL",":/message-page/rc-page/img/SS-default-icon-flat.jpg","","",{},
                         GetCurTime::getTimeObj()->getCurTimeStamp()},{},
                     it.content,it.createTime,isGroup
                 });
@@ -188,11 +188,17 @@ void MessagePage::addMsgCard(const MsgCombineDTO &info) {
             _cardLinkPageHash[user] = cP;
 
             connect(user,&ElaInteractiveCard::clicked,this,[=]() {
-               _unreadMsgCount[info.userBaseInfo.ssid] = 0;
-               user->changeStatus(true);
-               user->show();
-               _conversionWid->addTab(_cardLinkPageHash[user],QPixmap(avatarPath),info.userBaseInfo.username);
-           });
+                _unreadMsgCount[info.userBaseInfo.ssid] = 0;
+                user->changeStatus(true);
+                user->show();
+                if (_tabSSIDLinkIndex.contains(info.userBaseInfo.ssid)) {
+                    _conversionWid->setCurrentIndex(_tabSSIDLinkIndex.value(info.userBaseInfo.ssid));
+                }else {
+                    int idx = _conversionWid->addTab(_cardLinkPageHash[user],QPixmap(avatarPath),info.userBaseInfo.username);
+                    _tabSSIDLinkIndex.insert(info.userBaseInfo.ssid,idx);
+                    _conversionWid->setCurrentIndex(idx);
+                }
+            });
         }
         if (info.timestamp > 0) { // new msg come in
             int unreadCount = ++_unreadMsgCount[info.userBaseInfo.ssid];
@@ -224,7 +230,13 @@ void MessagePage::addMsgCard(const MsgCombineDTO &info) {
                _unreadMsgCount[info.groupBaseInfo.ssidGroup] = 0;
                user->changeStatus(true);
                user->show();
-               _conversionWid->addTab(_cardLinkPageHash[user],QPixmap(avatarPath),info.groupBaseInfo.groupName);
+                if (_tabSSIDLinkIndex.contains(info.userBaseInfo.ssid)) {
+                    _conversionWid->setCurrentIndex(_tabSSIDLinkIndex.value(info.userBaseInfo.ssid));
+                }else {
+                    int idx = _conversionWid->addTab(_cardLinkPageHash[user],QPixmap(avatarPath),info.groupBaseInfo.groupName);
+                    _tabSSIDLinkIndex.insert(info.userBaseInfo.ssid,idx);
+                    _conversionWid->setCurrentIndex(idx);
+                }
            });
         }
         if (info.timestamp > 0) { // new msg come in
@@ -302,7 +314,18 @@ void MessagePage::initConnectFunc() {
                 _unreadMsgCount[it.value().userBaseInfo.ssid] = 0;
                 it.key()->changeStatus(true);
                 it.key()->show();
-                _conversionWid->addTab(_cardLinkPageHash[it.key()],it.key()->getCardPixmap(),it.key()->getTitle());
+
+                if (_tabSSIDLinkIndex.contains(it.value().userBaseInfo.ssid)) {
+                    _conversionWid->setCurrentIndex(_tabSSIDLinkIndex.value(it.value().userBaseInfo.ssid));
+                }else {
+                    int idx = _conversionWid->addTab(
+                                    _cardLinkPageHash[it.key()],
+                                    it.key()->getCardPixmap(),
+                                    it.key()->getTitle()
+                                    );
+                    _tabSSIDLinkIndex.insert(it.value().userBaseInfo.ssid,idx);
+                    _conversionWid->setCurrentIndex(idx);
+                }
             });
         }else {
             auto cP = new ConversationPage(Group, it.value(), _conversionWid);
@@ -312,8 +335,23 @@ void MessagePage::initConnectFunc() {
                 _unreadMsgCount[it.value().groupBaseInfo.ssidGroup] = 0;
                 it.key()->changeStatus(true);
                 it.key()->show();
-                _conversionWid->addTab(_cardLinkPageHash[it.key()],it.key()->getCardPixmap(),it.key()->getTitle());
+
+                if (_tabSSIDLinkIndex.contains(it.value().userBaseInfo.ssid)) {
+                    _conversionWid->setCurrentIndex(_tabSSIDLinkIndex.value(it.value().userBaseInfo.ssid));
+                }else {
+                    int idx = _conversionWid->addTab(
+                        _cardLinkPageHash[it.key()],
+                        it.key()->getCardPixmap(),
+                        it.key()->getTitle()
+                    );
+                    _tabSSIDLinkIndex.insert(it.value().userBaseInfo.ssid,idx);
+                    _conversionWid->setCurrentIndex(idx);
+                }
             });
         }
     }
+
+    connect(this, &MessagePage::sigClickedSSIDCardRequest, this,[=](const QString ssid) {
+        emit _ssidLinkCardHash.value(ssid)->clicked();
+    });
 }

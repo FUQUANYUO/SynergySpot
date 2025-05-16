@@ -1,10 +1,6 @@
 <RCC>
      <qresource prefix="/about-page/">
            <file>rc-page/img/SS-default-icon-flat.jpg</file>
-           <file>rc-page/img/SS-default-icon-flat.jpg</file>
-           <file>rc-page/img/SS-default-icon.jpg</file>
-     </qresource>
-</RCC>
            <file>rc-page/img/SS-default-icon.jpg</file>
      </qresource>
 </RCC>

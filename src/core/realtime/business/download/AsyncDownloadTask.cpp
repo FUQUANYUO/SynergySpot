@@ -5,6 +5,7 @@
 #include "AsyncDownloadTask.h"
 
 #include "grpcpp/completion_queue.h"
+#include "uuid/GenUUID.h"
 
 #include <QDir>
 
@@ -30,13 +31,19 @@ AsyncDownloadTask::AsyncDownloadTask(
     _reader->StartCall(this);
 
     // 创建临时目录（提前创建避免多次IO）
-    _tempDir = QString("%1/%2").arg(
+    _tempDir = QString("%1/%2-%3").arg(
         QString::fromStdString(g_pCommonData->getDataPath(file)),
-        QString::fromStdString(GetCurTime::getTimeObj()->getCurTime("%Y-%m-%d"))
+        QString::fromStdString(GetCurTime::getTimeObj()->getCurTime("%Y-%m-%d")),
+        QString::fromStdString(g_pGenUUID->generateUUID("file_tmp"))
     );
     if (!QDir().mkpath(_tempDir)) {
         LOG_ERROR("create tmp dir failed!")
     }
+    LOG_INFO("Download task created for file: " << _dto.fileId.toStdString());
+}
+
+AsyncDownloadTask::~AsyncDownloadTask() {
+    cleanupTempFiles();
 }
 
 void AsyncDownloadTask::proceed(bool ok) {
@@ -92,6 +99,7 @@ void AsyncDownloadTask::processChunk() {
     QString receivedMd5 = QString::fromStdString(_chunk.checksum());
     QString calculatedMd5 = _handler->calculateChunkMD5(data);
     if (receivedMd5 != calculatedMd5) {
+        LOG_ERROR("MD5 verify failed for chunk: " + std::to_string(_chunk.chunk_number()))
         throw std::runtime_error(
             "MD5 verify failed for chunk: " + std::to_string(_chunk.chunk_number())
         );
@@ -111,6 +119,7 @@ void AsyncDownloadTask::processChunk() {
     int progress = static_cast<int>(
         _chunkPaths.size() * 100.0 / _chunk.total_chunks()
     );
+    LOG_INFO( _finalFileName.toStdString() + " progress: " << progress);
     QMetaObject::invokeMethod(_handler, "sigDownloadProgress",
         Qt::QueuedConnection, Q_ARG(int, progress));
 }

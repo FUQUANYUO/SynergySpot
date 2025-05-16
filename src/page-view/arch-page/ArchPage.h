@@ -36,6 +36,7 @@ class ContactPage;
 class FileManagerPage;
 class SettingsPage;
 class AddPage;
+class CreateGroupPage;
 class SSMaskWidget;
 class LoadingDialog;
 
@@ -43,8 +44,18 @@ class LoadingDialog;
 
 #include "help.h"
 
+enum PageName {
+    MessagePage,
+    ContactPage,
+    LLMPage,
+    FileManagerPage,
+    SettingsPage
+};
+
 class SS_API ArchPage : public ElaWindow{
     Q_OBJECT
+signals:
+    void sigJumpOtherPageRequest(PageName pageName);
 public:
     static ArchPage * getInstance();
     static void destroyInstance();
@@ -81,6 +92,7 @@ private:
     QAction          * _addAction        = nullptr;
 
     AddPage          * _addPage          = nullptr;
+    CreateGroupPage  * _createGroupPage  = nullptr;
 
     int                _msgNoticeNum     = 0;
     int                _contactNoticeNum = 0;

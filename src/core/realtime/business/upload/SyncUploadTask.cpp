@@ -36,7 +36,7 @@ void SyncUploadTask::initUpload() {
     req.set_file_name(QFileInfo(_localUrl).fileName().toStdString());
     req.set_file_size(_file.size());
     req.set_type(getBusinessType());
-    req.set_ssid(_handler->getUserSSID().toStdString());
+    req.set_ssid(_dto.uploaderSsid.toStdString());
 
     FileInitResponse res;
     grpc::Status status = _stub->InitUpload(&ctx, req, &res);

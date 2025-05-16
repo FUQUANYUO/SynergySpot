@@ -5,6 +5,9 @@
 #ifndef SYNERGYSPOT_SETTINGSPAGE_H
 #define SYNERGYSPOT_SETTINGSPAGE_H
 
+#include <QMainWindow>
+#include <ela-widget-tools/ElaRadioButton.h>
+
 #include "define.h"
 #include "ela-widget-tools/ElaScrollPage.h"
 
@@ -24,10 +27,14 @@
 
 #define g_pSettingsPage SettingsPage::getInstance()
 
+class ElaToggleSwitch;
+
 class SS_API SettingsPage : public ElaScrollPage{
 public:
     static SettingsPage * getInstance();
     static void destroySettingsPage();
+
+    void setMainWindowWidget(QMainWindow *parent);
 signals:
 private:
     explicit SettingsPage(QWidget *parent = nullptr);
@@ -42,11 +49,16 @@ protected:
 protected slots:
 private:
     // ----------------- UI -----------------
-    QWidget * _centralWidget = nullptr;
-
+    QWidget                 * _centralWidget    = nullptr;
+    ElaToggleSwitch         * _logSwitchButton  = nullptr;
+    ElaRadioButton          * _minimumButton    = nullptr;
+    ElaRadioButton          * _compactButton    = nullptr;
+    ElaRadioButton          * _maximumButton    = nullptr;
+    ElaRadioButton          * _autoButton       = nullptr;
     // ----------------- UI -----------------
 
     // --------------- BackEnd --------------
+    QMainWindow             * _mainWindowWidget  = nullptr;
     // --------------- BackEnd --------------
 
     static SettingsPage* _settingsPage;

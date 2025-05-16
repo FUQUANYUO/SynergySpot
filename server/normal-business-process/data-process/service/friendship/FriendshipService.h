@@ -20,7 +20,12 @@ public:
     bool updateFriendship(const FriendshipDTO& dto);
 
     // get all friendship for ssid
-    std::vector<UserBaseInfoDTO> getAllFriendshipBySSID(const std::string& ssid,std::vector<FriendshipDTO>& res);
+    void getAllFriendshipBySSID(const std::string& ssid,
+                                std::vector<FriendshipDTO>& res,
+                                std::vector<UserBaseInfoDTO>& users,
+                                std::vector<GroupBaseInfoDTO>& groups,
+                                std::vector<UserBaseInfoDTO>& members
+                                );
 
     // get friend remark
     std::string getFriendRemark(const std::string& ssid, const std::string& friendSSID);

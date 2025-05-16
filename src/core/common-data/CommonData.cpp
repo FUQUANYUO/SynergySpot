@@ -67,15 +67,12 @@ UserBaseInfoDTO CommonData::getUserInfoBySSID(const QString &ssid) {
         LOG_ERROR("Please init cur user info!");
         return {};
     }
-    if (!userInfoCacheMap.contains(ssid)) {
-        UserBaseInfoDTO uRes = userService->getUserBySSID(ssid);
-        if (uRes.ssid == "-1") {
-            LOG_WARNING("local cache cant find ssid < " << ssid.toStdString());
-            return {};
-        }
-        userInfoCacheMap.insert(ssid,new UserBaseInfoDTO(uRes));
+    UserBaseInfoDTO uRes = userService->getUserBySSID(ssid);
+    if (uRes.ssid == "-1") {
+        LOG_WARNING("local cache cant find ssid < " << ssid.toStdString());
+        return {};
     }
-    return *userInfoCacheMap[ssid];
+    return uRes;
 }
 
 bool CommonData::updateUserInfoBySSID(const UserBaseInfoDTO &userInfo) {
@@ -100,6 +97,62 @@ bool CommonData::addUserInfoByServer(const UserBaseInfoDTO &userInfo) {
         updateUserInfoBySSID(userInfo);
     }
     return userService->addUser(userInfo);
+}
+
+GroupBaseInfoDTO CommonData::getGroupBaseInfoBySSID(const QString &ssid) {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return {};
+    }
+    GroupBaseInfoDTO uRes = groupInfoService->getGroupInfoById(ssid);
+    if (uRes.ssidGroup == "-1") {
+        LOG_WARNING("local cache cant find ssid < " << ssid.toStdString());
+        return {};
+    }
+    return uRes;
+}
+
+QList<GroupMemberInfoDTO> CommonData::getGroupMemberInfoData(const QString &ssidGroup,int pageSize, int pageNum) {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return {};
+    }
+    auto mRes = groupMemberService->getAllGroupMember(ssidGroup,pageSize,pageNum);
+    if (mRes.count() <= 0) {
+        LOG_WARNING("local cache cant find members < " << ssidGroup.toStdString());
+        return {};
+    }
+    return mRes;
+}
+
+bool CommonData::updateGroupBaseInfoBySSID(const GroupBaseInfoDTO &groupInfo) {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return {};
+    }
+    bool res = false;
+    if (!groupInfo.profile.isEmpty())
+        res = groupInfoService->updateGroupInfo(groupInfo.ssidGroup,groupInfo.profile);
+    else if (!groupInfo.avatarPath.isEmpty())
+        res = groupInfoService->updateAvatarPath(groupInfo.ssidGroup,groupInfo.avatarPath);
+    if (res) {
+        groupInfoCacheMap.insert(groupInfo.ssidGroup ,new GroupBaseInfoDTO(groupInfo));
+        return true;
+    }
+    return false;
+}
+
+bool CommonData::addGroupInfoByServer(const GroupBaseInfoDTO &groupInfo) {
+    if (!_enable) {
+        LOG_ERROR("Please init cur user info!");
+        return {};
+    }
+    // TODO: updateGroupBase current only revise profile info
+    if (!groupInfoService->getGroupInfoById(groupInfo.ssidGroup).ssidGroup.isEmpty() &&
+        groupInfoService->getGroupInfoById(groupInfo.ssidGroup).ssidGroup != "-1" ) {
+        updateGroupBaseInfoBySSID(groupInfo);
+    }
+    return groupInfoService->setGroupInfoData({groupInfo});
 }
 
 bool CommonData::setLoginRecord(const LoginRecordDTO &loginInfo) {
@@ -204,15 +257,12 @@ GroupBaseInfoDTO CommonData::getGroupInfoDataBySSID(const QString &ssidGroup) {
         LOG_ERROR("Please init cur user info!");
         return {};
     }
-    if (!groupInfoCacheMap.contains(ssidGroup)) {
-        GroupBaseInfoDTO gRes = groupInfoService->getGroupInfoById(ssidGroup);
-        if (gRes.ssidGroup == "-1") {
-            LOG_WARNING("local cache cant find ssid < " << ssidGroup.toStdString())
-            return {"-1"};
-        }
-        groupInfoCacheMap.insert(ssidGroup, new GroupBaseInfoDTO(gRes));
+    GroupBaseInfoDTO gRes = groupInfoService->getGroupInfoById(ssidGroup);
+    if (gRes.ssidGroup == "-1") {
+        LOG_WARNING("local cache cant find ssid < " << ssidGroup.toStdString())
+        return {"-1"};
     }
-    return *groupInfoCacheMap[ssidGroup];
+    return gRes;
 }
 
 bool CommonData::setGroupInfoData(const QList<GroupBaseInfoDTO> &dto) {
@@ -221,22 +271,6 @@ bool CommonData::setGroupInfoData(const QList<GroupBaseInfoDTO> &dto) {
         return {};
     }
     return groupInfoService->setGroupInfoData(dto);
-}
-
-QList<GroupMemberInfoDTO> CommonData::getGroupMemberInfoData(const QString &ssidGroup,int pageSize, int pageNum) {
-    if (!_enable) {
-        LOG_ERROR("Please init cur user info!");
-        return {};
-    }
-    if (!groupMemberInfoCacheMap.contains(ssidGroup)) {
-        auto mRes = groupMemberService->getAllGroupMember(ssidGroup,pageSize,pageNum);
-        if (mRes.count() <= 0) {
-            LOG_WARNING("local cache cant find members < " << ssidGroup.toStdString());
-            return {};
-        }
-        groupMemberInfoCacheMap.insert(ssidGroup,new QList<GroupMemberInfoDTO>(mRes));
-    }
-    return *groupMemberInfoCacheMap[ssidGroup];
 }
 
 bool CommonData::setGroupMemberInfoData(const QList<GroupMemberInfoDTO> &dto) {
@@ -518,6 +552,7 @@ bool CommonData::initUserDatabase() {
         "  avatar TEXT,"
         "  create_ssid TEXT NOT NULL,"
         "  profile TEXT DEFAULT '',"
+        "  admins TEXT DEFAULT '',"
         "  create_time TEXT NOT NULL"
         ");"
         "CREATE INDEX IF NOT EXISTS idx_create_ssid ON group_base_info(create_ssid);",

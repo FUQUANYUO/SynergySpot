@@ -59,6 +59,12 @@ enum BusinessType {
   D_FILE = 93;
 }
 
+message RecoverPasswordDTO{
+  bytes ssid = 1;
+  bytes new_password = 2;
+  string password_salt = 3;
+};
+
 message VideoCallDTO{
   bytes sender_ssid = 1;
   bytes target_ssid = 2;
@@ -115,7 +121,8 @@ message EmailVerifyDTO{
   bytes verify_code = 3;
   bytes start_time = 4;
   bytes valid_time = 5;
-  bytes ip = 6;
+  bytes request_ssid = 6;
+  bytes ip = 7;
 };
 
 message NewFriendInfoDTO{
@@ -146,9 +153,10 @@ message DisconnectDTO{
 
 message GetAllUserFriendship{
   string ssid = 1;
-  repeated UserBaseInfoDTO friends_base_info = 2;
-  repeated FriendshipDTO friendship_info = 3;
-  bytes ip = 4;
+  repeated UserBaseInfoDTO user_base_info = 2;
+  repeated GroupBaseInfoDTO group_base_info = 3;
+  repeated FriendshipDTO friendship_info = 4;
+  bytes ip = 5;
 };
 
 // 用户基础信息 DTO
@@ -206,9 +214,10 @@ message GroupBaseInfoDTO {
   string avatar_remote_path = 5;
   string create_ssid = 6;
   string profile = 7;
-  repeated string admins = 8;  // 管理员列表
-  int64 create_time = 9;
-  bytes ip = 10;
+  repeated string admins = 8; // 管理员列表
+  repeated UserBaseInfoDTO members = 9; // 群聊成员
+  int64 create_time = 10;
+  bytes ip = 11;
 }
 
 // 群公告 DTO
@@ -216,15 +225,6 @@ message GroupNoticeDTO {
   int64 id = 1;
   int64 group_id = 2;
   string notice = 3;
-  int64 create_time = 4;
-  bytes ip = 5;
-}
-
-// 群成员信息 DTO
-message GroupMemberInfoDTO {
-  int64 id = 1;
-  string ssid_group = 2;
-  string ssid_member = 3;
   int64 create_time = 4;
   bytes ip = 5;
 }

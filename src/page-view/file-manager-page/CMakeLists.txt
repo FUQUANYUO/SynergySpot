@@ -51,6 +51,7 @@ FIND_PACKAGE(Qt6
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/lib-common/include)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/utils)
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/core)
 #--------------------------------   third party include    ----------------------------------   END
 
 # 库文件路径添加       add lib file path
@@ -105,6 +106,7 @@ ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Release")
 ENDIF ()
 # auto search rc file fill into *.qrc
 # 清空*.qrc文件，准备覆写
+IF(QRC_FILE_AUTO_LOAD)
 CMAKE_POLICY(
         SET
         CMP0076
@@ -145,6 +147,7 @@ file(
         "     </qresource>\n"
         "</RCC>\n"
 )
+ENDIF ()
 
 TARGET_SOURCES(
         ${PLUGINS_NAME}              PRIVATE

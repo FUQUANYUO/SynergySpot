@@ -3,6 +3,8 @@
 //
 
 #include "EmailVerify.h"
+
+#include <utility>
 #include "help.h"
 
 #include "DTO.pb.h"
@@ -34,11 +36,12 @@ void EmailVerify::destroyInstance(){
     }
 }
 
+
 EmailVerify::EmailVerify(QObject * bobj) {
     this->validTime = "10";
 }
 
-void EmailVerify::sendEmailVerifyCode(const std::string& emailAddress,const std::string& queryTime) {
+void EmailVerify::sendEmailVerifyCode(const std::string& emailAddress,const std::string& queryTime, std::string ssid) {
     startTime.clear();
     startTime = queryTime;
 
@@ -49,24 +52,10 @@ void EmailVerify::sendEmailVerifyCode(const std::string& emailAddress,const std:
     evdto.set_start_time(startTime);
     evdto.set_valid_time(validTime);
     evdto.set_verify_code("");
+    evdto.set_request_ssid(ssid);
     evdto.SerializeToString(&outEdto);
 
     emit g_pClientRequestHandler->sigEmailCodeRequest(outEdto);
-}
-
-std::string EmailVerify::parseEmailVerifyCode(const std::string& rawdto) {
-    validTime.clear();
-    SSDTO::EmailVerifyDTO evdto;
-    evdto.ParseFromString(rawdto);
-
-    LOG(evdto.start_time())
-    if(evdto.start_time() != this->startTime) {
-        LOG("the email verify code maybe revise,client start time doesn't equal server start time!!!")
-        return "-1";
-    }
-
-    this->validTime = evdto.valid_time();
-    return evdto.verify_code();
 }
 
 std::string EmailVerify::getStartTime() {
@@ -75,4 +64,12 @@ std::string EmailVerify::getStartTime() {
 
 std::string EmailVerify::getValidTime() {
     return validTime;
+}
+
+void EmailVerify::setStartTime(std::string time) {
+    startTime = std::move(time);
+}
+
+void EmailVerify::setValidTime(std::string time) {
+    validTime = std::move(time);
 }

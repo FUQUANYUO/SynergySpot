@@ -377,23 +377,42 @@ bool UserPrivateDAO::insert(const UserPrivateInfoDO &user) {
 }
 
 bool UserPrivateDAO::update(const UserPrivateInfoDO &user) {
-    std::string sql = "UPDATE user_private_info SET email = ?, password = ?, password_salt = ? WHERE ssid = ?";
+    std::string sql = "UPDATE user_private_info SET";
     std::vector<MysqlConn::Param> params;
+    std::vector<std::string> dynamicSQL;
 
-    MysqlConn::Param paramEmail;
-    paramEmail.type = MysqlConn::Param::STRING;
-    paramEmail.str_val = user.email;
-    params.push_back(paramEmail);
+    if (user.email != "-1" && !user.email.empty()) {
+        dynamicSQL.emplace_back(" email = ?");
+        MysqlConn::Param paramEmail;
+        paramEmail.type = MysqlConn::Param::STRING;
+        paramEmail.str_val = user.email;
+        params.push_back(paramEmail);
+    }
 
-    MysqlConn::Param paramPassword;
-    paramPassword.type = MysqlConn::Param::STRING;
-    paramPassword.str_val = user.password;
-    params.push_back(paramPassword);
+    if (user.password != "-1" && !user.password.empty()) {
+        dynamicSQL.emplace_back(" password = ?");
+        MysqlConn::Param paramPassword;
+        paramPassword.type = MysqlConn::Param::STRING;
+        paramPassword.str_val = user.password;
+        params.push_back(paramPassword);
+    }
 
-    MysqlConn::Param paramSalt;
-    paramSalt.type = MysqlConn::Param::STRING;
-    paramSalt.str_val = user.passwordSalt;
-    params.push_back(paramSalt);
+    if (user.passwordSalt != "-1" && !user.passwordSalt.empty()) {
+        dynamicSQL.emplace_back(" password_salt = ?");
+        MysqlConn::Param paramSalt;
+        paramSalt.type = MysqlConn::Param::STRING;
+        paramSalt.str_val = user.passwordSalt;
+        params.push_back(paramSalt);
+    }
+
+    for (int i = 0; i < dynamicSQL.size(); i++) {
+        if (i < dynamicSQL.size() - 1) {
+            sql += dynamicSQL[i] + ",";
+        }else {
+            sql += dynamicSQL[i];
+        }
+    }
+    sql += " WHERE ssid = ?";
 
     MysqlConn::Param paramSsid;
     paramSsid.type = MysqlConn::Param::STRING;
@@ -407,7 +426,6 @@ bool UserPrivateDAO::update(const UserPrivateInfoDO &user) {
 
     return true;
 }
-
 
 bool UserPrivateDAO::deleteById(const std::string &ssid) {
     std::string sql = "DELETE FROM user_private_info WHERE ssid = ?";

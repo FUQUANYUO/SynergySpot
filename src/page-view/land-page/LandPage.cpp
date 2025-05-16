@@ -9,6 +9,7 @@
 #include "../effect-component/SS-mask-widget/SSMaskWidget.h"
 #include "../plugin-manager/StrategyManager.h"
 #include "sign-up-page/SignUpPage.h"
+#include "recover-pw-page/RecoverPWPage.h"
 
 
 #include "ela-widget-tools/ElaImageCard.h"
@@ -277,7 +278,8 @@ void LandPage::initConnectFunc() {
         emit sigCurrentWidChanged(g_pSignUpPage);
     });
     connect(_recoverPWButton,&QPushButton::clicked,this,[=]() {
-        // emit sigCurrentWidChanged();
+        g_pRecoverPWPage->show();
+        emit sigCurrentWidChanged(g_pRecoverPWPage);
     });
     connect(_signInButton,&QPushButton::clicked,this,[=](){
         isFreezeSignInBtn(true);

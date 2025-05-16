@@ -49,7 +49,7 @@ void VideoAudioInvitePage::setHangUpBtnEnable(bool isEnable) {
 }
 
 void VideoAudioInvitePage::initWindow() {
-    setWindowFlags(Qt::FramelessWindowHint);
+    setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
     setAttribute(Qt::WA_TranslucentBackground);
     setFixedSize(640,480);
     pickUpCallBtn   = new QToolButton(this);

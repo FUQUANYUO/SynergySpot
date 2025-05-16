@@ -170,11 +170,22 @@ int ProcessBusiness::processBusiness(std::string dto, int businessType, std::sha
         SSDTO::GetAllUserFriendship fdto;
         fdto.ParseFromString(dto);
 
-        vector<FriendshipDTO> resFriendshipInfo;
-        vector<UserBaseInfoDTO> resFriendsBaseInfo = fService.getAllFriendshipBySSID(fdto.ssid(),resFriendshipInfo);
+        // 好友
+        vector<FriendshipDTO>      resFriendshipInfo;
+        vector<UserBaseInfoDTO>    resUserBaseInfo;
 
-        for (const auto& it : resFriendsBaseInfo) {
-            SSDTO::UserBaseInfoDTO * udto = fdto.add_friends_base_info();
+        // 群聊
+        vector<GroupBaseInfoDTO>   resGroupBaseInfo;
+        vector<UserBaseInfoDTO>    resGroupMemberBaseInfo;
+        fService.getAllFriendshipBySSID(
+            fdto.ssid(),
+            resFriendshipInfo,
+            resUserBaseInfo,
+            resGroupBaseInfo,
+            resGroupMemberBaseInfo);
+
+        for (const auto& it : resUserBaseInfo) {
+            SSDTO::UserBaseInfoDTO * udto = fdto.add_user_base_info();
             udto->set_ssid(it.ssid);
             udto->set_ssname(it.ssname);
             FileStorageDTO fileInfo = fileService.getFileByFilePath(it.avatarPath);
@@ -192,6 +203,48 @@ int ProcessBusiness::processBusiness(std::string dto, int businessType, std::sha
             udto->set_birthday(it.birthday);
             udto->set_region(it.region);
             udto->set_create_time(it.createTime);
+        }
+        for (const auto& it : resGroupBaseInfo) {
+            SSDTO::GroupBaseInfoDTO * gdto = fdto.add_group_base_info();
+            gdto->set_ssid_group(it.ssidGroup);
+            gdto->set_name(it.name);
+            FileStorageDTO fileInfo = fileService.getFileByFilePath(it.avatar);
+            if (fileInfo.fileId != "-1" && !fileInfo.fileId.empty()) {
+                gdto->set_avatar_file_id(fileInfo.fileId);
+                gdto->set_avatar_remote_path(fileInfo.storagePath);
+            }
+            else {
+                gdto->set_avatar_file_id("-1");
+                gdto->set_avatar_remote_path("");
+            }
+            gdto->set_create_ssid(it.createSsid);
+            gdto->set_profile(it.profile);
+            for (const auto& adIt : it.admins) {
+                std::string *opSSID = gdto->add_admins();
+                *opSSID = adIt;
+            }
+            gdto->set_create_time(it.createTime);
+
+            for (const auto& mIt : resGroupMemberBaseInfo) {
+                SSDTO::UserBaseInfoDTO * udto = gdto->add_members();
+                udto->set_ssid(mIt.ssid);
+                udto->set_ssname(mIt.ssname);
+                FileStorageDTO ufileInfo = fileService.getFileByFilePath(mIt.avatarPath);
+                if (ufileInfo.fileId != "-1" && !ufileInfo.fileId.empty()) {
+                    udto->set_avatar_file_id(ufileInfo.fileId);
+                    udto->set_avatar_remote_path(ufileInfo.storagePath);
+                }
+                else {
+                    udto->set_avatar_file_id("-1");
+                    udto->set_avatar_remote_path("");
+                }
+                udto->set_sex(std::string(1,mIt.sex));
+                udto->set_personal_sign(mIt.personalSign);
+                udto->set_thumb_up_count(mIt.thumbUpCount);
+                udto->set_birthday(mIt.birthday);
+                udto->set_region(mIt.region);
+                udto->set_create_time(mIt.createTime);
+            }
         }
         for (const auto& it : resFriendshipInfo) {
             SSDTO::FriendshipDTO * fsdto = fdto.add_friendship_info();
@@ -237,6 +290,14 @@ int ProcessBusiness::processBusiness(std::string dto, int businessType, std::sha
         std::string resDto;
         edto.SerializeToString(&resDto);
         info->tcp->sendMsg(resDto, SSDTO::BusinessType::ENROLL_ACCOUNT);
+    }
+    // 找回密码
+    else if (businessType == SSDTO::BusinessType::RECOVER_PASSWORD){
+        SSDTO::RecoverPasswordDTO edto;
+        edto.ParseFromString(dto);
+
+        UserService uService;
+        uService.updateUserPrivateInfo({edto.ssid(),"-1",edto.new_password(),edto.password_salt()});
     }
     // 添加好友
     else if (businessType == SSDTO::BusinessType::MAKE_FRIEND_REQUEST){
@@ -596,15 +657,65 @@ int ProcessBusiness::processBusiness(std::string dto, int businessType, std::sha
         std::string targetSSID = vcdto.target_ssid();
         auto targetSockInfo = onlineList.find(targetSSID);
         if (targetSockInfo != onlineList.end()) {
-            targetSockInfo->second->tcp->sendMsg(dto,SSDTO::VIDEO_CALL_RESPONSE);
+            targetSockInfo->second->tcp->sendMsg(resDto,SSDTO::VIDEO_CALL_RESPONSE);
         }else {
             auto resDequeue = businessSent.find(targetSSID);
             if (resDequeue != businessSent.end()) {
-                resDequeue->second.push_back({dto,SSDTO::VIDEO_CALL_RESPONSE});
+                resDequeue->second.push_back({resDto,SSDTO::VIDEO_CALL_RESPONSE});
             }else {
-                businessSent[targetSSID] = {{dto,SSDTO::VIDEO_CALL_RESPONSE}};
+                businessSent[targetSSID] = {{resDto,SSDTO::VIDEO_CALL_RESPONSE}};
             }
         }
+    }
+    // create group request
+    else if (businessType == SSDTO::BusinessType::C_GROUP_BASE_INFO) {
+        SSDTO::GroupBaseInfoDTO gbDto;
+        gbDto.ParseFromString(dto);
+
+        FriendshipService fService;
+
+        GroupBaseInfoDTO baseInfo;
+        std::vector<GroupMemberInfoDTO> members;
+        baseInfo.createSsid = gbDto.create_ssid();
+        for (const auto& admin : gbDto.admins()) {
+            baseInfo.admins.push_back(admin);
+        }
+        for (const auto& member : gbDto.members()) {
+            members.push_back({
+                -1,
+                "-1",
+                member.ssid(),
+            });
+        }
+
+        GroupService gService;
+
+        std::string curGroupSSID = gService.createGroup(baseInfo,members);
+
+        // 建立关系
+        for (const auto& member : gbDto.members()) {
+            std::string grouping = "";
+            if (gbDto.create_ssid() == member.ssid()) {
+                grouping = "我创建的群聊";
+            }else {
+                grouping = "我加入的群聊";
+            }
+            fService.addFriendship({
+                -1,
+                member.ssid(),
+                grouping,
+                "",
+                curGroupSSID,
+                1,
+                2,
+                gbDto.create_time()
+            });
+        }
+        gbDto.set_name(curGroupSSID);
+        gbDto.set_ssid_group(curGroupSSID);
+        std::string resDto;
+        gbDto.SerializeToString(&resDto);
+        info->tcp->sendMsg(resDto, SSDTO::BusinessType::C_GROUP_BASE_INFO);
     }
     else {
         LOG("some error occur in parse business!")

@@ -74,7 +74,7 @@ private:
     std::unordered_map<std::string, UploadSession> active_sessions_;
     std::string fileSavePath = "";
 
-    static constexpr int CHUNK_SIZE = 3 * 1024 * 1024;
+    static constexpr int CHUNK_SIZE = 64 * 1024;
 };
 // --------------------------------- GRPC Func Implement --------------------------------- //
 

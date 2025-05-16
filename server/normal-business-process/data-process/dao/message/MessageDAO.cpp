@@ -3,6 +3,22 @@
 //
 
 #include "MessageDAO.h"
+#include <map>
+
+// key of message union result
+struct Key {
+    int64_t messageId;
+    uint8_t recipientType;
+    std::string recipientSsid;
+    bool readStatus;
+
+    bool operator<(const Key& other) const {
+        if (messageId != other.messageId) return messageId < other.messageId;
+        if (recipientType != other.recipientType) return recipientType < other.recipientType;
+        if (recipientSsid != other.recipientSsid) return recipientSsid < other.recipientSsid;
+        return readStatus < other.readStatus;
+    }
+};
 
 int64_t MessageContentDAO::insert(const MessageContentDO &message)  {
     std::string sql = "INSERT INTO message_content (sender_ssid, content_type, content) "
@@ -104,36 +120,64 @@ std::vector<MessageContentDO> MessageContentDAO::listBySender(const std::string&
     }
 
     std::vector<MessageContentDO> messages;
-    std::unordered_map<std::string, MessageContentDO> messageMap;
+    std::map<Key, size_t> keyToIndexMap; // 跟踪消息位置的映射
 
     MYSQL_ROW row;
     while ((row = mysql_fetch_row(result))) {
+        // 解析基础字段
         int64_t messageId = std::stoll(row[0]);
-        std::string ssid = row[1];
-        if (messageMap.find(ssid) == messageMap.end()) {
+        std::string senderSSID = row[1] ? row[1] : "";
+        uint8_t contentType = static_cast<uint8_t>(std::stoi(row[2] ? row[2] : "0"));
+        std::string content = row[3] ? row[3] : "";
+        uint64_t createTime = std::stoull(row[4] ? row[4] : "0");
+
+        // 解析文件ID
+        char* fileIdRaw = row[5];
+        std::string fileId = fileIdRaw ? std::string(fileIdRaw) : "";
+
+        // 解析接收者信息
+        uint8_t recipientType = static_cast<uint8_t>(std::stoi(row[6] ? row[6] : "0"));
+        std::string recipientSSID = row[7] ? row[7] : "";
+        bool readStatus = row[8] ? (std::stoi(row[8]) != 0) : false;
+
+        // 构建唯一键
+        Key currentKey{messageId, recipientType, recipientSSID, readStatus};
+
+        // 检查是否已存在该组合
+        auto it = keyToIndexMap.find(currentKey);
+        if (it == keyToIndexMap.end()) {
+            // 创建新消息对象
             MessageContentDO msg;
             msg.id = messageId;
-            msg.senderSsid = row[1];
-            msg.contentType = static_cast<uint8_t>(std::stoul(row[2]));
-            msg.content = row[3];
-            msg.createTime = row[4] ? std::stoll(row[4]) : 0;
-            msg.recipient.recipientType = std::stoi(row[6]);
-            msg.recipient.recipientSsid = row[7];
-            msg.recipient.readStatus = row[8];
-            messageMap[ssid] = msg;
-        }
+            msg.senderSsid = senderSSID;
+            msg.contentType = contentType;
+            msg.content = content;
+            msg.createTime = createTime;
 
-        if (row[5] != nullptr) {
-            messageMap[ssid].fileIds.emplace_back(row[5]);
+            // 填充接收者信息
+            msg.recipient = {
+                -1,
+                messageId,
+                recipientType,
+                recipientSSID,
+                readStatus
+            };
+
+            // 添加文件ID
+            if (!fileId.empty()) {
+                msg.fileIds.push_back(fileId);
+            }
+
+            // 保存到结果集并记录索引
+            messages.push_back(msg);
+            keyToIndexMap[currentKey] = messages.size() - 1;
+        } else {
+            // 合并文件ID到现有消息
+            if (!fileId.empty()) {
+                messages[it->second].fileIds.push_back(fileId);
+            }
         }
     }
-
-    messages.reserve(messageMap.size());
-    for (auto& pair : messageMap) {
-        messages.push_back(pair.second);
-    }
-
-    mysql_free_result(result);
     return messages;
 }
 

@@ -103,9 +103,6 @@ extern GroupAdminDTODefaultTypeInternal _GroupAdminDTO_default_instance_;
 class GroupBaseInfoDTO;
 struct GroupBaseInfoDTODefaultTypeInternal;
 extern GroupBaseInfoDTODefaultTypeInternal _GroupBaseInfoDTO_default_instance_;
-class GroupMemberInfoDTO;
-struct GroupMemberInfoDTODefaultTypeInternal;
-extern GroupMemberInfoDTODefaultTypeInternal _GroupMemberInfoDTO_default_instance_;
 class GroupNoticeDTO;
 struct GroupNoticeDTODefaultTypeInternal;
 extern GroupNoticeDTODefaultTypeInternal _GroupNoticeDTO_default_instance_;
@@ -127,6 +124,9 @@ extern NewFriendInfoDTODefaultTypeInternal _NewFriendInfoDTO_default_instance_;
 class OperationLogDTO;
 struct OperationLogDTODefaultTypeInternal;
 extern OperationLogDTODefaultTypeInternal _OperationLogDTO_default_instance_;
+class RecoverPasswordDTO;
+struct RecoverPasswordDTODefaultTypeInternal;
+extern RecoverPasswordDTODefaultTypeInternal _RecoverPasswordDTO_default_instance_;
 class UserBaseInfoDTO;
 struct UserBaseInfoDTODefaultTypeInternal;
 extern UserBaseInfoDTODefaultTypeInternal _UserBaseInfoDTO_default_instance_;
@@ -156,7 +156,6 @@ template<> ::SSDTO::GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUse* Arena::Cre
 template<> ::SSDTO::GetUserMessageDTO* Arena::CreateMaybeMessage<::SSDTO::GetUserMessageDTO>(Arena*);
 template<> ::SSDTO::GroupAdminDTO* Arena::CreateMaybeMessage<::SSDTO::GroupAdminDTO>(Arena*);
 template<> ::SSDTO::GroupBaseInfoDTO* Arena::CreateMaybeMessage<::SSDTO::GroupBaseInfoDTO>(Arena*);
-template<> ::SSDTO::GroupMemberInfoDTO* Arena::CreateMaybeMessage<::SSDTO::GroupMemberInfoDTO>(Arena*);
 template<> ::SSDTO::GroupNoticeDTO* Arena::CreateMaybeMessage<::SSDTO::GroupNoticeDTO>(Arena*);
 template<> ::SSDTO::LoginCheckDTO* Arena::CreateMaybeMessage<::SSDTO::LoginCheckDTO>(Arena*);
 template<> ::SSDTO::MakeFriendDTO* Arena::CreateMaybeMessage<::SSDTO::MakeFriendDTO>(Arena*);
@@ -164,6 +163,7 @@ template<> ::SSDTO::MessageContentDTO* Arena::CreateMaybeMessage<::SSDTO::Messag
 template<> ::SSDTO::MessageRecipientDTO* Arena::CreateMaybeMessage<::SSDTO::MessageRecipientDTO>(Arena*);
 template<> ::SSDTO::NewFriendInfoDTO* Arena::CreateMaybeMessage<::SSDTO::NewFriendInfoDTO>(Arena*);
 template<> ::SSDTO::OperationLogDTO* Arena::CreateMaybeMessage<::SSDTO::OperationLogDTO>(Arena*);
+template<> ::SSDTO::RecoverPasswordDTO* Arena::CreateMaybeMessage<::SSDTO::RecoverPasswordDTO>(Arena*);
 template<> ::SSDTO::UserBaseInfoDTO* Arena::CreateMaybeMessage<::SSDTO::UserBaseInfoDTO>(Arena*);
 template<> ::SSDTO::UserCollectedStickerDTO* Arena::CreateMaybeMessage<::SSDTO::UserCollectedStickerDTO>(Arena*);
 template<> ::SSDTO::UserPrivateInfoDTO* Arena::CreateMaybeMessage<::SSDTO::UserPrivateInfoDTO>(Arena*);
@@ -237,6 +237,189 @@ inline bool BusinessType_Parse(
 }
 // ===================================================================
 
+class RecoverPasswordDTO final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:SSDTO.RecoverPasswordDTO) */ {
+ public:
+  inline RecoverPasswordDTO() : RecoverPasswordDTO(nullptr) {}
+  ~RecoverPasswordDTO() override;
+  explicit constexpr RecoverPasswordDTO(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  RecoverPasswordDTO(const RecoverPasswordDTO& from);
+  RecoverPasswordDTO(RecoverPasswordDTO&& from) noexcept
+    : RecoverPasswordDTO() {
+    *this = ::std::move(from);
+  }
+
+  inline RecoverPasswordDTO& operator=(const RecoverPasswordDTO& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline RecoverPasswordDTO& operator=(RecoverPasswordDTO&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const RecoverPasswordDTO& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const RecoverPasswordDTO* internal_default_instance() {
+    return reinterpret_cast<const RecoverPasswordDTO*>(
+               &_RecoverPasswordDTO_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    0;
+
+  friend void swap(RecoverPasswordDTO& a, RecoverPasswordDTO& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(RecoverPasswordDTO* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(RecoverPasswordDTO* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  RecoverPasswordDTO* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<RecoverPasswordDTO>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const RecoverPasswordDTO& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const RecoverPasswordDTO& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(RecoverPasswordDTO* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "SSDTO.RecoverPasswordDTO";
+  }
+  protected:
+  explicit RecoverPasswordDTO(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kSsidFieldNumber = 1,
+    kNewPasswordFieldNumber = 2,
+    kPasswordSaltFieldNumber = 3,
+  };
+  // bytes ssid = 1;
+  void clear_ssid();
+  const std::string& ssid() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_ssid(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_ssid();
+  PROTOBUF_NODISCARD std::string* release_ssid();
+  void set_allocated_ssid(std::string* ssid);
+  private:
+  const std::string& _internal_ssid() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_ssid(const std::string& value);
+  std::string* _internal_mutable_ssid();
+  public:
+
+  // bytes new_password = 2;
+  void clear_new_password();
+  const std::string& new_password() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_new_password(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_new_password();
+  PROTOBUF_NODISCARD std::string* release_new_password();
+  void set_allocated_new_password(std::string* new_password);
+  private:
+  const std::string& _internal_new_password() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_new_password(const std::string& value);
+  std::string* _internal_mutable_new_password();
+  public:
+
+  // string password_salt = 3;
+  void clear_password_salt();
+  const std::string& password_salt() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_password_salt(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_password_salt();
+  PROTOBUF_NODISCARD std::string* release_password_salt();
+  void set_allocated_password_salt(std::string* password_salt);
+  private:
+  const std::string& _internal_password_salt() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_password_salt(const std::string& value);
+  std::string* _internal_mutable_password_salt();
+  public:
+
+  // @@protoc_insertion_point(class_scope:SSDTO.RecoverPasswordDTO)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr ssid_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr new_password_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr password_salt_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_DTO_2eproto;
+};
+// -------------------------------------------------------------------
+
 class VideoCallDTO final :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:SSDTO.VideoCallDTO) */ {
  public:
@@ -285,7 +468,7 @@ class VideoCallDTO final :
                &_VideoCallDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    0;
+    1;
 
   friend void swap(VideoCallDTO& a, VideoCallDTO& b) {
     a.Swap(&b);
@@ -495,7 +678,7 @@ class GetMessagePicInfoDTO final :
                &_GetMessagePicInfoDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    3;
 
   friend void swap(GetMessagePicInfoDTO& a, GetMessagePicInfoDTO& b) {
     a.Swap(&b);
@@ -686,7 +869,7 @@ class GetUserMessageDTO final :
                &_GetUserMessageDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    4;
 
   friend void swap(GetUserMessageDTO& a, GetUserMessageDTO& b) {
     a.Swap(&b);
@@ -911,7 +1094,7 @@ class GetFileDTO final :
                &_GetFileDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    5;
 
   friend void swap(GetFileDTO& a, GetFileDTO& b) {
     a.Swap(&b);
@@ -1168,7 +1351,7 @@ class FuzzySearchDTO final :
                &_FuzzySearchDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   friend void swap(FuzzySearchDTO& a, FuzzySearchDTO& b) {
     a.Swap(&b);
@@ -1402,7 +1585,7 @@ class EnrollAccountDTO final :
                &_EnrollAccountDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   friend void swap(EnrollAccountDTO& a, EnrollAccountDTO& b) {
     a.Swap(&b);
@@ -1633,7 +1816,7 @@ class EmailVerifyDTO final :
                &_EmailVerifyDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    8;
 
   friend void swap(EmailVerifyDTO& a, EmailVerifyDTO& b) {
     a.Swap(&b);
@@ -1711,7 +1894,8 @@ class EmailVerifyDTO final :
     kVerifyCodeFieldNumber = 3,
     kStartTimeFieldNumber = 4,
     kValidTimeFieldNumber = 5,
-    kIpFieldNumber = 6,
+    kRequestSsidFieldNumber = 6,
+    kIpFieldNumber = 7,
     kIsRequestFieldNumber = 1,
   };
   // bytes email_address = 2;
@@ -1770,7 +1954,21 @@ class EmailVerifyDTO final :
   std::string* _internal_mutable_valid_time();
   public:
 
-  // bytes ip = 6;
+  // bytes request_ssid = 6;
+  void clear_request_ssid();
+  const std::string& request_ssid() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_request_ssid(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_request_ssid();
+  PROTOBUF_NODISCARD std::string* release_request_ssid();
+  void set_allocated_request_ssid(std::string* request_ssid);
+  private:
+  const std::string& _internal_request_ssid() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_request_ssid(const std::string& value);
+  std::string* _internal_mutable_request_ssid();
+  public:
+
+  // bytes ip = 7;
   void clear_ip();
   const std::string& ip() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -1804,6 +2002,7 @@ class EmailVerifyDTO final :
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr verify_code_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr start_time_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr valid_time_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr request_ssid_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr ip_;
   bool is_request_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
@@ -1859,7 +2058,7 @@ class NewFriendInfoDTO final :
                &_NewFriendInfoDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    9;
 
   friend void swap(NewFriendInfoDTO& a, NewFriendInfoDTO& b) {
     a.Swap(&b);
@@ -2061,7 +2260,7 @@ class MakeFriendDTO final :
                &_MakeFriendDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    10;
 
   friend void swap(MakeFriendDTO& a, MakeFriendDTO& b) {
     a.Swap(&b);
@@ -2250,7 +2449,7 @@ class LoginCheckDTO final :
                &_LoginCheckDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    11;
 
   friend void swap(LoginCheckDTO& a, LoginCheckDTO& b) {
     a.Swap(&b);
@@ -2444,7 +2643,7 @@ class DisconnectDTO final :
                &_DisconnectDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    12;
 
   friend void swap(DisconnectDTO& a, DisconnectDTO& b) {
     a.Swap(&b);
@@ -2611,7 +2810,7 @@ class GetAllUserFriendship final :
                &_GetAllUserFriendship_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    13;
 
   friend void swap(GetAllUserFriendship& a, GetAllUserFriendship& b) {
     a.Swap(&b);
@@ -2685,30 +2884,49 @@ class GetAllUserFriendship final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kFriendsBaseInfoFieldNumber = 2,
-    kFriendshipInfoFieldNumber = 3,
+    kUserBaseInfoFieldNumber = 2,
+    kGroupBaseInfoFieldNumber = 3,
+    kFriendshipInfoFieldNumber = 4,
     kSsidFieldNumber = 1,
-    kIpFieldNumber = 4,
+    kIpFieldNumber = 5,
   };
-  // repeated .SSDTO.UserBaseInfoDTO friends_base_info = 2;
-  int friends_base_info_size() const;
+  // repeated .SSDTO.UserBaseInfoDTO user_base_info = 2;
+  int user_base_info_size() const;
   private:
-  int _internal_friends_base_info_size() const;
+  int _internal_user_base_info_size() const;
   public:
-  void clear_friends_base_info();
-  ::SSDTO::UserBaseInfoDTO* mutable_friends_base_info(int index);
+  void clear_user_base_info();
+  ::SSDTO::UserBaseInfoDTO* mutable_user_base_info(int index);
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::UserBaseInfoDTO >*
-      mutable_friends_base_info();
+      mutable_user_base_info();
   private:
-  const ::SSDTO::UserBaseInfoDTO& _internal_friends_base_info(int index) const;
-  ::SSDTO::UserBaseInfoDTO* _internal_add_friends_base_info();
+  const ::SSDTO::UserBaseInfoDTO& _internal_user_base_info(int index) const;
+  ::SSDTO::UserBaseInfoDTO* _internal_add_user_base_info();
   public:
-  const ::SSDTO::UserBaseInfoDTO& friends_base_info(int index) const;
-  ::SSDTO::UserBaseInfoDTO* add_friends_base_info();
+  const ::SSDTO::UserBaseInfoDTO& user_base_info(int index) const;
+  ::SSDTO::UserBaseInfoDTO* add_user_base_info();
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::UserBaseInfoDTO >&
-      friends_base_info() const;
+      user_base_info() const;
 
-  // repeated .SSDTO.FriendshipDTO friendship_info = 3;
+  // repeated .SSDTO.GroupBaseInfoDTO group_base_info = 3;
+  int group_base_info_size() const;
+  private:
+  int _internal_group_base_info_size() const;
+  public:
+  void clear_group_base_info();
+  ::SSDTO::GroupBaseInfoDTO* mutable_group_base_info(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::GroupBaseInfoDTO >*
+      mutable_group_base_info();
+  private:
+  const ::SSDTO::GroupBaseInfoDTO& _internal_group_base_info(int index) const;
+  ::SSDTO::GroupBaseInfoDTO* _internal_add_group_base_info();
+  public:
+  const ::SSDTO::GroupBaseInfoDTO& group_base_info(int index) const;
+  ::SSDTO::GroupBaseInfoDTO* add_group_base_info();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::GroupBaseInfoDTO >&
+      group_base_info() const;
+
+  // repeated .SSDTO.FriendshipDTO friendship_info = 4;
   int friendship_info_size() const;
   private:
   int _internal_friendship_info_size() const;
@@ -2740,7 +2958,7 @@ class GetAllUserFriendship final :
   std::string* _internal_mutable_ssid();
   public:
 
-  // bytes ip = 4;
+  // bytes ip = 5;
   void clear_ip();
   const std::string& ip() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -2761,7 +2979,8 @@ class GetAllUserFriendship final :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::UserBaseInfoDTO > friends_base_info_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::UserBaseInfoDTO > user_base_info_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::GroupBaseInfoDTO > group_base_info_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::FriendshipDTO > friendship_info_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr ssid_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr ip_;
@@ -2818,7 +3037,7 @@ class UserBaseInfoDTO final :
                &_UserBaseInfoDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    14;
 
   friend void swap(UserBaseInfoDTO& a, UserBaseInfoDTO& b) {
     a.Swap(&b);
@@ -3109,7 +3328,7 @@ class UserPrivateInfoDTO final :
                &_UserPrivateInfoDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    15;
 
   friend void swap(UserPrivateInfoDTO& a, UserPrivateInfoDTO& b) {
     a.Swap(&b);
@@ -3335,7 +3554,7 @@ class FriendshipDTO final :
                &_FriendshipDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    16;
 
   friend void swap(FriendshipDTO& a, FriendshipDTO& b) {
     a.Swap(&b);
@@ -3594,7 +3813,7 @@ class GroupAdminDTO final :
                &_GroupAdminDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    17;
 
   friend void swap(GroupAdminDTO& a, GroupAdminDTO& b) {
     a.Swap(&b);
@@ -3783,7 +4002,7 @@ class GroupBaseInfoDTO final :
                &_GroupBaseInfoDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    18;
 
   friend void swap(GroupBaseInfoDTO& a, GroupBaseInfoDTO& b) {
     a.Swap(&b);
@@ -3858,15 +4077,16 @@ class GroupBaseInfoDTO final :
 
   enum : int {
     kAdminsFieldNumber = 8,
+    kMembersFieldNumber = 9,
     kSsidGroupFieldNumber = 2,
     kNameFieldNumber = 3,
     kAvatarFileIdFieldNumber = 4,
     kAvatarRemotePathFieldNumber = 5,
     kCreateSsidFieldNumber = 6,
     kProfileFieldNumber = 7,
-    kIpFieldNumber = 10,
+    kIpFieldNumber = 11,
     kIdFieldNumber = 1,
-    kCreateTimeFieldNumber = 9,
+    kCreateTimeFieldNumber = 10,
   };
   // repeated string admins = 8;
   int admins_size() const;
@@ -3891,6 +4111,24 @@ class GroupBaseInfoDTO final :
   const std::string& _internal_admins(int index) const;
   std::string* _internal_add_admins();
   public:
+
+  // repeated .SSDTO.UserBaseInfoDTO members = 9;
+  int members_size() const;
+  private:
+  int _internal_members_size() const;
+  public:
+  void clear_members();
+  ::SSDTO::UserBaseInfoDTO* mutable_members(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::UserBaseInfoDTO >*
+      mutable_members();
+  private:
+  const ::SSDTO::UserBaseInfoDTO& _internal_members(int index) const;
+  ::SSDTO::UserBaseInfoDTO* _internal_add_members();
+  public:
+  const ::SSDTO::UserBaseInfoDTO& members(int index) const;
+  ::SSDTO::UserBaseInfoDTO* add_members();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::UserBaseInfoDTO >&
+      members() const;
 
   // string ssid_group = 2;
   void clear_ssid_group();
@@ -3976,7 +4214,7 @@ class GroupBaseInfoDTO final :
   std::string* _internal_mutable_profile();
   public:
 
-  // bytes ip = 10;
+  // bytes ip = 11;
   void clear_ip();
   const std::string& ip() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -3999,7 +4237,7 @@ class GroupBaseInfoDTO final :
   void _internal_set_id(int64_t value);
   public:
 
-  // int64 create_time = 9;
+  // int64 create_time = 10;
   void clear_create_time();
   int64_t create_time() const;
   void set_create_time(int64_t value);
@@ -4016,6 +4254,7 @@ class GroupBaseInfoDTO final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> admins_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::UserBaseInfoDTO > members_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr ssid_group_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr avatar_file_id_;
@@ -4078,7 +4317,7 @@ class GroupNoticeDTO final :
                &_GroupNoticeDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    18;
+    19;
 
   friend void swap(GroupNoticeDTO& a, GroupNoticeDTO& b) {
     a.Swap(&b);
@@ -4224,211 +4463,6 @@ class GroupNoticeDTO final :
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr ip_;
   int64_t id_;
   int64_t group_id_;
-  int64_t create_time_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_DTO_2eproto;
-};
-// -------------------------------------------------------------------
-
-class GroupMemberInfoDTO final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:SSDTO.GroupMemberInfoDTO) */ {
- public:
-  inline GroupMemberInfoDTO() : GroupMemberInfoDTO(nullptr) {}
-  ~GroupMemberInfoDTO() override;
-  explicit constexpr GroupMemberInfoDTO(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
-
-  GroupMemberInfoDTO(const GroupMemberInfoDTO& from);
-  GroupMemberInfoDTO(GroupMemberInfoDTO&& from) noexcept
-    : GroupMemberInfoDTO() {
-    *this = ::std::move(from);
-  }
-
-  inline GroupMemberInfoDTO& operator=(const GroupMemberInfoDTO& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  inline GroupMemberInfoDTO& operator=(GroupMemberInfoDTO&& from) noexcept {
-    if (this == &from) return *this;
-    if (GetOwningArena() == from.GetOwningArena()
-  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
-        && GetOwningArena() != nullptr
-  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
-    ) {
-      InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
-    return GetDescriptor();
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
-    return default_instance().GetMetadata().descriptor;
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
-    return default_instance().GetMetadata().reflection;
-  }
-  static const GroupMemberInfoDTO& default_instance() {
-    return *internal_default_instance();
-  }
-  static inline const GroupMemberInfoDTO* internal_default_instance() {
-    return reinterpret_cast<const GroupMemberInfoDTO*>(
-               &_GroupMemberInfoDTO_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    19;
-
-  friend void swap(GroupMemberInfoDTO& a, GroupMemberInfoDTO& b) {
-    a.Swap(&b);
-  }
-  inline void Swap(GroupMemberInfoDTO* other) {
-    if (other == this) return;
-  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
-    if (GetOwningArena() != nullptr &&
-        GetOwningArena() == other->GetOwningArena()) {
-   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
-    if (GetOwningArena() == other->GetOwningArena()) {
-  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
-      InternalSwap(other);
-    } else {
-      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
-    }
-  }
-  void UnsafeArenaSwap(GroupMemberInfoDTO* other) {
-    if (other == this) return;
-    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
-    InternalSwap(other);
-  }
-
-  // implements Message ----------------------------------------------
-
-  GroupMemberInfoDTO* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
-    return CreateMaybeMessage<GroupMemberInfoDTO>(arena);
-  }
-  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
-  void CopyFrom(const GroupMemberInfoDTO& from);
-  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
-  void MergeFrom(const GroupMemberInfoDTO& from);
-  private:
-  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
-  public:
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
-  uint8_t* _InternalSerialize(
-      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(GroupMemberInfoDTO* other);
-
-  private:
-  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
-  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "SSDTO.GroupMemberInfoDTO";
-  }
-  protected:
-  explicit GroupMemberInfoDTO(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                       bool is_message_owned = false);
-  private:
-  static void ArenaDtor(void* object);
-  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
-  public:
-
-  static const ClassData _class_data_;
-  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
-
-  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  enum : int {
-    kSsidGroupFieldNumber = 2,
-    kSsidMemberFieldNumber = 3,
-    kIpFieldNumber = 5,
-    kIdFieldNumber = 1,
-    kCreateTimeFieldNumber = 4,
-  };
-  // string ssid_group = 2;
-  void clear_ssid_group();
-  const std::string& ssid_group() const;
-  template <typename ArgT0 = const std::string&, typename... ArgT>
-  void set_ssid_group(ArgT0&& arg0, ArgT... args);
-  std::string* mutable_ssid_group();
-  PROTOBUF_NODISCARD std::string* release_ssid_group();
-  void set_allocated_ssid_group(std::string* ssid_group);
-  private:
-  const std::string& _internal_ssid_group() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_ssid_group(const std::string& value);
-  std::string* _internal_mutable_ssid_group();
-  public:
-
-  // string ssid_member = 3;
-  void clear_ssid_member();
-  const std::string& ssid_member() const;
-  template <typename ArgT0 = const std::string&, typename... ArgT>
-  void set_ssid_member(ArgT0&& arg0, ArgT... args);
-  std::string* mutable_ssid_member();
-  PROTOBUF_NODISCARD std::string* release_ssid_member();
-  void set_allocated_ssid_member(std::string* ssid_member);
-  private:
-  const std::string& _internal_ssid_member() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_ssid_member(const std::string& value);
-  std::string* _internal_mutable_ssid_member();
-  public:
-
-  // bytes ip = 5;
-  void clear_ip();
-  const std::string& ip() const;
-  template <typename ArgT0 = const std::string&, typename... ArgT>
-  void set_ip(ArgT0&& arg0, ArgT... args);
-  std::string* mutable_ip();
-  PROTOBUF_NODISCARD std::string* release_ip();
-  void set_allocated_ip(std::string* ip);
-  private:
-  const std::string& _internal_ip() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_ip(const std::string& value);
-  std::string* _internal_mutable_ip();
-  public:
-
-  // int64 id = 1;
-  void clear_id();
-  int64_t id() const;
-  void set_id(int64_t value);
-  private:
-  int64_t _internal_id() const;
-  void _internal_set_id(int64_t value);
-  public:
-
-  // int64 create_time = 4;
-  void clear_create_time();
-  int64_t create_time() const;
-  void set_create_time(int64_t value);
-  private:
-  int64_t _internal_create_time() const;
-  void _internal_set_create_time(int64_t value);
-  public:
-
-  // @@protoc_insertion_point(class_scope:SSDTO.GroupMemberInfoDTO)
- private:
-  class _Internal;
-
-  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
-  typedef void InternalArenaConstructable_;
-  typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr ssid_group_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr ssid_member_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr ip_;
-  int64_t id_;
   int64_t create_time_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_DTO_2eproto;
@@ -6048,6 +6082,163 @@ class UserCollectedStickerDTO final :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
+// RecoverPasswordDTO
+
+// bytes ssid = 1;
+inline void RecoverPasswordDTO::clear_ssid() {
+  ssid_.ClearToEmpty();
+}
+inline const std::string& RecoverPasswordDTO::ssid() const {
+  // @@protoc_insertion_point(field_get:SSDTO.RecoverPasswordDTO.ssid)
+  return _internal_ssid();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void RecoverPasswordDTO::set_ssid(ArgT0&& arg0, ArgT... args) {
+ 
+ ssid_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:SSDTO.RecoverPasswordDTO.ssid)
+}
+inline std::string* RecoverPasswordDTO::mutable_ssid() {
+  std::string* _s = _internal_mutable_ssid();
+  // @@protoc_insertion_point(field_mutable:SSDTO.RecoverPasswordDTO.ssid)
+  return _s;
+}
+inline const std::string& RecoverPasswordDTO::_internal_ssid() const {
+  return ssid_.Get();
+}
+inline void RecoverPasswordDTO::_internal_set_ssid(const std::string& value) {
+  
+  ssid_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* RecoverPasswordDTO::_internal_mutable_ssid() {
+  
+  return ssid_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* RecoverPasswordDTO::release_ssid() {
+  // @@protoc_insertion_point(field_release:SSDTO.RecoverPasswordDTO.ssid)
+  return ssid_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+}
+inline void RecoverPasswordDTO::set_allocated_ssid(std::string* ssid) {
+  if (ssid != nullptr) {
+    
+  } else {
+    
+  }
+  ssid_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ssid,
+      GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (ssid_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
+    ssid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.RecoverPasswordDTO.ssid)
+}
+
+// bytes new_password = 2;
+inline void RecoverPasswordDTO::clear_new_password() {
+  new_password_.ClearToEmpty();
+}
+inline const std::string& RecoverPasswordDTO::new_password() const {
+  // @@protoc_insertion_point(field_get:SSDTO.RecoverPasswordDTO.new_password)
+  return _internal_new_password();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void RecoverPasswordDTO::set_new_password(ArgT0&& arg0, ArgT... args) {
+ 
+ new_password_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:SSDTO.RecoverPasswordDTO.new_password)
+}
+inline std::string* RecoverPasswordDTO::mutable_new_password() {
+  std::string* _s = _internal_mutable_new_password();
+  // @@protoc_insertion_point(field_mutable:SSDTO.RecoverPasswordDTO.new_password)
+  return _s;
+}
+inline const std::string& RecoverPasswordDTO::_internal_new_password() const {
+  return new_password_.Get();
+}
+inline void RecoverPasswordDTO::_internal_set_new_password(const std::string& value) {
+  
+  new_password_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* RecoverPasswordDTO::_internal_mutable_new_password() {
+  
+  return new_password_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* RecoverPasswordDTO::release_new_password() {
+  // @@protoc_insertion_point(field_release:SSDTO.RecoverPasswordDTO.new_password)
+  return new_password_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+}
+inline void RecoverPasswordDTO::set_allocated_new_password(std::string* new_password) {
+  if (new_password != nullptr) {
+    
+  } else {
+    
+  }
+  new_password_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), new_password,
+      GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (new_password_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
+    new_password_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.RecoverPasswordDTO.new_password)
+}
+
+// string password_salt = 3;
+inline void RecoverPasswordDTO::clear_password_salt() {
+  password_salt_.ClearToEmpty();
+}
+inline const std::string& RecoverPasswordDTO::password_salt() const {
+  // @@protoc_insertion_point(field_get:SSDTO.RecoverPasswordDTO.password_salt)
+  return _internal_password_salt();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void RecoverPasswordDTO::set_password_salt(ArgT0&& arg0, ArgT... args) {
+ 
+ password_salt_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:SSDTO.RecoverPasswordDTO.password_salt)
+}
+inline std::string* RecoverPasswordDTO::mutable_password_salt() {
+  std::string* _s = _internal_mutable_password_salt();
+  // @@protoc_insertion_point(field_mutable:SSDTO.RecoverPasswordDTO.password_salt)
+  return _s;
+}
+inline const std::string& RecoverPasswordDTO::_internal_password_salt() const {
+  return password_salt_.Get();
+}
+inline void RecoverPasswordDTO::_internal_set_password_salt(const std::string& value) {
+  
+  password_salt_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* RecoverPasswordDTO::_internal_mutable_password_salt() {
+  
+  return password_salt_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* RecoverPasswordDTO::release_password_salt() {
+  // @@protoc_insertion_point(field_release:SSDTO.RecoverPasswordDTO.password_salt)
+  return password_salt_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+}
+inline void RecoverPasswordDTO::set_allocated_password_salt(std::string* password_salt) {
+  if (password_salt != nullptr) {
+    
+  } else {
+    
+  }
+  password_salt_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), password_salt,
+      GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (password_salt_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
+    password_salt_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.RecoverPasswordDTO.password_salt)
+}
+
+// -------------------------------------------------------------------
+
 // VideoCallDTO
 
 // bytes sender_ssid = 1;
@@ -7711,7 +7902,58 @@ inline void EmailVerifyDTO::set_allocated_valid_time(std::string* valid_time) {
   // @@protoc_insertion_point(field_set_allocated:SSDTO.EmailVerifyDTO.valid_time)
 }
 
-// bytes ip = 6;
+// bytes request_ssid = 6;
+inline void EmailVerifyDTO::clear_request_ssid() {
+  request_ssid_.ClearToEmpty();
+}
+inline const std::string& EmailVerifyDTO::request_ssid() const {
+  // @@protoc_insertion_point(field_get:SSDTO.EmailVerifyDTO.request_ssid)
+  return _internal_request_ssid();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void EmailVerifyDTO::set_request_ssid(ArgT0&& arg0, ArgT... args) {
+ 
+ request_ssid_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:SSDTO.EmailVerifyDTO.request_ssid)
+}
+inline std::string* EmailVerifyDTO::mutable_request_ssid() {
+  std::string* _s = _internal_mutable_request_ssid();
+  // @@protoc_insertion_point(field_mutable:SSDTO.EmailVerifyDTO.request_ssid)
+  return _s;
+}
+inline const std::string& EmailVerifyDTO::_internal_request_ssid() const {
+  return request_ssid_.Get();
+}
+inline void EmailVerifyDTO::_internal_set_request_ssid(const std::string& value) {
+  
+  request_ssid_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* EmailVerifyDTO::_internal_mutable_request_ssid() {
+  
+  return request_ssid_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* EmailVerifyDTO::release_request_ssid() {
+  // @@protoc_insertion_point(field_release:SSDTO.EmailVerifyDTO.request_ssid)
+  return request_ssid_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+}
+inline void EmailVerifyDTO::set_allocated_request_ssid(std::string* request_ssid) {
+  if (request_ssid != nullptr) {
+    
+  } else {
+    
+  }
+  request_ssid_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), request_ssid,
+      GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (request_ssid_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
+    request_ssid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.EmailVerifyDTO.request_ssid)
+}
+
+// bytes ip = 7;
 inline void EmailVerifyDTO::clear_ip() {
   ip_.ClearToEmpty();
 }
@@ -8501,47 +8743,87 @@ inline void GetAllUserFriendship::set_allocated_ssid(std::string* ssid) {
   // @@protoc_insertion_point(field_set_allocated:SSDTO.GetAllUserFriendship.ssid)
 }
 
-// repeated .SSDTO.UserBaseInfoDTO friends_base_info = 2;
-inline int GetAllUserFriendship::_internal_friends_base_info_size() const {
-  return friends_base_info_.size();
+// repeated .SSDTO.UserBaseInfoDTO user_base_info = 2;
+inline int GetAllUserFriendship::_internal_user_base_info_size() const {
+  return user_base_info_.size();
 }
-inline int GetAllUserFriendship::friends_base_info_size() const {
-  return _internal_friends_base_info_size();
+inline int GetAllUserFriendship::user_base_info_size() const {
+  return _internal_user_base_info_size();
 }
-inline void GetAllUserFriendship::clear_friends_base_info() {
-  friends_base_info_.Clear();
+inline void GetAllUserFriendship::clear_user_base_info() {
+  user_base_info_.Clear();
 }
-inline ::SSDTO::UserBaseInfoDTO* GetAllUserFriendship::mutable_friends_base_info(int index) {
-  // @@protoc_insertion_point(field_mutable:SSDTO.GetAllUserFriendship.friends_base_info)
-  return friends_base_info_.Mutable(index);
+inline ::SSDTO::UserBaseInfoDTO* GetAllUserFriendship::mutable_user_base_info(int index) {
+  // @@protoc_insertion_point(field_mutable:SSDTO.GetAllUserFriendship.user_base_info)
+  return user_base_info_.Mutable(index);
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::UserBaseInfoDTO >*
-GetAllUserFriendship::mutable_friends_base_info() {
-  // @@protoc_insertion_point(field_mutable_list:SSDTO.GetAllUserFriendship.friends_base_info)
-  return &friends_base_info_;
+GetAllUserFriendship::mutable_user_base_info() {
+  // @@protoc_insertion_point(field_mutable_list:SSDTO.GetAllUserFriendship.user_base_info)
+  return &user_base_info_;
 }
-inline const ::SSDTO::UserBaseInfoDTO& GetAllUserFriendship::_internal_friends_base_info(int index) const {
-  return friends_base_info_.Get(index);
+inline const ::SSDTO::UserBaseInfoDTO& GetAllUserFriendship::_internal_user_base_info(int index) const {
+  return user_base_info_.Get(index);
 }
-inline const ::SSDTO::UserBaseInfoDTO& GetAllUserFriendship::friends_base_info(int index) const {
-  // @@protoc_insertion_point(field_get:SSDTO.GetAllUserFriendship.friends_base_info)
-  return _internal_friends_base_info(index);
+inline const ::SSDTO::UserBaseInfoDTO& GetAllUserFriendship::user_base_info(int index) const {
+  // @@protoc_insertion_point(field_get:SSDTO.GetAllUserFriendship.user_base_info)
+  return _internal_user_base_info(index);
 }
-inline ::SSDTO::UserBaseInfoDTO* GetAllUserFriendship::_internal_add_friends_base_info() {
-  return friends_base_info_.Add();
+inline ::SSDTO::UserBaseInfoDTO* GetAllUserFriendship::_internal_add_user_base_info() {
+  return user_base_info_.Add();
 }
-inline ::SSDTO::UserBaseInfoDTO* GetAllUserFriendship::add_friends_base_info() {
-  ::SSDTO::UserBaseInfoDTO* _add = _internal_add_friends_base_info();
-  // @@protoc_insertion_point(field_add:SSDTO.GetAllUserFriendship.friends_base_info)
+inline ::SSDTO::UserBaseInfoDTO* GetAllUserFriendship::add_user_base_info() {
+  ::SSDTO::UserBaseInfoDTO* _add = _internal_add_user_base_info();
+  // @@protoc_insertion_point(field_add:SSDTO.GetAllUserFriendship.user_base_info)
   return _add;
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::UserBaseInfoDTO >&
-GetAllUserFriendship::friends_base_info() const {
-  // @@protoc_insertion_point(field_list:SSDTO.GetAllUserFriendship.friends_base_info)
-  return friends_base_info_;
+GetAllUserFriendship::user_base_info() const {
+  // @@protoc_insertion_point(field_list:SSDTO.GetAllUserFriendship.user_base_info)
+  return user_base_info_;
 }
 
-// repeated .SSDTO.FriendshipDTO friendship_info = 3;
+// repeated .SSDTO.GroupBaseInfoDTO group_base_info = 3;
+inline int GetAllUserFriendship::_internal_group_base_info_size() const {
+  return group_base_info_.size();
+}
+inline int GetAllUserFriendship::group_base_info_size() const {
+  return _internal_group_base_info_size();
+}
+inline void GetAllUserFriendship::clear_group_base_info() {
+  group_base_info_.Clear();
+}
+inline ::SSDTO::GroupBaseInfoDTO* GetAllUserFriendship::mutable_group_base_info(int index) {
+  // @@protoc_insertion_point(field_mutable:SSDTO.GetAllUserFriendship.group_base_info)
+  return group_base_info_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::GroupBaseInfoDTO >*
+GetAllUserFriendship::mutable_group_base_info() {
+  // @@protoc_insertion_point(field_mutable_list:SSDTO.GetAllUserFriendship.group_base_info)
+  return &group_base_info_;
+}
+inline const ::SSDTO::GroupBaseInfoDTO& GetAllUserFriendship::_internal_group_base_info(int index) const {
+  return group_base_info_.Get(index);
+}
+inline const ::SSDTO::GroupBaseInfoDTO& GetAllUserFriendship::group_base_info(int index) const {
+  // @@protoc_insertion_point(field_get:SSDTO.GetAllUserFriendship.group_base_info)
+  return _internal_group_base_info(index);
+}
+inline ::SSDTO::GroupBaseInfoDTO* GetAllUserFriendship::_internal_add_group_base_info() {
+  return group_base_info_.Add();
+}
+inline ::SSDTO::GroupBaseInfoDTO* GetAllUserFriendship::add_group_base_info() {
+  ::SSDTO::GroupBaseInfoDTO* _add = _internal_add_group_base_info();
+  // @@protoc_insertion_point(field_add:SSDTO.GetAllUserFriendship.group_base_info)
+  return _add;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::GroupBaseInfoDTO >&
+GetAllUserFriendship::group_base_info() const {
+  // @@protoc_insertion_point(field_list:SSDTO.GetAllUserFriendship.group_base_info)
+  return group_base_info_;
+}
+
+// repeated .SSDTO.FriendshipDTO friendship_info = 4;
 inline int GetAllUserFriendship::_internal_friendship_info_size() const {
   return friendship_info_.size();
 }
@@ -8581,7 +8863,7 @@ GetAllUserFriendship::friendship_info() const {
   return friendship_info_;
 }
 
-// bytes ip = 4;
+// bytes ip = 5;
 inline void GetAllUserFriendship::clear_ip() {
   ip_.ClearToEmpty();
 }
@@ -10242,7 +10524,47 @@ GroupBaseInfoDTO::mutable_admins() {
   return &admins_;
 }
 
-// int64 create_time = 9;
+// repeated .SSDTO.UserBaseInfoDTO members = 9;
+inline int GroupBaseInfoDTO::_internal_members_size() const {
+  return members_.size();
+}
+inline int GroupBaseInfoDTO::members_size() const {
+  return _internal_members_size();
+}
+inline void GroupBaseInfoDTO::clear_members() {
+  members_.Clear();
+}
+inline ::SSDTO::UserBaseInfoDTO* GroupBaseInfoDTO::mutable_members(int index) {
+  // @@protoc_insertion_point(field_mutable:SSDTO.GroupBaseInfoDTO.members)
+  return members_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::UserBaseInfoDTO >*
+GroupBaseInfoDTO::mutable_members() {
+  // @@protoc_insertion_point(field_mutable_list:SSDTO.GroupBaseInfoDTO.members)
+  return &members_;
+}
+inline const ::SSDTO::UserBaseInfoDTO& GroupBaseInfoDTO::_internal_members(int index) const {
+  return members_.Get(index);
+}
+inline const ::SSDTO::UserBaseInfoDTO& GroupBaseInfoDTO::members(int index) const {
+  // @@protoc_insertion_point(field_get:SSDTO.GroupBaseInfoDTO.members)
+  return _internal_members(index);
+}
+inline ::SSDTO::UserBaseInfoDTO* GroupBaseInfoDTO::_internal_add_members() {
+  return members_.Add();
+}
+inline ::SSDTO::UserBaseInfoDTO* GroupBaseInfoDTO::add_members() {
+  ::SSDTO::UserBaseInfoDTO* _add = _internal_add_members();
+  // @@protoc_insertion_point(field_add:SSDTO.GroupBaseInfoDTO.members)
+  return _add;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::UserBaseInfoDTO >&
+GroupBaseInfoDTO::members() const {
+  // @@protoc_insertion_point(field_list:SSDTO.GroupBaseInfoDTO.members)
+  return members_;
+}
+
+// int64 create_time = 10;
 inline void GroupBaseInfoDTO::clear_create_time() {
   create_time_ = int64_t{0};
 }
@@ -10262,7 +10584,7 @@ inline void GroupBaseInfoDTO::set_create_time(int64_t value) {
   // @@protoc_insertion_point(field_set:SSDTO.GroupBaseInfoDTO.create_time)
 }
 
-// bytes ip = 10;
+// bytes ip = 11;
 inline void GroupBaseInfoDTO::clear_ip() {
   ip_.ClearToEmpty();
 }
@@ -10477,203 +10799,6 @@ inline void GroupNoticeDTO::set_allocated_ip(std::string* ip) {
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:SSDTO.GroupNoticeDTO.ip)
-}
-
-// -------------------------------------------------------------------
-
-// GroupMemberInfoDTO
-
-// int64 id = 1;
-inline void GroupMemberInfoDTO::clear_id() {
-  id_ = int64_t{0};
-}
-inline int64_t GroupMemberInfoDTO::_internal_id() const {
-  return id_;
-}
-inline int64_t GroupMemberInfoDTO::id() const {
-  // @@protoc_insertion_point(field_get:SSDTO.GroupMemberInfoDTO.id)
-  return _internal_id();
-}
-inline void GroupMemberInfoDTO::_internal_set_id(int64_t value) {
-  
-  id_ = value;
-}
-inline void GroupMemberInfoDTO::set_id(int64_t value) {
-  _internal_set_id(value);
-  // @@protoc_insertion_point(field_set:SSDTO.GroupMemberInfoDTO.id)
-}
-
-// string ssid_group = 2;
-inline void GroupMemberInfoDTO::clear_ssid_group() {
-  ssid_group_.ClearToEmpty();
-}
-inline const std::string& GroupMemberInfoDTO::ssid_group() const {
-  // @@protoc_insertion_point(field_get:SSDTO.GroupMemberInfoDTO.ssid_group)
-  return _internal_ssid_group();
-}
-template <typename ArgT0, typename... ArgT>
-inline PROTOBUF_ALWAYS_INLINE
-void GroupMemberInfoDTO::set_ssid_group(ArgT0&& arg0, ArgT... args) {
- 
- ssid_group_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:SSDTO.GroupMemberInfoDTO.ssid_group)
-}
-inline std::string* GroupMemberInfoDTO::mutable_ssid_group() {
-  std::string* _s = _internal_mutable_ssid_group();
-  // @@protoc_insertion_point(field_mutable:SSDTO.GroupMemberInfoDTO.ssid_group)
-  return _s;
-}
-inline const std::string& GroupMemberInfoDTO::_internal_ssid_group() const {
-  return ssid_group_.Get();
-}
-inline void GroupMemberInfoDTO::_internal_set_ssid_group(const std::string& value) {
-  
-  ssid_group_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
-}
-inline std::string* GroupMemberInfoDTO::_internal_mutable_ssid_group() {
-  
-  return ssid_group_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
-}
-inline std::string* GroupMemberInfoDTO::release_ssid_group() {
-  // @@protoc_insertion_point(field_release:SSDTO.GroupMemberInfoDTO.ssid_group)
-  return ssid_group_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
-}
-inline void GroupMemberInfoDTO::set_allocated_ssid_group(std::string* ssid_group) {
-  if (ssid_group != nullptr) {
-    
-  } else {
-    
-  }
-  ssid_group_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ssid_group,
-      GetArenaForAllocation());
-#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (ssid_group_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
-    ssid_group_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
-  }
-#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:SSDTO.GroupMemberInfoDTO.ssid_group)
-}
-
-// string ssid_member = 3;
-inline void GroupMemberInfoDTO::clear_ssid_member() {
-  ssid_member_.ClearToEmpty();
-}
-inline const std::string& GroupMemberInfoDTO::ssid_member() const {
-  // @@protoc_insertion_point(field_get:SSDTO.GroupMemberInfoDTO.ssid_member)
-  return _internal_ssid_member();
-}
-template <typename ArgT0, typename... ArgT>
-inline PROTOBUF_ALWAYS_INLINE
-void GroupMemberInfoDTO::set_ssid_member(ArgT0&& arg0, ArgT... args) {
- 
- ssid_member_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:SSDTO.GroupMemberInfoDTO.ssid_member)
-}
-inline std::string* GroupMemberInfoDTO::mutable_ssid_member() {
-  std::string* _s = _internal_mutable_ssid_member();
-  // @@protoc_insertion_point(field_mutable:SSDTO.GroupMemberInfoDTO.ssid_member)
-  return _s;
-}
-inline const std::string& GroupMemberInfoDTO::_internal_ssid_member() const {
-  return ssid_member_.Get();
-}
-inline void GroupMemberInfoDTO::_internal_set_ssid_member(const std::string& value) {
-  
-  ssid_member_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
-}
-inline std::string* GroupMemberInfoDTO::_internal_mutable_ssid_member() {
-  
-  return ssid_member_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
-}
-inline std::string* GroupMemberInfoDTO::release_ssid_member() {
-  // @@protoc_insertion_point(field_release:SSDTO.GroupMemberInfoDTO.ssid_member)
-  return ssid_member_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
-}
-inline void GroupMemberInfoDTO::set_allocated_ssid_member(std::string* ssid_member) {
-  if (ssid_member != nullptr) {
-    
-  } else {
-    
-  }
-  ssid_member_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ssid_member,
-      GetArenaForAllocation());
-#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (ssid_member_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
-    ssid_member_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
-  }
-#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:SSDTO.GroupMemberInfoDTO.ssid_member)
-}
-
-// int64 create_time = 4;
-inline void GroupMemberInfoDTO::clear_create_time() {
-  create_time_ = int64_t{0};
-}
-inline int64_t GroupMemberInfoDTO::_internal_create_time() const {
-  return create_time_;
-}
-inline int64_t GroupMemberInfoDTO::create_time() const {
-  // @@protoc_insertion_point(field_get:SSDTO.GroupMemberInfoDTO.create_time)
-  return _internal_create_time();
-}
-inline void GroupMemberInfoDTO::_internal_set_create_time(int64_t value) {
-  
-  create_time_ = value;
-}
-inline void GroupMemberInfoDTO::set_create_time(int64_t value) {
-  _internal_set_create_time(value);
-  // @@protoc_insertion_point(field_set:SSDTO.GroupMemberInfoDTO.create_time)
-}
-
-// bytes ip = 5;
-inline void GroupMemberInfoDTO::clear_ip() {
-  ip_.ClearToEmpty();
-}
-inline const std::string& GroupMemberInfoDTO::ip() const {
-  // @@protoc_insertion_point(field_get:SSDTO.GroupMemberInfoDTO.ip)
-  return _internal_ip();
-}
-template <typename ArgT0, typename... ArgT>
-inline PROTOBUF_ALWAYS_INLINE
-void GroupMemberInfoDTO::set_ip(ArgT0&& arg0, ArgT... args) {
- 
- ip_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:SSDTO.GroupMemberInfoDTO.ip)
-}
-inline std::string* GroupMemberInfoDTO::mutable_ip() {
-  std::string* _s = _internal_mutable_ip();
-  // @@protoc_insertion_point(field_mutable:SSDTO.GroupMemberInfoDTO.ip)
-  return _s;
-}
-inline const std::string& GroupMemberInfoDTO::_internal_ip() const {
-  return ip_.Get();
-}
-inline void GroupMemberInfoDTO::_internal_set_ip(const std::string& value) {
-  
-  ip_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
-}
-inline std::string* GroupMemberInfoDTO::_internal_mutable_ip() {
-  
-  return ip_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
-}
-inline std::string* GroupMemberInfoDTO::release_ip() {
-  // @@protoc_insertion_point(field_release:SSDTO.GroupMemberInfoDTO.ip)
-  return ip_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
-}
-inline void GroupMemberInfoDTO::set_allocated_ip(std::string* ip) {
-  if (ip != nullptr) {
-    
-  } else {
-    
-  }
-  ip_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ip,
-      GetArenaForAllocation());
-#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (ip_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
-    ip_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
-  }
-#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:SSDTO.GroupMemberInfoDTO.ip)
 }
 
 // -------------------------------------------------------------------

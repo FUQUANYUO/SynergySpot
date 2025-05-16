@@ -9,6 +9,7 @@
 
 #include <QStyledItemDelegate>
 #include <QTextDocument>
+#include "ela-widget-tools/ElaTheme.h"
 
 class ChatMessage;
 
@@ -40,6 +41,8 @@ private:
     const int fontSize = 12;       // plain text size
     const int namePadding = 20;    // name height
     bool isGroupMode = false;
+
+    ElaThemeType::ThemeMode _theme;
 };
 
 

@@ -23,6 +23,14 @@
 
 #define g_pFileManagerPage FileManagerPage::getInstance()
 
+#include <QPushButton>
+#include <QVBoxLayout>
+#include "file-model/FileModel.h"
+
+class ElaSuggestBox;
+class ElaTableView;
+class ElaToolButton;
+
 class SS_API FileManagerPage : public ElaScrollPage{
 public:
     static FileManagerPage * getInstance();
@@ -41,7 +49,12 @@ protected:
 protected slots:
 private:
     // ----------------- UI -----------------
-    QWidget * _centralWidget = nullptr;
+    QWidget                 * _centralWidget = nullptr;
+    QVBoxLayout             * _mainLayout    = nullptr;
+    ElaSuggestBox           * _search        = nullptr;
+    ElaTableView            * _tableView     = nullptr;
+    FileModel               * _fileModel     = nullptr;
+    ElaToolButton           * _uploadFile    = nullptr;
     // ----------------- UI -----------------
 
     // --------------- BackEnd --------------

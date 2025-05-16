@@ -31,7 +31,6 @@ public:
     int getFriendshipCount(const std::string& ssid) override;
 private:
     std::shared_ptr<MysqlConn> m_conn;
-
 };
 
 

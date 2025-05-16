@@ -14,7 +14,8 @@ std::string GroupService::createGroup(const GroupBaseInfoDTO &info, const std::v
         LOG("new GroupSSID dont find")
         return "-1";
     }
-    int groupID = groupBaseInfoDAO.createGroup({-1,newGroupSSID ,info.name,info.avatar,info.createSsid,info.profile});
+    int groupID = groupBaseInfoDAO.createGroup({-1,newGroupSSID ,newGroupSSID,info.avatar,info.createSsid,info.profile});
+    groupAdminDAO.addAdmin(groupID,info.createSsid);
     for (auto member : members) {
         groupMemberDAO.addMember(newGroupSSID,member.ssidMember);
     }

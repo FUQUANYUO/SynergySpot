@@ -76,7 +76,7 @@ UserBaseInfoDO UserDAO::findById(const QString &ssid) {
 QList<UserBaseInfoDO> UserDAO::findByRegion(quint8 region, int pageSize, int pageNum) {
     std::string sql = "SELECT ssid, ssname, avatar, sex, personal_sign, thumb_up_count, birthday, create_time, region "
                       "FROM user_base_info WHERE region = ? LIMIT ? OFFSET ?;";
-    std::vector<std::string> params = { std::to_string(region) , std::to_string(pageSize), std::to_string(pageNum)};
+    std::vector<std::string> params = { std::to_string(region) , std::to_string(pageSize),std::to_string((pageNum - 1) * pageSize)};
 
     auto result = _db.query(sql, params);
     QList<UserBaseInfoDO> users;

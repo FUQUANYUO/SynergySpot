@@ -10,8 +10,8 @@ GroupInfoService::GroupInfoService(LiteConn &db) : groupInfoDAO(db){}
 GroupBaseInfoDTO GroupInfoService::getGroupInfoById(const QString &groupId) {
     GroupBaseInfoDO result = groupInfoDAO.findBySsid(groupId);
     return {result.id==-1?"-1":result.ssidGroup,result.name,
-    QString::fromStdString(g_pCommonData->getDataPath(avatar)) + "/" + result.avatar + QString::fromStdString(g_pCommonData->getImageEx()),
-        result.createSSID,result.profile,result.createTime};
+    result.avatar.isEmpty()?"":(result.avatar),
+        result.createSSID,result.profile,result.admins, result.createTime};
 }
 
 QList<GroupBaseInfoDTO> GroupInfoService::getGroupInfos(int pageSize, int pageNum) {
@@ -19,20 +19,20 @@ QList<GroupBaseInfoDTO> GroupInfoService::getGroupInfos(int pageSize, int pageNu
     QList<GroupBaseInfoDO> result = groupInfoDAO.getAllGroupInfos(pageSize, pageNum);
     for (auto it : result) {
         dto.append({it.ssidGroup,it.name,
-    QString::fromStdString(g_pCommonData->getDataPath(avatar)) + "/" + it.avatar + QString::fromStdString(g_pCommonData->getImageEx()),
-            it.createSSID,it.profile,it.createTime});
+    it.avatar.isEmpty()?"":(it.avatar),
+            it.createSSID,it.profile,it.admins,it.createTime});
     }
     return dto;
 }
 
 int GroupInfoService::createGroup(const QString &ssidGroup, const GroupBaseInfoDTO &groupInfo) {
-    return groupInfoDAO.createGroup({-1,ssidGroup,groupInfo.groupName,groupInfo.avatarPath,groupInfo.createSSID,groupInfo.profile,groupInfo.createTime});
+    return groupInfoDAO.createGroup({-1,ssidGroup,groupInfo.groupName,groupInfo.avatarPath,groupInfo.createSSID,groupInfo.profile,groupInfo.admins,groupInfo.createTime});
 }
 
 bool GroupInfoService::setGroupInfoData(QList<GroupBaseInfoDTO> dto) {
     bool res = true;
     for (auto it : dto) {
-        res = groupInfoDAO.createGroup({-1, it.ssidGroup,it.groupName, it.avatarPath,it.createSSID,it.profile,it.createTime});
+        res = groupInfoDAO.createGroup({-1, it.ssidGroup,it.groupName, it.avatarPath,it.createSSID,it.profile,it.admins,it.createTime});
         if (!res)
             return res;
     }
@@ -41,4 +41,8 @@ bool GroupInfoService::setGroupInfoData(QList<GroupBaseInfoDTO> dto) {
 
 bool GroupInfoService::updateGroupInfo(const QString &ssidGroup, const QString &profile) {
     return groupInfoDAO.updateProfile(ssidGroup,profile);
+}
+
+bool GroupInfoService::updateAvatarPath(const QString &ssidGroup, const QString &path) {
+    return groupInfoDAO.updateAvatar(ssidGroup,path);
 }

@@ -43,6 +43,7 @@ public:
 
     bool loadCacheMsg(const QList<MessageContentDTO>& caches);
 signals:
+    void sigClickedSSIDCardRequest(const QString& ssid);
 public slots:
     // only process card ui logic , don't include interaction with conversation page
     void addMsgCard(const MsgCombineDTO& info);
@@ -69,6 +70,7 @@ private:
     QHash<QString,int>                           _unreadMsgCount;
     QHash<ElaInteractiveCard*,ConversationPage*> _cardLinkPageHash;
     QHash<QString,ElaInteractiveCard*>           _ssidLinkCardHash;
+    QHash<QString,int>                           _tabSSIDLinkIndex;
     // --------------- BackEnd --------------
     static MessagePage* _messagePage;
 };

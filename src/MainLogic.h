@@ -12,6 +12,13 @@ class QProcess;
 class QLocalServer;
 class QLocalSocket;
 
+enum LoadPhase {
+    INIT,
+    BASE_DATA_LOADING,  // 基础数据加载阶段
+    RESOURCE_LOADING,   // 资源加载阶段
+    COMPLETE
+};
+
 class MainLogic : public QObject{
     Q_OBJECT
 public:
@@ -22,17 +29,24 @@ public:
 
     bool initUserDataDir();
 
+    void processJsonFromGRPCClient(const QByteArray& packet);
+
     void checkAllDataLoaded();
+
+    void baseDataHandler();
 private:
     bool _enable = true;
     bool isInit  = true;
-    int  _dataLoadCounter = 0;
+    int  _dataLoadCounter = 3;  // base info (1); new msg (2); contact(3);
+    int  _pendingPic      = 0;
+    LoadPhase  _loadPhase = INIT;
 
-    QProcess * _pGRPCProcess   = nullptr;
-    QWidget  * _curWindow      = nullptr;
-    QLocalServer * _pIPCServer = nullptr;
-    QLocalSocket * _pGRCSocket = nullptr;
-    const QString processName = "SynergySpot-GRPC-Client.exe";
+    QProcess * _pGRPCProcess         = nullptr;
+    QTimer   * _toWaitRemoteMsgTimer = nullptr;
+    QWidget  * _curWindow            = nullptr;
+    QLocalServer * _pIPCServer       = nullptr;
+    QLocalSocket * _pGRCSocket       = nullptr;
+    const QString processName        = "SynergySpot-GRPC-Client.exe";
 };
 
 

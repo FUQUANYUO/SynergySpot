@@ -111,46 +111,48 @@ ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Release")
 ENDIF ()
 # auto search rc file fill into *.qrc
 # 清空*.qrc文件，准备覆写
-CMAKE_POLICY(
-        SET
-        CMP0076
-        NEW
-)
-FILE(
-        GLOB_RECURSE                 RC_FILES
-        ${CMAKE_SOURCE_DIR}/src/page-view/${QRC_PREFIX}/rc-page/*.*
-)
-FILE(
-        WRITE                        ${PROJECT_NAME}.qrc
-        ""
-)
-FILE(
-        WRITE                        ${PROJECT_NAME}.qrc
-        "<RCC>\n"
-        "     <qresource prefix=\"/${QRC_PREFIX}\/\">\n"
-)
-foreach(
-        RC_FILE                      ${RC_FILES}
-)
-    file(
-            REAL_PATH            ${RC_FILE}                 REAL_RC_FILE
+IF(QRC_FILE_AUTO_LOAD)
+    CMAKE_POLICY(
+            SET
+            CMP0076
+            NEW
     )
-    file(
-            RELATIVE_PATH        RC_RELATIVE_PATH
-            ${CMAKE_SOURCE_DIR}/src/page-view/${QRC_PREFIX}     ${REAL_RC_FILE}
+    FILE(
+            GLOB_RECURSE                 RC_FILES
+            ${CMAKE_SOURCE_DIR}/src/page-view/${QRC_PREFIX}/rc-page/*.*
     )
-    file(
-            APPEND               ${PROJECT_NAME}.qrc
-            "           <file>${RC_RELATIVE_PATH}</file>\n"
+    FILE(
+            WRITE                        ${PROJECT_NAME}.qrc
+            ""
     )
-endforeach(
+    FILE(
+            WRITE                        ${PROJECT_NAME}.qrc
+            "<RCC>\n"
+            "     <qresource prefix=\"/${QRC_PREFIX}\/\">\n"
+    )
+    foreach(
+            RC_FILE                      ${RC_FILES}
+    )
+        file(
+                REAL_PATH            ${RC_FILE}                 REAL_RC_FILE
+        )
+        file(
+                RELATIVE_PATH        RC_RELATIVE_PATH
+                ${CMAKE_SOURCE_DIR}/src/page-view/${QRC_PREFIX}     ${REAL_RC_FILE}
+        )
+        file(
+                APPEND               ${PROJECT_NAME}.qrc
+                "           <file>${RC_RELATIVE_PATH}</file>\n"
+        )
+    endforeach(
 
-)
-file(
-        APPEND                       ${PROJECT_NAME}.qrc
-        "     </qresource>\n"
-        "</RCC>\n"
-)
+    )
+    file(
+            APPEND                       ${PROJECT_NAME}.qrc
+            "     </qresource>\n"
+            "</RCC>\n"
+    )
+ENDIF ()
 
 TARGET_SOURCES(
         ${PLUGINS_NAME}              PRIVATE

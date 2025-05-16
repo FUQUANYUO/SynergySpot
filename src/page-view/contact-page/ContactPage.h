@@ -46,14 +46,23 @@ public:
 
     QList<QString> getFriendGrouping();
     bool loadCacheContact(const QList<FriendshipDTO>& caches);
+
+    // get user model view
+    ElaTreeView *getFriendTreeView();
+
 public slots:
     void addContactInfo(const QString& groupingName,const MsgCombineDTO &info);
 signals:
     void sigTriggerAddMsgCard(const MsgCombineDTO &info);
+    void sigTriggerAddToCreateGroupList(const UserBaseInfoDTO &dto);
+
     void sigHideArchPageMaskEffect();
     void sigShowArchPageMaskEffect();
     void sigAddMakeFriendRecord(const UserBaseInfoDTO& dto, NoticeStatus status);
     void sigAddJoinGroupRecord(const GroupBaseInfoDTO& dto, NoticeStatus status);
+
+    // by user info display page
+    void sigCommunicateRequestBySSID(const QString& ssid);
 private:
     explicit ContactPage(QWidget *parent = nullptr);
     ~ContactPage() override;
@@ -67,7 +76,6 @@ private:
     // ----------------- UI -----------------
     QWidget       * _centralWidget         = nullptr;
     QVBoxLayout   * _centralWidLayout      = nullptr;
-    ElaToolButton * _friendMangerContainer = nullptr;
     ElaToolButton * _friendNoticeButton    = nullptr;
     ElaToolButton * _groupNoticeButton     = nullptr;
     ElaPivot      * _friendOrGroupPivot    = nullptr;
@@ -84,9 +92,6 @@ private:
     QMap<QString,QMap<QString,QList<MsgCombineDTO>>>  _groupingInfos;
     // assist find MsgCardInfo
     QHash<QString, MsgCombineDTO>                     _ssidToCardInfoHash;
-    // cur contact data
-
-
     // --------------- BackEnd --------------
 
     static ContactPage* _contactPage;

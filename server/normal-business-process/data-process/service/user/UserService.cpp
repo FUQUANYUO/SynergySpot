@@ -71,3 +71,9 @@ std::vector<UserBaseInfoDTO> UserService::fuzzyMatch(const std::string &ssid, co
     return userDto;
 }
 
+std::string UserService::getUserBindEmail(std::string ssid) {
+    auto res = userPrivateDAO.findById(ssid);
+    if (res.ssid != ssid)return "-1";
+    return res.email;
+}
+

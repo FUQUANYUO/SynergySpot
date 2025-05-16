@@ -73,7 +73,7 @@ signals:
 
     void sigGRPCDisconnect();
 public:
-    static constexpr int CHUNK_SIZE = 3 * 1024 * 1024; // 4MB
+    static constexpr int CHUNK_SIZE = 64 * 1024; // 64KB
 
 private slots:
     void sltCheckHeartbeat();
@@ -106,6 +106,7 @@ private:
     std::unique_ptr<MediaService::Stub> _mediaStub;
 
     // async do
+    std::vector<std::thread> _workers;
     grpc::CompletionQueue _cq;
     std::atomic<bool> _shutdown{false};
     std::thread _cqThread;

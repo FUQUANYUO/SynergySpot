@@ -4,6 +4,9 @@
 
 #include "LiteConn.h"
 
+// 互斥锁防止不可重复读
+static std::mutex mForReadAndWrite;
+
 LiteConn::LiteConn(const char *dbName, std::string accessKey) {
     if (accessKey == "") {
         int rc = sqlite3_open(dbName,&qdb);
@@ -59,8 +62,9 @@ bool LiteConn::rollback() {
     return true;
 }
 
-bool LiteConn::update(const std::string& sql, const std::vector<std::string>& params) {
+bool LiteConn::update(std::string sql, std::vector<std::string> params) {
     sqlite3_stmt* stmt = nullptr;
+    std::lock_guard<std::mutex> lockM(mForReadAndWrite);
     if (sqlite3_prepare_v2(qdb, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
         LOG_ERROR("Prepare failed: " << sqlite3_errmsg(qdb));
         return false;
@@ -77,11 +81,13 @@ bool LiteConn::update(const std::string& sql, const std::vector<std::string>& pa
         LOG_ERROR("Update failed: " << sqlite3_errmsg(qdb));
     }
     sqlite3_finalize(stmt);
+
     return result;
 }
 
-std::vector<std::vector<std::string>> LiteConn::query(const std::string& sql, const std::vector<std::string>& params) {
+std::vector<std::vector<std::string>> LiteConn::query(std::string sql, std::vector<std::string> params) {
     std::vector<std::vector<std::string>> result;
+    std::lock_guard<std::mutex> lockM(mForReadAndWrite);
     sqlite3_stmt* stmt = nullptr;
     if (sqlite3_prepare_v2(qdb, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
         LOG_ERROR("Prepare failed: " << sqlite3_errmsg(qdb));

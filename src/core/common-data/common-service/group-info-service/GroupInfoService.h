@@ -18,6 +18,7 @@ public:
 
     bool setGroupInfoData(QList<GroupBaseInfoDTO> dto);
     bool updateGroupInfo(const QString& ssidGroup,const QString& profile);
+    bool updateAvatarPath(const QString& ssidGroup, const QString& path);
 private:
     GroupInfoDAO groupInfoDAO;
 };

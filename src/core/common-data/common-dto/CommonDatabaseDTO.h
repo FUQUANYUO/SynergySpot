@@ -32,12 +32,13 @@ struct FriendshipDTO{
 };
 
 struct GroupBaseInfoDTO{
-    QString   ssidGroup;
-    QString   groupName;
-    QString   avatarPath;
-    QString   createSSID;
-    QString   profile;
-    time_t createTime;
+    QString        ssidGroup;
+    QString        groupName;
+    QString        avatarPath;
+    QString        createSSID;
+    QString        profile;
+    QList<QString> admins;
+    time_t         createTime;
 };
 
 struct GroupMemberInfoDTO{

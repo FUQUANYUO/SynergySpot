@@ -28,6 +28,9 @@ public:
     // fuzzy matching
     std::vector<UserBaseInfoDTO> fuzzyMatch(const std::string& ssid,const std::string& name);
 
+    // get user bind email
+    std::string getUserBindEmail(std::string ssid);
+
 private:
     UserDAO        userDAO;
     UserPrivateDAO userPrivateDAO;

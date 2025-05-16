@@ -36,7 +36,7 @@ QList<BaseStickerDO> StickerDAO::listBaseStickers(int pageSize, int pageNum) {
     const int offset = (pageNum - 1) * pageSize;
 
     std::string sql = "SELECT sticker_id , image_url FROM base_stickers ORDER BY id DESC LIMIT ? OFFSET ?;";
-    auto result = _db.query(sql, {std::to_string(pageSize), std::to_string(pageNum)});
+    auto result = _db.query(sql, {std::to_string(pageSize), std::to_string(offset)});
     QList<BaseStickerDO> stickers;
     for (const auto &row : result) {
         BaseStickerDO sticker;
