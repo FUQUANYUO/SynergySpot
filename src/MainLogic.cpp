@@ -241,17 +241,6 @@ int MainLogic::startMainLogic(QApplication *app) {
                         g_pCommonData->updateUserInfoBySSID(baseInfoDto);
                     }
 
-                    // store user private data
-                    g_pCommonData->setLoginRecord({QString::fromStdString(ldto.ssid()),
-                                                  QString::fromStdString(ldto.password()),
-                                                  QDateTime::currentMSecsSinceEpoch(),
-#ifdef Q_OS_WIN
-                                                  "WINDOWS"
-#else
-    "LINUX"
-#endif
-                    });
-
                     g_pArchPage->hide();
 
                     // check load status
@@ -555,6 +544,13 @@ int MainLogic::startMainLogic(QApplication *app) {
         SSDTO::EnrollAccountDTO edto;
         edto.ParseFromString(dto);
         LOG_INFO(edto.ssid());
+
+        emit g_pSignUpPage->sigSignUpResponse({
+            edto.user_name(),
+            edto.email(),
+            "",
+            edto.ssid()
+        });
     });
 
     // recover pass word
@@ -741,6 +737,17 @@ int MainLogic::startMainLogic(QApplication *app) {
         g_pLandPage->close();
         g_pLandPage->destroyInstance();
         _dataLoadCounter = INT_MAX;
+
+        // store user private data
+        g_pCommonData->setLoginRecord({g_pCommonData->getCurUserInfo().ssid,
+                                      g_pCommonData->getCurUserInfo().avatarPath,
+                                      QDateTime::currentMSecsSinceEpoch(),
+#ifdef Q_OS_WIN
+                              "WINDOWS"
+#else
+                              "LINUX"
+#endif
+        });
     });
 
     // fuzzy search

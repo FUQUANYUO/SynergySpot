@@ -10,14 +10,14 @@ qint64 LoginRecordDAO::insert(const LoginRecordDO &record) {
     // 构建参数列表
     std::vector<std::string> params{
         record.account.toStdString(),
-        record.encryptedPassword.toStdString(),
+        record.avatarPath.toStdString(),
         std::to_string(record.loginTime),
         record.deviceInfo.toStdString()
     };
 
     // 执行插入
     bool success = _db.update(
-        "INSERT INTO login_record (account, encrypted_password, login_time, device_info) "
+        "INSERT INTO login_record (account, avatar, login_time, device_info) "
         "VALUES (?, ?, ?, ?)",
         params
     );
@@ -45,7 +45,7 @@ LoginRecordDO LoginRecordDAO::findByAccount(const QString &ssid) {
 
     // 执行查询
     auto result = _db.query(
-        "SELECT id, account, encrypted_password, login_time, device_info "
+        "SELECT id, account, avatar, login_time, device_info "
         "FROM login_record "
         "WHERE account = ? ",
         params
@@ -59,7 +59,7 @@ LoginRecordDO LoginRecordDAO::findByAccount(const QString &ssid) {
     for (const auto& row : result) {
         record.id = std::stoll(row[0]);
         record.account = QString::fromStdString(row[1]);
-        record.encryptedPassword = QString::fromStdString(row[2]);
+        record.avatarPath = QString::fromStdString(row[2]);
         record.loginTime = std::stoll(row[3]);
         record.deviceInfo = QString::fromStdString(row[4]);
     }
@@ -77,7 +77,7 @@ QList<LoginRecordDO> LoginRecordDAO::listAllRecord(int limit) {
 
     // 执行查询
     auto result = _db.query(
-        "SELECT id, account, encrypted_password, login_time, device_info "
+        "SELECT id, account, avatar, login_time, device_info "
         "FROM login_record "
         "ORDER BY login_time DESC "
         "LIMIT ?",
@@ -89,7 +89,7 @@ QList<LoginRecordDO> LoginRecordDAO::listAllRecord(int limit) {
         LoginRecordDO record;
         record.id = std::stoll(row[0]);
         record.account = QString::fromStdString(row[1]);
-        record.encryptedPassword = QString::fromStdString(row[2]);
+        record.avatarPath = QString::fromStdString(row[2]);
         record.loginTime = std::stoll(row[3]);
         record.deviceInfo = QString::fromStdString(row[4]);
         records.append(record);
@@ -138,10 +138,20 @@ bool LoginRecordDAO::deleteBefore(time_t threshold) {
 }
 
 bool LoginRecordDAO::updateTime(const QString& ssid,time_t date) {
-    std::string sql = "UPDATE login_record SET login_time = ? WHERE ssid = ?;";
+    std::string sql = "UPDATE login_record SET login_time = ? WHERE account = ?;";
     std::vector<std::string> params = {
         ssid.toStdString(),
         std::to_string(date)
+    };
+
+    return _db.update(sql, params);
+}
+
+bool LoginRecordDAO::updateAvatar(const QString &ssid, const QString &path) {
+    std::string sql = "UPDATE login_record SET avatar = ? WHERE account = ?;";
+    std::vector<std::string> params = {
+        ssid.toStdString(),
+        path.toStdString()
     };
 
     return _db.update(sql, params);

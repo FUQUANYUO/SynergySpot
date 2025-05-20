@@ -22,14 +22,13 @@ public:
     // 更新时间
     bool updateLoginTime(const QString& ssid,const time_t& date);
 
+    // 更新头像
+    bool updateAvatar(const QString& ssid,const QString& path);
+
     // 查询记录
     LoginRecordDTO        getLoginRecordsBySSID(const QString& ssid);
     QList<LoginRecordDTO> getLoginRecords(int limit = 5);
 
-private:
-    // 加密和解密
-    QString encryptPassword(const QString& plainPassword);
-    QString decryptPassword(const QString& encryptedPassword);
 private:
     LoginRecordDAO loginRecordDAO;
 };

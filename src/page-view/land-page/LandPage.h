@@ -101,7 +101,7 @@ private:
     // ----------------- UI -----------------
 
     // --------------- BackEnd --------------
-    QHash<QString, QString> _accToPasswordHash;
+    QHash<QString, QString> _accToAvatarPath;
     // --------------- BackEnd --------------
 
     static LandPage *_landPage;

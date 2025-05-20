@@ -87,8 +87,8 @@ Q_DECLARE_METATYPE(MsgCombineDTO)
 
 struct LoginRecordDTO {
     QString account;         // 登录账号
-    QString plainPassword;   // 明文密码
-    time_t loginTime;     // 登录时间
+    QString avatarPath;      // 头像
+    time_t loginTime;        // 登录时间
     QString deviceInfo;      // 设备信息
 };
 

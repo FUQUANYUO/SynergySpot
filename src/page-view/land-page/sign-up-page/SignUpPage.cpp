@@ -268,6 +268,7 @@ void SignUpPage::initConnectFunc() {
     // get response of sign up request
     connect(this, &SignUpPage::sigSignUpResponse, this, [=](const SignUpDataStruct & data) {
         _loadBar->hide();
+        ElaMessageBar::success(ElaMessageBarType::BottomLeft,"🎉成功", "🎉请牢记您的账号：" + QString::fromStdString(data.ssid), _displayTime + 3000, this);
     });
 
     // refresh code
@@ -592,6 +593,7 @@ void SignUpPage::sltCheckInfo(){
         std::string password = _inputPassword->text().toStdString();
 
         emit sigSignUpRequest({name,email,password, ""});
+        _signUpButton->setDisabled(true);
         _loadBar->show();
     }while (false);
 }

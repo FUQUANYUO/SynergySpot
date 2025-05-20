@@ -160,13 +160,9 @@ bool CommonData::setLoginRecord(const LoginRecordDTO &loginInfo) {
     if (res.account == "-1") {
         loginRecordService->addLoginRecord(loginInfo);
     }else {
-        if (res.plainPassword == loginInfo.plainPassword) {
-            // update login time
-            loginRecordService->updateLoginTime(loginInfo.account,loginInfo.loginTime);
-        }else {
-            // remove login data and insert new
-            loginRecordService->deleteLoginRecord(loginInfo.account);
-        }
+        // update login time
+        loginRecordService->updateLoginTime(loginInfo.account,loginInfo.loginTime);
+        loginRecordService->updateAvatar(loginInfo.account,loginInfo.avatarPath);
     }
     return true;
 }
@@ -676,7 +672,7 @@ CommonData::CommonData(){
         "CREATE TABLE IF NOT EXISTS login_record ("
         "  id INTEGER PRIMARY KEY AUTOINCREMENT,"
         "  account VARCHAR(64) NOT NULL,"
-        "  encrypted_password VARCHAR(256) NOT NULL,"
+        "  avatar  TEXT,"
         "  login_time TEXT NOT NULL,"
         "  device_info TEXT"
         ");"

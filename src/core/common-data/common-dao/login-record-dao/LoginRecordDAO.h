@@ -22,6 +22,7 @@ public:
     bool deleteBefore(time_t threshold) override;
 
     bool updateTime(const QString& ssid,time_t date);
+    bool updateAvatar(const QString &ssid, const QString &path);
 
 private:
     LiteConn& _db;  // 数据库连接引用

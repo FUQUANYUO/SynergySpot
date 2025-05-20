@@ -112,8 +112,8 @@ struct CollectedStickerDO {
 struct LoginRecordDO {
     qint64 id;                 // AUTOINCREMENT
     QString account;           // 登录账号
-    QString encryptedPassword; // 加密后的密码
-    time_t loginTime;       // 登录时间
+    QString avatarPath;        // 缓存头像
+    time_t loginTime;          // 登录时间
     QString deviceInfo;        // 设备信息（可选）
 };
 

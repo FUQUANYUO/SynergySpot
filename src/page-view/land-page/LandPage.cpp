@@ -190,6 +190,7 @@ void LandPage::initContent() {
     accountList->setMaximumHeight(120);
     accountList->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Maximum);
 
+    bool isExistCacheData = false;
     for (const auto& it : g_pCommonData->getLoginRecord(8)) {
         // init local cache for account
         auto * data = new QListWidgetItem(it.account);
@@ -198,10 +199,24 @@ void LandPage::initContent() {
         accountList->addItem(data);
 
         // init local cache for password
-        _accToPasswordHash.insert(it.account, it.plainPassword);
+        _accToAvatarPath.insert(it.account, it.avatarPath);
+        isExistCacheData = true;
     }
     _accountComboBox->setModel(accountList->model());
     _accountComboBox->setView(accountList);
+
+    if(isExistCacheData) {
+        QString curSSID = accountList->item(0)->text();
+        QString curAvatar = _accToAvatarPath.value(curSSID);
+        if (!curAvatar.isEmpty() && curAvatar != "-1") {
+            _avatar->setCardImage(QImage(curAvatar));
+        }else {
+            _avatar->setCardImage(QImage(":/land-page/rc-page/img/SS-default-icon.jpg"));
+        }
+        _avatar->setFixedSize(90,90);
+        _avatar->setBorderRadius(20);
+        _avatar->setMaximumAspectRatio(1);
+    }
 
     _inputPassword->setEnabled(true);
     _inputPassword->setPlaceholderText("请输入SS密码");
@@ -306,9 +321,16 @@ void LandPage::initConnectFunc() {
         }
     });
     connect(_accountComboBox,&QComboBox::currentIndexChanged,this,[=](int index) {
-        if (_accToPasswordHash.contains(_accountComboBox->itemData(index).toString())){
-            _inputPassword->setText(_accToPasswordHash[_accountComboBox->itemData(index).toString()]);
+        QString curSSID = _accountComboBox->itemData(index).toString();
+        QString curAvatar = _accToAvatarPath.value(curSSID);
+        if (!curAvatar.isEmpty() && curAvatar != "-1") {
+            _avatar->setCardImage(QImage(curAvatar));
+        }else {
+            _avatar->setCardImage(QImage(":/land-page/rc-page/img/SS-default-icon.jpg"));
         }
+        _avatar->setFixedSize(90,90);
+        _avatar->setBorderRadius(20);
+        _avatar->setMaximumAspectRatio(1);
     });
 
     timer->start(16);
