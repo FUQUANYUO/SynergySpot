@@ -6,6 +6,7 @@
 #include "msg-bubble-delegate/MsgBubbleDelegate.h"
 #include "msg-bubble-view/MsgBubbleView.h"
 #include "screenshot-page/ScreenshotPage.h"
+#include "emoji-picker-page/EmojiPickerPage.h"
 #include "group-member-dock/GroupMemberDock.h"
 #include "../user-page/UserPage.h"
 #include "../MessagePage.h"
@@ -27,37 +28,13 @@
 #endif
 
 #include <QGridLayout>
-#include <QTextEdit>
 #include <QMimeData>
 #include <QDragEnterEvent>
 #include <QPainter>
 #include <QDateTime>
 #include <QListView>
+#include <QTimer>
 #include <mutex>
-
-// input text edit
-class SSTextEdit : public QTextEdit {
-public:
-    SSTextEdit(QWidget *parent = nullptr);
-
-    QMap<QString, QImage>& getImageTmpMap();
-
-protected:
-    // image from paste board
-    void insertFromMimeData(const QMimeData *source) override;
-
-    // drag image
-    void dragEnterEvent(QDragEnterEvent *event) override;
-    void dropEvent(QDropEvent *event) override;
-
-    // backspace event
-    void keyPressEvent(QKeyEvent *event) override;
-
-    // insert logic default scale is 0.3
-    void insertImage(const QImage &image, double scale = 0.3);
-private:
-    QMap<QString, QImage>   _imagesTmpMap;    // pic name without suffix : pic pixmap
-};
 
 SSTextEdit::SSTextEdit(QWidget *parent): QTextEdit(parent) {
     setAcceptDrops(true);
@@ -110,6 +87,24 @@ void SSTextEdit::keyPressEvent(QKeyEvent *event) {
     if (document()->isEmpty() && event->key() == Qt::Key_Backspace) {
         _imagesTmpMap.clear();
     }
+    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
+        if (event->modifiers() & Qt::ControlModifier ) {
+            if (_isEnterToSendMsg) {
+                insertPlainText("\n");  // Ctrl + Enter 换行
+            }else {
+                emit sigSendMsgTrigger();  // Ctrl + Enter 触发提交
+            }
+            event->accept();
+        } else {
+            if (_isEnterToSendMsg) {
+                emit sigSendMsgTrigger();  // 单独 Enter 触发提交
+            }else {
+                insertPlainText("\n");  // 单独 Enter 换行
+            }
+            event->accept();
+        }
+        return ;
+    }
     QTextEdit::keyPressEvent(event);
 }
 
@@ -136,6 +131,10 @@ QMap<QString, QImage>& SSTextEdit::getImageTmpMap() {
     return _imagesTmpMap;
 }
 
+void SSTextEdit::setSendMsgStrategy(bool isEnterToSendMsg) {
+    _isEnterToSendMsg = isEnterToSendMsg;
+}
+
 InputWidget::InputWidget(QWidget *parent) : QWidget(parent)
 {
     initWindow();
@@ -147,7 +146,10 @@ InputWidget::InputWidget(QWidget *parent) : QWidget(parent)
     initConnectFunc();
 }
 
-InputWidget::~InputWidget(){}
+InputWidget::~InputWidget() {
+    delete _emojiPickerPage;
+    _emojiPickerPage = nullptr;
+}
 
 void InputWidget::initWindow() {
     setContentsMargins(0,0,0,0);
@@ -165,6 +167,7 @@ void InputWidget::initWindow() {
     _sendModButton       =      new ElaToolButton(this);
     _sendMod             =      new ElaMenu(this);
     _inputLayout         =      new QGridLayout(this);
+    _emojiPickerPage     =      new EmojiPickerPage();
 }
 
 void InputWidget::initEdgeLayout() {
@@ -209,8 +212,8 @@ void InputWidget::initContent() {
     _inputEditFrame->setStyleSheet("#_inputEditFrame{border:none;background-color:rgb(242,242,242);}");
     _inputEditFrame->viewport()->setAutoFillBackground(true);
 
-    _sendMod->addElaIconAction(ElaIconType::CircleCheck,"按 Enter 发送消息");
-    _sendMod->addElaIconAction(ElaIconType::Circle,"按 Ctrl + Enter 发送消息");
+    _enterStrategy = _sendMod->addElaIconAction(ElaIconType::CircleCheck,"按 Enter 发送消息");
+    _ctrlAndEnterStrategy = _sendMod->addElaIconAction(ElaIconType::Circle,"按 Ctrl + Enter 发送消息");
 
     _sendModButton->setIsTransparent(false);
     _sendModButton->setMenu(_sendMod);
@@ -240,10 +243,34 @@ void InputWidget::initConnectFunc() {
             emit sigSendBtnClicked(_inputEditFrame->toHtml());
         }
     });
+
     connect(_emojiButton,&QPushButton::clicked, this, [=]() {
-#ifdef WIN32
-        ShellExecuteW(NULL, NULL, L"explorer.exe", L"ms-windows-store://emojipicker", NULL, SW_SHOWNORMAL);
-#endif
+        QPoint globalPos = QCursor::pos();
+
+        globalPos.setY( globalPos.y() - _emojiPickerPage->height());
+        _emojiPickerPage->move(globalPos + QPoint{10,10});
+        _emojiPickerPage->show();
+    });
+
+    connect(_emojiPickerPage, &EmojiPickerPage::sigEmojiSelected, this, [=](const QString &emoji) {
+        _inputEditFrame->insertPlainText(emoji);
+        _inputEditFrame->setFocus();
+    });
+
+    connect(_enterStrategy, &QAction::triggered, this, [=]() {
+        _inputEditFrame->setSendMsgStrategy(true);
+        _enterStrategy->setProperty("ElaIconType", QChar((unsigned short)ElaIconType::CircleCheck));
+        _ctrlAndEnterStrategy->setProperty("ElaIconType", QChar((unsigned short)ElaIconType::Circle));
+    });
+
+    connect(_ctrlAndEnterStrategy, &QAction::triggered, this, [=]() {
+        _inputEditFrame->setSendMsgStrategy(false);
+        _ctrlAndEnterStrategy->setProperty("ElaIconType", QChar((unsigned short)ElaIconType::CircleCheck));
+        _enterStrategy->setProperty("ElaIconType", QChar((unsigned short)ElaIconType::Circle));
+    });
+
+    connect(_inputEditFrame, &SSTextEdit::sigSendMsgTrigger, this, [=]() {
+        emit _sendButton->click();
     });
 }
 
@@ -263,8 +290,17 @@ ConversationFriendPage::ConversationFriendPage(const UserBaseInfoDTO& userInfo,Q
 
 ConversationFriendPage::~ConversationFriendPage(){}
 
+void ConversationFriendPage::scrollMsgViewToBottom() {
+    QTimer::singleShot(100,this,[=]() {
+        _msgListView->scrollToBottom();
+    });
+}
+
 void ConversationFriendPage::insertMsgBubble(const ChatMessage& msg) const {
     _msgBubbleModel->addMsg(msg);
+    QTimer::singleShot(100,this,[=]() {
+        _msgListView->scrollToBottom();
+    });
 }
 
 void ConversationFriendPage::initWindow() {
@@ -280,6 +316,7 @@ void ConversationFriendPage::initWindow() {
     _msgBubbleModel      =      new MsgBubbleModel;
     _toolLayout          =      new QHBoxLayout;
 }
+
 void ConversationFriendPage::initEdgeLayout() {
     // toolbar layout
     _toolLayout->addWidget(_userNameButton);
@@ -398,8 +435,17 @@ ConversationGroupPage::ConversationGroupPage(
 
 ConversationGroupPage::~ConversationGroupPage(){}
 
+void ConversationGroupPage::scrollMsgViewToBottom() {
+    QTimer::singleShot(300,this,[=]() {
+        _msgListView->scrollToBottom();
+    });
+}
+
 void ConversationGroupPage::insertMsgBubble(const ChatMessage& msg) const {
     _msgBubbleModel->addMsg(msg);
+    QTimer::singleShot(300,this,[=]() {
+        _msgListView->scrollToBottom();
+    });
 }
 
 void ConversationGroupPage::initWindow() {
@@ -700,4 +746,11 @@ ConversationPage::ConversationPage(ConversationType type,const MsgCombineDTO& dt
 ConversationPage::~ConversationPage()
 {
 
+}
+
+void ConversationPage::scrollMsgViewToBottom() {
+    if (_cfP == nullptr)
+        _cgP->scrollMsgViewToBottom();
+    else
+        _cfP->scrollMsgViewToBottom();
 }

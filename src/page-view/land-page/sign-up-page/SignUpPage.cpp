@@ -4,6 +4,7 @@
 
 #include "SignUpPage.h"
 #include "help.h"
+#include "ProtoContent.h"
 #include "../../effect-component/cv-process-video-strategy/CVProVideoStrategy.h"
 #include "../../plugin-manager/StrategyManager.h"
 
@@ -16,6 +17,7 @@
 #include "ela-widget-tools/ElaText.h"
 #include "ela-widget-tools/ElaStatusBar.h"
 #include "ela-widget-tools/ElaProgressBar.h"
+#include "ela-widget-tools/ElaWidget.h"
 
 #include <QComboBox>
 #include <QLabel>
@@ -258,11 +260,22 @@ void SignUpPage::initConnectFunc() {
 
     // protocol text jump to the page
     connect(_protocolText,&QTextBrowser::anchorClicked,this,[=](const QUrl &url) {
+        ElaWidget * widget = new ElaWidget();
+        QHBoxLayout * hLayout = new QHBoxLayout(widget);
+        QTextBrowser * html = new QTextBrowser(widget);
+        widget->setWindowModality(Qt::WindowModal);
+        widget->setAttribute(Qt::WA_DeleteOnClose);
+        widget->setFixedSize(800,500);
+
+        hLayout->addWidget(html);
         if (url.toString() == "service_agreement") {
-            LOG("service test success")
-        } else if (url.toString() == "privacy_policy") {
-            LOG("privacy test success")
+            widget->setWindowTitle("服务协议");
+            html->setHtml(QString::fromStdString(serviceContent));
+        }else if (url.toString() == "privacy_policy") {
+            widget->setWindowTitle("隐私协议");
+            html->setHtml(QString::fromStdString(privacyContent));
         }
+        widget->show();
     });
 
     // get response of sign up request

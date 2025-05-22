@@ -191,6 +191,8 @@ void MessagePage::addMsgCard(const MsgCombineDTO &info) {
                 _unreadMsgCount[info.userBaseInfo.ssid] = 0;
                 user->changeStatus(true);
                 user->show();
+                cP->scrollMsgViewToBottom();
+
                 if (_tabSSIDLinkIndex.contains(info.userBaseInfo.ssid)) {
                     _conversionWid->setCurrentIndex(_tabSSIDLinkIndex.value(info.userBaseInfo.ssid));
                 }else {
@@ -227,9 +229,10 @@ void MessagePage::addMsgCard(const MsgCombineDTO &info) {
             _cardLinkPageHash[user] = cP;
 
             connect(user,&ElaInteractiveCard::clicked,this,[=]() {
-               _unreadMsgCount[info.groupBaseInfo.ssidGroup] = 0;
-               user->changeStatus(true);
-               user->show();
+                _unreadMsgCount[info.groupBaseInfo.ssidGroup] = 0;
+                user->changeStatus(true);
+                user->show();
+                cP->scrollMsgViewToBottom();
                 if (_tabSSIDLinkIndex.contains(info.userBaseInfo.ssid)) {
                     _conversionWid->setCurrentIndex(_tabSSIDLinkIndex.value(info.userBaseInfo.ssid));
                 }else {
@@ -314,6 +317,7 @@ void MessagePage::initConnectFunc() {
                 _unreadMsgCount[it.value().userBaseInfo.ssid] = 0;
                 it.key()->changeStatus(true);
                 it.key()->show();
+                cP->scrollMsgViewToBottom();
 
                 if (_tabSSIDLinkIndex.contains(it.value().userBaseInfo.ssid)) {
                     _conversionWid->setCurrentIndex(_tabSSIDLinkIndex.value(it.value().userBaseInfo.ssid));
@@ -335,6 +339,7 @@ void MessagePage::initConnectFunc() {
                 _unreadMsgCount[it.value().groupBaseInfo.ssidGroup] = 0;
                 it.key()->changeStatus(true);
                 it.key()->show();
+                cP->scrollMsgViewToBottom();
 
                 if (_tabSSIDLinkIndex.contains(it.value().userBaseInfo.ssid)) {
                     _conversionWid->setCurrentIndex(_tabSSIDLinkIndex.value(it.value().userBaseInfo.ssid));

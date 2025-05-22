@@ -2,6 +2,7 @@
 // Created by FU-QAQ on 2024/9/12.
 //
 #include "LandPage.h"
+#include "ProtoContent.h"
 #include "../CommonFunc.hpp"
 #include "../../core/common-data/CommonData.h"
 #include "../effect-component/cv-process-video-strategy/CVProVideoStrategy.h"
@@ -15,6 +16,7 @@
 #include "ela-widget-tools/ElaImageCard.h"
 #include "ela-widget-tools/ElaRadioButton.h"
 #include "ela-widget-tools/ElaText.h"
+#include "ela-widget-tools/ElaWidget.h"
 
 #include <QTextBrowser>
 #include <QCheckBox>
@@ -29,6 +31,7 @@
 #include <QThread>
 #include <QTimer>
 #include <mutex>
+#include <ela-widget-tools/ElaMessageBar.h>
 
 LandPage * LandPage::_landPage = nullptr;
 static std::mutex m;
@@ -297,8 +300,11 @@ void LandPage::initConnectFunc() {
         emit sigCurrentWidChanged(g_pRecoverPWPage);
     });
     connect(_signInButton,&QPushButton::clicked,this,[=](){
+        if (!_acceptButton->isChecked()) {
+            ElaMessageBar::error(ElaMessageBarType::Top,"⚠","请同意隐私和服务条款！",3000,this);
+            return;
+        }
         isFreezeSignInBtn(true);
-
         QString acc =  _accountComboBox->currentText();
         QString pw  =  _inputPassword->text();
         if(!acc.isEmpty() && !pw.isEmpty())
@@ -314,11 +320,22 @@ void LandPage::initConnectFunc() {
         }
     });
     connect(_protocolText,&QTextBrowser::anchorClicked,this,[=](const QUrl &url) {
+        ElaWidget * widget = new ElaWidget();
+        QHBoxLayout * hLayout = new QHBoxLayout(widget);
+        QTextBrowser * html = new QTextBrowser(widget);
+        widget->setWindowModality(Qt::WindowModal);
+        widget->setAttribute(Qt::WA_DeleteOnClose);
+        widget->setFixedSize(800,500);
+
+        hLayout->addWidget(html);
         if (url.toString() == "service_agreement") {
-            LOG("service test success")
+            widget->setWindowTitle("服务协议");
+            html->setHtml(QString::fromStdString(serviceContent));
         }else if (url.toString() == "privacy_policy") {
-            LOG("privacy test success")
+            widget->setWindowTitle("隐私协议");
+            html->setHtml(QString::fromStdString(privacyContent));
         }
+        widget->show();
     });
     connect(_accountComboBox,&QComboBox::currentIndexChanged,this,[=](int index) {
         QString curSSID = _accountComboBox->itemData(index).toString();
