@@ -35,5 +35,16 @@ namespace ComFunc {
         loop.exec();
     }
 
+    // truncate
+    inline QString truncateWithEllipsis(const QString& str, int maxLen = 12) {
+        if (maxLen < 0)
+            return QString();
+        if (str.length() <= maxLen)
+            return str;
+        if (maxLen >= 3)
+            return str.left(maxLen - 3) + "...";
+        else
+            return str.left(maxLen);
+    }
 }
 #endif

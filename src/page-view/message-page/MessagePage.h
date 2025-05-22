@@ -41,7 +41,7 @@ public:
     static MessagePage * getInstance();
     static void destroyMessagePage();
 
-    bool loadCacheMsg(const QList<MessageContentDTO>& caches);
+    bool loadCacheMsg(QList<MessageContentDTO> caches);
 signals:
     void sigClickedSSIDCardRequest(const QString& ssid);
 public slots:

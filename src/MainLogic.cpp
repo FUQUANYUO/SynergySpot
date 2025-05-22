@@ -308,6 +308,17 @@ int MainLogic::startMainLogic(QApplication *app) {
                 gfdto.ParseFromString(dto);
 
                 QList<FriendshipDTO>    contacts;
+                QList<QString>          contactSSIDList;
+                // contacts
+                for (const auto &info: gfdto.friendship_info()) {
+                    contacts.append({QString::fromStdString(info.ssid()),
+                                     QString::fromStdString(info.grouping()),
+                                     QString::fromStdString(info.friend_ssid()),
+                                     qint32(info.ship_status()),
+                                     qint32(info.friend_type()),
+                                     info.create_time()});
+                    contactSSIDList.append(QString::fromStdString(info.friend_ssid()));
+                }
                 // friend
                 for (const auto &info: gfdto.user_base_info()) {
                     UserBaseInfoDTO userBaseInfoDto{
@@ -380,6 +391,9 @@ int MainLogic::startMainLogic(QApplication *app) {
                         };
                         memberInfoDtoList.append(mInfoDto);
 
+                        // not exist in user contact user
+                        if (contactSSIDList.contains(QString::fromStdString(memberUserBaseInfoIt.ssid())))
+                            continue;
                         UserBaseInfoDTO mUserBaseInfo{
                             QString::fromStdString(memberUserBaseInfoIt.ssid()),
                             QString::fromStdString(memberUserBaseInfoIt.ssname()),
@@ -392,29 +406,13 @@ int MainLogic::startMainLogic(QApplication *app) {
                             memberUserBaseInfoIt.create_time(),
                         };
 
-                        FileStorageDTO mRes = g_pCommonData->getFileInfoById(QString::fromStdString(info.avatar_file_id()));
-
-                        if (mRes.fileId == "-1" || mRes.fileId.isEmpty()) {
-                            // // send query avatar by grpc
-                            // emit g_pCommonData->sigGetAvatarFileFromRemote(
-                            //     QString::fromStdString(memberUserBaseInfoIt.avatar_file_id()),
-                            //     QString::fromStdString(memberUserBaseInfoIt.ssid()),
-                            //     QString::fromStdString(memberUserBaseInfoIt.avatar_remote_path())
-                            // );
-                        } else {
-                            mUserBaseInfo.avatarPath = res.storagePath;
-                        }
+                        if (g_pCommonData->getUserInfoBySSID(mUserBaseInfo.ssid).ssid.isEmpty() ||
+                            g_pCommonData->getUserInfoBySSID(mUserBaseInfo.ssid).ssid == "-1")
+                                                g_pCommonData->addUserInfoByServer(mUserBaseInfo);
                     }
                     g_pCommonData->setGroupMemberInfoData(memberInfoDtoList);
                 }
-                for (const auto &info: gfdto.friendship_info()) {
-                    contacts.append({QString::fromStdString(info.ssid()),
-                                     QString::fromStdString(info.grouping()),
-                                     QString::fromStdString(info.friend_ssid()),
-                                     qint32(info.ship_status()),
-                                     qint32(info.friend_type()),
-                                     info.create_time()});
-                }
+
 
                 // check load status
                 baseDataHandler();
@@ -639,7 +637,14 @@ int MainLogic::startMainLogic(QApplication *app) {
         lmdto.senderSSID = QString::fromStdString(mdto.sender_ssid());
 
         g_pCommonData->setMessageContentData({lmdto},true);
-        g_pMessagePage->loadCacheMsg({lmdto});
+        if (lmdto.recipient.recipientType == 2) {
+            emit g_pMessagePage->sigClickedSSIDCardRequest(lmdto.recipient.recipientSSID);
+        }else {
+            emit g_pMessagePage->sigClickedSSIDCardRequest(lmdto.senderSSID);
+        }
+        QTimer::singleShot(200,this,[=]() {
+            g_pMessagePage->loadCacheMsg({lmdto});
+        });
     });
 
     // upload to server for msg dto

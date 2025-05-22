@@ -6,6 +6,7 @@
 #include "conversation-page/ConversationPage.h"
 
 #include "help.h"
+#include "../CommonFunc.hpp"
 
 #include "ela-widget-tools/ElaScrollPage.h"
 #include "ela-widget-tools/ElaTabWidget.h"
@@ -43,7 +44,7 @@ void MessagePage::destroyMessagePage() {
     }
 }
 
-bool MessagePage::loadCacheMsg(const QList<MessageContentDTO> &caches) {
+bool MessagePage::loadCacheMsg(QList<MessageContentDTO> caches) {
     for (const auto& it : caches) {
         bool isGroup = (it.recipient.recipientType==2);
         if (!isGroup) {
@@ -121,7 +122,7 @@ void MessagePage::addMsgContent(const MessageContentDTO &content) {
 
         // update conversation data
         if (isGroup) {
-            _ssidLinkCardHash[content.recipient.recipientSSID]->setSubTitle(_curName + "：" + docu.toPlainText());
+            _ssidLinkCardHash[content.recipient.recipientSSID]->setSubTitle(ComFunc::truncateWithEllipsis(_curName + "：" +  docu.toPlainText()));
             auto typeWid = dynamic_cast<ConversationGroupPage*>(_cardLinkPageHash[_ssidLinkCardHash[content.recipient.recipientSSID]]->getConversationTypePage());
             typeWid->insertMsgBubble({_curSSID,_curName,content.content,_avatar,true});
         }else {
@@ -143,9 +144,9 @@ void MessagePage::addMsgContent(const MessageContentDTO &content) {
 
         // update conversation data
         if (isGroup) {
-            auto typeWid = dynamic_cast<ConversationGroupPage*>(_cardLinkPageHash[_ssidLinkCardHash[content.senderSSID]]->getConversationTypePage());
+            auto typeWid = dynamic_cast<ConversationGroupPage*>(_cardLinkPageHash[_ssidLinkCardHash[content.recipient.recipientSSID]]->getConversationTypePage());
             auto userInfo = g_pCommonData->getUserInfoBySSID(content.senderSSID);
-            _ssidLinkCardHash[content.senderSSID]->setSubTitle(userInfo.username + "：" + docu.toPlainText());
+            _ssidLinkCardHash[content.senderSSID]->setSubTitle(ComFunc::truncateWithEllipsis(userInfo.username + "：" + docu.toPlainText()));
             typeWid->insertMsgBubble({content.senderSSID,userInfo.username,content.content,userInfo.avatarPath,false});
         }else {
             auto typeWid = dynamic_cast<ConversationFriendPage*>(_cardLinkPageHash[_ssidLinkCardHash[content.senderSSID]]->getConversationTypePage());
@@ -158,6 +159,8 @@ void MessagePage::addMsgContent(const MessageContentDTO &content) {
 
 void MessagePage::addMsgCard(const MsgCombineDTO &info) {
     if (info.groupBaseInfo.ssidGroup.isEmpty() && info.userBaseInfo.ssid.isEmpty())return;
+    if (info.isGroup && info.groupBaseInfo.ssidGroup == "-1") return;
+    if (!info.isGroup && info.userBaseInfo.ssid == "-1") return;
     QFont font;
     font.setPixelSize(8);
 
@@ -245,7 +248,7 @@ void MessagePage::addMsgCard(const MsgCombineDTO &info) {
         if (info.timestamp > 0) { // new msg come in
             int unreadCount = ++_unreadMsgCount[info.groupBaseInfo.ssidGroup];
             _ssidLinkCardHash[info.groupBaseInfo.ssidGroup]->setStatusContent((unreadCount>99?"99+":QString::number(unreadCount)),font,40);
-            _ssidLinkCardHash[info.groupBaseInfo.ssidGroup]->setSubTitle(info.groupBaseInfo.groupName + "：" + info.content);
+            _ssidLinkCardHash[info.groupBaseInfo.ssidGroup]->setSubTitle(ComFunc::truncateWithEllipsis(info.groupBaseInfo.groupName + "：" + info.content));
             _ssidLinkCardHash[info.groupBaseInfo.ssidGroup]->setTimeContent(QString::fromStdString(
                 GetCurTime::getTimeObj()->getMsgTypeTime(static_cast<std::time_t>(info.timestamp))),Qt::gray,font
             );

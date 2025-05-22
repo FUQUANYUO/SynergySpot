@@ -116,6 +116,7 @@ int ProcessBusiness::processBusiness(std::string dto, int businessType, std::sha
             GroupMemberDAO gDAO;
             vector<GroupMemberInfoDO> members = gDAO.listMembers(targetSSID);
             for (const auto& member : members ) {
+                if(info->ssid == member.ssidMember)continue;
                 auto targetSockInfo = onlineList.find(member.ssidMember);
                 if (targetSockInfo != onlineList.end()) {
                     targetSockInfo->second->tcp->sendMsg(dto,SSDTO::C_MESSAGE_CONTENT);
