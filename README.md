@@ -8,6 +8,9 @@
   中文名 “灵犀一点”，源自诗句"心有灵犀一点通"，形容即时的心灵沟通。
 </p>
 
+# 系统架构图
+
+<img src="doc\Static\系统架构图.png" alt="系统架构图" style="zoom:48%;" />
 
 # 部署项目
 **本项目分为两个部分：客户端(src)与服务端(server)**
@@ -155,3 +158,27 @@ trtc-api:
 
 ## 接入GPT（V0.0.1b版本采用使用 QtWebEngine 渲染部署的 open-webui 项目）
 - 配置相关的API信息
+
+
+
+# 效果图
+
+- 登录界面
+
+<img src="doc\Static\登录-加载.png" alt="登录-加载" style="zoom: 33%;" /><img src="D:\WORK\SynergySpot\doc\Static\登录-无网络.png" alt="登录-无网络" style="zoom: 33%;" />
+
+- 注册界面
+
+<img src="doc\Static\注册界面.png" alt="注册界面" style="zoom: 33%;" />
+
+- 聊天界面
+
+<img src="doc\Static\图片消息发送.png" alt="图片消息发送" style="zoom:33%;" />
+
+- 添加好友界面
+
+<img src="doc\Static\添加好友界面.png" alt="添加好友界面" style="zoom: 33%;" />
+
+- 音视频界面
+
+  <img src="doc\Static\音视频通话.png" alt="音视频通话" style="zoom: 50%;" />
