@@ -6,6 +6,7 @@
 #include "base/client-request-handler/ClientRequestHandler.h"
 #include "common-data/CommonData.h"
 
+#include "settings-page/SettingsPage.h"
 #include "contact-page/ContactPage.h"
 #include "message-page/MessagePage.h"
 #include "user-page/UserPage.h"
@@ -15,6 +16,7 @@
 #include "plugin-manager/StrategyManager.h"
 #include "effect-component/cv-process-video-strategy/CVProVideoStrategy.h"
 #include "arch-page/ArchPage.h"
+#include "file-manager-page/FileManagerPage.h"
 
 #include "ela-widget-tools/ElaApplication.h"
 #include "ela-widget-tools/ElaMessageBar.h"
@@ -51,6 +53,7 @@ MainLogic::MainLogic() {
 }
 
 MainLogic::~MainLogic() {
+    g_pSettingsPage->destroySettingsPage();
     g_pCommonData->destroyInstance();
     g_pEmailVerify->destroyInstance();
     g_pPluginManager->destroyInstance();
@@ -303,7 +306,7 @@ int MainLogic::startMainLogic(QApplication *app) {
                     g_pCommonData->setMessageContentData(newsMsg, true);
             });
 
-            connect(g_pClientRequestHandler, &ClientRequestHandler::sigContactListResponse, this, [=](const std::string dto) {
+            connect(g_pClientRequestHandler, &ClientRequestHandler::sigContactListResponse, this, [=](const std::string& dto) {
                 SSDTO::GetAllUserFriendship gfdto;
                 gfdto.ParseFromString(dto);
 
@@ -421,6 +424,28 @@ int MainLogic::startMainLogic(QApplication *app) {
                     g_pCommonData->setFriendshipData(contacts);
             });
 
+            // init file info
+            connect(g_pClientRequestHandler, &ClientRequestHandler::sigQueryAllFileInfoResponse,this,[=](const std::string& dto) {
+                SSDTO::GetAllFileDTO fdto;
+                fdto.ParseFromString(dto);
+
+                for (const auto& file : fdto.files()) {
+                    FileStorageDTO fileDto;
+                    fileDto.fileId       =   QString::fromStdString(file.file_id());
+                    fileDto.fileName     =   QString::fromStdString(file.file_name());
+                    fileDto.fileSize     =   file.file_size();
+                    fileDto.fileType     =   QString::fromStdString(file.file_type());
+                    fileDto.pageNum      =   fdto.page_num();
+                    fileDto.pageSize     =   fdto.page_size();
+                    fileDto.storagePath  =   QString::fromStdString(file.storage_path());
+                    fileDto.uploaderSsid =   QString::fromStdString(file.uploader_ssid());
+                    fileDto.uploadTime   =   file.upload_time();
+
+                    // add memory container to maintain it
+                    g_pFileManagerPage->addFileInfo(fileDto);
+                }
+            });
+
             // delay 1s to wait grpc sub cilent
             QTimer::singleShot(1000,this,[=]() {
                 // get user base info
@@ -451,6 +476,19 @@ int MainLogic::startMainLogic(QApplication *app) {
                     std::string resgfDto;
                     gfdto.SerializeToString(&resgfDto);
                     emit g_pClientRequestHandler->sigContactListRequest(resgfDto);
+                }
+
+                // get user all file info
+                {
+                    SSDTO::GetAllFileDTO fdto;
+                    fdto.set_ssid(ldto.ssid());
+
+                    // TODO: add page limit control
+                    fdto.set_page_num(1);
+                    fdto.set_page_size(20);
+                    std::string resFdto;
+                    fdto.SerializeToString(&resFdto);
+                    emit g_pClientRequestHandler->sigQueryAllFileInfoRequest(resFdto);
                 }
             });
         }
@@ -579,6 +617,17 @@ int MainLogic::startMainLogic(QApplication *app) {
         g_pMessagePage->addMsgCard(info);
         // simulate clicked
         emit g_pMessagePage->sigClickedSSIDCardRequest(info.isGroup?info.groupBaseInfo.ssidGroup:info.userBaseInfo.ssid);
+    });
+
+    connect(g_pContactPage, &ContactPage::sigUpdateFriendshipGrouping, this, [=](QString targetSSID, QString newGrouping) {
+        SSDTO::FriendshipDTO fdto;
+        fdto.set_ssid(g_pCommonData->getCurUserInfo().ssid.toStdString());
+        fdto.set_friend_ssid(targetSSID.toStdString());
+        fdto.set_grouping(newGrouping.toStdString());
+
+        std::string resDto;
+        fdto.SerializeToString(&resDto);
+        emit g_pClientRequestHandler->sigUpdateFriendshipRequest(resDto);
     });
 
     // cur user info changed
@@ -1086,6 +1135,30 @@ int MainLogic::startMainLogic(QApplication *app) {
         _pGRCSocket->flush();
     });
 
+    // file manager upload file
+    connect(g_pFileManagerPage, &FileManagerPage::sigUploadUserSelectFile, this, [=](const FileStorageDTO& dto){
+        QJsonObject resp;
+        resp["command"] = "upload";
+        resp["uploader-ssid"] = g_pCommonData->getCurUserInfo().ssid;
+        resp["file-id"] = dto.fileId;
+        resp["local-path"] = dto.storagePath;
+        resp["business-type"] = "file_storage";
+        _pGRCSocket->write(QJsonDocument(resp).toJson());
+        _pGRCSocket->flush();
+    });
+
+    // file manager download file
+    connect(g_pFileManagerPage, &FileManagerPage::sigDownloadFileRequest, this, [=](FileStorageDTO dto) {
+        QJsonObject cmd;
+        cmd["command"] = "download";
+        cmd["business-type"] = "file_storage";
+        cmd["local-path"] = g_pSettingsPage->getDownloadPath() + "/" + dto.fileName;
+        cmd["file-id"] = dto.fileId;
+        cmd["storage-path"] = dto.storagePath;
+        _pGRCSocket->write(QJsonDocument(cmd).toJson());
+        _pGRCSocket->flush();
+    });
+
     return QApplication::exec();
 }
 
@@ -1130,9 +1203,6 @@ void MainLogic::processJsonFromGRPCClient(const QByteArray &packet) {
             }
             // msg pic
             else if (resp["business-type"].toString() == "msg_pic") {
-                // if (resp["type"] == "file-upload") {
-                //
-                // }
                 if (resp["type"] == "file-download") {
                     emit g_pCommonData->sigUpdateMsgView();
 
@@ -1140,6 +1210,14 @@ void MainLogic::processJsonFromGRPCClient(const QByteArray &packet) {
                     LOG_INFO("cur data load counter : " << _dataLoadCounter << ", _loadPhase : " << _loadPhase <<", pendingPic : " << _pendingPic);
                     checkAllDataLoaded();
                 }
+            }
+            // upload success
+            else if (resp["business-type"].toString() == "file_storage" && resp["type"].toString() == "file-upload") {
+                g_pFileManagerPage->addFileInfo(responseFileDto);
+            }
+            // download success
+            else if (resp["business-type"].toString() == "file_storage" && resp["type"].toString() == "file-download") {
+                ElaMessageBar::success(ElaMessageBarType::Top, "🎉成功🎉", "文件下载成功！", 3000, _curWindow);
             }
 
             // storage in local file info

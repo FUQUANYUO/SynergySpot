@@ -4,11 +4,15 @@
 
 #include "SettingsPage.h"
 
+#include "wr-config/WRConfig.h"
+
 #include "ela-widget-tools/ElaText.h"
 #include "ela-widget-tools/ElaToggleSwitch.h"
 #include "ela-widget-tools/ElaScrollPageArea.h"
 #include "ela-widget-tools/ElaWindow.h"
+#include "ela-widget-tools/ElaToolButton.h"
 
+#include <QFileDialog>
 #include <QHBoxLayout>
 #include <mutex>
 
@@ -40,6 +44,10 @@ void SettingsPage::setMainWindowWidget(QMainWindow *parent) {
     _mainWindowWidget = parent;
 }
 
+QString SettingsPage::getDownloadPath() const {
+    return _downloadPath->text();
+}
+
 SettingsPage::SettingsPage(QWidget *parent) : ElaScrollPage(parent) {
     initWindow();
 
@@ -47,9 +55,11 @@ SettingsPage::SettingsPage(QWidget *parent) : ElaScrollPage(parent) {
 
     initContent();
 
-    initContent();
+    initConnectFunc();
 }
 SettingsPage::~SettingsPage() {
+    // to set data to  ini
+    WRConfig::getInstance()->setDownloadPath(_downloadPath->text());
 }
 
 void SettingsPage::initWindow() {
@@ -69,9 +79,6 @@ void SettingsPage::initWindow() {
     logSwitchLayout->addWidget(logSwitchText);
     logSwitchLayout->addStretch();
     logSwitchLayout->addWidget(_logSwitchButton);
-    connect(_logSwitchButton, &ElaToggleSwitch::toggled, this, [=](bool checked) {
-
-    });
 
     _minimumButton = new ElaRadioButton("Minimum", this);
     _compactButton = new ElaRadioButton("Compact", this);
@@ -90,6 +97,53 @@ void SettingsPage::initWindow() {
     displayModeLayout->addWidget(_maximumButton);
     displayModeLayout->addWidget(_autoButton);
 
+    _downloadPathSelect = new ElaToolButton(this);
+    _downloadPath = new ElaText(this);
+    ElaScrollPageArea* downloadPathArea = new ElaScrollPageArea(this);
+    QHBoxLayout* downloadPathLayout = new QHBoxLayout(downloadPathArea);
+    ElaText* _downloadPathText = new ElaText("下载路径",this);
+    _downloadPathSelect->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    _downloadPathSelect->setElaIcon(ElaIconType::FolderMagnifyingGlass);
+    _downloadPathSelect->setText("更改路径");
+    _downloadPathText->setWordWrap(false);
+    _downloadPathText->setTextPixelSize(15);
+    _downloadPath->setWordWrap(false);
+    _downloadPath->setTextPixelSize(15);
+    _downloadPath->setAlignment(Qt::AlignCenter);
+    downloadPathLayout->addWidget(_downloadPathText);
+    downloadPathLayout->addStretch();
+    downloadPathLayout->addWidget(_downloadPath);
+    downloadPathLayout->addStretch();
+    downloadPathLayout->addWidget(_downloadPathSelect);
+
+    QVBoxLayout* centerLayout = new QVBoxLayout(_centralWidget);
+    centerLayout->addSpacing(30);
+    centerLayout->addWidget(helperText);
+    centerLayout->addSpacing(10);
+    centerLayout->addWidget(logSwitchArea);
+    centerLayout->addWidget(displayModeArea);
+    centerLayout->addWidget(downloadPathArea);
+    centerLayout->addStretch();
+    centerLayout->setContentsMargins(0, 0, 0, 0);
+}
+
+void SettingsPage::initEdgeLayout() {
+    _centralWidget->setContentsMargins(0,0,0,0);
+    addCentralWidget(_centralWidget);
+}
+
+void SettingsPage::initContent() {
+    if (WRConfig::getInstance()->getDownloadPath().isEmpty()) {
+        _downloadPath->setText("D:\\SynergySpotDownload");
+    }else {
+        _downloadPath->setText(WRConfig::getInstance()->getDownloadPath());
+    }
+}
+
+void SettingsPage::initConnectFunc() {
+    connect(_logSwitchButton, &ElaToggleSwitch::toggled, this, [=](bool checked) {
+
+    });
     connect(_minimumButton, &ElaRadioButton::toggled, this, [=](bool checked) {
         if (checked)
         {
@@ -114,22 +168,12 @@ void SettingsPage::initWindow() {
             dynamic_cast<ElaWindow*>(_mainWindowWidget)->setNavigationBarDisplayMode(ElaNavigationType::Auto);
         }
     });
-
-    QVBoxLayout* centerLayout = new QVBoxLayout(_centralWidget);
-    centerLayout->addSpacing(30);
-    centerLayout->addWidget(helperText);
-    centerLayout->addSpacing(10);
-    centerLayout->addWidget(logSwitchArea);
-    centerLayout->addWidget(displayModeArea);
-    centerLayout->addStretch();
-    centerLayout->setContentsMargins(0, 0, 0, 0);
-}
-
-void SettingsPage::initEdgeLayout() {
-    _centralWidget->setContentsMargins(0,0,0,0);
-    addCentralWidget(_centralWidget);
-}
-void SettingsPage::initContent() {
-}
-void SettingsPage::initConnectFunc() {
+    connect(_downloadPathSelect, &ElaToolButton::clicked, this, [=]() {
+        QString path = QFileDialog::getExistingDirectory(this, "选择下载路径",
+                                                  "D://",QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+        if (path.isEmpty()) {
+            return;
+        }
+        _downloadPath->setText(path);
+    });
 }

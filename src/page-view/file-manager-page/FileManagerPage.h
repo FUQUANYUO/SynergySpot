@@ -25,17 +25,33 @@
 
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <ela-widget-tools/ElaProgressBar.h>
+
 #include "file-model/FileModel.h"
 
+#include "common-data/common-dto/CommonDatabaseDTO.h"
+
+class ElaWidget;
 class ElaSuggestBox;
 class ElaTableView;
 class ElaToolButton;
 
 class SS_API FileManagerPage : public ElaScrollPage{
+    Q_OBJECT
 public:
     static FileManagerPage * getInstance();
     static void destroyFileManagerPage();
+
+    void addFileInfo(FileStorageDTO infoDto);
+    void removeFileInfo(QString fileId);
+
+    void addFileDownloadInfo(FileStorageDTO file);
+    void updateFileDownloadProgress(QString fileId, double progress);
+    void removeFileDownloadInfo(QString fileId);
+
 signals:
+    void sigUploadUserSelectFile(const FileStorageDTO& dto);
+    void sigDownloadFileRequest(FileStorageDTO dto);
 private:
     explicit FileManagerPage(QWidget *parent = nullptr);
     ~FileManagerPage() override;
@@ -49,15 +65,22 @@ protected:
 protected slots:
 private:
     // ----------------- UI -----------------
-    QWidget                 * _centralWidget = nullptr;
-    QVBoxLayout             * _mainLayout    = nullptr;
-    ElaSuggestBox           * _search        = nullptr;
-    ElaTableView            * _tableView     = nullptr;
-    FileModel               * _fileModel     = nullptr;
-    ElaToolButton           * _uploadFile    = nullptr;
+    QWidget                 * _centralWidget       =   nullptr;
+    QVBoxLayout             * _mainLayout          =   nullptr;
+    ElaSuggestBox           * _search              =   nullptr;
+    ElaTableView            * _tableView           =   nullptr;
+    FileModel               * _fileModel           =   nullptr;
+    ElaToolButton           * _uploadFile          =   nullptr;
+    ElaWidget               * _downloadWid         =   nullptr;
+    ElaScrollPage           * _downloadScroll      =   nullptr;
+    QWidget                 * _downloadScrollWid   =   nullptr;
+    QVBoxLayout             * _downloadLayout      =   nullptr;
+    ElaToolButton           * _downloadPageButton  =   nullptr;
     // ----------------- UI -----------------
 
     // --------------- BackEnd --------------
+    QHash<QString, QWidget*> _fileIdToDownloadWid;
+    QHash<QString, ElaProgressBar*> _fileIdToProgress;
     // --------------- BackEnd --------------
 
     static FileManagerPage* _fileManagerPage;

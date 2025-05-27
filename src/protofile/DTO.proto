@@ -54,6 +54,7 @@ enum BusinessType {
   C_USER_COLLECTED_STICKER = 83;
   D_USER_COLLECTED_STICKER = 84;
 
+  R_ALL_FILE = 90;
   R_FILE = 91;
   C_FILE = 92;
   D_FILE = 93;
@@ -86,7 +87,7 @@ message GetUserMessageDTO{
   bytes ip = 6;
 };
 
-message GetFileDTO{
+message GetAllFileDTO{
   bytes ssid = 1;
   bytes file_id = 2;
   bytes file_name = 3;

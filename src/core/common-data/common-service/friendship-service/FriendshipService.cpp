@@ -27,10 +27,14 @@ bool FriendshipService::setFriendshipData(QList<FriendshipDTO> dto) {
     bool res = true;
     for (auto it : dto) {
         auto isStorageInLocal = friendshipDAO.findRelationship(it.ssid,it.friendSSID);
+        FriendshipDO fdo{-1,it.ssid,it.groupingName,it.friendSSID,it.shipStatus,it.friendType,it.createTime};
         if (isStorageInLocal.isEmpty()) {
-            res = friendshipDAO.create({-1,it.ssid,it.groupingName,it.friendSSID,it.shipStatus,it.friendType,it.createTime});
+            res = friendshipDAO.create(fdo);
             if (!res)
                 return res;
+        }else {
+            // update data
+            friendshipDAO.updateGrouping(fdo);
         }
     }
     return res;

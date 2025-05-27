@@ -23,6 +23,10 @@ struct GroupingItem{
 };
 
 class ContactModel : public QStandardItemModel{
+    Q_OBJECT
+signals:
+    // update grouping
+    void sigUpdateFriendshipGrouping(QString targetSSID,QString newGroupingName);
 public:
     explicit ContactModel(QObject * parent = nullptr);
     ~ContactModel() = default;

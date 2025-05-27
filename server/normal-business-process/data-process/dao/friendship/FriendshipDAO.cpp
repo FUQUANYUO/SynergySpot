@@ -66,7 +66,7 @@ bool FriendshipDAO::update(const FriendshipDO &friendship) {
     }
 
     // 检查并添加 shipStatus
-    if (friendship.shipStatus != 0) { // 假设 0 是无效值
+    if (friendship.shipStatus != -1) { // -1 是无效值
         setClauses.push_back("ship_status = ?");
         MysqlConn::Param paramShipStatus;
         paramShipStatus.type = MysqlConn::Param::INT;

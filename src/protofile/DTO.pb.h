@@ -82,12 +82,12 @@ extern FriendshipDTODefaultTypeInternal _FriendshipDTO_default_instance_;
 class FuzzySearchDTO;
 struct FuzzySearchDTODefaultTypeInternal;
 extern FuzzySearchDTODefaultTypeInternal _FuzzySearchDTO_default_instance_;
+class GetAllFileDTO;
+struct GetAllFileDTODefaultTypeInternal;
+extern GetAllFileDTODefaultTypeInternal _GetAllFileDTO_default_instance_;
 class GetAllUserFriendship;
 struct GetAllUserFriendshipDefaultTypeInternal;
 extern GetAllUserFriendshipDefaultTypeInternal _GetAllUserFriendship_default_instance_;
-class GetFileDTO;
-struct GetFileDTODefaultTypeInternal;
-extern GetFileDTODefaultTypeInternal _GetFileDTO_default_instance_;
 class GetMessagePicInfoDTO;
 struct GetMessagePicInfoDTODefaultTypeInternal;
 extern GetMessagePicInfoDTODefaultTypeInternal _GetMessagePicInfoDTO_default_instance_;
@@ -149,8 +149,8 @@ template<> ::SSDTO::EnrollAccountDTO* Arena::CreateMaybeMessage<::SSDTO::EnrollA
 template<> ::SSDTO::FileStorageDTO* Arena::CreateMaybeMessage<::SSDTO::FileStorageDTO>(Arena*);
 template<> ::SSDTO::FriendshipDTO* Arena::CreateMaybeMessage<::SSDTO::FriendshipDTO>(Arena*);
 template<> ::SSDTO::FuzzySearchDTO* Arena::CreateMaybeMessage<::SSDTO::FuzzySearchDTO>(Arena*);
+template<> ::SSDTO::GetAllFileDTO* Arena::CreateMaybeMessage<::SSDTO::GetAllFileDTO>(Arena*);
 template<> ::SSDTO::GetAllUserFriendship* Arena::CreateMaybeMessage<::SSDTO::GetAllUserFriendship>(Arena*);
-template<> ::SSDTO::GetFileDTO* Arena::CreateMaybeMessage<::SSDTO::GetFileDTO>(Arena*);
 template<> ::SSDTO::GetMessagePicInfoDTO* Arena::CreateMaybeMessage<::SSDTO::GetMessagePicInfoDTO>(Arena*);
 template<> ::SSDTO::GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUse* Arena::CreateMaybeMessage<::SSDTO::GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUse>(Arena*);
 template<> ::SSDTO::GetUserMessageDTO* Arena::CreateMaybeMessage<::SSDTO::GetUserMessageDTO>(Arena*);
@@ -210,6 +210,7 @@ enum BusinessType : int {
   R_USER_COLLECTED_STICKER = 82,
   C_USER_COLLECTED_STICKER = 83,
   D_USER_COLLECTED_STICKER = 84,
+  R_ALL_FILE = 90,
   R_FILE = 91,
   C_FILE = 92,
   D_FILE = 93,
@@ -1046,24 +1047,24 @@ class GetUserMessageDTO final :
 };
 // -------------------------------------------------------------------
 
-class GetFileDTO final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:SSDTO.GetFileDTO) */ {
+class GetAllFileDTO final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:SSDTO.GetAllFileDTO) */ {
  public:
-  inline GetFileDTO() : GetFileDTO(nullptr) {}
-  ~GetFileDTO() override;
-  explicit constexpr GetFileDTO(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+  inline GetAllFileDTO() : GetAllFileDTO(nullptr) {}
+  ~GetAllFileDTO() override;
+  explicit constexpr GetAllFileDTO(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
-  GetFileDTO(const GetFileDTO& from);
-  GetFileDTO(GetFileDTO&& from) noexcept
-    : GetFileDTO() {
+  GetAllFileDTO(const GetAllFileDTO& from);
+  GetAllFileDTO(GetAllFileDTO&& from) noexcept
+    : GetAllFileDTO() {
     *this = ::std::move(from);
   }
 
-  inline GetFileDTO& operator=(const GetFileDTO& from) {
+  inline GetAllFileDTO& operator=(const GetAllFileDTO& from) {
     CopyFrom(from);
     return *this;
   }
-  inline GetFileDTO& operator=(GetFileDTO&& from) noexcept {
+  inline GetAllFileDTO& operator=(GetAllFileDTO&& from) noexcept {
     if (this == &from) return *this;
     if (GetOwningArena() == from.GetOwningArena()
   #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
@@ -1086,20 +1087,20 @@ class GetFileDTO final :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return default_instance().GetMetadata().reflection;
   }
-  static const GetFileDTO& default_instance() {
+  static const GetAllFileDTO& default_instance() {
     return *internal_default_instance();
   }
-  static inline const GetFileDTO* internal_default_instance() {
-    return reinterpret_cast<const GetFileDTO*>(
-               &_GetFileDTO_default_instance_);
+  static inline const GetAllFileDTO* internal_default_instance() {
+    return reinterpret_cast<const GetAllFileDTO*>(
+               &_GetAllFileDTO_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     5;
 
-  friend void swap(GetFileDTO& a, GetFileDTO& b) {
+  friend void swap(GetAllFileDTO& a, GetAllFileDTO& b) {
     a.Swap(&b);
   }
-  inline void Swap(GetFileDTO* other) {
+  inline void Swap(GetAllFileDTO* other) {
     if (other == this) return;
   #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() != nullptr &&
@@ -1112,7 +1113,7 @@ class GetFileDTO final :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(GetFileDTO* other) {
+  void UnsafeArenaSwap(GetAllFileDTO* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
     InternalSwap(other);
@@ -1120,13 +1121,13 @@ class GetFileDTO final :
 
   // implements Message ----------------------------------------------
 
-  GetFileDTO* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
-    return CreateMaybeMessage<GetFileDTO>(arena);
+  GetAllFileDTO* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<GetAllFileDTO>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
-  void CopyFrom(const GetFileDTO& from);
+  void CopyFrom(const GetAllFileDTO& from);
   using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
-  void MergeFrom(const GetFileDTO& from);
+  void MergeFrom(const GetAllFileDTO& from);
   private:
   static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
   public:
@@ -1143,15 +1144,15 @@ class GetFileDTO final :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(GetFileDTO* other);
+  void InternalSwap(GetAllFileDTO* other);
 
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "SSDTO.GetFileDTO";
+    return "SSDTO.GetAllFileDTO";
   }
   protected:
-  explicit GetFileDTO(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+  explicit GetAllFileDTO(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                        bool is_message_owned = false);
   private:
   static void ArenaDtor(void* object);
@@ -1283,7 +1284,7 @@ class GetFileDTO final :
   void _internal_set_page_num(int32_t value);
   public:
 
-  // @@protoc_insertion_point(class_scope:SSDTO.GetFileDTO)
+  // @@protoc_insertion_point(class_scope:SSDTO.GetAllFileDTO)
  private:
   class _Internal;
 
@@ -6770,44 +6771,44 @@ inline void GetUserMessageDTO::set_allocated_ip(std::string* ip) {
 
 // -------------------------------------------------------------------
 
-// GetFileDTO
+// GetAllFileDTO
 
 // bytes ssid = 1;
-inline void GetFileDTO::clear_ssid() {
+inline void GetAllFileDTO::clear_ssid() {
   ssid_.ClearToEmpty();
 }
-inline const std::string& GetFileDTO::ssid() const {
-  // @@protoc_insertion_point(field_get:SSDTO.GetFileDTO.ssid)
+inline const std::string& GetAllFileDTO::ssid() const {
+  // @@protoc_insertion_point(field_get:SSDTO.GetAllFileDTO.ssid)
   return _internal_ssid();
 }
 template <typename ArgT0, typename... ArgT>
 inline PROTOBUF_ALWAYS_INLINE
-void GetFileDTO::set_ssid(ArgT0&& arg0, ArgT... args) {
+void GetAllFileDTO::set_ssid(ArgT0&& arg0, ArgT... args) {
  
  ssid_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:SSDTO.GetFileDTO.ssid)
+  // @@protoc_insertion_point(field_set:SSDTO.GetAllFileDTO.ssid)
 }
-inline std::string* GetFileDTO::mutable_ssid() {
+inline std::string* GetAllFileDTO::mutable_ssid() {
   std::string* _s = _internal_mutable_ssid();
-  // @@protoc_insertion_point(field_mutable:SSDTO.GetFileDTO.ssid)
+  // @@protoc_insertion_point(field_mutable:SSDTO.GetAllFileDTO.ssid)
   return _s;
 }
-inline const std::string& GetFileDTO::_internal_ssid() const {
+inline const std::string& GetAllFileDTO::_internal_ssid() const {
   return ssid_.Get();
 }
-inline void GetFileDTO::_internal_set_ssid(const std::string& value) {
+inline void GetAllFileDTO::_internal_set_ssid(const std::string& value) {
   
   ssid_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
 }
-inline std::string* GetFileDTO::_internal_mutable_ssid() {
+inline std::string* GetAllFileDTO::_internal_mutable_ssid() {
   
   return ssid_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
 }
-inline std::string* GetFileDTO::release_ssid() {
-  // @@protoc_insertion_point(field_release:SSDTO.GetFileDTO.ssid)
+inline std::string* GetAllFileDTO::release_ssid() {
+  // @@protoc_insertion_point(field_release:SSDTO.GetAllFileDTO.ssid)
   return ssid_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
 }
-inline void GetFileDTO::set_allocated_ssid(std::string* ssid) {
+inline void GetAllFileDTO::set_allocated_ssid(std::string* ssid) {
   if (ssid != nullptr) {
     
   } else {
@@ -6820,45 +6821,45 @@ inline void GetFileDTO::set_allocated_ssid(std::string* ssid) {
     ssid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:SSDTO.GetFileDTO.ssid)
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.GetAllFileDTO.ssid)
 }
 
 // bytes file_id = 2;
-inline void GetFileDTO::clear_file_id() {
+inline void GetAllFileDTO::clear_file_id() {
   file_id_.ClearToEmpty();
 }
-inline const std::string& GetFileDTO::file_id() const {
-  // @@protoc_insertion_point(field_get:SSDTO.GetFileDTO.file_id)
+inline const std::string& GetAllFileDTO::file_id() const {
+  // @@protoc_insertion_point(field_get:SSDTO.GetAllFileDTO.file_id)
   return _internal_file_id();
 }
 template <typename ArgT0, typename... ArgT>
 inline PROTOBUF_ALWAYS_INLINE
-void GetFileDTO::set_file_id(ArgT0&& arg0, ArgT... args) {
+void GetAllFileDTO::set_file_id(ArgT0&& arg0, ArgT... args) {
  
  file_id_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:SSDTO.GetFileDTO.file_id)
+  // @@protoc_insertion_point(field_set:SSDTO.GetAllFileDTO.file_id)
 }
-inline std::string* GetFileDTO::mutable_file_id() {
+inline std::string* GetAllFileDTO::mutable_file_id() {
   std::string* _s = _internal_mutable_file_id();
-  // @@protoc_insertion_point(field_mutable:SSDTO.GetFileDTO.file_id)
+  // @@protoc_insertion_point(field_mutable:SSDTO.GetAllFileDTO.file_id)
   return _s;
 }
-inline const std::string& GetFileDTO::_internal_file_id() const {
+inline const std::string& GetAllFileDTO::_internal_file_id() const {
   return file_id_.Get();
 }
-inline void GetFileDTO::_internal_set_file_id(const std::string& value) {
+inline void GetAllFileDTO::_internal_set_file_id(const std::string& value) {
   
   file_id_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
 }
-inline std::string* GetFileDTO::_internal_mutable_file_id() {
+inline std::string* GetAllFileDTO::_internal_mutable_file_id() {
   
   return file_id_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
 }
-inline std::string* GetFileDTO::release_file_id() {
-  // @@protoc_insertion_point(field_release:SSDTO.GetFileDTO.file_id)
+inline std::string* GetAllFileDTO::release_file_id() {
+  // @@protoc_insertion_point(field_release:SSDTO.GetAllFileDTO.file_id)
   return file_id_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
 }
-inline void GetFileDTO::set_allocated_file_id(std::string* file_id) {
+inline void GetAllFileDTO::set_allocated_file_id(std::string* file_id) {
   if (file_id != nullptr) {
     
   } else {
@@ -6871,45 +6872,45 @@ inline void GetFileDTO::set_allocated_file_id(std::string* file_id) {
     file_id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:SSDTO.GetFileDTO.file_id)
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.GetAllFileDTO.file_id)
 }
 
 // bytes file_name = 3;
-inline void GetFileDTO::clear_file_name() {
+inline void GetAllFileDTO::clear_file_name() {
   file_name_.ClearToEmpty();
 }
-inline const std::string& GetFileDTO::file_name() const {
-  // @@protoc_insertion_point(field_get:SSDTO.GetFileDTO.file_name)
+inline const std::string& GetAllFileDTO::file_name() const {
+  // @@protoc_insertion_point(field_get:SSDTO.GetAllFileDTO.file_name)
   return _internal_file_name();
 }
 template <typename ArgT0, typename... ArgT>
 inline PROTOBUF_ALWAYS_INLINE
-void GetFileDTO::set_file_name(ArgT0&& arg0, ArgT... args) {
+void GetAllFileDTO::set_file_name(ArgT0&& arg0, ArgT... args) {
  
  file_name_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:SSDTO.GetFileDTO.file_name)
+  // @@protoc_insertion_point(field_set:SSDTO.GetAllFileDTO.file_name)
 }
-inline std::string* GetFileDTO::mutable_file_name() {
+inline std::string* GetAllFileDTO::mutable_file_name() {
   std::string* _s = _internal_mutable_file_name();
-  // @@protoc_insertion_point(field_mutable:SSDTO.GetFileDTO.file_name)
+  // @@protoc_insertion_point(field_mutable:SSDTO.GetAllFileDTO.file_name)
   return _s;
 }
-inline const std::string& GetFileDTO::_internal_file_name() const {
+inline const std::string& GetAllFileDTO::_internal_file_name() const {
   return file_name_.Get();
 }
-inline void GetFileDTO::_internal_set_file_name(const std::string& value) {
+inline void GetAllFileDTO::_internal_set_file_name(const std::string& value) {
   
   file_name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
 }
-inline std::string* GetFileDTO::_internal_mutable_file_name() {
+inline std::string* GetAllFileDTO::_internal_mutable_file_name() {
   
   return file_name_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
 }
-inline std::string* GetFileDTO::release_file_name() {
-  // @@protoc_insertion_point(field_release:SSDTO.GetFileDTO.file_name)
+inline std::string* GetAllFileDTO::release_file_name() {
+  // @@protoc_insertion_point(field_release:SSDTO.GetAllFileDTO.file_name)
   return file_name_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
 }
-inline void GetFileDTO::set_allocated_file_name(std::string* file_name) {
+inline void GetAllFileDTO::set_allocated_file_name(std::string* file_name) {
   if (file_name != nullptr) {
     
   } else {
@@ -6922,45 +6923,45 @@ inline void GetFileDTO::set_allocated_file_name(std::string* file_name) {
     file_name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:SSDTO.GetFileDTO.file_name)
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.GetAllFileDTO.file_name)
 }
 
 // bytes file_storage = 4;
-inline void GetFileDTO::clear_file_storage() {
+inline void GetAllFileDTO::clear_file_storage() {
   file_storage_.ClearToEmpty();
 }
-inline const std::string& GetFileDTO::file_storage() const {
-  // @@protoc_insertion_point(field_get:SSDTO.GetFileDTO.file_storage)
+inline const std::string& GetAllFileDTO::file_storage() const {
+  // @@protoc_insertion_point(field_get:SSDTO.GetAllFileDTO.file_storage)
   return _internal_file_storage();
 }
 template <typename ArgT0, typename... ArgT>
 inline PROTOBUF_ALWAYS_INLINE
-void GetFileDTO::set_file_storage(ArgT0&& arg0, ArgT... args) {
+void GetAllFileDTO::set_file_storage(ArgT0&& arg0, ArgT... args) {
  
  file_storage_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:SSDTO.GetFileDTO.file_storage)
+  // @@protoc_insertion_point(field_set:SSDTO.GetAllFileDTO.file_storage)
 }
-inline std::string* GetFileDTO::mutable_file_storage() {
+inline std::string* GetAllFileDTO::mutable_file_storage() {
   std::string* _s = _internal_mutable_file_storage();
-  // @@protoc_insertion_point(field_mutable:SSDTO.GetFileDTO.file_storage)
+  // @@protoc_insertion_point(field_mutable:SSDTO.GetAllFileDTO.file_storage)
   return _s;
 }
-inline const std::string& GetFileDTO::_internal_file_storage() const {
+inline const std::string& GetAllFileDTO::_internal_file_storage() const {
   return file_storage_.Get();
 }
-inline void GetFileDTO::_internal_set_file_storage(const std::string& value) {
+inline void GetAllFileDTO::_internal_set_file_storage(const std::string& value) {
   
   file_storage_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
 }
-inline std::string* GetFileDTO::_internal_mutable_file_storage() {
+inline std::string* GetAllFileDTO::_internal_mutable_file_storage() {
   
   return file_storage_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
 }
-inline std::string* GetFileDTO::release_file_storage() {
-  // @@protoc_insertion_point(field_release:SSDTO.GetFileDTO.file_storage)
+inline std::string* GetAllFileDTO::release_file_storage() {
+  // @@protoc_insertion_point(field_release:SSDTO.GetAllFileDTO.file_storage)
   return file_storage_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
 }
-inline void GetFileDTO::set_allocated_file_storage(std::string* file_storage) {
+inline void GetAllFileDTO::set_allocated_file_storage(std::string* file_storage) {
   if (file_storage != nullptr) {
     
   } else {
@@ -6973,125 +6974,125 @@ inline void GetFileDTO::set_allocated_file_storage(std::string* file_storage) {
     file_storage_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:SSDTO.GetFileDTO.file_storage)
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.GetAllFileDTO.file_storage)
 }
 
 // int32 page_size = 5;
-inline void GetFileDTO::clear_page_size() {
+inline void GetAllFileDTO::clear_page_size() {
   page_size_ = 0;
 }
-inline int32_t GetFileDTO::_internal_page_size() const {
+inline int32_t GetAllFileDTO::_internal_page_size() const {
   return page_size_;
 }
-inline int32_t GetFileDTO::page_size() const {
-  // @@protoc_insertion_point(field_get:SSDTO.GetFileDTO.page_size)
+inline int32_t GetAllFileDTO::page_size() const {
+  // @@protoc_insertion_point(field_get:SSDTO.GetAllFileDTO.page_size)
   return _internal_page_size();
 }
-inline void GetFileDTO::_internal_set_page_size(int32_t value) {
+inline void GetAllFileDTO::_internal_set_page_size(int32_t value) {
   
   page_size_ = value;
 }
-inline void GetFileDTO::set_page_size(int32_t value) {
+inline void GetAllFileDTO::set_page_size(int32_t value) {
   _internal_set_page_size(value);
-  // @@protoc_insertion_point(field_set:SSDTO.GetFileDTO.page_size)
+  // @@protoc_insertion_point(field_set:SSDTO.GetAllFileDTO.page_size)
 }
 
 // int32 page_num = 6;
-inline void GetFileDTO::clear_page_num() {
+inline void GetAllFileDTO::clear_page_num() {
   page_num_ = 0;
 }
-inline int32_t GetFileDTO::_internal_page_num() const {
+inline int32_t GetAllFileDTO::_internal_page_num() const {
   return page_num_;
 }
-inline int32_t GetFileDTO::page_num() const {
-  // @@protoc_insertion_point(field_get:SSDTO.GetFileDTO.page_num)
+inline int32_t GetAllFileDTO::page_num() const {
+  // @@protoc_insertion_point(field_get:SSDTO.GetAllFileDTO.page_num)
   return _internal_page_num();
 }
-inline void GetFileDTO::_internal_set_page_num(int32_t value) {
+inline void GetAllFileDTO::_internal_set_page_num(int32_t value) {
   
   page_num_ = value;
 }
-inline void GetFileDTO::set_page_num(int32_t value) {
+inline void GetAllFileDTO::set_page_num(int32_t value) {
   _internal_set_page_num(value);
-  // @@protoc_insertion_point(field_set:SSDTO.GetFileDTO.page_num)
+  // @@protoc_insertion_point(field_set:SSDTO.GetAllFileDTO.page_num)
 }
 
 // repeated .SSDTO.FileStorageDTO files = 7;
-inline int GetFileDTO::_internal_files_size() const {
+inline int GetAllFileDTO::_internal_files_size() const {
   return files_.size();
 }
-inline int GetFileDTO::files_size() const {
+inline int GetAllFileDTO::files_size() const {
   return _internal_files_size();
 }
-inline void GetFileDTO::clear_files() {
+inline void GetAllFileDTO::clear_files() {
   files_.Clear();
 }
-inline ::SSDTO::FileStorageDTO* GetFileDTO::mutable_files(int index) {
-  // @@protoc_insertion_point(field_mutable:SSDTO.GetFileDTO.files)
+inline ::SSDTO::FileStorageDTO* GetAllFileDTO::mutable_files(int index) {
+  // @@protoc_insertion_point(field_mutable:SSDTO.GetAllFileDTO.files)
   return files_.Mutable(index);
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::FileStorageDTO >*
-GetFileDTO::mutable_files() {
-  // @@protoc_insertion_point(field_mutable_list:SSDTO.GetFileDTO.files)
+GetAllFileDTO::mutable_files() {
+  // @@protoc_insertion_point(field_mutable_list:SSDTO.GetAllFileDTO.files)
   return &files_;
 }
-inline const ::SSDTO::FileStorageDTO& GetFileDTO::_internal_files(int index) const {
+inline const ::SSDTO::FileStorageDTO& GetAllFileDTO::_internal_files(int index) const {
   return files_.Get(index);
 }
-inline const ::SSDTO::FileStorageDTO& GetFileDTO::files(int index) const {
-  // @@protoc_insertion_point(field_get:SSDTO.GetFileDTO.files)
+inline const ::SSDTO::FileStorageDTO& GetAllFileDTO::files(int index) const {
+  // @@protoc_insertion_point(field_get:SSDTO.GetAllFileDTO.files)
   return _internal_files(index);
 }
-inline ::SSDTO::FileStorageDTO* GetFileDTO::_internal_add_files() {
+inline ::SSDTO::FileStorageDTO* GetAllFileDTO::_internal_add_files() {
   return files_.Add();
 }
-inline ::SSDTO::FileStorageDTO* GetFileDTO::add_files() {
+inline ::SSDTO::FileStorageDTO* GetAllFileDTO::add_files() {
   ::SSDTO::FileStorageDTO* _add = _internal_add_files();
-  // @@protoc_insertion_point(field_add:SSDTO.GetFileDTO.files)
+  // @@protoc_insertion_point(field_add:SSDTO.GetAllFileDTO.files)
   return _add;
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::SSDTO::FileStorageDTO >&
-GetFileDTO::files() const {
-  // @@protoc_insertion_point(field_list:SSDTO.GetFileDTO.files)
+GetAllFileDTO::files() const {
+  // @@protoc_insertion_point(field_list:SSDTO.GetAllFileDTO.files)
   return files_;
 }
 
 // bytes ip = 8;
-inline void GetFileDTO::clear_ip() {
+inline void GetAllFileDTO::clear_ip() {
   ip_.ClearToEmpty();
 }
-inline const std::string& GetFileDTO::ip() const {
-  // @@protoc_insertion_point(field_get:SSDTO.GetFileDTO.ip)
+inline const std::string& GetAllFileDTO::ip() const {
+  // @@protoc_insertion_point(field_get:SSDTO.GetAllFileDTO.ip)
   return _internal_ip();
 }
 template <typename ArgT0, typename... ArgT>
 inline PROTOBUF_ALWAYS_INLINE
-void GetFileDTO::set_ip(ArgT0&& arg0, ArgT... args) {
+void GetAllFileDTO::set_ip(ArgT0&& arg0, ArgT... args) {
  
  ip_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:SSDTO.GetFileDTO.ip)
+  // @@protoc_insertion_point(field_set:SSDTO.GetAllFileDTO.ip)
 }
-inline std::string* GetFileDTO::mutable_ip() {
+inline std::string* GetAllFileDTO::mutable_ip() {
   std::string* _s = _internal_mutable_ip();
-  // @@protoc_insertion_point(field_mutable:SSDTO.GetFileDTO.ip)
+  // @@protoc_insertion_point(field_mutable:SSDTO.GetAllFileDTO.ip)
   return _s;
 }
-inline const std::string& GetFileDTO::_internal_ip() const {
+inline const std::string& GetAllFileDTO::_internal_ip() const {
   return ip_.Get();
 }
-inline void GetFileDTO::_internal_set_ip(const std::string& value) {
+inline void GetAllFileDTO::_internal_set_ip(const std::string& value) {
   
   ip_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
 }
-inline std::string* GetFileDTO::_internal_mutable_ip() {
+inline std::string* GetAllFileDTO::_internal_mutable_ip() {
   
   return ip_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
 }
-inline std::string* GetFileDTO::release_ip() {
-  // @@protoc_insertion_point(field_release:SSDTO.GetFileDTO.ip)
+inline std::string* GetAllFileDTO::release_ip() {
+  // @@protoc_insertion_point(field_release:SSDTO.GetAllFileDTO.ip)
   return ip_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
 }
-inline void GetFileDTO::set_allocated_ip(std::string* ip) {
+inline void GetAllFileDTO::set_allocated_ip(std::string* ip) {
   if (ip != nullptr) {
     
   } else {
@@ -7104,7 +7105,7 @@ inline void GetFileDTO::set_allocated_ip(std::string* ip) {
     ip_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:SSDTO.GetFileDTO.ip)
+  // @@protoc_insertion_point(field_set_allocated:SSDTO.GetAllFileDTO.ip)
 }
 
 // -------------------------------------------------------------------

@@ -42,6 +42,21 @@ bool FriendshipDAO::updateStatus(qint64 id, qint32 newStatus) {
     return _db.update(sql, params);
 }
 
+bool FriendshipDAO::updateMark(const FriendshipDO &friendship) {
+    return true;
+}
+
+bool FriendshipDAO::updateGrouping(const FriendshipDO &friendship) {
+    std::string sql = "UPDATE friendship SET grouping = ? WHERE ssid = ? AND friend_ssid = ?;";
+    std::vector<std::string> params = {
+        friendship.grouping.toStdString(),
+        friendship.ssid.toStdString(),
+        friendship.friendSSID.toStdString()
+    };
+
+    return _db.update(sql, params);
+}
+
 FriendshipDO FriendshipDAO::findRelationship(const QString &ssid, const QString &friendSsid) {
     std::string sql = "SELECT id, ssid, grouping, friend_ssid, ship_status, friend_type, create_time "
                      "FROM friendship WHERE ssid = ? AND friend_ssid = ?;";

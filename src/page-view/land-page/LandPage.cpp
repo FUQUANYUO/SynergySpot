@@ -341,6 +341,9 @@ void LandPage::initConnectFunc() {
         QString curSSID = _accountComboBox->itemData(index).toString();
         QString curAvatar = _accToAvatarPath.value(curSSID);
         if (!curAvatar.isEmpty() && curAvatar != "-1") {
+            QImage img(curAvatar);
+            if (img.isNull())
+                _avatar->setCardImage(QImage(":/land-page/rc-page/img/SS-default-icon.jpg"));
             _avatar->setCardImage(QImage(curAvatar));
         }else {
             _avatar->setCardImage(QImage(":/land-page/rc-page/img/SS-default-icon.jpg"));
@@ -348,6 +351,22 @@ void LandPage::initConnectFunc() {
         _avatar->setFixedSize(90,90);
         _avatar->setBorderRadius(20);
         _avatar->setMaximumAspectRatio(1);
+    });
+    connect(_accountComboBox->lineEdit(),&QLineEdit::textChanged,this,[=](const QString &str) {
+        if (_accToAvatarPath.contains(str)) {
+            QString curAvatar = _accToAvatarPath.value(str);
+            if (!curAvatar.isEmpty() && curAvatar != "-1") {
+                QImage img(curAvatar);
+                if (img.isNull())
+                    _avatar->setCardImage(QImage(":/land-page/rc-page/img/SS-default-icon.jpg"));
+                _avatar->setCardImage(QImage(curAvatar));
+            }else {
+                _avatar->setCardImage(QImage(":/land-page/rc-page/img/SS-default-icon.jpg"));
+            }
+            _avatar->setFixedSize(90,90);
+            _avatar->setBorderRadius(20);
+            _avatar->setMaximumAspectRatio(1);
+        }
     });
 
     timer->start(16);

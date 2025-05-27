@@ -79,10 +79,11 @@ ClientRequestHandler::ClientRequestHandler(QObject* parent) : QObject(parent) {
     connect(this, &ClientRequestHandler::sigQueryGroupBaseInfoRequest,       businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_GROUP_BASE_INFO),Qt::QueuedConnection);
     connect(this, &ClientRequestHandler::sigQueryGroupNoticesRequest,        businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_GROUP_NOTICE),Qt::QueuedConnection);
     connect(this, &ClientRequestHandler::sigQueryNewMessageRequest,          businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_MESSAGE_CONTENT),Qt::QueuedConnection);
-    connect(this, &ClientRequestHandler::sigQueryFileInfoRequest,            businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_FILE),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigQueryAllFileInfoRequest,         businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_ALL_FILE),       Qt::QueuedConnection);
     connect(this, &ClientRequestHandler::sigQueryMsgPicInfoRequest,          businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::R_MESSAGE_PIC_INFO),Qt::QueuedConnection);
     connect(this, &ClientRequestHandler::sigCallVideoRequest,                businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::VIDEO_CALL_REQUEST),Qt::QueuedConnection);
     connect(this, &ClientRequestHandler::sigCreateGroupRequest,              businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::C_GROUP_BASE_INFO),Qt::QueuedConnection);
+    connect(this, &ClientRequestHandler::sigUpdateFriendshipRequest,         businessProcessor,    businessProcessor->getMappingFunction("request")->value(SSDTO::U_FRIENDSHIP),Qt::QueuedConnection);
 
     // 连接响应信号槽
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigEmailCodeResponse,              this, &ClientRequestHandler::sigEmailCodeResponse);
@@ -98,7 +99,7 @@ ClientRequestHandler::ClientRequestHandler(QObject* parent) : QObject(parent) {
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryGroupBaseInfoResponse,     this, &ClientRequestHandler::sigQueryGroupBaseInfoResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryGroupNoticesResponse,      this, &ClientRequestHandler::sigQueryGroupNoticesResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryNewMessageResponse,        this, &ClientRequestHandler::sigQueryNewMessageResponse);
-    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryFileInfoResponse,          this, &ClientRequestHandler::sigQueryFileInfoResponse);
+    connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryAllFileInfoResponse,       this, &ClientRequestHandler::sigQueryAllFileInfoResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigQueryMsgPicInfoResponse,        this, &ClientRequestHandler::sigQueryMsgPicInfoResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigCallVideoResponse,              this, &ClientRequestHandler::sigCallVideoResponse);
     connect(businessProcessor, &BusinessLayer::BusinessProcessor::sigNewFriendshipInfoResponse,      this, &ClientRequestHandler::sigNewFriendshipInfoResponse);
@@ -247,8 +248,8 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
         };
 
         // query file info
-        _requestHandlerMap[SSDTO::R_FILE] = [=](const std::string & dto) {
-            SEND_PACKAGE(dto,SSDTO::R_FILE,"query of file info dto has been send to server...")
+        _requestHandlerMap[SSDTO::R_ALL_FILE] = [=](const std::string & dto) {
+            SEND_PACKAGE(dto,SSDTO::R_ALL_FILE,"query of file info dto has been send to server...")
         };
 
         // query msg pic info
@@ -264,6 +265,11 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
         // create group request
         _requestHandlerMap[SSDTO::C_GROUP_BASE_INFO] = [=](const std::string & dto) {
             SEND_PACKAGE(dto,SSDTO::C_GROUP_BASE_INFO,"create group request to server...")
+        };
+
+        // update friendship request
+        _requestHandlerMap[SSDTO::U_FRIENDSHIP] = [=](const std::string & dto) {
+            SEND_PACKAGE(dto,SSDTO::U_FRIENDSHIP,"update friendship request to server...")
         };
     }
 
@@ -337,9 +343,9 @@ BusinessLayer::BusinessProcessor::BusinessProcessor(QObject* parent) : QObject(p
         };
 
         // file info
-        _responseHandlerMap[SSDTO::R_FILE] = [=](const std::string & dto) {
+        _responseHandlerMap[SSDTO::R_ALL_FILE] = [=](const std::string & dto) {
             LOG("get file response")
-            emit sigQueryFileInfoResponse(dto);
+            emit sigQueryAllFileInfoResponse(dto);
         };
 
         // query msg pic info

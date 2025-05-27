@@ -263,6 +263,19 @@ int ProcessBusiness::processBusiness(std::string dto, int businessType, std::sha
 
         info->tcp->sendMsg(resDto, SSDTO::BusinessType::R_FRIENDSHIP_LIST);
     }
+    // 更新好友关系
+    else if (businessType == SSDTO::BusinessType::U_FRIENDSHIP) {
+        FriendshipService fService;
+        SSDTO::FriendshipDTO fdto;
+        fdto.ParseFromString(dto);
+        fService.updateFriendship({
+            -1,fdto.ssid(),fdto.grouping(),fdto.remark(),
+            fdto.friend_ssid(),
+            static_cast<uint8_t>(fdto.ship_status()),
+            static_cast<uint8_t>(fdto.friend_type()),
+            -1
+        });
+    }
     // 连接断开
     else if (businessType == SSDTO::BusinessType::DISCONNECT) {
         // 发生错误
@@ -478,9 +491,9 @@ int ProcessBusiness::processBusiness(std::string dto, int businessType, std::sha
         info->tcp->sendMsg(resDto, SSDTO::BusinessType::FUZZY_SEARCH);
     }
     // 获取用户文件信息
-    else if (businessType == SSDTO::BusinessType::R_FILE) {
+    else if (businessType == SSDTO::BusinessType::R_ALL_FILE) {
         FileService fService;
-        SSDTO::GetFileDTO fdto;
+        SSDTO::GetAllFileDTO fdto;
         fdto.ParseFromString(dto);
 
         vector<FileStorageDTO> files;
@@ -506,7 +519,7 @@ int ProcessBusiness::processBusiness(std::string dto, int businessType, std::sha
 
         std::string resDto;
         fdto.SerializeToString(&resDto);
-        info->tcp->sendMsg(resDto, SSDTO::BusinessType::R_FILE);
+        info->tcp->sendMsg(resDto, SSDTO::BusinessType::R_ALL_FILE);
     }
     // 添加文件信息 by grpc sub process
     else if (businessType == SSDTO::BusinessType::C_FILE) {

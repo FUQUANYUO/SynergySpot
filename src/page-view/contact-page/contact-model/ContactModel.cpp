@@ -12,6 +12,7 @@
 #include <qiodevice.h>
 
 ContactModel::ContactModel(QObject *parent) : QStandardItemModel(parent) {
+    addGrouping("我的好友");
 }
 
 void ContactModel::addGrouping(const QString &groupingName) {
@@ -69,6 +70,10 @@ void ContactModel::delGroupingItem(const QString &groupingName, const GroupingIt
                 parent->removeRow(it->first->row());
                 delete it->first;
                 items.erase(it);
+
+                if (items.isEmpty() && groupingName != "我的好友") {
+                    delGrouping(groupingName);
+                }
                 break;
             }
         }
@@ -149,23 +154,33 @@ bool ContactModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
     // 执行移动
     QString destGroup = parent.data(Qt::DisplayRole).toString();
     QStandardItem *destParent = _groupingHash[destGroup];
+    QStandardItem *originalChild = it->first;
+    GroupingItem item = it->second;
 
-    if (beginMoveRows(createIndex(_groupingHash[srcGroup]->row(), 0, _groupingHash[srcGroup]),
-                    srcRow, srcRow,
-                    createIndex(destParent->row(), 0, destParent),
-                    row)) {
-        QStandardItem *child = it->first;
-        GroupingItem item = it->second;
+    // 创建新的子项并复制所有数据
+    QStandardItem *newChild = new QStandardItem(originalChild->text());
+    newChild->setData(originalChild->data(Qt::DecorationRole), Qt::DecorationRole);
+    newChild->setData(originalChild->data(Qt::UserRole + 1), Qt::UserRole + 1); // StatusRole
+    newChild->setData(originalChild->data(Qt::UserRole + 2), Qt::UserRole + 2); // SSIDRole
 
-        _groupingHash[srcGroup]->removeRow(srcRow);
+    // 从原分组移除
+    int originalRow = originalChild->row();
+    _groupingHash[srcGroup]->removeRow(originalRow);
 
-        destParent->insertRow(row, child);
+    // 从源分组的映射中移除
+    srcItems.erase(it);
 
-        updateItemMapping(child, srcGroup, destGroup, item);
-        endMoveRows();
-        return true;
+    // 添加到目标分组
+    if (row < 0 || row > destParent->rowCount()) {
+        destParent->appendRow(newChild);
+    } else {
+        destParent->insertRow(row, newChild);
     }
-    return false;
+
+    // 更新目标分组的映射
+    _itemMap[destGroup].append(qMakePair(newChild, item));
+    emit sigUpdateFriendshipGrouping(ssid, destGroup);
+    return true;
 }
 
 void ContactModel::updateItemMapping(QStandardItem *child,

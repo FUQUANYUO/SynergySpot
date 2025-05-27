@@ -176,13 +176,13 @@ std::vector<FileStorageDO> FileStorageDAO::findByName(const std::string &fileNam
 
 std::vector<FileStorageDO> FileStorageDAO::findBySSID(const std::string &userSSID,int pageSize, int pageNum) {
     std::string sql = "SELECT file_id, uploader_ssid, file_name, file_size, file_type, storage_path, UNIX_TIMESTAMP(upload_time) FROM file_storage "
-                      "WHERE file_name = ? "
+                      "WHERE uploader_ssid = ? "
                       "LIMIT ? OFFSET ?";
     std::vector<MysqlConn::Param> params;
-    MysqlConn::Param paramFileName;
-    paramFileName.type = MysqlConn::Param::STRING;
-    paramFileName.str_val = userSSID;
-    params.push_back(paramFileName);
+    MysqlConn::Param paramSSID;
+    paramSSID.type = MysqlConn::Param::STRING;
+    paramSSID.str_val = userSSID;
+    params.push_back(paramSSID);
 
     MysqlConn::Param paramPageSize;
     paramPageSize.type = MysqlConn::Param::INT;

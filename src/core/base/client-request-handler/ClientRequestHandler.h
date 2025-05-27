@@ -53,14 +53,16 @@ signals:
     void sigQueryGroupNoticesRequest(const std::string& dto);
     // 获取最新消息
     void sigQueryNewMessageRequest(const std::string& dto);
-    // 查询文件相关信息
-    void sigQueryFileInfoRequest(const std::string& dto);
+    // 查询当前用户所有上传文件相关信息
+    void sigQueryAllFileInfoRequest(const std::string& dto);
     // 获取消息中的图片相关的信息
     void sigQueryMsgPicInfoRequest(const std::string& dto);
     // 发起音视频请求
     void sigCallVideoRequest(const std::string& dto);
     // 创建群聊
     void sigCreateGroupRequest(const std::string& dto);
+    // 修改好友关系
+    void sigUpdateFriendshipRequest(const std::string& dto);
 
     // --------------- 响应信号 --------------- //
     void sigEmailCodeResponse(const std::string& dto);
@@ -80,7 +82,7 @@ signals:
     void sigQueryGroupBaseInfoResponse(const std::string& dto);
     void sigQueryGroupNoticesResponse(const std::string& dto);
     void sigQueryNewMessageResponse(const std::string& dto);
-    void sigQueryFileInfoResponse(const std::string& dto);
+    void sigQueryAllFileInfoResponse(const std::string& dto);
     void sigQueryMsgPicInfoResponse(const std::string& dto);
 
     void sigConnServerFailed();
@@ -132,7 +134,7 @@ namespace BusinessLayer {
         void sigQueryGroupBaseInfoResponse(const std::string& dto);
         void sigQueryGroupNoticesResponse(const std::string& dto);
         void sigQueryNewMessageResponse(const std::string& dto);
-        void sigQueryFileInfoResponse(const std::string& dto);
+        void sigQueryAllFileInfoResponse(const std::string& dto);
         void sigQueryMsgPicInfoResponse(const std::string& dto);
 
         void sigConnServerFailed();

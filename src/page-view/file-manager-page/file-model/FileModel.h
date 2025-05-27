@@ -15,6 +15,9 @@ public:
     explicit FileModel(QObject* parent = nullptr);
     ~FileModel();
 
+    QString getFileId(int row);
+    FileStorageDTO getFileData(QString fileId);
+
     void addFileInfo(FileStorageDTO fileInfo);
     void removeFileInfo(const QString& fileId);
 
@@ -24,7 +27,10 @@ public:
     QVariant data(const QModelIndex& index, int role) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 private:
-    QStringList _header;
+    QString formatSize(qint64 bytes) const;
+private:
+    QStringList                     _header;
+    QList<FileStorageDTO>           _fileList; // 存储文件信息列表
 };
 
 

@@ -68,6 +68,7 @@ SET(
         SRC_CPP                      ${SRC_CPP}
         ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/log/Log.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/get-time/GetCurTime.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/uuid/GenUUID.cpp
         # effect
         ${CMAKE_CURRENT_SOURCE_DIR}/../effect-component/SS-mask-widget/SSMaskWidget.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../effect-component/loading-dialog/LoadingDialog.cpp
@@ -92,7 +93,7 @@ IF(CMAKE_BUILD_TYPE STREQUAL "Debug")
                 ${PLUGINS_NAME}              PUBLIC
                 Qt6::Core                    Qt6::Gui                   Qt6::Widgets
         #--------------------------------    your lib file name    ----------------------------------   BEGIN
-                PluginManagerd               ElaWidgetToolsd
+                PluginManagerd               ElaWidgetToolsd            CommonDataPlugind
         #--------------------------------    your lib file name    ----------------------------------   END
         )
 ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -100,7 +101,7 @@ ELSEIF (CMAKE_BUILD_TYPE STREQUAL "Release")
                 ${PLUGINS_NAME}              PUBLIC
                 Qt6::Core                    Qt6::Gui                   Qt6::Widgets
         #--------------------------------    your lib file name    ----------------------------------   BEGIN
-                PluginManager                ElaWidgetTools
+                PluginManager                ElaWidgetTools             CommonDataPlugin
         #--------------------------------    your lib file name    ----------------------------------   END
         )
 ENDIF ()

@@ -30,4 +30,6 @@ realtime-info:
  fileSavePath: "xxxxxxxxx"
 log:
  logName: "log/SynergySpot"
-
+trtc-api:
+ sdkAppId: "xxxxxx"
+ sdkSecretKey: "xxxxxx"

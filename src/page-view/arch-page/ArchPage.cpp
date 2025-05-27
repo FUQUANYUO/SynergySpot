@@ -220,7 +220,7 @@ void ArchPage::initConnectFunc() {
     connect(this, &ElaWindow::navigationNodeClicked, this, [=](ElaNavigationType::NavigationNodeType nodeType, QString nodeKey) {
         if (_aboutKey == nodeKey)
         {
-            g_pAboutPage->setFixedSize(400, 700);
+            g_pAboutPage->setFixedSize(400, 300);
             g_pAboutPage->moveToCenter();
             g_pAboutPage->show();
         }

@@ -24,4 +24,6 @@ realtime-info:
  maxRetryCount: 5              # 重连最大尝试次数
 open-webui-info:
  url: "xxxxxxxxx"
+trtc-api:
+ sdkAppId: "xxxxxxxx"
 

@@ -87,7 +87,7 @@ struct GetUserMessageDTODefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT GetUserMessageDTODefaultTypeInternal _GetUserMessageDTO_default_instance_;
-constexpr GetFileDTO::GetFileDTO(
+constexpr GetAllFileDTO::GetAllFileDTO(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
   : files_()
   , ssid_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
@@ -97,15 +97,15 @@ constexpr GetFileDTO::GetFileDTO(
   , ip_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
   , page_size_(0)
   , page_num_(0){}
-struct GetFileDTODefaultTypeInternal {
-  constexpr GetFileDTODefaultTypeInternal()
+struct GetAllFileDTODefaultTypeInternal {
+  constexpr GetAllFileDTODefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
-  ~GetFileDTODefaultTypeInternal() {}
+  ~GetAllFileDTODefaultTypeInternal() {}
   union {
-    GetFileDTO _instance;
+    GetAllFileDTO _instance;
   };
 };
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT GetFileDTODefaultTypeInternal _GetFileDTO_default_instance_;
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT GetAllFileDTODefaultTypeInternal _GetAllFileDTO_default_instance_;
 constexpr FuzzySearchDTO::FuzzySearchDTO(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
   : user_infos_()
@@ -524,19 +524,19 @@ const uint32_t TableStruct_DTO_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(prot
   PROTOBUF_FIELD_OFFSET(::SSDTO::GetUserMessageDTO, page_num_),
   PROTOBUF_FIELD_OFFSET(::SSDTO::GetUserMessageDTO, ip_),
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::SSDTO::GetFileDTO, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::GetAllFileDTO, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::SSDTO::GetFileDTO, ssid_),
-  PROTOBUF_FIELD_OFFSET(::SSDTO::GetFileDTO, file_id_),
-  PROTOBUF_FIELD_OFFSET(::SSDTO::GetFileDTO, file_name_),
-  PROTOBUF_FIELD_OFFSET(::SSDTO::GetFileDTO, file_storage_),
-  PROTOBUF_FIELD_OFFSET(::SSDTO::GetFileDTO, page_size_),
-  PROTOBUF_FIELD_OFFSET(::SSDTO::GetFileDTO, page_num_),
-  PROTOBUF_FIELD_OFFSET(::SSDTO::GetFileDTO, files_),
-  PROTOBUF_FIELD_OFFSET(::SSDTO::GetFileDTO, ip_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::GetAllFileDTO, ssid_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::GetAllFileDTO, file_id_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::GetAllFileDTO, file_name_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::GetAllFileDTO, file_storage_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::GetAllFileDTO, page_size_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::GetAllFileDTO, page_num_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::GetAllFileDTO, files_),
+  PROTOBUF_FIELD_OFFSET(::SSDTO::GetAllFileDTO, ip_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::SSDTO::FuzzySearchDTO, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -801,7 +801,7 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOB
   { 18, 26, -1, sizeof(::SSDTO::GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUse)},
   { 28, -1, -1, sizeof(::SSDTO::GetMessagePicInfoDTO)},
   { 37, -1, -1, sizeof(::SSDTO::GetUserMessageDTO)},
-  { 49, -1, -1, sizeof(::SSDTO::GetFileDTO)},
+  { 49, -1, -1, sizeof(::SSDTO::GetAllFileDTO)},
   { 63, -1, -1, sizeof(::SSDTO::FuzzySearchDTO)},
   { 75, -1, -1, sizeof(::SSDTO::EnrollAccountDTO)},
   { 87, -1, -1, sizeof(::SSDTO::EmailVerifyDTO)},
@@ -831,7 +831,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SSDTO::_GetMessagePicInfoDTO_PicNameToPathEntry_DoNotUse_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SSDTO::_GetMessagePicInfoDTO_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SSDTO::_GetUserMessageDTO_default_instance_),
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SSDTO::_GetFileDTO_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SSDTO::_GetAllFileDTO_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SSDTO::_FuzzySearchDTO_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SSDTO::_EnrollAccountDTO_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::SSDTO::_EmailVerifyDTO_default_instance_),
@@ -868,112 +868,112 @@ const char descriptor_table_protodef_DTO_2eproto[] PROTOBUF_SECTION_VARIABLE(pro
   "etUserMessageDTO\022\014\n\004ssid\030\001 \001(\014\022%\n\003msg\030\002 "
   "\003(\0132\030.SSDTO.MessageContentDTO\022\021\n\tlast_ti"
   "me\030\003 \001(\014\022\021\n\tpage_size\030\004 \001(\005\022\020\n\010page_num\030"
-  "\005 \001(\005\022\n\n\002ip\030\006 \001(\014\"\253\001\n\nGetFileDTO\022\014\n\004ssid"
-  "\030\001 \001(\014\022\017\n\007file_id\030\002 \001(\014\022\021\n\tfile_name\030\003 \001"
-  "(\014\022\024\n\014file_storage\030\004 \001(\014\022\021\n\tpage_size\030\005 "
-  "\001(\005\022\020\n\010page_num\030\006 \001(\005\022$\n\005files\030\007 \003(\0132\025.S"
-  "SDTO.FileStorageDTO\022\n\n\002ip\030\010 \001(\014\"\244\001\n\016Fuzz"
-  "ySearchDTO\022\020\n\010is_group\030\001 \001(\010\022\014\n\004ssid\030\002 \001"
-  "(\014\022\014\n\004name\030\003 \001(\014\022*\n\nuser_infos\030\004 \003(\0132\026.S"
-  "SDTO.UserBaseInfoDTO\022,\n\013group_infos\030\005 \003("
-  "\0132\027.SSDTO.GroupBaseInfoDTO\022\n\n\002ip\030\006 \001(\014\"w"
-  "\n\020EnrollAccountDTO\022\014\n\004ssid\030\001 \001(\014\022\021\n\tuser"
-  "_name\030\002 \001(\014\022\020\n\010password\030\003 \001(\014\022\025\n\rpasswor"
-  "d_salt\030\004 \001(\014\022\r\n\005email\030\005 \001(\014\022\n\n\002ip\030\006 \001(\014\""
-  "\232\001\n\016EmailVerifyDTO\022\022\n\nis_request\030\001 \001(\010\022\025"
-  "\n\remail_address\030\002 \001(\014\022\023\n\013verify_code\030\003 \001"
-  "(\014\022\022\n\nstart_time\030\004 \001(\014\022\022\n\nvalid_time\030\005 \001"
-  "(\014\022\024\n\014request_ssid\030\006 \001(\014\022\n\n\002ip\030\007 \001(\014\"\215\001\n"
-  "\020NewFriendInfoDTO\022\017\n\007isGroup\030\001 \001(\010\022)\n\tus"
-  "er_info\030\002 \001(\0132\026.SSDTO.UserBaseInfoDTO\022+\n"
-  "\ngroup_info\030\003 \001(\0132\027.SSDTO.GroupBaseInfoD"
-  "TO\022\020\n\010grouping\030\004 \001(\014\"S\n\rMakeFriendDTO\022\016\n"
-  "\006sender\030\001 \001(\014\022\021\n\trecipient\030\002 \001(\014\022\016\n\006acce"
-  "pt\030\003 \001(\010\022\017\n\007isGroup\030\004 \001(\010\"L\n\rLoginCheckD"
-  "TO\022\014\n\004ssid\030\001 \001(\014\022\020\n\010password\030\002 \001(\014\022\017\n\007is"
-  "_pass\030\003 \001(\010\022\n\n\002ip\030\005 \001(\014\")\n\rDisconnectDTO"
-  "\022\014\n\004ssid\030\001 \001(\014\022\n\n\002ip\030\002 \001(\014\"\301\001\n\024GetAllUse"
-  "rFriendship\022\014\n\004ssid\030\001 \001(\t\022.\n\016user_base_i"
-  "nfo\030\002 \003(\0132\026.SSDTO.UserBaseInfoDTO\0220\n\017gro"
-  "up_base_info\030\003 \003(\0132\027.SSDTO.GroupBaseInfo"
-  "DTO\022-\n\017friendship_info\030\004 \003(\0132\024.SSDTO.Fri"
-  "endshipDTO\022\n\n\002ip\030\005 \001(\014\"\342\001\n\017UserBaseInfoD"
-  "TO\022\014\n\004ssid\030\001 \001(\t\022\016\n\006ssname\030\002 \001(\t\022\026\n\016avat"
-  "ar_file_id\030\003 \001(\t\022\032\n\022avatar_remote_path\030\004"
-  " \001(\t\022\013\n\003sex\030\005 \001(\t\022\025\n\rpersonal_sign\030\006 \001(\t"
-  "\022\026\n\016thumb_up_count\030\007 \001(\r\022\020\n\010birthday\030\010 \001"
-  "(\003\022\016\n\006region\030\t \001(\r\022\023\n\013create_time\030\n \001(\003\022"
-  "\n\n\002ip\030\013 \001(\014\"~\n\022UserPrivateInfoDTO\022\014\n\004ssi"
-  "d\030\001 \001(\t\022\r\n\005email\030\002 \001(\t\022\020\n\010password\030\003 \001(\t"
-  "\022\025\n\rpassword_salt\030\004 \001(\t\022\026\n\016account_statu"
-  "s\030\005 \001(\r\022\n\n\002ip\030\006 \001(\014\"\253\001\n\rFriendshipDTO\022\n\n"
-  "\002id\030\001 \001(\003\022\014\n\004ssid\030\002 \001(\t\022\020\n\010grouping\030\003 \001("
-  "\t\022\016\n\006remark\030\004 \001(\t\022\023\n\013friend_ssid\030\005 \001(\t\022\023"
-  "\n\013ship_status\030\006 \001(\r\022\023\n\013friend_type\030\007 \001(\r"
-  "\022\023\n\013create_time\030\010 \001(\003\022\n\n\002ip\030\t \001(\014\"J\n\rGro"
-  "upAdminDTO\022\n\n\002id\030\001 \001(\003\022\020\n\010group_id\030\002 \001(\003"
-  "\022\017\n\007op_ssid\030\003 \001(\t\022\n\n\002ip\030\004 \001(\014\"\364\001\n\020GroupB"
-  "aseInfoDTO\022\n\n\002id\030\001 \001(\003\022\022\n\nssid_group\030\002 \001"
-  "(\t\022\014\n\004name\030\003 \001(\t\022\026\n\016avatar_file_id\030\004 \001(\t"
-  "\022\032\n\022avatar_remote_path\030\005 \001(\t\022\023\n\013create_s"
-  "sid\030\006 \001(\t\022\017\n\007profile\030\007 \001(\t\022\016\n\006admins\030\010 \003"
-  "(\t\022\'\n\007members\030\t \003(\0132\026.SSDTO.UserBaseInfo"
-  "DTO\022\023\n\013create_time\030\n \001(\003\022\n\n\002ip\030\013 \001(\014\"_\n\016"
-  "GroupNoticeDTO\022\n\n\002id\030\001 \001(\003\022\020\n\010group_id\030\002"
-  " \001(\003\022\016\n\006notice\030\003 \001(\t\022\023\n\013create_time\030\004 \001("
-  "\003\022\n\n\002ip\030\005 \001(\014\"\206\001\n\023MessageRecipientDTO\022\n\n"
-  "\002id\030\001 \001(\003\022\022\n\nmessage_id\030\002 \001(\003\022\026\n\016recipie"
-  "nt_type\030\003 \001(\r\022\026\n\016recipient_ssid\030\004 \001(\t\022\023\n"
-  "\013read_status\030\005 \001(\010\022\n\n\002ip\030\006 \001(\014\"\274\001\n\021Messa"
-  "geContentDTO\022\n\n\002id\030\001 \001(\003\022\023\n\013sender_ssid\030"
-  "\002 \001(\t\022\024\n\014content_type\030\003 \001(\r\022\017\n\007content\030\004"
-  " \001(\t\022\017\n\007file_id\030\005 \003(\t\022-\n\trecipient\030\006 \001(\013"
-  "2\032.SSDTO.MessageRecipientDTO\022\023\n\013create_t"
-  "ime\030\007 \001(\003\022\n\n\002ip\030\010 \001(\014\"\\\n\013DistrictDTO\022\023\n\013"
-  "district_id\030\001 \001(\r\022\013\n\003pid\030\002 \001(\r\022\020\n\010distri"
-  "ct\030\003 \001(\t\022\r\n\005level\030\004 \001(\r\022\n\n\002ip\030\005 \001(\014\"\250\001\n\016"
-  "FileStorageDTO\022\017\n\007file_id\030\001 \001(\t\022\025\n\ruploa"
-  "der_ssid\030\002 \001(\t\022\021\n\tfile_name\030\003 \001(\t\022\021\n\tfil"
-  "e_size\030\004 \001(\003\022\021\n\tfile_type\030\005 \001(\t\022\024\n\014stora"
-  "ge_path\030\006 \001(\t\022\023\n\013upload_time\030\007 \001(\003\022\n\n\002ip"
-  "\030\010 \001(\014\"\210\001\n\017OperationLogDTO\022\n\n\002id\030\001 \001(\003\022\014"
-  "\n\004ssid\030\002 \001(\t\022\026\n\016operation_type\030\003 \001(\t\022\016\n\006"
-  "detail\030\004 \001(\t\022\022\n\nip_address\030\005 \001(\t\022\023\n\013crea"
-  "te_time\030\006 \001(\003\022\n\n\002ip\030\007 \001(\014\"e\n\016BaseSticker"
-  "DTO\022\022\n\nsticker_id\030\001 \001(\003\022\021\n\timage_url\030\002 \001"
-  "(\t\022\014\n\004tags\030\003 \001(\t\022\022\n\ncreated_at\030\004 \001(\003\022\n\n\002"
-  "ip\030\005 \001(\014\"\256\001\n\027UserCollectedStickerDTO\022\025\n\r"
-  "collection_id\030\001 \001(\003\022\021\n\tuser_ssid\030\002 \001(\t\022\021"
-  "\n\tis_custom\030\003 \001(\010\022\021\n\timage_url\030\004 \001(\t\022\022\n\n"
-  "created_at\030\005 \001(\003\022\021\n\tpage_size\030\006 \001(\005\022\020\n\010p"
-  "age_num\030\007 \001(\005\022\n\n\002ip\030\010 \001(\014*\210\007\n\014BusinessTy"
-  "pe\022\024\n\020R_USER_BASE_INFO\020\000\022\024\n\020U_USER_BASE_"
-  "INFO\020\001\022\016\n\nDISCONNECT\020\003\022\020\n\014EMAIL_VERIFY\020\004"
-  "\022\026\n\022VIDEO_CALL_REQUEST\020\005\022\027\n\023VIDEO_CALL_R"
-  "ESPONSE\020\006\022\017\n\013LOGIN_CHECK\020\013\022\022\n\016ENROLL_ACC"
-  "OUNT\020\014\022\024\n\020RECOVER_PASSWORD\020\r\022\025\n\021R_FRIEND"
-  "SHIP_LIST\020\025\022\020\n\014U_FRIENDSHIP\020\026\022\020\n\014D_FRIEN"
-  "DSHIP\020\027\022\020\n\014C_FRIENDSHIP\020\030\022\025\n\021C_GROUP_BAS"
-  "E_INFO\020\037\022\025\n\021R_GROUP_BASE_INFO\020 \022\025\n\021D_GRO"
-  "UP_BASE_INFO\020!\022\025\n\021U_GROUP_BASE_INF0\020\"\022\027\n"
-  "\023C_GROUP_MEMBER_INFO\020)\022\027\n\023D_GROUP_MEMBER"
-  "_INFO\020*\022\027\n\023R_GROUP_MEMBER_INFO\020+\022\022\n\016C_GR"
-  "OUP_NOTICE\0203\022\022\n\016D_GROUP_NOTICE\0204\022\022\n\016R_GR"
-  "OUP_NOTICE\0205\022\020\n\014FUZZY_SEARCH\0208\022\025\n\021R_MESS"
-  "AGE_CONTENT\020=\022\025\n\021C_MESSAGE_CONTENT\020>\022\026\n\022"
-  "R_MESSAGE_PIC_INFO\020\?\022\027\n\023MAKE_FRIEND_REQU"
-  "EST\020@\022\030\n\024MAKE_FRIEND_RESPONSE\020A\022\025\n\021R_DIS"
-  "TRICT_BY_PID\020G\022\027\n\023R_DISTRICT_PROVINCE\020H\022"
-  "\023\n\017R_DISTRICT_CITY\020I\022\024\n\020R_DISTRICT_BLOCK"
-  "\020J\022\026\n\022R_DISTRICT_BY_NAME\020K\022\022\n\016R_BASE_STI"
-  "CKER\020Q\022\034\n\030R_USER_COLLECTED_STICKER\020R\022\034\n\030"
-  "C_USER_COLLECTED_STICKER\020S\022\034\n\030D_USER_COL"
-  "LECTED_STICKER\020T\022\n\n\006R_FILE\020[\022\n\n\006C_FILE\020\\"
-  "\022\n\n\006D_FILE\020]b\006proto3"
+  "\005 \001(\005\022\n\n\002ip\030\006 \001(\014\"\256\001\n\rGetAllFileDTO\022\014\n\004s"
+  "sid\030\001 \001(\014\022\017\n\007file_id\030\002 \001(\014\022\021\n\tfile_name\030"
+  "\003 \001(\014\022\024\n\014file_storage\030\004 \001(\014\022\021\n\tpage_size"
+  "\030\005 \001(\005\022\020\n\010page_num\030\006 \001(\005\022$\n\005files\030\007 \003(\0132"
+  "\025.SSDTO.FileStorageDTO\022\n\n\002ip\030\010 \001(\014\"\244\001\n\016F"
+  "uzzySearchDTO\022\020\n\010is_group\030\001 \001(\010\022\014\n\004ssid\030"
+  "\002 \001(\014\022\014\n\004name\030\003 \001(\014\022*\n\nuser_infos\030\004 \003(\0132"
+  "\026.SSDTO.UserBaseInfoDTO\022,\n\013group_infos\030\005"
+  " \003(\0132\027.SSDTO.GroupBaseInfoDTO\022\n\n\002ip\030\006 \001("
+  "\014\"w\n\020EnrollAccountDTO\022\014\n\004ssid\030\001 \001(\014\022\021\n\tu"
+  "ser_name\030\002 \001(\014\022\020\n\010password\030\003 \001(\014\022\025\n\rpass"
+  "word_salt\030\004 \001(\014\022\r\n\005email\030\005 \001(\014\022\n\n\002ip\030\006 \001"
+  "(\014\"\232\001\n\016EmailVerifyDTO\022\022\n\nis_request\030\001 \001("
+  "\010\022\025\n\remail_address\030\002 \001(\014\022\023\n\013verify_code\030"
+  "\003 \001(\014\022\022\n\nstart_time\030\004 \001(\014\022\022\n\nvalid_time\030"
+  "\005 \001(\014\022\024\n\014request_ssid\030\006 \001(\014\022\n\n\002ip\030\007 \001(\014\""
+  "\215\001\n\020NewFriendInfoDTO\022\017\n\007isGroup\030\001 \001(\010\022)\n"
+  "\tuser_info\030\002 \001(\0132\026.SSDTO.UserBaseInfoDTO"
+  "\022+\n\ngroup_info\030\003 \001(\0132\027.SSDTO.GroupBaseIn"
+  "foDTO\022\020\n\010grouping\030\004 \001(\014\"S\n\rMakeFriendDTO"
+  "\022\016\n\006sender\030\001 \001(\014\022\021\n\trecipient\030\002 \001(\014\022\016\n\006a"
+  "ccept\030\003 \001(\010\022\017\n\007isGroup\030\004 \001(\010\"L\n\rLoginChe"
+  "ckDTO\022\014\n\004ssid\030\001 \001(\014\022\020\n\010password\030\002 \001(\014\022\017\n"
+  "\007is_pass\030\003 \001(\010\022\n\n\002ip\030\005 \001(\014\")\n\rDisconnect"
+  "DTO\022\014\n\004ssid\030\001 \001(\014\022\n\n\002ip\030\002 \001(\014\"\301\001\n\024GetAll"
+  "UserFriendship\022\014\n\004ssid\030\001 \001(\t\022.\n\016user_bas"
+  "e_info\030\002 \003(\0132\026.SSDTO.UserBaseInfoDTO\0220\n\017"
+  "group_base_info\030\003 \003(\0132\027.SSDTO.GroupBaseI"
+  "nfoDTO\022-\n\017friendship_info\030\004 \003(\0132\024.SSDTO."
+  "FriendshipDTO\022\n\n\002ip\030\005 \001(\014\"\342\001\n\017UserBaseIn"
+  "foDTO\022\014\n\004ssid\030\001 \001(\t\022\016\n\006ssname\030\002 \001(\t\022\026\n\016a"
+  "vatar_file_id\030\003 \001(\t\022\032\n\022avatar_remote_pat"
+  "h\030\004 \001(\t\022\013\n\003sex\030\005 \001(\t\022\025\n\rpersonal_sign\030\006 "
+  "\001(\t\022\026\n\016thumb_up_count\030\007 \001(\r\022\020\n\010birthday\030"
+  "\010 \001(\003\022\016\n\006region\030\t \001(\r\022\023\n\013create_time\030\n \001"
+  "(\003\022\n\n\002ip\030\013 \001(\014\"~\n\022UserPrivateInfoDTO\022\014\n\004"
+  "ssid\030\001 \001(\t\022\r\n\005email\030\002 \001(\t\022\020\n\010password\030\003 "
+  "\001(\t\022\025\n\rpassword_salt\030\004 \001(\t\022\026\n\016account_st"
+  "atus\030\005 \001(\r\022\n\n\002ip\030\006 \001(\014\"\253\001\n\rFriendshipDTO"
+  "\022\n\n\002id\030\001 \001(\003\022\014\n\004ssid\030\002 \001(\t\022\020\n\010grouping\030\003"
+  " \001(\t\022\016\n\006remark\030\004 \001(\t\022\023\n\013friend_ssid\030\005 \001("
+  "\t\022\023\n\013ship_status\030\006 \001(\r\022\023\n\013friend_type\030\007 "
+  "\001(\r\022\023\n\013create_time\030\010 \001(\003\022\n\n\002ip\030\t \001(\014\"J\n\r"
+  "GroupAdminDTO\022\n\n\002id\030\001 \001(\003\022\020\n\010group_id\030\002 "
+  "\001(\003\022\017\n\007op_ssid\030\003 \001(\t\022\n\n\002ip\030\004 \001(\014\"\364\001\n\020Gro"
+  "upBaseInfoDTO\022\n\n\002id\030\001 \001(\003\022\022\n\nssid_group\030"
+  "\002 \001(\t\022\014\n\004name\030\003 \001(\t\022\026\n\016avatar_file_id\030\004 "
+  "\001(\t\022\032\n\022avatar_remote_path\030\005 \001(\t\022\023\n\013creat"
+  "e_ssid\030\006 \001(\t\022\017\n\007profile\030\007 \001(\t\022\016\n\006admins\030"
+  "\010 \003(\t\022\'\n\007members\030\t \003(\0132\026.SSDTO.UserBaseI"
+  "nfoDTO\022\023\n\013create_time\030\n \001(\003\022\n\n\002ip\030\013 \001(\014\""
+  "_\n\016GroupNoticeDTO\022\n\n\002id\030\001 \001(\003\022\020\n\010group_i"
+  "d\030\002 \001(\003\022\016\n\006notice\030\003 \001(\t\022\023\n\013create_time\030\004"
+  " \001(\003\022\n\n\002ip\030\005 \001(\014\"\206\001\n\023MessageRecipientDTO"
+  "\022\n\n\002id\030\001 \001(\003\022\022\n\nmessage_id\030\002 \001(\003\022\026\n\016reci"
+  "pient_type\030\003 \001(\r\022\026\n\016recipient_ssid\030\004 \001(\t"
+  "\022\023\n\013read_status\030\005 \001(\010\022\n\n\002ip\030\006 \001(\014\"\274\001\n\021Me"
+  "ssageContentDTO\022\n\n\002id\030\001 \001(\003\022\023\n\013sender_ss"
+  "id\030\002 \001(\t\022\024\n\014content_type\030\003 \001(\r\022\017\n\007conten"
+  "t\030\004 \001(\t\022\017\n\007file_id\030\005 \003(\t\022-\n\trecipient\030\006 "
+  "\001(\0132\032.SSDTO.MessageRecipientDTO\022\023\n\013creat"
+  "e_time\030\007 \001(\003\022\n\n\002ip\030\010 \001(\014\"\\\n\013DistrictDTO\022"
+  "\023\n\013district_id\030\001 \001(\r\022\013\n\003pid\030\002 \001(\r\022\020\n\010dis"
+  "trict\030\003 \001(\t\022\r\n\005level\030\004 \001(\r\022\n\n\002ip\030\005 \001(\014\"\250"
+  "\001\n\016FileStorageDTO\022\017\n\007file_id\030\001 \001(\t\022\025\n\rup"
+  "loader_ssid\030\002 \001(\t\022\021\n\tfile_name\030\003 \001(\t\022\021\n\t"
+  "file_size\030\004 \001(\003\022\021\n\tfile_type\030\005 \001(\t\022\024\n\014st"
+  "orage_path\030\006 \001(\t\022\023\n\013upload_time\030\007 \001(\003\022\n\n"
+  "\002ip\030\010 \001(\014\"\210\001\n\017OperationLogDTO\022\n\n\002id\030\001 \001("
+  "\003\022\014\n\004ssid\030\002 \001(\t\022\026\n\016operation_type\030\003 \001(\t\022"
+  "\016\n\006detail\030\004 \001(\t\022\022\n\nip_address\030\005 \001(\t\022\023\n\013c"
+  "reate_time\030\006 \001(\003\022\n\n\002ip\030\007 \001(\014\"e\n\016BaseStic"
+  "kerDTO\022\022\n\nsticker_id\030\001 \001(\003\022\021\n\timage_url\030"
+  "\002 \001(\t\022\014\n\004tags\030\003 \001(\t\022\022\n\ncreated_at\030\004 \001(\003\022"
+  "\n\n\002ip\030\005 \001(\014\"\256\001\n\027UserCollectedStickerDTO\022"
+  "\025\n\rcollection_id\030\001 \001(\003\022\021\n\tuser_ssid\030\002 \001("
+  "\t\022\021\n\tis_custom\030\003 \001(\010\022\021\n\timage_url\030\004 \001(\t\022"
+  "\022\n\ncreated_at\030\005 \001(\003\022\021\n\tpage_size\030\006 \001(\005\022\020"
+  "\n\010page_num\030\007 \001(\005\022\n\n\002ip\030\010 \001(\014*\230\007\n\014Busines"
+  "sType\022\024\n\020R_USER_BASE_INFO\020\000\022\024\n\020U_USER_BA"
+  "SE_INFO\020\001\022\016\n\nDISCONNECT\020\003\022\020\n\014EMAIL_VERIF"
+  "Y\020\004\022\026\n\022VIDEO_CALL_REQUEST\020\005\022\027\n\023VIDEO_CAL"
+  "L_RESPONSE\020\006\022\017\n\013LOGIN_CHECK\020\013\022\022\n\016ENROLL_"
+  "ACCOUNT\020\014\022\024\n\020RECOVER_PASSWORD\020\r\022\025\n\021R_FRI"
+  "ENDSHIP_LIST\020\025\022\020\n\014U_FRIENDSHIP\020\026\022\020\n\014D_FR"
+  "IENDSHIP\020\027\022\020\n\014C_FRIENDSHIP\020\030\022\025\n\021C_GROUP_"
+  "BASE_INFO\020\037\022\025\n\021R_GROUP_BASE_INFO\020 \022\025\n\021D_"
+  "GROUP_BASE_INFO\020!\022\025\n\021U_GROUP_BASE_INF0\020\""
+  "\022\027\n\023C_GROUP_MEMBER_INFO\020)\022\027\n\023D_GROUP_MEM"
+  "BER_INFO\020*\022\027\n\023R_GROUP_MEMBER_INFO\020+\022\022\n\016C"
+  "_GROUP_NOTICE\0203\022\022\n\016D_GROUP_NOTICE\0204\022\022\n\016R"
+  "_GROUP_NOTICE\0205\022\020\n\014FUZZY_SEARCH\0208\022\025\n\021R_M"
+  "ESSAGE_CONTENT\020=\022\025\n\021C_MESSAGE_CONTENT\020>\022"
+  "\026\n\022R_MESSAGE_PIC_INFO\020\?\022\027\n\023MAKE_FRIEND_R"
+  "EQUEST\020@\022\030\n\024MAKE_FRIEND_RESPONSE\020A\022\025\n\021R_"
+  "DISTRICT_BY_PID\020G\022\027\n\023R_DISTRICT_PROVINCE"
+  "\020H\022\023\n\017R_DISTRICT_CITY\020I\022\024\n\020R_DISTRICT_BL"
+  "OCK\020J\022\026\n\022R_DISTRICT_BY_NAME\020K\022\022\n\016R_BASE_"
+  "STICKER\020Q\022\034\n\030R_USER_COLLECTED_STICKER\020R\022"
+  "\034\n\030C_USER_COLLECTED_STICKER\020S\022\034\n\030D_USER_"
+  "COLLECTED_STICKER\020T\022\016\n\nR_ALL_FILE\020Z\022\n\n\006R"
+  "_FILE\020[\022\n\n\006C_FILE\020\\\022\n\n\006D_FILE\020]b\006proto3"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_DTO_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_DTO_2eproto = {
-  false, false, 4540, descriptor_table_protodef_DTO_2eproto, "DTO.proto", 
+  false, false, 4559, descriptor_table_protodef_DTO_2eproto, "DTO.proto", 
   &descriptor_table_DTO_2eproto_once, nullptr, 0, 27,
   schemas, file_default_instances, TableStruct_DTO_2eproto::offsets,
   file_level_metadata_DTO_2eproto, file_level_enum_descriptors_DTO_2eproto, file_level_service_descriptors_DTO_2eproto,
@@ -1029,6 +1029,7 @@ bool BusinessType_IsValid(int value) {
     case 82:
     case 83:
     case 84:
+    case 90:
     case 91:
     case 92:
     case 93:
@@ -2335,11 +2336,11 @@ void GetUserMessageDTO::InternalSwap(GetUserMessageDTO* other) {
 
 // ===================================================================
 
-class GetFileDTO::_Internal {
+class GetAllFileDTO::_Internal {
  public:
 };
 
-GetFileDTO::GetFileDTO(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+GetAllFileDTO::GetAllFileDTO(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned),
   files_(arena) {
@@ -2347,9 +2348,9 @@ GetFileDTO::GetFileDTO(::PROTOBUF_NAMESPACE_ID::Arena* arena,
   if (!is_message_owned) {
     RegisterArenaDtor(arena);
   }
-  // @@protoc_insertion_point(arena_constructor:SSDTO.GetFileDTO)
+  // @@protoc_insertion_point(arena_constructor:SSDTO.GetAllFileDTO)
 }
-GetFileDTO::GetFileDTO(const GetFileDTO& from)
+GetAllFileDTO::GetAllFileDTO(const GetAllFileDTO& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
       files_(from.files_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
@@ -2396,10 +2397,10 @@ GetFileDTO::GetFileDTO(const GetFileDTO& from)
   ::memcpy(&page_size_, &from.page_size_,
     static_cast<size_t>(reinterpret_cast<char*>(&page_num_) -
     reinterpret_cast<char*>(&page_size_)) + sizeof(page_num_));
-  // @@protoc_insertion_point(copy_constructor:SSDTO.GetFileDTO)
+  // @@protoc_insertion_point(copy_constructor:SSDTO.GetAllFileDTO)
 }
 
-inline void GetFileDTO::SharedCtor() {
+inline void GetAllFileDTO::SharedCtor() {
 ssid_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
   ssid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
@@ -2426,14 +2427,14 @@ ip_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyIn
     reinterpret_cast<char*>(&page_size_)) + sizeof(page_num_));
 }
 
-GetFileDTO::~GetFileDTO() {
-  // @@protoc_insertion_point(destructor:SSDTO.GetFileDTO)
+GetAllFileDTO::~GetAllFileDTO() {
+  // @@protoc_insertion_point(destructor:SSDTO.GetAllFileDTO)
   if (GetArenaForAllocation() != nullptr) return;
   SharedDtor();
   _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-inline void GetFileDTO::SharedDtor() {
+inline void GetAllFileDTO::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
   ssid_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   file_id_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
@@ -2442,18 +2443,18 @@ inline void GetFileDTO::SharedDtor() {
   ip_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
-void GetFileDTO::ArenaDtor(void* object) {
-  GetFileDTO* _this = reinterpret_cast< GetFileDTO* >(object);
+void GetAllFileDTO::ArenaDtor(void* object) {
+  GetAllFileDTO* _this = reinterpret_cast< GetAllFileDTO* >(object);
   (void)_this;
 }
-void GetFileDTO::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+void GetAllFileDTO::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
 }
-void GetFileDTO::SetCachedSize(int size) const {
+void GetAllFileDTO::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
 
-void GetFileDTO::Clear() {
-// @@protoc_insertion_point(message_clear_start:SSDTO.GetFileDTO)
+void GetAllFileDTO::Clear() {
+// @@protoc_insertion_point(message_clear_start:SSDTO.GetAllFileDTO)
   uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -2470,7 +2471,7 @@ void GetFileDTO::Clear() {
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* GetFileDTO::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+const char* GetAllFileDTO::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
     uint32_t tag;
@@ -2573,9 +2574,9 @@ failure:
 #undef CHK_
 }
 
-uint8_t* GetFileDTO::_InternalSerialize(
+uint8_t* GetAllFileDTO::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:SSDTO.GetFileDTO)
+  // @@protoc_insertion_point(serialize_to_array_start:SSDTO.GetAllFileDTO)
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -2633,12 +2634,12 @@ uint8_t* GetFileDTO::_InternalSerialize(
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:SSDTO.GetFileDTO)
+  // @@protoc_insertion_point(serialize_to_array_end:SSDTO.GetAllFileDTO)
   return target;
 }
 
-size_t GetFileDTO::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:SSDTO.GetFileDTO)
+size_t GetAllFileDTO::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:SSDTO.GetAllFileDTO)
   size_t total_size = 0;
 
   uint32_t cached_has_bits = 0;
@@ -2700,21 +2701,21 @@ size_t GetFileDTO::ByteSizeLong() const {
   return MaybeComputeUnknownFieldsSize(total_size, &_cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData GetFileDTO::_class_data_ = {
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData GetAllFileDTO::_class_data_ = {
     ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSizeCheck,
-    GetFileDTO::MergeImpl
+    GetAllFileDTO::MergeImpl
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetFileDTO::GetClassData() const { return &_class_data_; }
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetAllFileDTO::GetClassData() const { return &_class_data_; }
 
-void GetFileDTO::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
+void GetAllFileDTO::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
                       const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-  static_cast<GetFileDTO *>(to)->MergeFrom(
-      static_cast<const GetFileDTO &>(from));
+  static_cast<GetAllFileDTO *>(to)->MergeFrom(
+      static_cast<const GetAllFileDTO &>(from));
 }
 
 
-void GetFileDTO::MergeFrom(const GetFileDTO& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:SSDTO.GetFileDTO)
+void GetAllFileDTO::MergeFrom(const GetAllFileDTO& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:SSDTO.GetAllFileDTO)
   GOOGLE_DCHECK_NE(&from, this);
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
@@ -2744,18 +2745,18 @@ void GetFileDTO::MergeFrom(const GetFileDTO& from) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
-void GetFileDTO::CopyFrom(const GetFileDTO& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:SSDTO.GetFileDTO)
+void GetAllFileDTO::CopyFrom(const GetAllFileDTO& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:SSDTO.GetAllFileDTO)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool GetFileDTO::IsInitialized() const {
+bool GetAllFileDTO::IsInitialized() const {
   return true;
 }
 
-void GetFileDTO::InternalSwap(GetFileDTO* other) {
+void GetAllFileDTO::InternalSwap(GetAllFileDTO* other) {
   using std::swap;
   auto* lhs_arena = GetArenaForAllocation();
   auto* rhs_arena = other->GetArenaForAllocation();
@@ -2787,14 +2788,14 @@ void GetFileDTO::InternalSwap(GetFileDTO* other) {
       &other->ip_, rhs_arena
   );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(GetFileDTO, page_num_)
-      + sizeof(GetFileDTO::page_num_)
-      - PROTOBUF_FIELD_OFFSET(GetFileDTO, page_size_)>(
+      PROTOBUF_FIELD_OFFSET(GetAllFileDTO, page_num_)
+      + sizeof(GetAllFileDTO::page_num_)
+      - PROTOBUF_FIELD_OFFSET(GetAllFileDTO, page_size_)>(
           reinterpret_cast<char*>(&page_size_),
           reinterpret_cast<char*>(&other->page_size_));
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata GetFileDTO::GetMetadata() const {
+::PROTOBUF_NAMESPACE_ID::Metadata GetAllFileDTO::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_DTO_2eproto_getter, &descriptor_table_DTO_2eproto_once,
       file_level_metadata_DTO_2eproto[5]);
@@ -11219,8 +11220,8 @@ template<> PROTOBUF_NOINLINE ::SSDTO::GetMessagePicInfoDTO* Arena::CreateMaybeMe
 template<> PROTOBUF_NOINLINE ::SSDTO::GetUserMessageDTO* Arena::CreateMaybeMessage< ::SSDTO::GetUserMessageDTO >(Arena* arena) {
   return Arena::CreateMessageInternal< ::SSDTO::GetUserMessageDTO >(arena);
 }
-template<> PROTOBUF_NOINLINE ::SSDTO::GetFileDTO* Arena::CreateMaybeMessage< ::SSDTO::GetFileDTO >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::SSDTO::GetFileDTO >(arena);
+template<> PROTOBUF_NOINLINE ::SSDTO::GetAllFileDTO* Arena::CreateMaybeMessage< ::SSDTO::GetAllFileDTO >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::SSDTO::GetAllFileDTO >(arena);
 }
 template<> PROTOBUF_NOINLINE ::SSDTO::FuzzySearchDTO* Arena::CreateMaybeMessage< ::SSDTO::FuzzySearchDTO >(Arena* arena) {
   return Arena::CreateMessageInternal< ::SSDTO::FuzzySearchDTO >(arena);

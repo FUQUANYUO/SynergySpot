@@ -54,7 +54,7 @@ void EditInfoPage::sltSetEditPageInfo(const UserInfo &info) {
     _nameLineEdit->setText(info._name);
     _personalSignEdit->setText(info._signContent);
     _sexSelected->setCurrentIndex(info._sex=="男生"?1:0);
-    _birthdaySelected->setText(QDateTime::fromMSecsSinceEpoch(g_pCommonData->getCurUserInfo().birthDate).toString("yyyy-MM-dd"));
+    _birthdaySelected->setText(QDateTime::fromSecsSinceEpoch(g_pCommonData->getCurUserInfo().birthDate).toString("yyyy-MM-dd"));
     _provinceSelected->setCurrentText(info._localInfo.province);
     _citySelected->setCurrentText(info._localInfo.city);
     _districtSelected->setCurrentText(info._localInfo.district);

@@ -291,6 +291,8 @@ void ContactPage::initConnectFunc() {
         emit sigTriggerAddMsgCard(_ssidToCardInfoHash.value(ssid));
     });
 
+    connect(_friendModel, &ContactModel::sigUpdateFriendshipGrouping, this, &ContactPage::sigUpdateFriendshipGrouping);
+
     connect(this,&ContactPage::sigAddMakeFriendRecord,_noticePage,&NoticePage::sltMakeFriendRecord);
     connect(this,&ContactPage::sigAddJoinGroupRecord,_noticePage,&NoticePage::sltJoinGroupRecord);
 }

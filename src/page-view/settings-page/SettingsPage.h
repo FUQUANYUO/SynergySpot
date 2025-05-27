@@ -27,6 +27,7 @@
 
 #define g_pSettingsPage SettingsPage::getInstance()
 
+class ElaToolButton;
 class ElaToggleSwitch;
 
 class SS_API SettingsPage : public ElaScrollPage{
@@ -35,6 +36,10 @@ public:
     static void destroySettingsPage();
 
     void setMainWindowWidget(QMainWindow *parent);
+
+    // get global value (read only)
+    QString getDownloadPath() const;
+
 signals:
 private:
     explicit SettingsPage(QWidget *parent = nullptr);
@@ -49,12 +54,14 @@ protected:
 protected slots:
 private:
     // ----------------- UI -----------------
-    QWidget                 * _centralWidget    = nullptr;
-    ElaToggleSwitch         * _logSwitchButton  = nullptr;
-    ElaRadioButton          * _minimumButton    = nullptr;
-    ElaRadioButton          * _compactButton    = nullptr;
-    ElaRadioButton          * _maximumButton    = nullptr;
-    ElaRadioButton          * _autoButton       = nullptr;
+    QWidget                 * _centralWidget      = nullptr;
+    ElaToggleSwitch         * _logSwitchButton    = nullptr;
+    ElaRadioButton          * _minimumButton      = nullptr;
+    ElaRadioButton          * _compactButton      = nullptr;
+    ElaRadioButton          * _maximumButton      = nullptr;
+    ElaRadioButton          * _autoButton         = nullptr;
+    ElaText                 * _downloadPath       = nullptr;
+    ElaToolButton           * _downloadPathSelect = nullptr;
     // ----------------- UI -----------------
 
     // --------------- BackEnd --------------

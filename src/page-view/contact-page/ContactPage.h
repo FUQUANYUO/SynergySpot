@@ -47,6 +47,9 @@ public:
     QList<QString> getFriendGrouping();
     bool loadCacheContact(const QList<FriendshipDTO>& caches);
 
+    // get update data
+    QHash<QString,QString> getUpdateGrouping();
+
     // get user model view
     ElaTreeView *getFriendTreeView();
 
@@ -55,6 +58,9 @@ public slots:
 signals:
     void sigTriggerAddMsgCard(const MsgCombineDTO &info);
     void sigTriggerAddToCreateGroupList(const UserBaseInfoDTO &dto);
+
+    // update grouping
+    void sigUpdateFriendshipGrouping(QString targetSSID,QString newGroupingName);
 
     void sigHideArchPageMaskEffect();
     void sigShowArchPageMaskEffect();

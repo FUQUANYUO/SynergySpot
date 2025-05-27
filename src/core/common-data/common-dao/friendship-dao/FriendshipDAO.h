@@ -14,6 +14,8 @@ public:
 
     qint64 create(const FriendshipDO& friendship) override;
     bool updateStatus(qint64 id, qint32 newStatus) override;
+    bool updateMark(const FriendshipDO& friendship);
+    bool updateGrouping(const FriendshipDO &friendship);
     FriendshipDO findRelationship(const QString& ssid, const QString& friendSsid) override;
     QList<FriendshipDO> listByUser(const QString& ssid) override;
     int getFriendshipCount(const QString& ssid);

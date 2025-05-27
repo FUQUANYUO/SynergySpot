@@ -54,6 +54,8 @@ server-host-info:
  port: [服务端端口]
 open-webui-info:
  url: [部署的`open webui`项目所在url]
+trtc-api:
+   sdkAppId: [腾讯 TRTC 服务ID]
 
 # serverInfo.yaml
 mysql-info:
@@ -73,6 +75,9 @@ realtime-info:
  grpcPort: [grpc服务端端口]
  maxRetryCount: 5
  fileSavePath: [服务端文件存储路径]
+trtc-api:
+   sdkAppId: [腾讯 TRTC 服务ID]
+   sdkSecretKey: [腾讯 TRTC 服务KEY]
 ```
 
 **执行SQL脚本**
@@ -84,17 +89,34 @@ realtime-info:
 - 可与其他高级语言做兼容、扩展
 - 其本质是二进制代码，服务器和客户端对于信息处理更快
 
-## 服务端
-- grpc 服务端作为 epoll 服务端的子进程，处理文件传输，心跳检测相关性能消耗较大的业务
-- 使用 epoll 边缘触发，主从模式 利用线程池做并发处理
-- 对于MySQL数据库连接和请求使用数据库连接池处理
-
 ## 客户端
 
-**V1.x.x 针对于windows平台做扩展，后续尝试移植到Linux**
-- 使用QT6进行客户端搭建、CMake做项目管理
-- 使用 ElaWidgetTool 作为Ui框架，核心内容大部分使用纯cpp及利用lib*库
-- 使用 SQlite3 做客户端数据持久化
+- `Qt6.6.3`
+    - `Network`、`OpenGLWidgets`、`WebEngineWidgets`
+- `ElaWidgetTools`
+- `grpc v1.46.5` -> `protobuf v3.19.5`
+- `sqlcipher`
+- `yaml`
+- `trtc`
+- `opencv v4.90`
+- `openssl`
+
+## 服务端
+
+- `epoll` + `c++11 线程池`
+- `grpc v1.46.5`   + `protobuf v3.19.5`
+- `mysql`
+- `yaml`
+- `curl`
+- `openssl`
+- [ ] `redis`
+
+## 中间件及管理技术栈
+
+- `cmake`
+- `docker`
+- `shell`
+- `bat`
 
 ## 数据库
 - Mysql作为云端的存储数据库
