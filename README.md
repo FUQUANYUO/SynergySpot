@@ -165,7 +165,7 @@ trtc-api:
 
 - 登录界面
 
-<img src="doc\Static\登录-加载.png" alt="登录-加载" style="zoom: 33%;" /><img src="D:\WORK\SynergySpot\doc\Static\登录-无网络.png" alt="登录-无网络" style="zoom: 33%;" />
+<img src="doc\Static\登录-加载.png" alt="登录-加载" style="zoom: 33%;" /><img src="doc\Static\登录-无网络.png" alt="登录-无网络" style="zoom: 33%;" />
 
 - 注册界面
 
